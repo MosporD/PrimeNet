@@ -15,22 +15,30 @@ const MRBTSGraph = {
     paramCache: new Map(),
     animToken: 0,
     svg: null,
+    gRoot: null,
     gLinks: null,
     gNodes: null,
+    defsReady: false,
     width: 900,
     height: 600,
+    view: { x: 0, y: 0, k: 1 },
+    viewAnim: null,
+    contentExtent: 300,
+    tooltip: null,
 };
 
 const LEVEL_COLORS = {
-    1: '#0f172a',
-    2: '#12416b',
-    3: '#1d4ed8',
-    4: '#0369a1',
-    5: '#0f766e',
-    6: '#b45309',
-    7: '#a16207',
-    8: '#7c3aed',
+    1: '#6366f1',
+    2: '#3b82f6',
+    3: '#06b6d4',
+    4: '#14b8a6',
+    5: '#10b981',
+    6: '#f59e0b',
+    7: '#f97316',
+    8: '#f43f5e',
 };
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function graphParentId(id) {
     const parts = (id || '').split('/');
@@ -53,11 +61,40 @@ function graphTruncate(text, max) {
     return value.slice(0, max - 1) + '…';
 }
 
+function graphShade(hex, pct) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) & 255;
+    let g = (n >> 8) & 255;
+    let b = n & 255;
+    if (pct >= 0) {
+        r += (255 - r) * pct;
+        g += (255 - g) * pct;
+        b += (255 - b) * pct;
+    } else {
+        r *= 1 + pct;
+        g *= 1 + pct;
+        b *= 1 + pct;
+    }
+    return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+}
+
+function graphLevelColor(level) {
+    return LEVEL_COLORS[level] || '#64748b';
+}
+
 function indexGraphTree(node) {
     if (!node || !node.id) return;
     MRBTSGraph.byId.set(node.id, node);
     (node.children || []).forEach(indexGraphTree);
 }
+
+function svgEl(tag, attrs = {}) {
+    const el = document.createElementNS(SVG_NS, tag);
+    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, String(value)));
+    return el;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────── */
 
 function graphLayout(focusNode) {
     const { width, height } = MRBTSGraph;
@@ -66,11 +103,15 @@ function graphLayout(focusNode) {
     const children = MRBTSGraph.spreadChildren ? (focusNode.children || []) : [];
     const count = children.length;
 
-    const focusRadius = count > 30 ? 46 : count > 12 ? 54 : 62;
-    const childRadius = count > 50 ? 14 : count > 30 ? 17 : count > 16 ? 20 : 24;
+    const focusRadius = count > 30 ? 52 : count > 12 ? 58 : 64;
+    const childRadius = count > 60 ? 15 : count > 30 ? 17 : count > 16 ? 19 : 22;
+
+    // Grow the orbit from the circumference each child needs, so nodes
+    // never overlap no matter how many branches spread out.
+    const arcPerChild = childRadius * 2 + 14;
     const orbitRadius = count === 0
         ? 0
-        : Math.max(150, Math.min(340, 70 + count * (count > 40 ? 7 : 11)));
+        : Math.max(focusRadius + 120, (count * arcPerChild) / (2 * Math.PI));
 
     const nodes = [{
         node: focusNode,
@@ -78,6 +119,7 @@ function graphLayout(focusNode) {
         y: cy,
         r: focusRadius,
         kind: 'focus',
+        angle: 0,
     }];
 
     children.forEach((child, index) => {
@@ -92,7 +134,149 @@ function graphLayout(focusNode) {
         });
     });
 
-    return { nodes, cx, cy, orbitRadius };
+    return { nodes, cx, cy, orbitRadius, focusRadius };
+}
+
+/* ── SVG scaffolding, defs, pan & zoom ──────────────────────────────── */
+
+function graphBuildDefs(svg) {
+    if (MRBTSGraph.defsReady) return;
+    const defs = svgEl('defs');
+
+    Object.entries(LEVEL_COLORS).forEach(([level, color]) => {
+        const grad = svgEl('radialGradient', {
+            id: `mrbts-grad-${level}`,
+            cx: '32%',
+            cy: '28%',
+            r: '80%',
+        });
+        grad.appendChild(svgEl('stop', { offset: '0%', 'stop-color': graphShade(color, 0.38) }));
+        grad.appendChild(svgEl('stop', { offset: '55%', 'stop-color': color }));
+        grad.appendChild(svgEl('stop', { offset: '100%', 'stop-color': graphShade(color, -0.28) }));
+        defs.appendChild(grad);
+    });
+
+    svg.appendChild(defs);
+    MRBTSGraph.defsReady = true;
+}
+
+function graphApplyView() {
+    const { x, y, k } = MRBTSGraph.view;
+    if (MRBTSGraph.gRoot) {
+        MRBTSGraph.gRoot.setAttribute('transform', `translate(${x} ${y}) scale(${k})`);
+    }
+}
+
+function graphAnimateViewTo(target, duration = 320) {
+    if (MRBTSGraph.viewAnim) cancelAnimationFrame(MRBTSGraph.viewAnim);
+    const from = { ...MRBTSGraph.view };
+    const start = performance.now();
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const e = ease(t);
+        MRBTSGraph.view = {
+            x: from.x + (target.x - from.x) * e,
+            y: from.y + (target.y - from.y) * e,
+            k: from.k + (target.k - from.k) * e,
+        };
+        graphApplyView();
+        if (t < 1) {
+            MRBTSGraph.viewAnim = requestAnimationFrame(step);
+        } else {
+            MRBTSGraph.viewAnim = null;
+        }
+    };
+    MRBTSGraph.viewAnim = requestAnimationFrame(step);
+}
+
+function graphFitView(animate = true) {
+    const { width, height, contentExtent } = MRBTSGraph;
+    const cx = width / 2;
+    const cy = height / 2;
+    const k = Math.min(1.15, Math.min(width, height) / (contentExtent * 2));
+    const target = { x: cx - cx * k, y: cy - cy * k, k };
+    if (animate) graphAnimateViewTo(target);
+    else {
+        MRBTSGraph.view = target;
+        graphApplyView();
+    }
+}
+
+function graphZoomBy(factor, sx, sy) {
+    const { width, height } = MRBTSGraph;
+    const px = sx === undefined ? width / 2 : sx;
+    const py = sy === undefined ? height / 2 : sy;
+    const { x, y, k } = MRBTSGraph.view;
+    const k2 = Math.min(3, Math.max(0.25, k * factor));
+    MRBTSGraph.view = {
+        x: px - ((px - x) * k2) / k,
+        y: py - ((py - y) * k2) / k,
+        k: k2,
+    };
+    graphApplyView();
+}
+
+function graphBindStageInteractions(svg) {
+    if (svg.dataset.panBound) return;
+    svg.dataset.panBound = '1';
+
+    svg.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        const rect = svg.getBoundingClientRect();
+        const factor = Math.exp(-event.deltaY * 0.0016);
+        graphZoomBy(factor, event.clientX - rect.left, event.clientY - rect.top);
+    }, { passive: false });
+
+    let pressed = false;
+    let panning = false;
+    let last = { x: 0, y: 0 };
+
+    svg.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        pressed = true;
+        panning = false;
+        last = { x: event.clientX, y: event.clientY };
+    });
+    svg.addEventListener('pointermove', (event) => {
+        if (!pressed) return;
+        const dx = event.clientX - last.x;
+        const dy = event.clientY - last.y;
+        // Capture the pointer only once a real drag starts, so plain
+        // clicks still reach the node groups underneath.
+        if (!panning) {
+            if (Math.abs(dx) + Math.abs(dy) < 4) return;
+            panning = true;
+            svg.setPointerCapture(event.pointerId);
+            svg.classList.add('grabbing');
+        }
+        last = { x: event.clientX, y: event.clientY };
+        MRBTSGraph.view.x += dx;
+        MRBTSGraph.view.y += dy;
+        graphApplyView();
+    });
+    const endDrag = (event) => {
+        if (!pressed) return;
+        pressed = false;
+        svg.classList.remove('grabbing');
+        if (svg.hasPointerCapture?.(event.pointerId)) {
+            svg.releasePointerCapture(event.pointerId);
+        }
+        // Swallow the click that follows a real drag so nodes don't fire.
+        if (panning) {
+            const stop = (e) => e.stopPropagation();
+            svg.addEventListener('click', stop, { capture: true, once: true });
+        }
+        panning = false;
+    };
+    svg.addEventListener('pointerup', endDrag);
+    svg.addEventListener('pointercancel', endDrag);
+
+    svg.addEventListener('dblclick', (event) => {
+        event.preventDefault();
+        graphFitView();
+    });
 }
 
 function graphEnsureSvg() {
@@ -101,11 +285,9 @@ function graphEnsureSvg() {
 
     let svg = document.getElementById('mrbts-graph-svg');
     if (!svg) {
-        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg = svgEl('svg', { role: 'img', 'aria-label': 'MRBTS managed object hierarchy graph' });
         svg.id = 'mrbts-graph-svg';
         svg.classList.add('nokia-graph-svg');
-        svg.setAttribute('role', 'img');
-        svg.setAttribute('aria-label', 'MRBTS managed object hierarchy graph');
         host.appendChild(svg);
     }
 
@@ -114,19 +296,61 @@ function graphEnsureSvg() {
     MRBTSGraph.height = host.clientHeight || 600;
     svg.setAttribute('viewBox', `0 0 ${MRBTSGraph.width} ${MRBTSGraph.height}`);
 
+    graphBuildDefs(svg);
+    graphBindStageInteractions(svg);
+
+    if (!MRBTSGraph.gRoot) {
+        MRBTSGraph.gRoot = svgEl('g', { class: 'graph-root' });
+        svg.appendChild(MRBTSGraph.gRoot);
+    }
     if (!MRBTSGraph.gLinks) {
-        MRBTSGraph.gLinks = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        MRBTSGraph.gLinks.setAttribute('class', 'graph-links');
-        svg.appendChild(MRBTSGraph.gLinks);
+        MRBTSGraph.gLinks = svgEl('g', { class: 'graph-links' });
+        MRBTSGraph.gRoot.appendChild(MRBTSGraph.gLinks);
     }
     if (!MRBTSGraph.gNodes) {
-        MRBTSGraph.gNodes = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        MRBTSGraph.gNodes.setAttribute('class', 'graph-nodes');
-        svg.appendChild(MRBTSGraph.gNodes);
+        MRBTSGraph.gNodes = svgEl('g', { class: 'graph-nodes' });
+        MRBTSGraph.gRoot.appendChild(MRBTSGraph.gNodes);
+    }
+
+    if (!MRBTSGraph.tooltip) {
+        const tip = document.createElement('div');
+        tip.className = 'nokia-graph-tooltip';
+        tip.hidden = true;
+        host.appendChild(tip);
+        MRBTSGraph.tooltip = tip;
     }
 
     return svg;
 }
+
+/* ── Tooltip ────────────────────────────────────────────────────────── */
+
+function graphShowTooltip(item, event) {
+    const tip = MRBTSGraph.tooltip;
+    const host = document.getElementById('nokia-graph-stage');
+    if (!tip || !host) return;
+    const mo = item.node;
+    const childCount = (mo.children || []).length;
+    tip.innerHTML = `
+        <div class="nokia-graph-tooltip-name">${graphEscapeHtml(mo.name)}</div>
+        ${mo.meaning ? `<div class="nokia-graph-tooltip-meaning">${graphEscapeHtml(graphTruncate(mo.meaning, 90))}</div>` : ''}
+        <div class="nokia-graph-tooltip-meta">Level ${mo.level}${childCount ? ` · ${childCount} child MO${childCount !== 1 ? 's' : ''}` : ' · leaf'}</div>
+    `;
+    tip.hidden = false;
+    const rect = host.getBoundingClientRect();
+    let x = event.clientX - rect.left + 14;
+    let y = event.clientY - rect.top + 14;
+    const maxX = rect.width - tip.offsetWidth - 10;
+    const maxY = rect.height - tip.offsetHeight - 10;
+    tip.style.left = `${Math.min(x, maxX)}px`;
+    tip.style.top = `${Math.min(y, maxY)}px`;
+}
+
+function graphHideTooltip() {
+    if (MRBTSGraph.tooltip) MRBTSGraph.tooltip.hidden = true;
+}
+
+/* ── Rendering ──────────────────────────────────────────────────────── */
 
 function graphRender() {
     const focusNode = MRBTSGraph.byId.get(MRBTSGraph.focusId);
@@ -134,88 +358,169 @@ function graphRender() {
 
     const layout = graphLayout(focusNode);
     const focusPoint = layout.nodes[0];
-    const token = ++MRBTSGraph.animToken;
+    MRBTSGraph.animToken += 1;
+    MRBTSGraph.contentExtent = layout.orbitRadius
+        ? layout.orbitRadius + 130
+        : layout.focusRadius + 110;
 
     MRBTSGraph.gLinks.innerHTML = '';
     MRBTSGraph.gNodes.innerHTML = '';
+    graphHideTooltip();
 
-    layout.nodes.forEach((item) => {
-        if (item.kind === 'focus') return;
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('class', 'graph-link');
-        line.setAttribute('x1', String(focusPoint.x));
-        line.setAttribute('y1', String(focusPoint.y));
-        line.setAttribute('x2', String(item.x));
-        line.setAttribute('y2', String(item.y));
-        MRBTSGraph.gLinks.appendChild(line);
-    });
+    const totalChildren = layout.nodes.length - 1;
 
-    layout.nodes.forEach((item) => {
-        const mo = item.node;
-        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        group.setAttribute('class', 'graph-node-group'
-            + (item.kind === 'focus' ? ' focus' : '')
-            + (mo.id === MRBTSGraph.selectedId ? ' selected' : ''));
-        group.dataset.id = mo.id;
+    layout.nodes.forEach((item, order) => {
+        const delay = item.kind === 'focus'
+            ? 0
+            : Math.min(240, (order - 1) * (totalChildren > 40 ? 3 : 8));
 
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('class', 'graph-node-circle graph-level-' + mo.level);
-        circle.setAttribute('cx', String(item.x));
-        circle.setAttribute('cy', String(item.y));
-        circle.setAttribute('r', String(item.r));
-        circle.setAttribute('fill', LEVEL_COLORS[mo.level] || '#64748b');
-
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('class', 'graph-node-label');
-        label.setAttribute('x', String(item.x));
-        label.setAttribute('y', String(item.y + item.r + 14));
-        label.textContent = mo.name;
-
-        const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        sub.setAttribute('class', 'graph-node-sub');
-        sub.setAttribute('x', String(item.x));
-        const subY = item.kind === 'focus'
-            ? item.y + 5
-            : item.y + item.r + 26;
-        sub.setAttribute('y', String(subY));
-        if (item.kind === 'focus') {
-            sub.textContent = MRBTSGraph.spreadChildren
-                ? graphTruncate(mo.meaning || '', 28)
-                : ((mo.children || []).length
-                    ? 'Click to expand branches'
-                    : graphTruncate(mo.meaning || '', 28));
-        } else if ((mo.children || []).length) {
-            sub.textContent = `${(mo.children || []).length} children`;
-        } else {
-            sub.textContent = graphTruncate(mo.meaning || '', 22);
+        if (item.kind !== 'focus') {
+            const line = svgEl('line', {
+                class: 'graph-link',
+                x1: focusPoint.x,
+                y1: focusPoint.y,
+                x2: item.x,
+                y2: item.y,
+                stroke: graphLevelColor(item.node.level),
+            });
+            const len = Math.hypot(item.x - focusPoint.x, item.y - focusPoint.y);
+            line.style.strokeDasharray = String(len);
+            line.style.strokeDashoffset = String(len);
+            line.style.transition = `stroke-dashoffset 0.4s ease ${delay}ms, opacity 0.2s ease`;
+            MRBTSGraph.gLinks.appendChild(line);
+            requestAnimationFrame(() => {
+                line.style.strokeDashoffset = '0';
+            });
         }
 
-        group.appendChild(circle);
-        group.appendChild(label);
-        if (sub.textContent) group.appendChild(sub);
-
-        group.addEventListener('click', (event) => {
-            event.stopPropagation();
-            graphOnNodeClick(mo, item.kind);
-        });
-
-        MRBTSGraph.gNodes.appendChild(group);
+        MRBTSGraph.gNodes.appendChild(graphBuildNode(item, focusPoint, delay));
     });
 
     graphUpdateToolbar();
     graphUpdateCrumbs();
-
-    if (token === MRBTSGraph.animToken) {
-        MRBTSGraph.gNodes.style.opacity = '0';
-        MRBTSGraph.gLinks.style.opacity = '0';
-        requestAnimationFrame(() => {
-            MRBTSGraph.gNodes.style.transition = 'opacity 0.28s ease';
-            MRBTSGraph.gLinks.style.transition = 'opacity 0.28s ease';
-            MRBTSGraph.gNodes.style.opacity = '1';
-            MRBTSGraph.gLinks.style.opacity = '1';
-        });
-    }
+    graphFitView(true);
 }
+
+function graphBuildNode(item, focusPoint, delay) {
+    const mo = item.node;
+    const color = graphLevelColor(mo.level);
+    const childCount = (mo.children || []).length;
+    const isFocus = item.kind === 'focus';
+
+    const group = svgEl('g', {
+        class: 'graph-node-group'
+            + (isFocus ? ' focus' : '')
+            + (childCount ? ' has-children' : ' is-leaf')
+            + (mo.id === MRBTSGraph.selectedId ? ' selected' : ''),
+    });
+    group.dataset.id = mo.id;
+
+    // Everything inside the group uses local coordinates around (0,0);
+    // the group transform places (and animates) the node.
+    if (isFocus) {
+        const halo = svgEl('circle', {
+            class: 'graph-focus-halo',
+            cx: 0, cy: 0, r: item.r + 16,
+            fill: color,
+        });
+        const ring = svgEl('circle', {
+            class: 'graph-focus-ring',
+            cx: 0, cy: 0, r: item.r + 8,
+            stroke: color,
+        });
+        group.appendChild(halo);
+        group.appendChild(ring);
+    }
+
+    const circle = svgEl('circle', {
+        class: 'graph-node-circle',
+        cx: 0, cy: 0, r: item.r,
+        fill: `url(#mrbts-grad-${mo.level})`,
+        stroke: graphShade(color, -0.35),
+    });
+    group.appendChild(circle);
+
+    if (isFocus) {
+        const name = svgEl('text', { class: 'graph-focus-name', x: 0, y: childCount ? -2 : 4 });
+        name.textContent = graphTruncate(mo.name, 14);
+        group.appendChild(name);
+
+        if (childCount) {
+            const sub = svgEl('text', { class: 'graph-focus-sub', x: 0, y: 16 });
+            sub.textContent = MRBTSGraph.spreadChildren
+                ? `${childCount} branch${childCount !== 1 ? 'es' : ''}`
+                : 'click to expand';
+            group.appendChild(sub);
+        }
+    } else {
+        if (childCount) {
+            const count = svgEl('text', { class: 'graph-node-count', x: 0, y: 3.5 });
+            count.textContent = childCount > 99 ? '99+' : String(childCount);
+            group.appendChild(count);
+        }
+
+        // Radial label: runs along the spoke, flipped upright on the left half.
+        const deg = (item.angle * 180) / Math.PI;
+        const flip = deg > 90 || deg < -90;
+        const dist = item.r + 8;
+        const lx = dist * Math.cos(item.angle);
+        const ly = dist * Math.sin(item.angle);
+        const label = svgEl('text', {
+            class: 'graph-node-label',
+            x: lx,
+            y: ly,
+            'text-anchor': flip ? 'end' : 'start',
+            transform: `rotate(${flip ? deg + 180 : deg} ${lx} ${ly})`,
+        });
+        label.setAttribute('dy', '0.35em');
+        label.textContent = mo.name;
+        group.appendChild(label);
+    }
+
+    group.addEventListener('click', (event) => {
+        event.stopPropagation();
+        graphHideTooltip();
+        graphOnNodeClick(mo, item.kind);
+    });
+    group.addEventListener('pointermove', (event) => {
+        if (!isFocus) graphShowTooltip(item, event);
+    });
+    group.addEventListener('pointerleave', graphHideTooltip);
+
+    // Fly out from the focus point with a soft spring. SVG attribute
+    // transforms don't animate via CSS transitions, so tween manually.
+    const startScale = isFocus ? 0.7 : 0.2;
+    group.setAttribute('transform', `translate(${focusPoint.x} ${focusPoint.y}) scale(${startScale})`);
+    group.style.opacity = '0';
+    group.style.transition = `opacity 0.25s ease ${delay}ms`;
+    requestAnimationFrame(() => {
+        group.style.opacity = '1';
+    });
+    graphTweenNode(group, focusPoint, item, delay, startScale);
+
+    return group;
+}
+
+function graphTweenNode(group, from, to, delay, startScale) {
+    const token = MRBTSGraph.animToken;
+    const duration = 380;
+    const start = performance.now() + delay;
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now) => {
+        if (token !== MRBTSGraph.animToken || !group.isConnected) return;
+        const t = Math.min(1, Math.max(0, (now - start) / duration));
+        const e = ease(t);
+        const x = from.x + (to.x - from.x) * e;
+        const y = from.y + (to.y - from.y) * e;
+        const s = startScale + (1 - startScale) * e;
+        group.setAttribute('transform', `translate(${x} ${y}) scale(${s})`);
+        if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+/* ── Interaction ────────────────────────────────────────────────────── */
 
 function graphOnNodeClick(node, kind) {
     MRBTSGraph.selectedId = node.id;
@@ -227,12 +532,25 @@ function graphOnNodeClick(node, kind) {
             graphRender();
             return;
         }
-    } else if ((node.children || []).length > 0) {
-        MRBTSGraph.focusId = node.id;
-        MRBTSGraph.spreadChildren = true;
+        graphUpdateSelection();
+        return;
     }
 
-    graphRender();
+    if ((node.children || []).length > 0) {
+        MRBTSGraph.focusId = node.id;
+        MRBTSGraph.spreadChildren = true;
+        graphRender();
+        return;
+    }
+
+    graphUpdateSelection();
+}
+
+function graphUpdateSelection() {
+    if (!MRBTSGraph.gNodes) return;
+    MRBTSGraph.gNodes.querySelectorAll('.graph-node-group').forEach((group) => {
+        group.classList.toggle('selected', group.dataset.id === MRBTSGraph.selectedId);
+    });
 }
 
 function graphFocusNode(id, selectId) {
@@ -300,6 +618,65 @@ function graphUpdateCrumbs() {
     });
 }
 
+/* ── Search ─────────────────────────────────────────────────────────── */
+
+function graphJumpTo(id) {
+    const node = MRBTSGraph.byId.get(id);
+    if (!node) return;
+    const hasChildren = (node.children || []).length > 0;
+    const target = hasChildren ? id : (graphParentId(id) || id);
+    graphFocusNode(target, id);
+}
+
+function graphRenderSearchResults(term) {
+    const host = document.getElementById('nokia-graph-search-results');
+    if (!host) return;
+
+    const query = term.trim().toLowerCase();
+    if (query.length < 2) {
+        host.hidden = true;
+        host.innerHTML = '';
+        return;
+    }
+
+    const words = query.split(/\s+/).filter(Boolean);
+    const matches = [];
+    for (const entry of MRBTSGraph.flat) {
+        const hay = `${entry.name} ${entry.meaning || ''}`.toLowerCase();
+        if (words.every((w) => hay.includes(w))) {
+            matches.push(entry);
+            if (matches.length >= 12) break;
+        }
+    }
+
+    if (!matches.length) {
+        host.innerHTML = '<div class="nokia-graph-search-empty">No matching MOs.</div>';
+        host.hidden = false;
+        return;
+    }
+
+    host.innerHTML = '';
+    matches.forEach((entry) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'nokia-graph-search-item';
+        btn.innerHTML = `
+            <span class="nokia-graph-search-name">${graphEscapeHtml(entry.name)}</span>
+            <span class="nokia-graph-search-path">${graphEscapeHtml(entry.id)}</span>
+        `;
+        btn.addEventListener('click', () => {
+            graphJumpTo(entry.id);
+            host.hidden = true;
+            const input = document.getElementById('nokia-graph-search');
+            if (input) input.value = '';
+        });
+        host.appendChild(btn);
+    });
+    host.hidden = false;
+}
+
+/* ── Details panel ──────────────────────────────────────────────────── */
+
 async function graphShowNodePanel(node) {
     const nameEl = document.getElementById('nokia-graph-node-name');
     const meaningEl = document.getElementById('nokia-graph-node-meaning');
@@ -307,11 +684,12 @@ async function graphShowNodePanel(node) {
     const pathEl = document.getElementById('nokia-graph-node-path');
     const bodyEl = document.getElementById('nokia-graph-panel-body');
 
+    if (!node) return;
     if (nameEl) nameEl.textContent = node.name;
     if (meaningEl) meaningEl.textContent = node.meaning || 'No description available.';
     if (levelEl) {
         levelEl.textContent = `Level ${node.level}`;
-        levelEl.style.background = LEVEL_COLORS[node.level] || '#64748b';
+        levelEl.style.background = graphLevelColor(node.level);
     }
     if (pathEl) pathEl.textContent = node.id;
 
@@ -427,6 +805,8 @@ function graphOpenParamDetail(row, moId) {
     modal.hidden = false;
 }
 
+/* ── Bootstrap ──────────────────────────────────────────────────────── */
+
 async function initNokiaMrbtsGraph() {
     if (MRBTSGraph.loaded) {
         graphEnsureSvg();
@@ -486,6 +866,11 @@ async function initNokiaMrbtsGraph() {
 function bindNokiaGraphControls() {
     const zoomOut = document.getElementById('nokia-graph-zoom-out');
     const reset = document.getElementById('nokia-graph-reset');
+    const viewZoomIn = document.getElementById('nokia-graph-view-zoom-in');
+    const viewZoomOut = document.getElementById('nokia-graph-view-zoom-out');
+    const fit = document.getElementById('nokia-graph-fit');
+    const search = document.getElementById('nokia-graph-search');
+    const searchResults = document.getElementById('nokia-graph-search-results');
     const stage = document.getElementById('nokia-graph-stage');
 
     if (zoomOut && !zoomOut.dataset.bound) {
@@ -496,12 +881,48 @@ function bindNokiaGraphControls() {
         reset.dataset.bound = '1';
         reset.addEventListener('click', graphResetView);
     }
+    if (viewZoomIn && !viewZoomIn.dataset.bound) {
+        viewZoomIn.dataset.bound = '1';
+        viewZoomIn.addEventListener('click', () => graphZoomBy(1.3));
+    }
+    if (viewZoomOut && !viewZoomOut.dataset.bound) {
+        viewZoomOut.dataset.bound = '1';
+        viewZoomOut.addEventListener('click', () => graphZoomBy(0.77));
+    }
+    if (fit && !fit.dataset.bound) {
+        fit.dataset.bound = '1';
+        fit.addEventListener('click', () => graphFitView());
+    }
+    if (search && !search.dataset.bound) {
+        search.dataset.bound = '1';
+        search.addEventListener('input', () => graphRenderSearchResults(search.value));
+        search.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                search.value = '';
+                graphRenderSearchResults('');
+                search.blur();
+            }
+        });
+        document.addEventListener('click', (event) => {
+            if (searchResults && !searchResults.hidden
+                && !searchResults.contains(event.target) && event.target !== search) {
+                searchResults.hidden = true;
+            }
+        });
+    }
     if (stage && !stage.dataset.bound) {
         stage.dataset.bound = '1';
         window.addEventListener('resize', () => {
             if (document.getElementById('nokia-graph-content')?.style.display === 'none') return;
             graphEnsureSvg();
             graphRender();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            if (document.getElementById('nokia-graph-content')?.style.display === 'none') return;
+            if (document.activeElement === document.getElementById('nokia-graph-search')) return;
+            if (!document.getElementById('nokia-detail-modal')?.hidden) return;
+            graphZoomOut();
         });
     }
 }

@@ -56,7 +56,8 @@
     min-width: 0;
     position: relative;
     background:
-        radial-gradient(circle at 50% 45%, rgba(37, 99, 235, 0.06) 0%, transparent 55%),
+        radial-gradient(circle at 50% 45%, rgba(99, 102, 241, 0.08) 0%, transparent 55%),
+        radial-gradient(circle at 18% 15%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
         linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
     border-right: 1px solid #e0e0e0;
 }
@@ -65,8 +66,13 @@
     width: 100%;
     height: 100%;
     display: block;
-    cursor: default;
+    cursor: grab;
     user-select: none;
+    touch-action: none;
+}
+
+.nokia-graph-svg.grabbing {
+    cursor: grabbing;
 }
 
 .nokia-graph-toolbar {
@@ -76,6 +82,7 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
     z-index: 2;
 }
 
@@ -89,6 +96,7 @@
     font-weight: 600;
     cursor: pointer;
     backdrop-filter: blur(4px);
+    transition: background 0.15s, border-color 0.15s;
 }
 
 .nokia-graph-tool-btn:hover {
@@ -99,6 +107,133 @@
 .nokia-graph-tool-btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+}
+
+.nokia-graph-tool-btn.icon {
+    width: 32px;
+    padding: 7px 0;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.nokia-graph-toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #cbd5e1;
+}
+
+/* Search-to-jump */
+.nokia-graph-search-wrap {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    width: min(280px, 60%);
+}
+
+.nokia-graph-search {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    color: #1e293b;
+    outline: none;
+    backdrop-filter: blur(4px);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.nokia-graph-search:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.nokia-graph-search-results {
+    margin-top: 6px;
+    max-height: 320px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+}
+
+.nokia-graph-search-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nokia-graph-search-item:last-child {
+    border-bottom: none;
+}
+
+.nokia-graph-search-item:hover {
+    background: #eef2ff;
+}
+
+.nokia-graph-search-name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.nokia-graph-search-path {
+    display: block;
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 1px;
+    word-break: break-all;
+}
+
+.nokia-graph-search-empty {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+
+/* Hover tooltip */
+.nokia-graph-tooltip {
+    position: absolute;
+    z-index: 4;
+    max-width: 260px;
+    pointer-events: none;
+    background: rgba(15, 23, 42, 0.92);
+    color: #f1f5f9;
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+.nokia-graph-tooltip-name {
+    font-weight: 700;
+    font-size: 0.84rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.nokia-graph-tooltip-meaning {
+    margin-top: 3px;
+    color: #cbd5e1;
+}
+
+.nokia-graph-tooltip-meta {
+    margin-top: 5px;
+    font-size: 0.68rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .nokia-graph-crumbs {
@@ -116,23 +251,26 @@
 .nokia-graph-crumb {
     border: none;
     background: rgba(255, 255, 255, 0.9);
-    color: #2563eb;
+    color: #4f46e5;
     border-radius: 999px;
     padding: 5px 10px;
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+    transition: background 0.15s, transform 0.15s;
 }
 
 .nokia-graph-crumb:hover {
     background: #fff;
+    transform: translateY(-1px);
 }
 
 .nokia-graph-crumb.current {
     color: #0f172a;
     cursor: default;
-    background: #dbeafe;
+    background: #e0e7ff;
+    transform: none;
 }
 
 .nokia-graph-crumb-sep {
@@ -185,7 +323,7 @@
     font-size: 0.72rem;
     font-weight: 700;
     color: #fff;
-    background: #12416b;
+    background: #3b82f6;
 }
 
 .nokia-graph-path {
@@ -262,61 +400,103 @@
 
 /* SVG node styling */
 .graph-link {
-    stroke: #94a3b8;
-    stroke-width: 1.5;
-    opacity: 0.55;
-    transition: opacity 0.25s ease;
+    stroke-width: 1.4;
+    opacity: 0.38;
+    stroke-linecap: round;
 }
 
 .graph-node-group {
     cursor: pointer;
-    transition: opacity 0.25s ease;
-}
-
-.graph-node-group.dimmed {
-    opacity: 0.35;
 }
 
 .graph-node-circle {
-    stroke: #fff;
-    stroke-width: 2.5;
-    transition: stroke-width 0.15s ease, filter 0.15s ease;
+    stroke-width: 1.5;
+    transition: transform 0.16s ease, filter 0.16s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+    filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.22));
 }
 
-.graph-node-group:hover .graph-node-circle,
+.graph-node-group:hover .graph-node-circle {
+    transform: scale(1.12);
+    filter: drop-shadow(0 4px 10px rgba(15, 23, 42, 0.32));
+}
+
 .graph-node-group.selected .graph-node-circle {
-    stroke-width: 3.5;
-    filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.18));
+    stroke: #fff;
+    stroke-width: 3;
+    filter: drop-shadow(0 4px 12px rgba(15, 23, 42, 0.35));
 }
 
-.graph-node-group.focus .graph-node-circle {
-    stroke: #1d4ed8;
-    stroke-width: 4;
+.graph-focus-halo {
+    opacity: 0.12;
+    animation: mrbts-halo-pulse 3.2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.graph-focus-ring {
+    fill: none;
+    stroke-width: 1.6;
+    stroke-dasharray: 4 7;
+    opacity: 0.7;
+    pointer-events: none;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: mrbts-ring-spin 26s linear infinite;
+}
+
+@keyframes mrbts-ring-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes mrbts-halo-pulse {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.2; }
+}
+
+.graph-focus-name {
+    fill: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    text-anchor: middle;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.graph-focus-sub {
+    fill: rgba(255, 255, 255, 0.82);
+    font-size: 10px;
+    font-weight: 600;
+    pointer-events: none;
+    text-anchor: middle;
+}
+
+.graph-node-count {
+    fill: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    pointer-events: none;
+    text-anchor: middle;
 }
 
 .graph-node-label {
-    fill: #0f172a;
+    fill: #334155;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 650;
     pointer-events: none;
-    text-anchor: middle;
+    paint-order: stroke;
+    stroke: rgba(255, 255, 255, 0.85);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-.graph-node-sub {
-    fill: #64748b;
-    font-size: 9px;
-    pointer-events: none;
-    text-anchor: middle;
+.graph-node-group:hover .graph-node-label,
+.graph-node-group.selected .graph-node-label {
+    fill: #0f172a;
+    font-weight: 800;
 }
-
-.graph-level-1 { fill: #0f172a; }
-.graph-level-2 { fill: #12416b; }
-.graph-level-3 { fill: #1d4ed8; }
-.graph-level-4 { fill: #0369a1; }
-.graph-level-5 { fill: #0f766e; }
-.graph-level-6 { fill: #b45309; }
-.graph-level-7 { fill: #a16207; }
-.graph-level-8 { fill: #7c3aed; }
 
 @media (max-width: 1100px) {
     .nokia-graph-layout {
@@ -346,6 +526,10 @@
         margin-left: 0;
         width: 100%;
     }
+
+    .nokia-graph-search-wrap {
+        width: min(220px, 55%);
+    }
 }
 
 body.dark-mode .nokia-graph-layout,
@@ -359,7 +543,8 @@ body.dark-mode .nokia-graph-crumb {
 
 body.dark-mode .nokia-graph-stage {
     background:
-        radial-gradient(circle at 50% 45%, rgba(37, 99, 235, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 50% 45%, rgba(99, 102, 241, 0.14) 0%, transparent 55%),
+        radial-gradient(circle at 18% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
         linear-gradient(180deg, #0f1a28 0%, #111b27 100%) !important;
 }
 
@@ -396,16 +581,42 @@ body.dark-mode .nokia-graph-param-table tbody tr:hover {
     background: #1b2b40 !important;
 }
 
-body.dark-mode .graph-link {
-    stroke: #64748b;
+body.dark-mode .nokia-graph-search {
+    background: rgba(15, 26, 40, 0.94) !important;
+    color: #eef3f8 !important;
+    border-color: #3f536b !important;
+}
+
+body.dark-mode .nokia-graph-search-results {
+    background: #111b27 !important;
+    border-color: #314257 !important;
+}
+
+body.dark-mode .nokia-graph-search-item {
+    border-bottom-color: #1b2b40 !important;
+}
+
+body.dark-mode .nokia-graph-search-item:hover {
+    background: #1b2b40 !important;
+}
+
+body.dark-mode .nokia-graph-search-name {
+    color: #eef3f8 !important;
+}
+
+body.dark-mode .nokia-graph-search-path,
+body.dark-mode .nokia-graph-search-empty {
+    color: #a8b7c8 !important;
 }
 
 body.dark-mode .graph-node-label {
-    fill: #eef3f8;
+    fill: #cdd9e6;
+    stroke: rgba(15, 26, 40, 0.85);
 }
 
-body.dark-mode .graph-node-sub {
-    fill: #a8b7c8;
+body.dark-mode .graph-node-group:hover .graph-node-label,
+body.dark-mode .graph-node-group.selected .graph-node-label {
+    fill: #eef3f8;
 }
 
 body.dark-mode .nokia-graph-crumb.current {
