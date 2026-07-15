@@ -11,7 +11,10 @@ import pandas as pd
 
 _DIR = os.path.dirname(__file__)
 NOKIA_PERF_DIR = os.path.join(_DIR, "Nokia Performance")
-NOKIA_CACHE_PATH = os.path.join(_DIR, "data", "nokia_performance.json")
+NOKIA_CACHE_DIR = os.path.join(_DIR, "data", "nokia_performance")
+NOKIA_CACHE_PATH = os.path.join(_DIR, "data", "nokia_performance.json")  # legacy monolith
+NOKIA_CACHE_INDEX = os.path.join(NOKIA_CACHE_DIR, "index.json")
+COUNTERS_DIR = os.path.join(NOKIA_CACHE_DIR, "counters")
 
 # Exact sheet names and aliases (RNC uses "Counter mcRNC").
 ENTITY_SHEETS: dict[str, str] = {
@@ -158,11 +161,49 @@ def _excel_mtime() -> float:
     return latest
 
 
+def _shard_tech_name(technology: str) -> str:
+    tech = (technology or "unknown").strip() or "unknown"
+    safe = re.sub(r"[^A-Za-z0-9._+-]+", "_", tech)
+    return safe or "unknown"
+
+
+def _counter_shard_path(technology: str) -> str:
+    return os.path.join(COUNTERS_DIR, f"{_shard_tech_name(technology)}.json")
+
+
 def _cache_mtime() -> float:
-    try:
-        return os.path.getmtime(NOKIA_CACHE_PATH)
-    except OSError:
-        return 0.0
+    latest = 0.0
+    for path in (NOKIA_CACHE_INDEX, NOKIA_CACHE_PATH):
+        try:
+            latest = max(latest, os.path.getmtime(path))
+        except OSError:
+            continue
+    if os.path.isdir(NOKIA_CACHE_DIR):
+        for root, _, files in os.walk(NOKIA_CACHE_DIR):
+            for name in files:
+                if not name.endswith(".json"):
+                    continue
+                try:
+                    latest = max(latest, os.path.getmtime(os.path.join(root, name)))
+                except OSError:
+                    continue
+    return latest
+
+
+def _compact_row(row: dict[str, Any]) -> dict[str, str]:
+    """Drop empty fields so shard files stay small enough for git."""
+    return {str(key): value for key, value in row.items() if value not in (None, "")}
+
+
+def _write_json(path: str, payload: Any) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"))
+
+
+def _read_json(path: str) -> Any:
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
 
 
 def _ordered_columns(entity: str, all_columns: set[str]) -> list[str]:
@@ -460,24 +501,115 @@ def build_nokia_data_from_excel() -> dict[str, Any]:
 
 
 def write_nokia_cache(data: dict[str, Any] | None = None) -> str:
+    """Write sharded JSON cache (index + entity files + per-technology counters)."""
     payload = data if data is not None else build_nokia_data_from_excel()
-    os.makedirs(os.path.dirname(NOKIA_CACHE_PATH), exist_ok=True)
-    with open(NOKIA_CACHE_PATH, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
-    return NOKIA_CACHE_PATH
+    os.makedirs(COUNTERS_DIR, exist_ok=True)
+
+    counters = payload.get("counters") or {}
+    counters_by_tech: dict[str, dict[str, dict[str, str]]] = {}
+    for counter_id, row in counters.items():
+        tech = (row.get("Technology") or "").strip()
+        if not tech and "|" in counter_id:
+            tech = counter_id.split("|", 1)[0]
+        tech = tech or "unknown"
+        counters_by_tech.setdefault(tech, {})[counter_id] = _compact_row(row)
+
+    shard_map: dict[str, str] = {}
+    for tech, rows in sorted(counters_by_tech.items()):
+        shard_name = f"{_shard_tech_name(tech)}.json"
+        shard_map[tech] = shard_name
+        _write_json(os.path.join(COUNTERS_DIR, shard_name), rows)
+
+    measurements = {
+        key: _compact_row(row)
+        for key, row in (payload.get("measurements") or {}).items()
+    }
+    kpis = {
+        key: _compact_row(row)
+        for key, row in (payload.get("kpis") or {}).items()
+    }
+    _write_json(os.path.join(NOKIA_CACHE_DIR, "measurements.json"), measurements)
+    _write_json(os.path.join(NOKIA_CACHE_DIR, "kpis.json"), kpis)
+
+    index_payload = {
+        "format": "sharded_v1",
+        "columns": payload.get("columns") or {},
+        "measurement_index": payload.get("measurement_index") or [],
+        "kpi_index": payload.get("kpi_index") or [],
+        "counters_by_measurement": payload.get("counters_by_measurement") or {},
+        "meta": {
+            **(payload.get("meta") or {}),
+            "cache_format": "sharded_v1",
+            "counter_shards": shard_map,
+        },
+        "files": {
+            "measurements": "measurements.json",
+            "kpis": "kpis.json",
+            "counters_dir": "counters",
+        },
+    }
+    _write_json(NOKIA_CACHE_INDEX, index_payload)
+
+    # Remove legacy monolith if present so it is not re-uploaded by accident.
+    try:
+        if os.path.isfile(NOKIA_CACHE_PATH):
+            os.remove(NOKIA_CACHE_PATH)
+    except OSError:
+        pass
+
+    return NOKIA_CACHE_INDEX
+
+
+def _load_sharded_cache() -> dict[str, Any]:
+    index = _read_json(NOKIA_CACHE_INDEX)
+    files = index.get("files") or {}
+    measurements_name = files.get("measurements") or "measurements.json"
+    kpis_name = files.get("kpis") or "kpis.json"
+    counters_dirname = files.get("counters_dir") or "counters"
+
+    measurements = _read_json(os.path.join(NOKIA_CACHE_DIR, measurements_name))
+    kpis = _read_json(os.path.join(NOKIA_CACHE_DIR, kpis_name))
+
+    counters: dict[str, dict[str, str]] = {}
+    counters_dir = os.path.join(NOKIA_CACHE_DIR, counters_dirname)
+    if os.path.isdir(counters_dir):
+        for name in sorted(os.listdir(counters_dir)):
+            if not name.endswith(".json"):
+                continue
+            shard = _read_json(os.path.join(counters_dir, name))
+            if isinstance(shard, dict):
+                counters.update(shard)
+
+    return {
+        "columns": index.get("columns") or {},
+        "measurements": measurements if isinstance(measurements, dict) else {},
+        "counters": counters,
+        "kpis": kpis if isinstance(kpis, dict) else {},
+        "measurement_index": index.get("measurement_index") or [],
+        "kpi_index": index.get("kpi_index") or [],
+        "counters_by_measurement": index.get("counters_by_measurement") or {},
+        "meta": index.get("meta") or {},
+    }
 
 
 def load_nokia_data(force_refresh: bool = False) -> dict[str, Any]:
     global _cache
     excel_mtime = _excel_mtime()
-    cache_stale = _cache_mtime() < excel_mtime
+    cache_mtime = _cache_mtime()
+    cache_stale = cache_mtime < excel_mtime if excel_mtime else False
 
     if not force_refresh and _cache is not None and not cache_stale:
         return _cache
 
+    if not force_refresh and os.path.isfile(NOKIA_CACHE_INDEX) and not cache_stale:
+        _cache = _load_sharded_cache()
+        return _cache
+
+    # Legacy single-file cache support (migrate on load).
     if not force_refresh and os.path.isfile(NOKIA_CACHE_PATH) and not cache_stale:
-        with open(NOKIA_CACHE_PATH, encoding="utf-8") as f:
-            _cache = json.load(f)
+        legacy = _read_json(NOKIA_CACHE_PATH)
+        write_nokia_cache(legacy)
+        _cache = legacy
         return _cache
 
     _cache = build_nokia_data_from_excel()
