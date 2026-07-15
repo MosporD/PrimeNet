@@ -12,6 +12,7 @@ from database_enhanced import get_user_by_session, log_activity
 from .knowledge import parse_huawei_toc
 from .ai_service import answer_question
 from .nokia_loader import get_nokia_index_payload, get_nokia_mo_parameters, load_nokia_data, search_nokia_parameters
+from .mrbts_tree_loader import get_mrbts_tree_payload
 
 parameter_dictionary_bp = Blueprint(
     'parameter_dictionary', __name__,
@@ -151,6 +152,33 @@ def nokia_parameter_search():
     try:
         result = search_nokia_parameters(query, limit=limit)
         return jsonify({'success': True, 'query': query, **result})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@parameter_dictionary_bp.route('/api/parameter-dictionary/nokia/mrbts-tree', methods=['GET'])
+def nokia_mrbts_tree():
+    """Return Single RAN MRBTS MO hierarchy (levels 1-8) with meanings."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        payload = get_mrbts_tree_payload()
+        meta = payload.get('meta') or {}
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'mrbts_tree_browse',
+            'Browsed Nokia MRBTS MO hierarchy',
+        )
+        return jsonify({
+            'success': True,
+            'meta': meta,
+            'tree': payload.get('tree') or {},
+            'flat': payload.get('flat') or [],
+        })
+    except FileNotFoundError as e:
+        return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

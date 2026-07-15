@@ -590,40 +590,25 @@ function fmt(value, unit, decimals = 2) {
 /** PM trend row: always prefer backend-normalized ``timestamp`` for chart axis. */
 function trendXRaw(row) {
     if (!row) return null;
-    // Backend normalizes/buckets ``timestamp``; ``Date`` can remain vendor-raw and ambiguous.
-    const v = row.timestamp ?? row.Date ?? row.date;
+    // Backend aggregates to canonical ISO ``timestamp``; never fall back to vendor-raw Date/Time
+    // (Huawei DD/MM slash strings break JS Date which treats them as US MM/DD).
+    const v = row.timestamp;
     if (v === null || v === undefined) return null;
     const s = String(v).trim();
     return s === '' ? null : s;
 }
 
-function formatTrendXLabel(raw) {
-    if (raw == null) return '';
-    const d = new Date(raw);
-    if (!isNaN(d.getTime())) {
-        return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
-               d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    return String(raw);
-}
-
-/** Two-line category label: time on first line, calendar day on second (Chart.js category multiline). */
-function formatTrendXLabelHierarchy(raw) {
-    if (raw == null) return [''];
-    const d = new Date(raw);
-    if (!isNaN(d.getTime())) {
-        const line1 = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const line2 = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
-        return [line1, line2];
-    }
-    return [String(raw)];
-}
-
-function _parseTrendRowMoment(row) {
-    const raw = trendXRaw(row);
+/**
+ * Parse PM timestamps into a Date.
+ * Preferred / canonical: YYYY-MM-DD[ HH:MM[:SS]] (Huawei + Nokia after API normalize).
+ * Fallbacks match vendor exports without relying on browser Date.parse (MM/DD trap).
+ */
+function parsePmTimestamp(raw) {
     if (raw == null) return null;
-    const s = String(raw).trim();
-    const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    const s0 = String(raw).trim().replace(/\s+[A-Za-z]{2,5}$/, '').trim();
+    if (!s0) return null;
+
+    const iso = s0.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
     if (iso) {
         return new Date(
             Number(iso[1]),
@@ -634,9 +619,64 @@ function _parseTrendRowMoment(row) {
             Number(iso[6] || 0),
         );
     }
-    const d = new Date(s);
-    if (isNaN(d.getTime())) return null;
-    return d;
+
+    // Huawei DD/MM/YYYY[ HH:MM[:SS]]
+    const huawei = s0.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (huawei) {
+        let y = Number(huawei[3]);
+        if (y < 100) y += 2000;
+        return new Date(
+            y,
+            Number(huawei[2]) - 1,
+            Number(huawei[1]),
+            Number(huawei[4] || 0),
+            Number(huawei[5] || 0),
+            Number(huawei[6] || 0),
+        );
+    }
+
+    // Nokia M.D.YYYY[ HH:MM[:SS]] (month-first)
+    const nokia = s0.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (nokia) {
+        let y = Number(nokia[3]);
+        if (y < 100) y += 2000;
+        return new Date(
+            y,
+            Number(nokia[1]) - 1,
+            Number(nokia[2]),
+            Number(nokia[4] || 0),
+            Number(nokia[5] || 0),
+            Number(nokia[6] || 0),
+        );
+    }
+
+    return null;
+}
+
+function formatTrendXLabel(raw) {
+    if (raw == null) return '';
+    const d = parsePmTimestamp(raw);
+    if (d && !isNaN(d.getTime())) {
+        return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+               d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return String(raw);
+}
+
+/** Two-line category label: time on first line, calendar day on second (Chart.js category multiline). */
+function formatTrendXLabelHierarchy(raw) {
+    if (raw == null) return [''];
+    const d = parsePmTimestamp(raw);
+    if (d && !isNaN(d.getTime())) {
+        const line1 = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const line2 = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+        return [line1, line2];
+    }
+    return [String(raw)];
+}
+
+function _parseTrendRowMoment(row) {
+    return parsePmTimestamp(trendXRaw(row));
 }
 
 function _dateKeyLocal(d) {
@@ -3724,9 +3764,9 @@ function _perfCompareAxis(cells) {
         });
     });
     const keys = [...set.keys()].sort((a, b) => {
-        const da = Date.parse(a);
-        const db = Date.parse(b);
-        if (Number.isFinite(da) && Number.isFinite(db)) return da - db;
+        const da = parsePmTimestamp(a);
+        const db = parsePmTimestamp(b);
+        if (da && db) return da.getTime() - db.getTime();
         return String(a).localeCompare(String(b));
     });
     const labels = keys.map(k => formatTrendXLabelHierarchy(set.get(k)));

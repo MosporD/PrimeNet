@@ -43,6 +43,7 @@ from modules.excel_generator.routes import excel_generator_bp
 from modules.xml_parser.routes import xml_parser_bp
 from modules.cm_extractor import cm_extractor_bp
 from modules.parameter_dictionary.routes import parameter_dictionary_bp
+from modules.performance_dictionary.routes import performance_dictionary_bp
 from modules.admin_panel.routes import admin_panel_bp
 from modules.sync.routes import sync_bp
 from modules.config_history.routes import config_history_bp
@@ -80,6 +81,7 @@ app.register_blueprint(cm_extractor_bp)
 app.register_blueprint(excel_generator_bp)
 app.register_blueprint(ne_comparison_bp)
 app.register_blueprint(parameter_dictionary_bp)
+app.register_blueprint(performance_dictionary_bp)
 app.register_blueprint(network_map_bp)
 app.register_blueprint(admin_panel_bp)
 app.register_blueprint(sync_bp)

@@ -20,20 +20,45 @@ let hwTocLoaded = false;
 let hwActiveUrl = '';
 let hwSearchTimer = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    const nokiaBtn = document.getElementById('vendor-nokia-btn');
-    const huaweiBtn = document.getElementById('vendor-huawei-btn');
+function hideAllVendorSections() {
     const gate = document.getElementById('vendor-gate');
     const nokiaContent = document.getElementById('nokia-content');
+    const nokiaGraphContent = document.getElementById('nokia-graph-content');
+    const huaweiContent = document.getElementById('huawei-content');
+
+    if (gate) gate.style.display = 'none';
+    if (nokiaContent) nokiaContent.style.display = 'none';
+    if (nokiaGraphContent) nokiaGraphContent.style.display = 'none';
+    if (huaweiContent) huaweiContent.style.display = 'none';
+}
+
+function showVendorGate() {
+    const gate = document.getElementById('vendor-gate');
+    const nokiaContent = document.getElementById('nokia-content');
+    const nokiaGraphContent = document.getElementById('nokia-graph-content');
+    const huaweiContent = document.getElementById('huawei-content');
+
+    if (nokiaContent) nokiaContent.style.display = 'none';
+    if (nokiaGraphContent) nokiaGraphContent.style.display = 'none';
+    if (huaweiContent) huaweiContent.style.display = 'none';
+    if (gate) gate.style.display = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const nokiaBtn = document.getElementById('vendor-nokia-btn');
+    const nokiaTreeBtn = document.getElementById('vendor-nokia-tree-btn');
+    const huaweiBtn = document.getElementById('vendor-huawei-btn');
+    const nokiaContent = document.getElementById('nokia-content');
+    const nokiaGraphContent = document.getElementById('nokia-graph-content');
     const huaweiContent = document.getElementById('huawei-content');
     const nokiaBackBtn = document.getElementById('nokia-back-btn');
+    const nokiaGraphBackBtn = document.getElementById('nokia-graph-back-btn');
     const huaweiBackBtn = document.getElementById('huawei-back-btn');
     const hwSearch = document.getElementById('huawei-search');
 
     if (nokiaBtn) {
         nokiaBtn.addEventListener('click', async () => {
-            if (gate) gate.style.display = 'none';
-            if (huaweiContent) huaweiContent.style.display = 'none';
+            hideAllVendorSections();
             if (nokiaContent) nokiaContent.style.display = '';
             if (typeof window.setParameterDictionaryAiVendor === 'function') {
                 window.setParameterDictionaryAiVendor('nokia');
@@ -44,10 +69,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (nokiaTreeBtn) {
+        nokiaTreeBtn.addEventListener('click', async () => {
+            hideAllVendorSections();
+            if (nokiaGraphContent) nokiaGraphContent.style.display = '';
+            if (typeof window.setParameterDictionaryAiVendor === 'function') {
+                window.setParameterDictionaryAiVendor('nokia');
+            }
+            if (typeof window.initNokiaMrbtsGraph === 'function') {
+                await window.initNokiaMrbtsGraph();
+            }
+        });
+    }
+
     if (huaweiBtn) {
         huaweiBtn.addEventListener('click', async () => {
-            if (gate) gate.style.display = 'none';
-            if (nokiaContent) nokiaContent.style.display = 'none';
+            hideAllVendorSections();
             if (huaweiContent) huaweiContent.style.display = '';
             if (typeof window.setParameterDictionaryAiVendor === 'function') {
                 window.setParameterDictionaryAiVendor('huawei');
@@ -59,17 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (nokiaBackBtn) {
-        nokiaBackBtn.addEventListener('click', () => {
-            if (nokiaContent) nokiaContent.style.display = 'none';
-            if (gate) gate.style.display = '';
-        });
+        nokiaBackBtn.addEventListener('click', showVendorGate);
+    }
+
+    if (nokiaGraphBackBtn) {
+        nokiaGraphBackBtn.addEventListener('click', showVendorGate);
     }
 
     if (huaweiBackBtn) {
-        huaweiBackBtn.addEventListener('click', () => {
-            if (huaweiContent) huaweiContent.style.display = 'none';
-            if (gate) gate.style.display = '';
-        });
+        huaweiBackBtn.addEventListener('click', showVendorGate);
     }
 
     const nokiaMoSearch = document.getElementById('nokia-mo-search');

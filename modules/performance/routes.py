@@ -51,6 +51,7 @@ from modules.sync.metadata_active_sql import (
 )
 from .kpi_catalog import KPI_HEADERS_MAP
 from .kpi_mapping import get_kpi_mapping_payload
+from core.pm_timestamp import format_pm_timestamp, parse_pm_datetime
 
 performance_bp = Blueprint(
     'performance', __name__,
@@ -132,108 +133,12 @@ def _groups_db_for_vendor(vendor: str, scope: str = 'hourly') -> str:
 
 
 def _parse_trend_ts(val, prefer_dayfirst: bool | None = None):
-    if val is None:
-        return None
-    if isinstance(val, (int, float)) and not isinstance(val, bool):
-        try:
-            if float(val).is_integer() and float(val) > 10_000_000_000:  # ms epoch guard
-                return datetime.utcfromtimestamp(float(val) / 1000.0)
-            if float(val) > 10_000_000:  # seconds
-                return datetime.utcfromtimestamp(float(val))
-        except (TypeError, ValueError, OSError):
-            return None
-    s = str(val).strip()
-    if not s or s.lower() in ('nan', 'nat', 'none'):
-        return None
-    # Huawei PM exports may append timezone-like tokens (e.g. 'DST').
-    s = re.sub(r'\s+[A-Za-z]{2,5}$', '', s).strip()
-    try:
-        s_iso = s
-        if s_iso.endswith('Z'):
-            s_iso = s_iso[:-1] + '+00:00'
-        if 'T' not in s_iso and len(s_iso) >= 10:
-            s_iso = s_iso.replace(' ', 'T', 1)
-        dt = datetime.fromisoformat(s_iso.split('.')[0])
-        if dt.tzinfo:
-            return dt.replace(tzinfo=None)
-        return dt
-    except ValueError:
-        pass
-    # For ambiguous date strings, apply caller hint:
-    # - Nokia PERIOD_START_TIME tends to be month.day.year (prefer_dayfirst=False)
-    # - Huawei Date tends to be day/month/year (prefer_dayfirst=True)
-    dayfirst_dotted = (
-        (
-            '%d.%m.%Y %H:%M:%S',
-            '%d.%m.%Y %H:%M',
-            '%d.%m.%Y',
-            '%d.%m.%y %H:%M:%S',
-            '%d.%m.%y %H:%M',
-            '%d.%m.%y',
-            '%m.%d.%Y %H:%M:%S',
-            '%m.%d.%y %H:%M:%S',
-            '%m.%d.%Y',
-            '%m.%d.%y',
-        )
-        if prefer_dayfirst is True
-        else
-        (
-            '%m.%d.%Y %H:%M:%S',
-            '%m.%d.%y %H:%M:%S',
-            '%m.%d.%Y',
-            '%m.%d.%y',
-            '%d.%m.%Y %H:%M:%S',
-            '%d.%m.%Y %H:%M',
-            '%d.%m.%Y',
-            '%d.%m.%y %H:%M:%S',
-            '%d.%m.%y %H:%M',
-            '%d.%m.%y',
-        )
-    )
-
-    fmts = (
-        '%Y-%m-%d %H:%M:%S',
-        '%Y-%m-%d %H:%M',
-        '%Y-%m-%d',
-        '%Y/%m/%d %H:%M:%S',
-        '%Y/%m/%d %H:%M',
-        '%Y/%m/%d',
-        '%d/%m/%Y',
-        '%d/%m/%y',
-        '%d-%m-%Y',
-        '%d-%m-%y',
-        '%d/%m/%y %H:%M',
-        '%d/%m/%Y %H:%M',
-    ) + dayfirst_dotted
-    for fmt in fmts:
-        try:
-            return datetime.strptime(s[:19], fmt)
-        except ValueError:
-            continue
-    # Last-resort parsing for mixed exports.
-    try:
-        pref = prefer_dayfirst
-        if pref is True:
-            order = (True, False)
-        elif pref is False:
-            order = (False, True)
-        else:
-            # Ambiguous dotted Nokia PERIOD_START_TIME defaults to month.day.year.
-            order = (False, True)
-        for dayfirst in order:
-            t = pd.to_datetime(s, errors='coerce', dayfirst=dayfirst)
-            if pd.notna(t):
-                return t.to_pydatetime().replace(tzinfo=None)
-        t = pd.to_datetime(s, errors='coerce', dayfirst=True)
-        if pd.notna(t):
-            return t.to_pydatetime().replace(tzinfo=None)
-    except Exception:
-        pass
-    return None
+    """Parse Huawei/Nokia PM time cells into naive datetime (canonical ISO via format_pm_timestamp)."""
+    return parse_pm_datetime(val, prefer_dayfirst=prefer_dayfirst)
 
 
 def _pick_trend_time_value(row: dict, granularity: str) -> tuple[object, bool | None]:
-    """Pick row timestamp value plus parse hint (day-first or month-first)."""
+    """Pick row timestamp value plus parse hint (day-first Huawei vs month-first Nokia)."""
     source_col = str(row.get('__time_source') or '').strip().lower()
     if source_col in ('period_start_time', 'period start time'):
         v = row.get('timestamp')
@@ -257,11 +162,15 @@ def _pick_trend_time_value(row: dict, granularity: str) -> tuple[object, bool | 
         s = str(v).strip()
         if not s or s.lower() in ('nan', 'nat', 'none'):
             continue
-        # Vendor/date-source hints for ambiguous strings.
+        # Column / shape hints for ambiguous vendor strings.
         if k in ('Date', 'date'):
-            return v, True   # Huawei Date style: day/month/year
+            return v, True  # Huawei Date: day/month/year
         if k == 'PERIOD_START_TIME':
-            return v, False  # Nokia style: month.day.year
+            return v, False  # Nokia: month.day.year
+        if '/' in s and not (len(s) >= 10 and s[4] == '-'):
+            return v, True  # Huawei Time / slash dates are day-first
+        if '.' in s and not (len(s) >= 10 and s[4] == '-'):
+            return v, False  # Nokia dotted
         return v, None
     return None, None
 
@@ -292,7 +201,7 @@ def _log_trend_time_parse_sample(
             'db_time_col_raw': row.get(time_col),
             'selected_ts_raw': ts_raw,
             'prefer_dayfirst': prefer_dayfirst,
-            'parsed_ts': dt.strftime('%Y-%m-%d %H:%M:%S') if dt else None,
+            'parsed_ts': format_pm_timestamp(dt) if dt else None,
         })
     logger_obj.info(
         'trend-time-parse endpoint=%s vendor=%s table=%s time_col=%s granularity=%s sample=%s',
@@ -309,6 +218,7 @@ def _aggregate_trend_rows(rows: list[dict], granularity: str) -> list[dict]:
     """
     Roll up raw PM rows to hour / day / month buckets (mean numeric KPIs per bucket).
     ``hour`` collapses duplicate timestamps within the same clock hour.
+    Output ``timestamp`` is always canonical ``YYYY-MM-DD HH:MM:SS``.
     """
     if not rows:
         return rows
@@ -319,10 +229,10 @@ def _aggregate_trend_rows(rows: list[dict], granularity: str) -> list[dict]:
     def bucket_label(dt: datetime) -> str:
         if gran == 'hour':
             z = dt.replace(minute=0, second=0, microsecond=0)
-            return z.strftime('%Y-%m-%d %H:%M:%S')
+            return format_pm_timestamp(z)
         if gran == 'day':
-            return datetime(dt.year, dt.month, dt.day).strftime('%Y-%m-%d %H:%M:%S')
-        return datetime(dt.year, dt.month, 1).strftime('%Y-%m-%d %H:%M:%S')
+            return format_pm_timestamp(datetime(dt.year, dt.month, dt.day))
+        return format_pm_timestamp(datetime(dt.year, dt.month, 1))
 
     buckets: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
@@ -339,7 +249,10 @@ def _aggregate_trend_rows(rows: list[dict], granularity: str) -> list[dict]:
     for label in sorted(buckets.keys()):
         group = buckets[label]
         merged = dict(group[0])
+        # One standard for chart clients — drop ambiguous vendor-raw date fields.
         merged['timestamp'] = label
+        for raw_key in ('Date', 'date', 'Time', 'PERIOD_START_TIME'):
+            merged.pop(raw_key, None)
         keys = [k for k in group[0] if k not in skip]
         for k in keys:
             vals = []

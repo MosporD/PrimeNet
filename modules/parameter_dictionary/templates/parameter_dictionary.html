@@ -1,161 +1,397 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Parameter Dictionary - PrimeNet</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('parameter_dictionary.static', filename='parameter_dictionary.css') }}?v=1.9">
+
+    <link rel="stylesheet" href="{{ url_for('parameter_dictionary.static', filename='parameter_dictionary.css') }}?v=2.1">
+
+    <link rel="stylesheet" href="{{ url_for('parameter_dictionary.static', filename='nokia_mrbts_graph.css') }}?v=1.0">
+
 </head>
+
 <body>
+
     <div class="container param-dict-container">
+
         <header>
+
             <div class="header-content">
+
                 <div class="header-left">
+
                     <a href="/dashboard" class="back-link">Dashboard</a>
+
                     <h1>📚 Parameter Dictionary</h1>
+
                     <p>Browse and search Nokia &amp; Huawei MO parameters — with AI assistant</p>
+
                 </div>
+
                 <div class="header-right">
+
                     <span class="user-name">{{ user.username }}</span>
+
                     <button onclick="logout()" class="btn-logout">Logout</button>
+
                 </div>
+
             </div>
+
         </header>
 
+
+
         <main class="main-content">
+
             <section id="vendor-gate" class="vendor-gate">
-                <h2 class="vendor-gate-title">Select Vendor</h2>
-                <p class="vendor-gate-subtitle">Choose which parameter library you want to open.</p>
+
+                <h2 class="vendor-gate-title">Select Reference</h2>
+
+                <p class="vendor-gate-subtitle">Choose which parameter library or graphical tree you want to open.</p>
+
                 <div class="vendor-buttons">
+
                     <button type="button" id="vendor-nokia-btn" class="vendor-btn vendor-nokia">
+
                         <img src="{{ url_for('parameter_dictionary.static', filename='images/nokia_logo.png') }}?v=1" alt="Nokia logo" class="vendor-logo-img">
-                        <span class="vendor-label">Nokia</span>
+
+                        <span class="vendor-label">Nokia Parameters</span>
+
                     </button>
+
+                    <button type="button" id="vendor-nokia-tree-btn" class="vendor-btn vendor-nokia vendor-btn-nokia-tree">
+
+                        <span class="vendor-tree-icon" aria-hidden="true">🌳</span>
+
+                        <span class="vendor-label">Nokia Graphical Tree</span>
+
+                        <span class="vendor-tree-caption">Single RAN MRBTS MO hierarchy</span>
+
+                    </button>
+
                     <button type="button" id="vendor-huawei-btn" class="vendor-btn vendor-huawei">
+
                         <img src="{{ url_for('parameter_dictionary.static', filename='images/huawei_logo.png') }}?v=1" alt="Huawei logo" class="vendor-logo-img">
+
                         <span class="vendor-label">Huawei</span>
+
                     </button>
+
                 </div>
+
             </section>
+
+
 
             <section id="huawei-content" class="huawei-content" style="display:none;">
+
                 <div class="huawei-bar">
+
                     <button type="button" class="huawei-back-btn" id="huawei-back-btn">Back</button>
+
                     <span class="huawei-bar-title">Huawei MO &amp; Parameter Reference</span>
+
                 </div>
+
                 <div class="huawei-layout">
+
                     <div class="huawei-sidebar">
+
                         <input type="text" id="huawei-search" class="huawei-search" placeholder="Search MOs &amp; parameters...">
+
                         <div class="huawei-result-count" id="huawei-result-count"></div>
+
                         <div class="huawei-results" id="huawei-results"></div>
+
                     </div>
+
                     <iframe id="huawei-frame" class="huawei-frame"
+
                             src="/parameter-dictionary/huawei/"
+
                             frameborder="0"></iframe>
+
                 </div>
+
             </section>
+
+
 
             <section id="nokia-content" class="nokia-content" style="display:none;">
+
                 <div class="nokia-bar">
+
                     <button type="button" class="nokia-back-btn" id="nokia-back-btn">Back</button>
+
                     <span class="nokia-bar-title">Nokia Parameter Reference</span>
+
                     <span class="nokia-bar-source" id="nokia-source-label"></span>
+
                 </div>
+
                 <div class="nokia-layout">
+
                     <aside class="nokia-sidebar">
+
                         <input type="text" id="nokia-mo-search" class="nokia-search" placeholder="Search MO classes…">
+
                         <div class="nokia-sidebar-filters">
+
                             <select id="nokia-tech-filter" class="filter-select">
+
                                 <option value="">All Technologies</option>
+
                             </select>
+
                             <select id="nokia-category-filter" class="filter-select">
+
                                 <option value="">All Categories</option>
+
                             </select>
+
                         </div>
+
                         <div class="nokia-result-count" id="nokia-mo-count"></div>
+
                         <div class="nokia-mo-list" id="nokia-mo-list"></div>
+
                     </aside>
+
                     <div class="nokia-main">
+
                         <div class="nokia-main-head">
+
                             <div>
+
                                 <h2 class="nokia-selected-mo" id="nokia-selected-mo">Select an MO class</h2>
+
                                 <p class="nokia-selected-meta" id="nokia-selected-meta">Browse MO classes on the left, or search parameters below.</p>
+
                             </div>
+
                             <div class="mo-stats-bar nokia-stats-bar">
+
                                 <div class="mo-stat">
+
                                     <div class="stat-value" id="total-mos">0</div>
+
                                     <div class="stat-label">MO Classes</div>
+
                                 </div>
+
                                 <div class="mo-stat">
+
                                     <div class="stat-value" id="total-params">0</div>
+
                                     <div class="stat-label">Parameters</div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                         <input type="text" id="nokia-param-search" class="nokia-search nokia-param-search" placeholder="Search parameters in view (all Excel columns)…">
+
                         <div id="nokia-param-table" class="nokia-param-table-host"></div>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <div id="nokia-detail-modal" class="nokia-detail-modal" hidden>
-                <div class="nokia-detail-backdrop" id="nokia-detail-backdrop"></div>
-                <div class="nokia-detail-card" role="dialog" aria-modal="true" aria-labelledby="nokia-detail-title">
-                    <div class="nokia-detail-header">
-                        <h3 id="nokia-detail-title">Parameter details</h3>
-                        <button type="button" class="nokia-detail-close" id="nokia-detail-close" aria-label="Close">×</button>
-                    </div>
-                    <div class="nokia-detail-body" id="nokia-detail-body"></div>
+
+
+            <section id="nokia-graph-content" class="nokia-graph-content" style="display:none;">
+
+                <div class="nokia-graph-bar">
+
+                    <button type="button" class="nokia-graph-back-btn" id="nokia-graph-back-btn">Back</button>
+
+                    <span class="nokia-graph-bar-title">Nokia Single RAN MRBTS — Graphical Tree</span>
+
+                    <span class="nokia-graph-bar-hint">Click the center node to spread branches · click a branch to zoom in · parameters load on the right</span>
+
                 </div>
+
+                <div class="nokia-graph-layout">
+
+                    <div class="nokia-graph-stage" id="nokia-graph-stage">
+
+                        <div class="nokia-graph-toolbar">
+
+                            <button type="button" class="nokia-graph-tool-btn" id="nokia-graph-zoom-out">Zoom out</button>
+
+                            <button type="button" class="nokia-graph-tool-btn" id="nokia-graph-reset">Reset to MRBTS</button>
+
+                        </div>
+
+                        <div class="nokia-graph-crumbs" id="nokia-graph-crumbs"></div>
+
+                    </div>
+
+                    <aside class="nokia-graph-panel">
+
+                        <div class="nokia-graph-panel-head">
+
+                            <h2 class="nokia-graph-node-name" id="nokia-graph-node-name">MRBTS</h2>
+
+                            <p class="nokia-graph-node-meaning" id="nokia-graph-node-meaning">Select a node in the graph.</p>
+
+                            <div class="nokia-graph-node-meta">
+
+                                <span class="nokia-graph-level-pill" id="nokia-graph-node-level">Level 1</span>
+
+                                <code class="nokia-graph-path" id="nokia-graph-node-path">MRBTS</code>
+
+                            </div>
+
+                        </div>
+
+                        <div class="nokia-graph-panel-body" id="nokia-graph-panel-body">
+
+                            <p class="nokia-graph-empty">Loading graph…</p>
+
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+
+
+            <div id="nokia-detail-modal" class="nokia-detail-modal" hidden>
+
+                <div class="nokia-detail-backdrop" id="nokia-detail-backdrop"></div>
+
+                <div class="nokia-detail-card" role="dialog" aria-modal="true" aria-labelledby="nokia-detail-title">
+
+                    <div class="nokia-detail-header">
+
+                        <h3 id="nokia-detail-title">Parameter details</h3>
+
+                        <button type="button" class="nokia-detail-close" id="nokia-detail-close" aria-label="Close">×</button>
+
+                    </div>
+
+                    <div class="nokia-detail-body" id="nokia-detail-body"></div>
+
+                </div>
+
             </div>
+
+
 
             <div id="parameter-content" style="display:none;" hidden></div>
+
         </main>
+
     </div>
 
+
+
     <button type="button" id="pd-ai-toggle" class="pd-ai-fab" aria-expanded="false" aria-controls="pd-ai-panel" title="Ask about parameters">
+
         <span aria-hidden="true">🧠</span>
+
         <span class="pd-ai-fab-label">Ask AI</span>
+
     </button>
 
+
+
     <aside id="pd-ai-panel" class="pd-ai-panel" aria-hidden="true" aria-label="Parameter dictionary AI assistant">
+
         <div class="pd-ai-header">
+
             <div>
+
                 <div class="pd-ai-title">Parameter AI</div>
+
                 <div class="pd-ai-subtitle">What does a parameter do? Which params relate to a feature?</div>
+
             </div>
+
             <button type="button" id="pd-ai-close" class="pd-ai-close" aria-label="Close">×</button>
+
         </div>
+
+
 
         <div class="pd-ai-toolbar">
+
             <label class="pd-ai-vendor-label">
+
                 Vendor
+
                 <select id="pd-ai-vendor">
+
                     <option value="all">All vendors</option>
+
                     <option value="nokia">Nokia</option>
+
                     <option value="huawei">Huawei</option>
+
                 </select>
+
             </label>
+
         </div>
+
+
 
         <div id="pd-ai-messages" class="pd-ai-messages">
+
             <div class="pd-ai-welcome">
+
                 <p>Examples:</p>
+
                 <button type="button" class="pd-ai-suggestion" data-question="What does drxInactivityTimer do?">What does drxInactivityTimer do?</button>
+
                 <button type="button" class="pd-ai-suggestion" data-question="Which parameters are related to ANR?">Which parameters are related to ANR?</button>
+
                 <button type="button" class="pd-ai-suggestion" data-question="Explain KPI fault auto recovery parameters">Explain KPI fault auto recovery</button>
+
             </div>
+
         </div>
+
+
 
         <div class="pd-ai-compose">
+
             <textarea id="pd-ai-input" rows="2" placeholder="Ask about a parameter or feature…" maxlength="500"></textarea>
+
             <button type="button" id="pd-ai-send" class="pd-ai-send">Send</button>
+
         </div>
+
     </aside>
 
+
+
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.0"></script>
-    <script src="{{ url_for('parameter_dictionary.static', filename='parameter_dictionary.js') }}?v=1.9"></script>
-    <script src="{{ url_for('parameter_dictionary.static', filename='parameter_dictionary_ai.js') }}?v=1.1"></script>
+
+    <script src="{{ url_for('parameter_dictionary.static', filename='parameter_dictionary.js') }}?v=2.1"></script>
+
+    <script src="{{ url_for('parameter_dictionary.static', filename='nokia_mrbts_graph.js') }}?v=1.1"></script>
+
+    <script src="{{ url_for('parameter_dictionary.static', filename='parameter_dictionary_ai.js') }}?v=1.2"></script>
+
 </body>
+
 </html>
+
+

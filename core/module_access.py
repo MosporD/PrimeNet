@@ -45,6 +45,7 @@ NAV_SECTIONS: list[dict] = [
         "title": "Configuration",
         "links": [
             {"label": "Parameter Dictionary", "href": "/parameter-dictionary", "visibility": "all"},
+            {"label": "Performance Dictionary", "href": "/performance-dictionary", "visibility": "all"},
             {"label": "Configuration Data Extractor", "href": "/cm-extractor", "visibility": "all"},
             {"label": "CM Parameter Audit", "href": "/cm-parameter-audit", "visibility": "all"},
             {"label": "XML Parser", "href": "/xml-parser", "visibility": "all"},

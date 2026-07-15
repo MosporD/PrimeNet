@@ -76,11 +76,12 @@ function syncAiVendorFromPage(force = false) {
     if (aiVendorManual && !force) return;
 
     const nokiaVisible = document.getElementById('nokia-content')?.style.display !== 'none';
+    const nokiaGraphVisible = document.getElementById('nokia-graph-content')?.style.display !== 'none';
     const huaweiVisible = document.getElementById('huawei-content')?.style.display !== 'none';
 
-    if (huaweiVisible && !nokiaVisible) {
+    if (huaweiVisible && !nokiaVisible && !nokiaGraphVisible) {
         setAiVendor('huawei');
-    } else if (nokiaVisible && !huaweiVisible) {
+    } else if ((nokiaVisible || nokiaGraphVisible) && !huaweiVisible) {
         setAiVendor('nokia');
     } else {
         setAiVendor('all');

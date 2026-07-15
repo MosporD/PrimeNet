@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Dictionary - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('performance_dictionary.static', filename='performance_dictionary.css') }}?v=1.1">
+</head>
+<body>
+    <div class="container perf-dict-container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">Dashboard</a>
+                    <h1>Performance Dictionary</h1>
+                    <p>Browse Nokia measurements, counters, and KPI reference definitions</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="perf-dict-shell">
+                <div class="perf-dict-toolbar">
+                    <div class="entity-tabs" role="tablist" aria-label="Entity type">
+                        <button type="button" class="entity-tab active" data-entity="measurements" role="tab" aria-selected="true">Measurements</button>
+                        <button type="button" class="entity-tab" data-entity="counters" role="tab" aria-selected="false">Counters</button>
+                        <button type="button" class="entity-tab" data-entity="kpis" role="tab" aria-selected="false">KPIs</button>
+                    </div>
+                    <span class="perf-source-label" id="perf-source-label"></span>
+                </div>
+
+                <div class="perf-dict-layout">
+                    <aside class="perf-sidebar">
+                        <input type="text" id="perf-sidebar-search" class="perf-search" placeholder="Filter list…">
+                        <div class="perf-sidebar-filters">
+                            <select id="perf-tech-filter" class="filter-select">
+                                <option value="">All Technologies</option>
+                            </select>
+                        </div>
+                        <div class="perf-result-count" id="perf-sidebar-count"></div>
+                        <div class="perf-sidebar-list" id="perf-sidebar-list"></div>
+                    </aside>
+
+                    <div class="perf-main">
+                        <div class="perf-main-head">
+                            <div>
+                                <h2 class="perf-selected-title" id="perf-selected-title">Select an item</h2>
+                                <p class="perf-selected-meta" id="perf-selected-meta">Choose a measurement, counter group, or KPI from the sidebar.</p>
+                            </div>
+                            <div class="perf-stats-bar">
+                                <div class="perf-stat">
+                                    <div class="stat-value" id="stat-measurements">0</div>
+                                    <div class="stat-label">Measurements</div>
+                                </div>
+                                <div class="perf-stat">
+                                    <div class="stat-value" id="stat-counters">0</div>
+                                    <div class="stat-label">Counters</div>
+                                </div>
+                                <div class="perf-stat">
+                                    <div class="stat-value" id="stat-kpis">0</div>
+                                    <div class="stat-label">KPIs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="text" id="perf-table-search" class="perf-search perf-table-search" placeholder="Search in current view (all columns)…">
+                        <div id="perf-table-host" class="perf-table-host"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="perf-detail-modal" class="perf-detail-modal" hidden>
+        <div class="perf-detail-backdrop" id="perf-detail-backdrop"></div>
+        <div class="perf-detail-card" role="dialog" aria-modal="true" aria-labelledby="perf-detail-title">
+            <div class="perf-detail-header">
+                <h3 id="perf-detail-title">Details</h3>
+                <button type="button" class="perf-detail-close" id="perf-detail-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="perf-detail-body" id="perf-detail-body"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('performance_dictionary.static', filename='performance_dictionary.js') }}?v=1.1"></script>
+</body>
+</html>
