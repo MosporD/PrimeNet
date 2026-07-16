@@ -8,7 +8,7 @@ from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.site_catalog import list_huawei_areas, list_nokia_inventory_areas
 from core.radio.cm_live import query_live_parameter_status
 from core.radio.web import format_user, get_current_user, json_error, login_required
-from modules.cm_parameter_audit import MODULE_VERSION_LABEL
+from modules.cm_parameter_audit.version import MODULE_VERSION_LABEL
 from modules.cm_parameter_audit.cache import get_export_payload, store_export_payload
 from modules.cm_parameter_audit.export import build_audit_workbook
 from pathlib import Path

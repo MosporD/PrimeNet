@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from urllib.parse import urlparse
 
-from modules.cm_parameter_audit import MODULE_VERSION_LABEL
+from core.module_versions import nav_label
 
 # visibility:
 #   all          — any authenticated user
@@ -49,7 +49,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Parameter Dictionary", "href": "/parameter-dictionary", "visibility": "all"},
             {"label": "Performance Dictionary", "href": "/performance-dictionary", "visibility": "all"},
             {"label": "Configuration Data Extractor", "href": "/cm-extractor", "visibility": "all"},
-            {"label": f"CM Parameter Audit {MODULE_VERSION_LABEL}", "href": "/cm-parameter-audit", "visibility": "all"},
+            {"label": "CM Parameter Audit", "href": "/cm-parameter-audit", "visibility": "all"},
             {"label": "XML Parser", "href": "/xml-parser", "visibility": "all"},
             {"label": "XML Generator", "href": "/excel-generator", "visibility": "all"},
             {"label": "NE Comparison", "href": "/ne-comparison", "visibility": "all"},
@@ -133,7 +133,7 @@ def navigation_sections_for_role(user_or_role) -> list[dict]:
     sections: list[dict] = []
     for section in NAV_SECTIONS:
         links = [
-            {"label": link["label"], "href": link["href"]}
+            {"label": nav_label(link["label"], link["href"]), "href": link["href"]}
             for link in section.get("links") or []
             if _link_visible(str(link.get("visibility") or "all"), role)
         ]

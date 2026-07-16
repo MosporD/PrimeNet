@@ -28,6 +28,12 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
 app.config['SECRET_KEY'] = (os.getenv('FLASK_SECRET_KEY') or os.getenv('SECRET_KEY') or secrets.token_hex(32))
 
+
+@app.context_processor
+def inject_module_versions():
+    from core.module_versions import MODULE_VERSIONS
+    return {'module_versions': MODULE_VERSIONS}
+
 # ============================================================================
 # REGISTER BLUEPRINTS
 # ============================================================================

@@ -226,7 +226,7 @@
                     <a href="/cm-parameter-audit" class="function-card" data-module-id="cm-parameter-audit" data-module-name="CM Parameter Audit" data-module-href="/cm-parameter-audit">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin CM Parameter Audit" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128736;</div>
-                        <div class="function-name">CM Parameter Audit <span class="function-version">{{ cm_parameter_audit_version }}</span></div>
+                        <div class="function-name">CM Parameter Audit</div>
                     </a>
                     <a href="/xml-parser" class="function-card" data-module-id="xml-parser" data-module-name="Configuration XML Parser" data-module-href="/xml-parser">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration XML Parser" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
@@ -1094,6 +1094,29 @@
         }
 
         const DASHBOARD_ALLOWED_HREFS = {{ allowed_hrefs | tojson }};
+        const MODULE_VERSIONS = {{ module_versions | tojson }};
+
+        function applyModuleVersionBadges(root) {
+            const scope = root || document;
+            scope.querySelectorAll('.function-card[data-module-id]').forEach((card) => {
+                const moduleId = card.dataset.moduleId;
+                const version = MODULE_VERSIONS[moduleId];
+                if (!version) return;
+                const nameEl = card.querySelector('.function-name');
+                if (!nameEl || nameEl.querySelector('.function-version')) return;
+                const badge = document.createElement('span');
+                badge.className = 'function-version';
+                badge.textContent = version;
+                nameEl.appendChild(document.createTextNode(' '));
+                nameEl.appendChild(badge);
+            });
+        }
+
+        function moduleVersionBadge(moduleId) {
+            const version = MODULE_VERSIONS[moduleId];
+            if (!version) return '';
+            return ` <span class="function-version">${version}</span>`;
+        }
 
         function normalizeDashboardHref(href) {
             return String(href || '/').split('?')[0].replace(/\/+$/, '') || '/';
@@ -1194,7 +1217,7 @@
             grid.innerHTML = favorites.map(item => `
                 <a href="${item.href}" class="function-card pinned-tool-card">
                     ${item.icon}
-                    <div class="function-name">${item.name}</div>
+                    <div class="function-name">${item.name}${moduleVersionBadge(item.id)}</div>
                 </a>
             `).join('');
             replayDashboardCardWash(section);
@@ -1771,6 +1794,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             applyDashboardModuleAccess();
+            applyModuleVersionBadges();
             startDashboardClock();
             const bgCanvas = document.getElementById('primenet-bg-canvas');
             if (bgCanvas && window.PrimeNetConstellation) {
