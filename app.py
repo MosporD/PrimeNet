@@ -4,6 +4,7 @@ import sys
 import subprocess
 import secrets
 import threading
+import re
 from flask import g
 from urllib.parse import urlparse
 from werkzeug.serving import WSGIRequestHandler
@@ -406,6 +407,23 @@ def enforce_password_rotation():
     return redirect(url_for('user_profile.profile_page', force_password_change=1))
 
 
+# Inline boot: apply saved theme before first paint (avoids light-mode FOUC on nav).
+_THEME_BOOT_SCRIPT = (
+    '<script data-primenet-theme-boot="1">'
+    '(function(){try{'
+    'var t=localStorage.getItem("primenet-theme");'
+    'if(t!=="dark"&&t!=="light"){'
+    'var L=localStorage.getItem("darkMode");'
+    'if(L==="true")t="dark";else if(L==="false")t="light";'
+    'else t=(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";'
+    '}'
+    'document.documentElement.setAttribute("data-theme",t);'
+    'if(document.body)document.body.classList.toggle("dark-mode",t==="dark");'
+    '}catch(e){}})();'
+    '</script>'
+)
+
+
 @app.after_request
 def set_security_headers(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -425,6 +443,24 @@ def set_security_headers(resp):
     resp.headers.setdefault("Content-Security-Policy", csp)
     if _env_true("NCM_ENABLE_HSTS", False):
         resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+
+    # Run as first thing inside <body> so body.dark-mode exists before content paints.
+    try:
+        ctype = (resp.headers.get("Content-Type") or "").lower()
+        if resp.status_code == 200 and "text/html" in ctype and not resp.direct_passthrough:
+            data = resp.get_data(as_text=True)
+            if data and "data-primenet-theme-boot" not in data:
+                data2, n = re.subn(
+                    r"(<body\b[^>]*>)",
+                    r"\1" + _THEME_BOOT_SCRIPT,
+                    data,
+                    count=1,
+                    flags=re.IGNORECASE,
+                )
+                if n:
+                    resp.set_data(data2)
+    except Exception:
+        pass
     return resp
 
 if __name__ == '__main__':

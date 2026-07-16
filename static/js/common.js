@@ -431,14 +431,12 @@ function _closeFeatureNav() {
 }
 
 function _runFeatureNavTransition(direction, href) {
-    const dir = direction === 'left' ? 'left' : 'right';
+    // Navigate immediately — delayed slide-outs caused a flash of the previous
+    // page / light theme and felt like a remembered hop through the dashboard.
     try {
-        sessionStorage.setItem(PAGE_TRANSITION_STORAGE_KEY, dir);
+        sessionStorage.removeItem(PAGE_TRANSITION_STORAGE_KEY);
     } catch (_) { /* ignore */ }
-    document.body.classList.add('page-transition-out', dir === 'left' ? 'page-transition-out-left' : 'page-transition-out-right');
-    setTimeout(() => {
-        window.location.href = href;
-    }, 420);
+    window.location.href = href;
 }
 
 function _clearPageTransitionClasses() {
@@ -482,35 +480,17 @@ function _wirePageLinkTransitions() {
         }
         event.preventDefault();
         if (link.classList.contains('feature-nav-link')) _closeFeatureNav();
-        const direction = (targetPath === '/dashboard') ? 'left' : 'right';
-        _runFeatureNavTransition(direction, href);
+        _runFeatureNavTransition(null, href);
     });
 }
 
 function _runPageEnterTransition() {
-    let direction = null;
+    // Clear any leftover transition state from older clients; no enter animation.
     try {
-        direction = sessionStorage.getItem(PAGE_TRANSITION_STORAGE_KEY);
-        if (direction) sessionStorage.removeItem(PAGE_TRANSITION_STORAGE_KEY);
-    } catch (_) {
-        direction = null;
-    }
-    if (!direction) {
-        document.dispatchEvent(new CustomEvent('primenet:page-enter-done'));
-        return;
-    }
-
-    const enterClass = direction === 'left' ? 'page-transition-enter-from-left' : 'page-transition-enter-from-right';
-    document.body.classList.add(enterClass);
-    setTimeout(() => {
-        document.body.classList.add('page-transition-enter-active');
-    }, 40);
-
-    const done = () => {
-        document.body.classList.remove(enterClass, 'page-transition-enter-active');
-        document.dispatchEvent(new CustomEvent('primenet:page-enter-done'));
-    };
-    setTimeout(done, 500);
+        sessionStorage.removeItem(PAGE_TRANSITION_STORAGE_KEY);
+    } catch (_) { /* ignore */ }
+    _clearPageTransitionClasses();
+    document.dispatchEvent(new CustomEvent('primenet:page-enter-done'));
 }
 
 function _wirePageTransitionRestoreGuards() {
@@ -642,6 +622,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Apply theme as soon as this file runs (body already exists when common.js is at page end).
+try {
+    if (document.body) _applyTheme(_preferredTheme());
+} catch (_) { /* ignore */ }
 // Logout function
 async function logout() {
     if (confirm('Are you sure you want to logout?')) {
