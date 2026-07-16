@@ -800,7 +800,12 @@
     document.addEventListener("DOMContentLoaded", () => {
         initMap();
         initDrawer();
-        setTimeout(() => map.invalidateSize(), 200);
+        const fixMapSize = () => {
+            if (map) map.invalidateSize();
+        };
+        setTimeout(fixMapSize, 200);
+        setTimeout(fixMapSize, 600);
+        window.addEventListener("resize", fixMapSize);
         $("load-btn")?.addEventListener("click", loadHeatmap);
         $("fit-bounds-btn")?.addEventListener("click", fitToData);
         bindScopeControls();
