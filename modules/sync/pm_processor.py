@@ -1418,7 +1418,8 @@ def huawei_pm_user_tables(db_path: str | None = None) -> list[str]:
 def huawei_pm_kpi_tables(db_path: str | None = None) -> list[str]:
     """RAT tables including area partitions when present in the DB."""
     path = HUAWEI_PM_DB if db_path is None else db_path
-    bases = [pm_table_name(t) for t in PM_TECHNOLOGIES]
+    scope = 'daily' if 'daily' in os.path.normpath(str(path or '')).replace('\\', '/').lower() else 'hourly'
+    bases = [pm_table_name(t, scope) for t in PM_TECHNOLOGIES]
     if not path or not os.path.isfile(path):
         return bases
     try:
@@ -1439,7 +1440,13 @@ def huawei_pm_kpi_tables(db_path: str | None = None) -> list[str]:
     out: list[str] = []
     for base in bases:
         parts = list_pm_partition_tables(names, base)
-        out.extend(parts or [base])
+        if parts:
+            out.extend(parts)
+            continue
+        # Fall back to any existing cells table for this RAT (name drift).
+        tech = base.split('_', 1)[0]
+        matched = [n for n in names if n.upper().startswith(f'{tech}_CELLS')]
+        out.extend(matched or [base])
     return out
 
 
@@ -1449,9 +1456,10 @@ def huawei_table_matches_technology(table: str, technology: str | None) -> bool:
         return True
     tech = technology.strip().upper()
     t = table.upper()
-    legacy = pm_table_name(technology)
-    if table == legacy or t == legacy.upper() or t.startswith(legacy.upper() + "__"):
-        return True
+    for scope in ('hourly', 'daily'):
+        legacy = pm_table_name(technology, scope)
+        if table == legacy or t == legacy.upper() or t.startswith(legacy.upper() + "__"):
+            return True
     if tech in t:
         return True
     if tech == '4G':
@@ -1470,13 +1478,15 @@ def huawei_pm_table_for_cell(
     cell_technology: str | None = None,
     db_path: str | None = None,
 ) -> str | None:
-    """Pick the hourly table for this cell (prefer area partition, then base)."""
+    """Pick the PM table for this cell (prefer area partition, then base)."""
     from core.site_area import list_pm_partition_tables, pm_area_table_name, resolve_cell_area
 
     path = HUAWEI_PM_DB if db_path is None else db_path
-    base = pm_table_name(cell_technology or '4G')
+    scope = 'daily' if 'daily' in os.path.normpath(str(path or '')).replace('\\', '/').lower() else 'hourly'
+    base = pm_table_name(cell_technology or '4G', scope)
     preferred = pm_area_table_name(base, resolve_cell_area(cell_name))
     probe_order = [preferred, base]
+    names: list[str] = []
 
     conn = sqlite3.connect(path, timeout=15)
     try:
@@ -1486,12 +1496,18 @@ def huawei_pm_table_for_cell(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
             ).fetchall()
         ]
-        for base_cand in [base] + [pm_table_name(t) for t in PM_TECHNOLOGIES if pm_table_name(t) != base]:
+        for base_cand in [base] + [
+            pm_table_name(t, scope) for t in PM_TECHNOLOGIES if pm_table_name(t, scope) != base
+        ]:
             for tbl in list_pm_partition_tables(names, base_cand):
                 if tbl not in probe_order:
                     probe_order.append(tbl)
+            if base_cand in names and base_cand not in probe_order:
+                probe_order.append(base_cand)
 
         for tbl in probe_order:
+            if tbl not in names:
+                continue
             try:
                 if conn.execute(
                     f'SELECT 1 FROM "{tbl}" WHERE cell_name = ? LIMIT 1',
@@ -1499,15 +1515,36 @@ def huawei_pm_table_for_cell(
                 ).fetchone():
                     return tbl
             except sqlite3.OperationalError:
+                pass
+            try:
+                cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{tbl}")').fetchall()]
+            except sqlite3.OperationalError:
                 continue
+            for cand in ('Cell Name', 'LNCEL name', 'WCEL name', 'NRCEL name', 'BTS name'):
+                if cand not in cols:
+                    continue
+                try:
+                    if conn.execute(
+                        f'SELECT 1 FROM "{tbl}" WHERE "{cand}" = ? LIMIT 1',
+                        (cell_name,),
+                    ).fetchone():
+                        return tbl
+                except sqlite3.OperationalError:
+                    continue
     finally:
         conn.close()
+    if preferred in names:
+        return preferred
+    if base in names:
+        return base
     return preferred
 
 
 def resolve_huawei_pm_table(technology: str, db_path: str | None = None) -> str | None:
-    """Map UI technology to the Huawei PM hourly table name (same rule as Nokia)."""
-    return pm_table_name(technology or '4G')
+    """Map UI technology to the Huawei PM table name (hourly or daily from db path)."""
+    path = db_path or HUAWEI_PM_DB
+    scope = 'daily' if 'daily' in os.path.normpath(str(path)).replace('\\', '/').lower() else 'hourly'
+    return pm_table_name(technology or '4G', scope)
 
 
 def _huawei_ingest_prepared_df(prep: pd.DataFrame, technology: str) -> dict:

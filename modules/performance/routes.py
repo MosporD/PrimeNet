@@ -130,6 +130,14 @@ def _pm_db_for_vendor(vendor: str, scope: str = 'hourly') -> str:
     return NOKIA_PM_DAILY_DB if s == 'daily' else NOKIA_PM_DB
 
 
+def _scope_from_pm_db(db_path: str) -> str:
+    """Infer hourly/daily from a PM DB path (daily filenames/dirs contain 'daily')."""
+    p = os.path.normpath(str(db_path or '')).replace('\\', '/').lower()
+    if 'daily' in p:
+        return 'daily'
+    return 'hourly'
+
+
 def _groups_db_for_vendor(vendor: str, scope: str = 'hourly') -> str:
     s = _normalize_data_scope(scope)
     if _norm_vendor_for_pm(vendor) == 'Huawei':
@@ -884,11 +892,14 @@ def _resolve_pm_table_bundle(
     technology: str,
     preferred: str | None = None,
 ) -> dict | None:
-    key = _pm_table_meta_cache_key(db_path, vendor, technology) + f'||{preferred or ""}'
+    data_scope = _scope_from_pm_db(db_path)
+    key = _pm_table_meta_cache_key(db_path, vendor, technology) + f'||{preferred or ""}||{data_scope}'
     hit = _PM_TABLE_META_CACHE.get(key)
     if hit:
         return hit
-    table = _resolve_pm_table_sqlite(conn, vendor, technology, '', preferred)
+    table = _resolve_pm_table_sqlite(
+        conn, vendor, technology, '', preferred, scope=data_scope
+    )
     if not table:
         return None
     cell_col, time_col = _resolve_pm_axis_columns_sqlite(conn, table)
@@ -1132,15 +1143,17 @@ def _resolve_pm_table_sqlite(
     technology: str,
     cell_name: str = "",
     preferred: str | None = None,
+    scope: str = 'hourly',
 ) -> str | None:
     rows = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name DESC"
     ).fetchall()
     tables = [r[0] for r in rows]
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
-    base = pm_table_name(tech) if tech else None
+    data_scope = _normalize_data_scope(scope)
+    base = pm_table_name(tech, data_scope) if tech else None
     if not preferred and cell_name:
-        preferred = _preferred_pm_table_for_cell_name(technology, cell_name)
+        preferred = _preferred_pm_table_for_cell_name(technology, cell_name, data_scope)
 
     candidates: list[str] = []
     for t in tables:
@@ -1210,16 +1223,16 @@ def _resolve_pm_table_sqlite(
     return candidates[0] if candidates else None
 
 
-def _preferred_pm_table_for_site(technology: str, site_id) -> str:
+def _preferred_pm_table_for_site(technology: str, site_id, scope: str = 'hourly') -> str:
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else (technology or '4G')
-    return preferred_pm_table(pm_table_name(tech), site_id)
+    return preferred_pm_table(pm_table_name(tech, _normalize_data_scope(scope)), site_id)
 
 
-def _preferred_pm_table_for_cell_name(technology: str, cell_name: str) -> str | None:
+def _preferred_pm_table_for_cell_name(technology: str, cell_name: str, scope: str = 'hourly') -> str | None:
     sid = site_id_from_cell_name(cell_name)
     if not sid:
         return None
-    return _preferred_pm_table_for_site(technology, sid)
+    return _preferred_pm_table_for_site(technology, sid, scope)
 
 
 def _sqlite_table_names(conn: sqlite3.Connection) -> set[str]:
@@ -1235,6 +1248,7 @@ def _pm_dual_read_tables(
     site_id=None,
     *,
     preferred: str | None = None,
+    scope: str = 'hourly',
 ) -> list[str]:
     """
     Tables to read during the dual-read window.
@@ -1244,7 +1258,8 @@ def _pm_dual_read_tables(
     No migration required.
     """
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else (technology or '4G')
-    base = pm_table_name(tech)
+    data_scope = _normalize_data_scope(scope)
+    base = pm_table_name(tech, data_scope)
     area = preferred or (
         preferred_pm_table(base, site_id) if site_id is not None else None
     )
@@ -1253,6 +1268,14 @@ def _pm_dual_read_tables(
     for name in (area, base):
         if name and name in existing and name not in out:
             out.append(name)
+    # Daily DBs are still monotables today; tolerate a stale hourly preferred name.
+    if not out and base in existing:
+        out.append(base)
+    if not out:
+        for t in existing:
+            if _table_technology(t) == tech and ('CELLS' in t.upper()):
+                out.append(t)
+                break
     return out
 
 
@@ -1365,10 +1388,11 @@ def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: st
             ).fetchall()
         ]
         tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
-        base = pm_table_name(tech)
+        data_scope = _normalize_data_scope(scope)
+        base = pm_table_name(tech, data_scope)
         tables = list_pm_partition_tables(existing, base)
         if not tables:
-            hit = _resolve_pm_table_sqlite(conn, vendor, technology)
+            hit = _resolve_pm_table_sqlite(conn, vendor, technology, scope=data_scope)
             tables = [hit] if hit else []
         for table in tables:
             cell_col, _time_col = _resolve_pm_axis_columns_sqlite(conn, table)
@@ -1599,6 +1623,7 @@ def _get_pm_cols(db_path, technology=None):
         return _drop_duplicate_kpis(sorted(result))
 
     techs = [technology] if technology else PM_TECHNOLOGIES
+    data_scope = _scope_from_pm_db(db_path)
     try:
         conn = sqlite3.connect(db_path, timeout=30)
         existing = [
@@ -1608,8 +1633,16 @@ def _get_pm_cols(db_path, technology=None):
             ).fetchall()
         ]
         for tech in techs:
-            base = pm_table_name(tech)
-            for table in list_pm_partition_tables(existing, base) or [base]:
+            base = pm_table_name(tech, data_scope)
+            tables = list_pm_partition_tables(existing, base)
+            if not tables:
+                # Fall back to any tech-matching cells table (legacy name drift).
+                tables = [
+                    t for t in existing
+                    if _table_technology(t) == ('4G' if tech in ('4G-FDD', '4G-TDD') else tech)
+                    and 'CELLS' in t.upper()
+                ] or [base]
+            for table in tables:
                 try:
                     result.update(_kpi_columns_for_sqlite_table(conn, table))
                 except sqlite3.OperationalError:
@@ -1703,7 +1736,11 @@ def _build_pm_union(alias, db_path, technology=None):
         if technology:
             tables = [t for t in tables if huawei_table_matches_technology(t, technology)]
     else:
-        tables = [pm_table_name(t) for t in ([technology] if technology else PM_TECHNOLOGIES)]
+        data_scope = _scope_from_pm_db(db_path)
+        tables = [
+            pm_table_name(t, data_scope)
+            for t in ([technology] if technology else PM_TECHNOLOGIES)
+        ]
 
     try:
         conn = sqlite3.connect(db_path, timeout=30)
@@ -1753,7 +1790,11 @@ def _build_pm_union_minimal(alias, db_path, technology=None):
         if technology:
             tables = [t for t in tables if huawei_table_matches_technology(t, technology)]
     else:
-        tables = [pm_table_name(t) for t in ([technology] if technology else PM_TECHNOLOGIES)]
+        data_scope = _scope_from_pm_db(db_path)
+        tables = [
+            pm_table_name(t, data_scope)
+            for t in ([technology] if technology else PM_TECHNOLOGIES)
+        ]
 
     if not tables:
         return None, None
@@ -2553,7 +2594,7 @@ def get_cell_trend(cell_id):
     cell_name = cell['cell_name']
     cell_tech = cell.get('technology', '4G')
     pm_db     = _pm_db_for_vendor(vendor, data_scope)
-    table = _preferred_pm_table_for_site(cell_tech, cell.get('site_id'))
+    table = _preferred_pm_table_for_site(cell_tech, cell.get('site_id'), data_scope)
 
     requested_kpis = _requested_trend_kpi_names()
     trend_cache_key = _trend_cache_key(
@@ -2576,11 +2617,11 @@ def get_cell_trend(cell_id):
             pm_conn = _open_pm_db(pm_db)
             pm_conn.row_factory = sqlite3.Row
             tables = _pm_dual_read_tables(
-                pm_conn, str(cell_tech or ''), cell.get('site_id'), preferred=table
+                pm_conn, str(cell_tech or ''), cell.get('site_id'), preferred=table, scope=data_scope
             )
             if not tables:
                 hit = _resolve_pm_table_sqlite(
-                    pm_conn, str(vendor or ''), str(cell_tech or ''), cell_name, table
+                    pm_conn, str(vendor or ''), str(cell_tech or ''), cell_name, table, scope=data_scope
                 )
                 tables = [hit] if hit else []
             trend, table, cell_col, time_col = _query_cell_trend_from_tables(
@@ -2667,7 +2708,7 @@ def get_cell_trend_by_name():
     tech = cell.get('technology', '4G')
     pm_db = _pm_db_for_vendor(vendor, data_scope)
     pm_tech = '4G' if tech in ('4G-FDD', '4G-TDD') else tech
-    table = _preferred_pm_table_for_site(pm_tech, cell.get('site_id'))
+    table = _preferred_pm_table_for_site(pm_tech, cell.get('site_id'), data_scope)
 
     requested_kpis = _requested_trend_kpi_names()
     trend_cache_key = _trend_cache_key(
@@ -2690,11 +2731,11 @@ def get_cell_trend_by_name():
             pm_conn = _open_pm_db(pm_db)
             pm_conn.row_factory = sqlite3.Row
             tables = _pm_dual_read_tables(
-                pm_conn, str(pm_tech or ''), cell.get('site_id'), preferred=table
+                pm_conn, str(pm_tech or ''), cell.get('site_id'), preferred=table, scope=data_scope
             )
             if not tables:
                 hit = _resolve_pm_table_sqlite(
-                    pm_conn, str(vendor or ''), str(pm_tech or ''), cell_name, table
+                    pm_conn, str(vendor or ''), str(pm_tech or ''), cell_name, table, scope=data_scope
                 )
                 tables = [hit] if hit else []
             trend, table, cell_col, time_col = _query_cell_trend_from_tables(
@@ -2923,9 +2964,11 @@ def get_pm_table():
         conn = _open_pm_db(db_path)
         preferred = None
         if scoped_cell_names:
-            preferred = _preferred_pm_table_for_cell_name(technology, scoped_cell_names[0])
+            preferred = _preferred_pm_table_for_cell_name(
+                technology, scoped_cell_names[0], data_scope
+            )
             preferred = _resolve_pm_table_sqlite(
-                conn, vendor, technology, scoped_cell_names[0], preferred
+                conn, vendor, technology, scoped_cell_names[0], preferred, scope=data_scope
             )
         bundle = _resolve_pm_table_bundle(conn, db_path, vendor, technology, preferred=preferred)
         if not bundle:
@@ -2934,7 +2977,7 @@ def get_pm_table():
 
         table = bundle['table']
         dual_tables = _pm_dual_read_tables(
-            conn, technology, None, preferred=preferred or table
+            conn, technology, None, preferred=preferred or table, scope=data_scope
         ) or [table]
         # Include bundle table if dual-read missed it (e.g. unexpected name).
         if table not in dual_tables:

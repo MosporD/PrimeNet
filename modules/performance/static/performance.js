@@ -226,6 +226,22 @@ let hwChartTrendCacheSig = '';
 let hwSearchTimer   = null;
 const HW_PAGE_SIZE  = 20;
 
+/** Bumps on every tree reload so stale cell/group fetches cannot overwrite the UI. */
+let _perfTreeLoadSeq = 0;
+
+function _nextPerfTreeLoadToken() {
+    _perfTreeLoadSeq += 1;
+    return _perfTreeLoadSeq;
+}
+
+function _isPerfTreeLoadCurrent(token) {
+    return token === _perfTreeLoadSeq;
+}
+
+function _currentSelectionType() {
+    return (document.getElementById('filter-selection-type')?.value || 'cell').trim();
+}
+
 let KPI_CATEGORY_MAP = {};
 let KPI_DISPLAY_NAMES = {};
 let META_KPI_KEYS = new Set();
@@ -567,13 +583,6 @@ async function loadKpiColumns() {
             listEl.innerHTML = `<p class="kpi-scope-empty">Could not load KPI columns. Please refresh and try again.</p>`;
         }
     }
-}
-
-async function onFilterTechChange() {
-    _resetObjectScopeFilters();
-    await loadKpiColumns();
-    await loadCellGroups();
-    await maybeAutoReloadCells();
 }
 
 function kpiClass(value, def) {
@@ -1293,9 +1302,10 @@ async function runSelectedReport() {
     await runPerformanceQuery();
 }
 
-async function loadCellGroups() {
+async function loadCellGroups(opts = {}) {
     const sel = document.getElementById('filter-group');
     if (!sel) return;
+    const token = opts.token != null ? opts.token : _nextPerfTreeLoadToken();
     try {
         const vendor = (document.getElementById('filter-vendor')?.value || '').trim();
         const technology = (document.getElementById('filter-tech')?.value || '').trim();
@@ -1304,7 +1314,9 @@ async function loadCellGroups() {
         if (technology) qs.set('technology', technology);
         qs.set('data_scope', _currentDataScope());
         const res = await fetch('/api/performance/groups' + (qs.toString() ? `?${qs.toString()}` : ''));
+        if (!_isPerfTreeLoadCurrent(token)) return;
         const data = await res.json();
+        if (!_isPerfTreeLoadCurrent(token)) return;
         if (!data.success) {
             return;
         }
@@ -1326,8 +1338,7 @@ async function loadCellGroups() {
             sel.appendChild(o);
         }
         if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
-        const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
-        if (selectionType === 'group') {
+        if (_isPerfTreeLoadCurrent(token) && _currentSelectionType() === 'group') {
             showGroupPicker(allCellGroups);
         }
     } catch (_) {
@@ -1336,7 +1347,8 @@ async function loadCellGroups() {
 }
 
 async function onSelectionTypeChange() {
-    const type = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
+    const token = _nextPerfTreeLoadToken();
+    const type = _currentSelectionType();
     const groupWrap = document.getElementById('group-picker-wrap');
     const cellsBody = document.getElementById('perf-cells-body');
     if (groupWrap) groupWrap.style.display = 'none';
@@ -1344,11 +1356,20 @@ async function onSelectionTypeChange() {
     if (type === 'group') {
         allCells = [];
         activeCellId = null;
-        await loadCellGroups();
-        showGroupPicker(allCellGroups);
-        _perfQueryUserMessage('Select a group, then click Query.');
+        await loadCellGroups({ token });
+        if (!_isPerfTreeLoadCurrent(token)) return;
+        if (_currentSelectionType() === 'group') {
+            showGroupPicker(allCellGroups);
+            _perfQueryUserMessage('Select a group, then click Query.');
+        }
     } else {
-        showCellPicker(allCells, { fromApply: true });
+        // Cell list was cleared while in group mode — reload cells for current filters.
+        await applyFilters({
+            skipAutoChart: true,
+            skipKpiColumns: true,
+            token,
+            skipGroupReload: true,
+        });
     }
 }
 
@@ -1487,6 +1508,7 @@ async function onVendorChange() {
     if (perfPmViewPrefPromise) {
         await perfPmViewPrefPromise;
     }
+    const scopeToken = _nextPerfTreeLoadToken();
     const vendor  = document.getElementById('filter-vendor').value;
     const techSel = document.getElementById('filter-tech');
     const opt5g   = techSel.querySelector('option[value="5G"]');
@@ -1511,8 +1533,33 @@ async function onVendorChange() {
     hwCurrentScopedGroupRefs = [];
     _setPerfChartChoiceVisible(false);
 
-    await Promise.all([loadKpiColumns(), loadCellGroups()]);
-    await maybeAutoReloadCells();
+    await Promise.all([
+        loadKpiColumns(),
+        loadCellGroups({ token: scopeToken }),
+    ]);
+    if (!_isPerfTreeLoadCurrent(scopeToken)) return;
+    await applyFilters({
+        skipAutoChart: true,
+        skipKpiColumns: true,
+        skipGroupReload: true,
+        token: scopeToken,
+    });
+}
+
+async function onFilterTechChange() {
+    const scopeToken = _nextPerfTreeLoadToken();
+    _resetObjectScopeFilters();
+    await Promise.all([
+        loadKpiColumns(),
+        loadCellGroups({ token: scopeToken }),
+    ]);
+    if (!_isPerfTreeLoadCurrent(scopeToken)) return;
+    await applyFilters({
+        skipAutoChart: true,
+        skipKpiColumns: true,
+        skipGroupReload: true,
+        token: scopeToken,
+    });
 }
 
 async function loadPmViewPreference() {
@@ -1576,6 +1623,8 @@ function onClusterChange() {
     }
 
     _applyGeoFilters(cluster, area);
+    // Area/cluster only scopes the cell tree — ignore while browsing groups.
+    if (_currentSelectionType() === 'group') return;
     // In the Cells panel, changing cluster should immediately refresh scoped cells.
     void applyFilters({ skipAutoChart: true, skipKpiColumns: true });
 }
@@ -1598,6 +1647,7 @@ function onAreaChange() {
     const cluster = clusterSel.value;
 
     _applyGeoFilters(cluster, area);
+    if (_currentSelectionType() === 'group') return;
     // In the Cells panel, changing area should immediately refresh scoped cells.
     void applyFilters({ skipAutoChart: true, skipKpiColumns: true });
 }
@@ -2194,16 +2244,20 @@ function _currentTrendGranularity() {
 }
 
 /**
- * @param {{ skipAutoChart?: boolean, skipKpiColumns?: boolean }} opts
+ * @param {{ skipAutoChart?: boolean, skipKpiColumns?: boolean, skipGroupReload?: boolean, token?: number }} opts
  *  skipAutoChart: do not jump straight to chart when filter-cell is set (scope refresh from UI).
  *  skipKpiColumns: avoid duplicate KPI column fetch when caller just ran loadKpiColumns.
+ *  skipGroupReload: reuse cached allCellGroups (selection-type switch already loaded them).
+ *  token: optional tree-load generation token for race protection.
  */
 async function applyFilters(opts = {}) {
+    const token = opts.token != null ? opts.token : _nextPerfTreeLoadToken();
     if (!opts.skipKpiColumns) await loadKpiColumns();
+    if (!_isPerfTreeLoadCurrent(token)) return;
 
     const vendor  = document.getElementById('filter-vendor').value;
     const tech    = document.getElementById('filter-tech').value;
-    const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
+    const selectionType = _currentSelectionType();
     const cluster = document.getElementById('filter-cluster')?.value || '';
     const area    = document.getElementById('filter-area')?.value || '';
     const site    = (document.getElementById('filter-site').value
@@ -2219,8 +2273,12 @@ async function applyFilters(opts = {}) {
     if (selectionType === 'group') {
         // Groups mode should read from groups DB flow, not metadata /cells list.
         allCells = [];
-        _resetPerfChartStateForNewScope();
-        showGroupPicker(allCellGroups);
+        if (!opts.skipGroupReload) {
+            await loadCellGroups({ token });
+        } else if (_isPerfTreeLoadCurrent(token) && _currentSelectionType() === 'group') {
+            showGroupPicker(allCellGroups);
+        }
+        if (!_isPerfTreeLoadCurrent(token) || _currentSelectionType() !== 'group') return;
         const tView = document.getElementById('pm-table-view');
         if (tView && tView.style.display !== 'none') {
             const v = document.getElementById('filter-vendor').value;
@@ -2243,15 +2301,26 @@ async function applyFilters(opts = {}) {
     if (site)    params.set('site_id',    site);
     params.set('data_scope', _currentDataScope());
 
+    const listEl = document.getElementById('cell-list');
+    if (listEl && !allCells.length) {
+        listEl.innerHTML = '<p class="perf-tree-empty">Loading cells…</p>';
+    }
+
     const res  = await fetch('/api/performance/cells?' + params);
+    if (!_isPerfTreeLoadCurrent(token)) return;
     const data = await res.json();
+    if (!_isPerfTreeLoadCurrent(token)) return;
     if (!data.success) return;
+    // User may have switched to Groups while this cell fetch was in flight.
+    if (_currentSelectionType() !== 'cell') return;
 
     allCells = data.cells;
     if (vendor) {
         allCells = allCells.filter(c => String(c.vendor || '') === vendor);
     }
     _rebuildGeoFiltersFromCells(allCells);
+
+    if (!_isPerfTreeLoadCurrent(token) || _currentSelectionType() !== 'cell') return;
 
     _resetPerfChartStateForNewScope();
 
@@ -3596,6 +3665,7 @@ function onHwSearch(value) {
 }
 
 async function onDataScopeChange() {
+    const scopeToken = _nextPerfTreeLoadToken();
     perfChartDisplayMode = 'trend';
     perfDodPickerNeedsReset = true;
     perfDodPickerSig = '';
@@ -3608,9 +3678,18 @@ async function onDataScopeChange() {
     hwCurrentScopedGroupRefs = [];
     _setPerfChartChoiceVisible(false);
     await loadKpiHeaderMap();
-    await loadKpiColumns();
-    await loadCellGroups();
-    await maybeAutoReloadCells();
+    if (!_isPerfTreeLoadCurrent(scopeToken)) return;
+    await Promise.all([
+        loadKpiColumns(),
+        loadCellGroups({ token: scopeToken }),
+    ]);
+    if (!_isPerfTreeLoadCurrent(scopeToken)) return;
+    await applyFilters({
+        skipAutoChart: true,
+        skipKpiColumns: true,
+        skipGroupReload: true,
+        token: scopeToken,
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

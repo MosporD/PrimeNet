@@ -323,19 +323,24 @@ RAW_PULL_PRUNE_AFTER = _env_bool_loader('RAW_PULL_PRUNE_AFTER', True)
 # a single cell_kpis table.  Table names: "2G_CELLS_HOURLY", etc.
 PM_TECHNOLOGIES = ['2G', '3G', '4G', '5G']
 
-def pm_table_name(technology):
+def pm_table_name(technology, scope='hourly'):
     """Map a technology label to its PM database table name.
-    '4G', '4G-FDD', '4G-TDD', 'LTE' → '4G_CELLS_HOURLY', etc."""
+
+    '4G', '4G-FDD', '4G-TDD', 'LTE' → '4G_CELLS_HOURLY' (or ``_DAILY`` when
+    ``scope`` is daily). Hourly remains the default for callers that omit scope.
+    """
     tech = str(technology).upper().strip()
+    scope_l = str(scope or 'hourly').strip().lower()
+    scope_tag = 'DAILY' if scope_l in ('d', 'day', 'daily') else 'HOURLY'
     if '5G' in tech or 'NR' in tech:
-        return '5G_CELLS_HOURLY'
+        return f'5G_CELLS_{scope_tag}'
     if '4G' in tech or 'LTE' in tech:
-        return '4G_CELLS_HOURLY'
+        return f'4G_CELLS_{scope_tag}'
     if '3G' in tech or 'WCDMA' in tech or 'UMTS' in tech:
-        return '3G_CELLS_HOURLY'
+        return f'3G_CELLS_{scope_tag}'
     if '2G' in tech or 'GSM' in tech:
-        return '2G_CELLS_HOURLY'
-    return f'{tech}_CELLS_HOURLY'
+        return f'2G_CELLS_{scope_tag}'
+    return f'{tech}_CELLS_{scope_tag}'
 
 # ============================================================
 # SERVER 1A — Nokia PM
