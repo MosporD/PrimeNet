@@ -114,6 +114,15 @@ let measurePtMarkers = [];
 let measurePolyline  = null;
 let measureDistLabel = null;
 
+// ─── Polygon selection tool state ─────────────────────────────────────────────
+let polygonDrawActive      = false;
+let polygonDrawPoints      = [];
+let polygonDrawMarkers     = [];
+let polygonDrawPreviewLine = null;
+let selectionPolygonLayer  = null;
+let selectionPolygon       = null;
+let _polygonExtractBusy    = false;
+
 const LEFT_PANEL_COLLAPSE_KEY = 'networkMapLeftPanelCollapsed';
 
 function applySavedLeftPanelState() {
@@ -158,6 +167,7 @@ function initializeMap() {
     map = L.map('network-map', { preferCanvas: true }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
     neighborLinesLayer = L.layerGroup().addTo(map);
     repeaterLayer = L.layerGroup();
+    selectionPolygonLayer = L.layerGroup().addTo(map);
     if (NEIGHBOR_ONLY_MODE) {
         mapModule = 'neighbor-explorer';
         neighborEnabled = true;
@@ -2395,6 +2405,7 @@ function toggleMeasure() {
     measureActive = !measureActive;
     const btn = document.getElementById('measure-btn');
     if (measureActive) {
+        if (polygonDrawActive) _stopPolygonDrawMode();
         btn.classList.add('active');
         btn.textContent = '✕ Stop Measuring';
         map.getContainer().style.cursor = 'crosshair';
@@ -2463,6 +2474,444 @@ function clearMeasure() {
     if (measurePolyline)  { map.removeLayer(measurePolyline);  measurePolyline  = null; }
     if (measureDistLabel) { map.removeLayer(measureDistLabel); measureDistLabel = null; }
     measurePoints = [];
+}
+
+// ─── Polygon draw + spatial extraction ───────────────────────────────────────
+
+function _polygonRingFromLayer(polygon) {
+    const latlngs = polygon.getLatLngs();
+    const ring = Array.isArray(latlngs[0]) ? latlngs[0] : latlngs;
+    return ring.map(ll => [ll.lat, ll.lng]);
+}
+
+function pointInPolygon(lat, lng, ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const yi = ring[i][0];
+        const xi = ring[i][1];
+        const yj = ring[j][0];
+        const xj = ring[j][1];
+        const intersect = ((yi > lat) !== (yj > lat))
+            && (lng < (xj - xi) * (lat - yi) / (yj - yi + 1e-15) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+function _updatePolygonClearButton() {
+    const clearBtn = document.getElementById('polygon-clear-btn');
+    const extractBtn = document.getElementById('polygon-extract-btn');
+    const visible = Boolean(selectionPolygon);
+    if (clearBtn) clearBtn.style.display = visible ? '' : 'none';
+    if (extractBtn) extractBtn.style.display = visible ? '' : 'none';
+}
+
+function clearSelectionPolygon() {
+    if (selectionPolygon && selectionPolygonLayer) {
+        selectionPolygonLayer.removeLayer(selectionPolygon);
+        selectionPolygon = null;
+    }
+    _clearPolygonDrawPreview();
+    polygonDrawPoints = [];
+    _updatePolygonClearButton();
+}
+
+function _clearPolygonDrawPreview() {
+    polygonDrawMarkers.forEach(m => map && map.removeLayer(m));
+    polygonDrawMarkers = [];
+    if (polygonDrawPreviewLine) {
+        map.removeLayer(polygonDrawPreviewLine);
+        polygonDrawPreviewLine = null;
+    }
+}
+
+function _stopPolygonDrawMode() {
+    polygonDrawActive = false;
+    const btn = document.getElementById('polygon-draw-btn');
+    if (btn) {
+        btn.classList.remove('active');
+        btn.textContent = '⬠ Draw Polygon';
+    }
+    if (map) {
+        map.getContainer().style.cursor = '';
+        map.doubleClickZoom.enable();
+        map.off('click', onPolygonDrawClick);
+        map.off('dblclick', onPolygonDrawDblClick);
+    }
+    _clearPolygonDrawPreview();
+    polygonDrawPoints = [];
+}
+
+function togglePolygonDraw() {
+    if (polygonDrawActive) {
+        _stopPolygonDrawMode();
+        return;
+    }
+    if (measureActive) toggleMeasure();
+
+    polygonDrawActive = true;
+    polygonDrawPoints = [];
+    _clearPolygonDrawPreview();
+
+    const btn = document.getElementById('polygon-draw-btn');
+    if (btn) {
+        btn.classList.add('active');
+        btn.textContent = '✕ Cancel Draw';
+    }
+    map.getContainer().style.cursor = 'crosshair';
+    map.doubleClickZoom.disable();
+    map.on('click', onPolygonDrawClick);
+    map.on('dblclick', onPolygonDrawDblClick);
+    showNotification('Click map corners to draw. Double-click to finish (min 3 points).', 'info');
+}
+
+function onPolygonDrawClick(e) {
+    if (!polygonDrawActive) return;
+    L.DomEvent.stopPropagation(e);
+    polygonDrawPoints.push(e.latlng);
+
+    const pt = L.circleMarker(e.latlng, {
+        radius: 4,
+        color: '#2980b9',
+        fillColor: '#fff',
+        fillOpacity: 1,
+        weight: 2,
+    }).addTo(map);
+    polygonDrawMarkers.push(pt);
+
+    if (polygonDrawPreviewLine) map.removeLayer(polygonDrawPreviewLine);
+    if (polygonDrawPoints.length >= 2) {
+        const previewPts = polygonDrawPoints.slice();
+        if (previewPts.length >= 3) previewPts.push(previewPts[0]);
+        polygonDrawPreviewLine = L.polyline(previewPts, {
+            color: '#2980b9',
+            weight: 2,
+            dashArray: '6,4',
+            opacity: 0.9,
+        }).addTo(map);
+    }
+}
+
+function onPolygonDrawDblClick(e) {
+    if (!polygonDrawActive) return;
+    L.DomEvent.stopPropagation(e);
+    L.DomEvent.preventDefault(e);
+    if (polygonDrawPoints.length < 3) {
+        showNotification('Add at least 3 points before finishing the polygon', 'info');
+        return;
+    }
+    finishPolygonDraw();
+}
+
+function finishPolygonDraw() {
+    if (!polygonDrawActive || polygonDrawPoints.length < 3) return;
+
+    // Snapshot vertices before clearing draw state / previous polygon.
+    const ring = polygonDrawPoints.map(ll => [ll.lat, ll.lng]);
+
+    if (selectionPolygon && selectionPolygonLayer) {
+        selectionPolygonLayer.removeLayer(selectionPolygon);
+        selectionPolygon = null;
+    }
+
+    selectionPolygon = L.polygon(ring, {
+        color: '#2980b9',
+        weight: 2.5,
+        fillColor: '#3498db',
+        fillOpacity: 0.18,
+    });
+    selectionPolygon.addTo(selectionPolygonLayer);
+
+    const layerLabel = document.getElementById('polygon-layer-select')?.selectedOptions?.[0]?.textContent
+        || 'Sites';
+    selectionPolygon.bindPopup(`
+        <div style="font-weight:700;margin-bottom:6px;">Selection polygon</div>
+        <div style="font-size:0.9em;margin-bottom:8px;">
+            Layer: <strong>${escapeHtml(layerLabel)}</strong>
+        </div>
+        <button type="button" class="polygon-extract-popup-btn" onclick="extractFromCurrentPolygon()">
+            Export Excel — ${escapeHtml(layerLabel)}
+        </button>
+    `);
+    selectionPolygon.on('click', e => {
+        L.DomEvent.stopPropagation(e);
+        selectionPolygon.openPopup();
+    });
+
+    _stopPolygonDrawMode();
+    _updatePolygonClearButton();
+    _showPolygonReadyPanel(layerLabel);
+    showNotification('Polygon ready — use Extract in the popup or left panel.', 'success');
+}
+
+function _showPolygonReadyPanel(layerLabel) {
+    const panel = document.getElementById('site-info-panel');
+    if (!panel) return;
+    panel.innerHTML = `
+        <h3 class="site-panel-title">⬠ Selection polygon</h3>
+        <div class="site-meta-row">Polygon drawn. Layer: <strong>${escapeHtml(layerLabel || 'Sites')}</strong></div>
+        <button type="button" class="polygon-extract-btn" onclick="extractFromCurrentPolygon()">
+            Export Excel — ${escapeHtml(layerLabel || 'Sites')}
+        </button>
+    `;
+    panel.style.display = 'block';
+}
+
+function extractFromCurrentPolygon() {
+    if (!selectionPolygon) {
+        showNotification('Draw a polygon first', 'info');
+        return;
+    }
+    void extractFromSelectionPolygon(selectionPolygon);
+}
+
+function _polygonSpatialRequestBody(ring) {
+    return {
+        polygon: ring,
+        layer: document.getElementById('polygon-layer-select')?.value || 'sites',
+        tech: activeTech !== 'all' ? activeTech : '',
+        tech_value: activeTechSpecific !== 'all' ? activeTechSpecific : '',
+        vendor: document.getElementById('vendor-filter')?.value || 'all',
+        area: document.getElementById('area-filter')?.value || 'all',
+        cluster: document.getElementById('cluster-filter')?.value || 'all',
+    };
+}
+
+function _filenameFromContentDisposition(header, fallback) {
+    if (!header) return fallback;
+    const utfMatch = /filename\*=UTF-8''([^;]+)/i.exec(header);
+    if (utfMatch) {
+        try { return decodeURIComponent(utfMatch[1].trim()); } catch (_) { /* ignore */ }
+    }
+    const plain = /filename="?([^";]+)"?/i.exec(header);
+    return plain ? plain[1].trim() : fallback;
+}
+
+function _downloadBlob(blob, fname) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function _csvEscape(val) {
+    const s = val == null ? '' : String(val);
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+}
+
+function _downloadCsv(filename, headers, rows) {
+    const lines = [
+        headers.map(_csvEscape).join(','),
+        ...rows.map((row) => row.map(_csvEscape).join(',')),
+    ];
+    // BOM so Excel opens UTF-8 correctly
+    const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    _downloadBlob(blob, filename);
+}
+
+function _polygonExportStamp() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+function _markPolygonExportDone(layerLabel, fname, count) {
+    const panel = document.getElementById('site-info-panel');
+    const countText = (count === 'file' || count == null)
+        ? escapeHtml(layerLabel)
+        : `<strong>${count}</strong> ${escapeHtml(layerLabel.toLowerCase())}`;
+    if (panel) {
+        panel.innerHTML = `
+            <h3 class="site-panel-title">⬠ Polygon export</h3>
+            <div class="site-meta-row">Exported ${countText} inside the polygon.</div>
+            <div class="site-meta-row">${escapeHtml(fname)}</div>
+            <button type="button" class="polygon-extract-btn" onclick="extractFromCurrentPolygon()">
+                Export again
+            </button>
+        `;
+        panel.style.display = 'block';
+    }
+    const nMsg = (count === 'file' || count == null) ? layerLabel : `${count} ${layerLabel.toLowerCase()}`;
+    showNotification(`Downloaded ${nMsg} (${fname})`, 'success');
+}
+
+/** Client-side export — works even if the Excel API route is unavailable. */
+async function _exportPolygonClientSide(ring, layer) {
+    const stamp = _polygonExportStamp();
+
+    if (layer === 'sites') {
+        if (!sitesData.length) {
+            showNotification('Apply a filter first so sites are loaded', 'info');
+            return false;
+        }
+        const matched = applyClientFilters(sitesData).filter((s) => {
+            const lat = Number(s.latitude);
+            const lng = Number(s.longitude);
+            return Number.isFinite(lat) && Number.isFinite(lng) && pointInPolygon(lat, lng, ring);
+        });
+        if (!matched.length) {
+            showNotification('No sites inside polygon', 'info');
+            return false;
+        }
+        const fname = `polygon_sites_${stamp}.csv`;
+        _downloadCsv(
+            fname,
+            ['Site ID', 'Site Name', 'Latitude', 'Longitude', 'Vendor', 'Area', 'Cluster', 'Region'],
+            matched.map((s) => [
+                s.site_id, s.site_name, s.latitude, s.longitude,
+                s.vendor, s.area, s.cluster, s.region,
+            ]),
+        );
+        _markPolygonExportDone('Sites', fname, matched.length);
+        return true;
+    }
+
+    if (layer === 'repeaters') {
+        const source = repeaterData.length ? repeaterData : [];
+        if (!source.length) {
+            showNotification('Enable "Show repeaters" and wait for them to load', 'info');
+            return false;
+        }
+        const matched = source.filter((rep) => {
+            const lat = Number(rep.latitude);
+            const lng = Number(rep.longitude);
+            return Number.isFinite(lat) && Number.isFinite(lng) && pointInPolygon(lat, lng, ring);
+        });
+        if (!matched.length) {
+            showNotification('No repeaters inside polygon', 'info');
+            return false;
+        }
+        const fname = `polygon_repeaters_${stamp}.csv`;
+        _downloadCsv(
+            fname,
+            ['Repeater ID', 'Name', 'Site Name', 'Type', 'Supported RATs', 'Contact', 'Technician', 'Latitude', 'Longitude'],
+            matched.map((r) => [
+                r.repeater_id, r.name || r.refcode, r.site_name, r.repeater_type,
+                r.supported_rats, r.contact_number, r.technician, r.latitude, r.longitude,
+            ]),
+        );
+        _markPolygonExportDone('Repeaters', fname, matched.length);
+        return true;
+    }
+
+    // Cells: resolve via sites inside polygon, then fetch each site's cells.
+    if (!sitesData.length) {
+        showNotification('Apply a filter first so sites are loaded', 'info');
+        return false;
+    }
+    const matchedSites = applyClientFilters(sitesData).filter((s) => {
+        const lat = Number(s.latitude);
+        const lng = Number(s.longitude);
+        return Number.isFinite(lat) && Number.isFinite(lng) && pointInPolygon(lat, lng, ring);
+    });
+    if (!matchedSites.length) {
+        showNotification('No sites inside polygon', 'info');
+        return false;
+    }
+
+    showNotification(`Loading cells for ${matchedSites.length} sites…`, 'info');
+    const rows = [];
+    for (const site of matchedSites) {
+        try {
+            const res = await fetch(`/api/map/site/${encodeURIComponent(site.site_id)}`, {
+                credentials: 'same-origin',
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success || !data.site) continue;
+            const cells = Array.isArray(data.site.cells) ? data.site.cells : [];
+            cells
+                .filter((c) => cellMatchesMapTechFilter(c))
+                .forEach((c) => {
+                    rows.push([
+                        c.cell_name,
+                        site.site_id,
+                        site.site_name,
+                        c.technology,
+                        c.frequency_band,
+                        c.azimuth,
+                        c.mechanical_tilt,
+                        c.electrical_tilt,
+                        c.pci,
+                        c.activity_status || c.status,
+                        c.vendor || site.vendor,
+                        site.latitude,
+                        site.longitude,
+                    ]);
+                });
+        } catch (_) { /* skip site */ }
+    }
+    if (!rows.length) {
+        showNotification('No cells inside polygon for the selected layer', 'info');
+        return false;
+    }
+    const fname = `polygon_cells_${stamp}.csv`;
+    _downloadCsv(
+        fname,
+        [
+            'Cell Name', 'Site ID', 'Site Name', 'Technology', 'Frequency Band',
+            'Azimuth', 'Mech. Tilt', 'Elec. Tilt', 'PCI / SC / BCCH',
+            'Activity status', 'Vendor', 'Latitude', 'Longitude',
+        ],
+        rows,
+    );
+    _markPolygonExportDone('Cells', fname, rows.length);
+    return true;
+}
+
+async function extractFromSelectionPolygon(polygon) {
+    if (!polygon || _polygonExtractBusy) return;
+    const ring = _polygonRingFromLayer(polygon);
+    if (!ring || ring.length < 3) {
+        showNotification('Polygon is invalid — please redraw', 'error');
+        return;
+    }
+    const layer = document.getElementById('polygon-layer-select')?.value || 'sites';
+    const layerLabel = layer === 'cells' ? 'Cells' : layer === 'repeaters' ? 'Repeaters' : 'Sites';
+
+    _polygonExtractBusy = true;
+    showNotification(`Exporting ${layerLabel.toLowerCase()} inside polygon…`, 'info');
+    try {
+        // Prefer server Excel when available; fall back to client CSV.
+        let usedServer = false;
+        try {
+            const res = await fetch('/api/map/export/polygon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(_polygonSpatialRequestBody(ring)),
+            });
+            const contentType = (res.headers.get('Content-Type') || '').toLowerCase();
+            if (res.ok && (contentType.includes('spreadsheet') || contentType.includes('octet-stream') || contentType.includes('excel'))) {
+                const blob = await res.blob();
+                if (blob && blob.size >= 32) {
+                    const fname = _filenameFromContentDisposition(
+                        res.headers.get('Content-Disposition'),
+                        `polygon_${layer}_${_polygonExportStamp()}.xlsx`,
+                    );
+                    _downloadBlob(blob, fname);
+                    _markPolygonExportDone(layerLabel, fname, 'file');
+                    usedServer = true;
+                }
+            }
+        } catch (apiErr) {
+            console.warn('Polygon Excel API unavailable, using CSV fallback', apiErr);
+        }
+
+        if (!usedServer) {
+            const ok = await _exportPolygonClientSide(ring, layer);
+            if (!ok) return;
+        }
+    } catch (e) {
+        console.error('Polygon export error:', e);
+        showNotification(e.message || 'Polygon export failed', 'error');
+    } finally {
+        _polygonExtractBusy = false;
+    }
 }
 
 // Close modal on backdrop click

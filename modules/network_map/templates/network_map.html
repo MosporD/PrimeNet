@@ -6,7 +6,7 @@
     <title>PrimeNet - Network Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.28">
+    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.30">
 </head>
 <body class="map-page">
     <header class="map-header">
@@ -81,6 +81,27 @@
                         title="Click points on the map to measure distance">
                     📏 Measure Distance
                 </button>
+                <div class="polygon-tool-row">
+                    <button id="polygon-draw-btn" class="polygon-draw-btn" onclick="togglePolygonDraw()"
+                            title="Draw a polygon on the map, then click it to extract sites/cells inside">
+                        ⬠ Draw Polygon
+                    </button>
+                    <select id="polygon-layer-select" class="polygon-layer-select"
+                            title="Layer to extract when clicking the polygon">
+                        <option value="sites">Sites</option>
+                        <option value="cells">Cells</option>
+                        <option value="repeaters">Repeaters</option>
+                    </select>
+                    <button id="polygon-clear-btn" class="polygon-clear-btn" onclick="clearSelectionPolygon()"
+                            title="Remove drawn polygon" style="display:none;">
+                        ✕
+                    </button>
+                    <button id="polygon-extract-btn" class="polygon-extract-btn" onclick="extractFromCurrentPolygon()"
+                            title="Download Excel of sites/cells/repeaters inside the drawn polygon"
+                            style="display:none;">
+                        Export Excel
+                    </button>
+                </div>
                 <button class="export-excel-btn" onclick="exportCurrentView('excel')"
                         title="Export current filter / search result to Excel">
                     ⬇ Export Excel
@@ -111,7 +132,7 @@
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.0"></script>
     <script src="{{ url_for('static', filename='js/saved_views.js') }}?v=1.0"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.36"></script>
+    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.41"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initializeMap();

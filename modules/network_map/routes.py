@@ -746,6 +746,402 @@ def get_all_sites():
         return jsonify({'error': str(e)}), 500
 
 
+def _point_in_polygon(lat: float, lng: float, ring: list[tuple[float, float]]) -> bool:
+    """Ray-casting point-in-polygon test. ``ring`` vertices are (lat, lng)."""
+    n = len(ring)
+    if n < 3:
+        return False
+    inside = False
+    j = n - 1
+    for i in range(n):
+        yi, xi = ring[i]
+        yj, xj = ring[j]
+        if ((yi > lat) != (yj > lat)) and (
+            lng < (xj - xi) * (lat - yi) / (yj - yi + 1e-15) + xi
+        ):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _parse_polygon_ring(raw) -> list[tuple[float, float]] | None:
+    if not isinstance(raw, list) or len(raw) < 3:
+        return None
+    ring: list[tuple[float, float]] = []
+    for pt in raw[:500]:
+        if not isinstance(pt, (list, tuple)) or len(pt) < 2:
+            return None
+        try:
+            lat = float(pt[0])
+            lng = float(pt[1])
+        except (TypeError, ValueError):
+            return None
+        if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+            return None
+        ring.append((lat, lng))
+    return ring if len(ring) >= 3 else None
+
+
+def _polygon_bbox(ring: list[tuple[float, float]]) -> tuple[float, float, float, float]:
+    lats = [p[0] for p in ring]
+    lngs = [p[1] for p in ring]
+    return min(lats), max(lats), min(lngs), max(lngs)
+
+
+def _site_matches_map_client_filters(
+    site_id,
+    site_vendor: str | None,
+    *,
+    vendor: str,
+    area: str,
+    cluster: str,
+) -> bool:
+    if vendor and vendor != 'all' and (site_vendor or '') != vendor:
+        return False
+    cluster_num, area_name = _derive_cluster_area(site_id)
+    if cluster and cluster != 'all' and str(cluster_num) != cluster:
+        return False
+    if area and area != 'all' and area_name != area:
+        return False
+    return True
+
+
+def _collect_within_polygon(
+    ring: list[tuple[float, float]],
+    *,
+    layer: str,
+    tech: str = '',
+    tech_value: str = '',
+    vendor: str = 'all',
+    area: str = 'all',
+    cluster: str = 'all',
+) -> list[dict]:
+    """Return sites, cells, or repeaters whose coordinates fall inside ``ring``."""
+    min_lat, max_lat, min_lng, max_lng = _polygon_bbox(ring)
+
+    if layer == 'repeaters':
+        repeaters, _source = load_all_repeaters()
+        map_rows = repeaters_for_map(repeaters)
+        matched = []
+        for rep in map_rows:
+            lat = rep.get('latitude')
+            lng = rep.get('longitude')
+            if lat is None or lng is None:
+                continue
+            try:
+                la = float(lat)
+                lo = float(lng)
+            except (TypeError, ValueError):
+                continue
+            if not (min_lat <= la <= max_lat and min_lng <= lo <= max_lng):
+                continue
+            if _point_in_polygon(la, lo, ring):
+                matched.append(rep)
+        matched.sort(key=lambda r: str(r.get('site_name') or r.get('repeater_id') or ''))
+        return matched
+
+    conn = connect_metadata()
+    _sqlite_row(conn)
+
+    union_sql, params = _union_sql_for_map_filter(tech if tech else None)
+    scope_clause = ''
+    sql_params = list(params)
+    if tech_value:
+        if _map_request_tech_filter_to_bcch_band_clause(tech):
+            scope_clause = ' AND CAST(v.pci AS TEXT) = ?'
+        else:
+            scope_clause = ' AND CAST(v.frequency_band AS TEXT) = ?'
+        sql_params.append(tech_value)
+
+    vendor_clause = ''
+    if vendor and vendor != 'all':
+        vendor_clause = ' AND s.vendor = ?'
+        sql_params.append(vendor)
+
+    rows = execute_query(conn, f'''
+        SELECT
+            v.cell_name,
+            v.site_id,
+            v.site_name,
+            v.technology,
+            v.vendor,
+            v.frequency_band,
+            v.azimuth,
+            v.mechanical_tilt,
+            v.electrical_tilt,
+            v.pci,
+            v.activity_status,
+            v.status,
+            s.latitude,
+            s.longitude,
+            s.region,
+            s.site_type
+        FROM ({union_sql}) v
+        JOIN sites s ON s.site_id = v.site_id
+        WHERE s.latitude IS NOT NULL
+          AND s.longitude IS NOT NULL
+          AND s.latitude BETWEEN ? AND ?
+          AND s.longitude BETWEEN ? AND ?
+          {scope_clause}
+          {vendor_clause}
+    ''', sql_params + [min_lat, max_lat, min_lng, max_lng]).fetchall()
+    conn.close()
+
+    if layer == 'cells':
+        matched_cells = []
+        for row in rows:
+            r = dict(row)
+            la = float(r['latitude'])
+            lo = float(r['longitude'])
+            if not _point_in_polygon(la, lo, ring):
+                continue
+            if not _site_matches_map_client_filters(
+                r.get('site_id'), r.get('vendor'),
+                vendor=vendor, area=area, cluster=cluster,
+            ):
+                continue
+            matched_cells.append(r)
+        matched_cells.sort(
+            key=lambda c: (str(c.get('site_name') or ''), str(c.get('cell_name') or ''))
+        )
+        return matched_cells
+
+    by_site: dict[str, dict] = {}
+    cells_by_site: dict[str, list] = {}
+    for row in rows:
+        r = dict(row)
+        sid = r.get('site_id')
+        if sid is None:
+            continue
+        la = float(r['latitude'])
+        lo = float(r['longitude'])
+        if not _point_in_polygon(la, lo, ring):
+            continue
+        if not _site_matches_map_client_filters(
+            sid, r.get('vendor'),
+            vendor=vendor, area=area, cluster=cluster,
+        ):
+            continue
+        key = str(sid)
+        if key not in by_site:
+            cluster_num, area_name = _derive_cluster_area(sid)
+            by_site[key] = {
+                'site_id': sid,
+                'site_name': r.get('site_name'),
+                'latitude': la,
+                'longitude': lo,
+                'region': r.get('region'),
+                'site_type': r.get('site_type'),
+                'vendor': r.get('vendor'),
+                'status': r.get('status'),
+                'cluster': cluster_num,
+                'area': area_name,
+            }
+            cells_by_site[key] = []
+        cells_by_site[key].append(r)
+
+    matched_sites = sorted(by_site.values(), key=lambda s: str(s.get('site_name') or ''))
+    # Attach cells for Excel export when layer=sites (ignored by JSON API callers).
+    for s in matched_sites:
+        s['_cells'] = cells_by_site.get(str(s['site_id']), [])
+    return matched_sites
+
+
+@network_map_bp.route('/api/map/spatial/within', methods=['POST'])
+def spatial_within_polygon():
+    """Return sites, cells, or repeaters whose coordinates fall inside a polygon."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    body = request.get_json(silent=True) or {}
+    ring = _parse_polygon_ring(body.get('polygon'))
+    if not ring:
+        return jsonify({'error': 'polygon must be an array of at least 3 [lat, lng] points'}), 400
+
+    layer = (body.get('layer') or 'sites').strip().lower()
+    if layer not in ('sites', 'cells', 'repeaters'):
+        return jsonify({'error': 'layer must be sites, cells, or repeaters'}), 400
+
+    try:
+        items = _collect_within_polygon(
+            ring,
+            layer=layer,
+            tech=(body.get('tech') or '').strip(),
+            tech_value=(body.get('tech_value') or '').strip(),
+            vendor=(body.get('vendor') or 'all').strip(),
+            area=(body.get('area') or 'all').strip(),
+            cluster=(body.get('cluster') or 'all').strip(),
+        )
+        # Strip internal Excel-only payload from JSON responses.
+        public_items = []
+        for item in items:
+            if isinstance(item, dict) and '_cells' in item:
+                public_items.append({k: v for k, v in item.items() if k != '_cells'})
+            else:
+                public_items.append(item)
+        return jsonify({
+            'success': True,
+            'layer': layer,
+            'count': len(public_items),
+            'items': public_items,
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/map/export/polygon', methods=['POST'])
+def export_polygon_excel():
+    """Export sites/cells/repeaters inside a drawn polygon as Excel."""
+    from io import BytesIO
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from flask import send_file
+    from datetime import datetime as dt
+
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    body = request.get_json(silent=True) or {}
+    ring = _parse_polygon_ring(body.get('polygon'))
+    if not ring:
+        return jsonify({'error': 'polygon must be an array of at least 3 [lat, lng] points'}), 400
+
+    layer = (body.get('layer') or 'sites').strip().lower()
+    if layer not in ('sites', 'cells', 'repeaters'):
+        return jsonify({'error': 'layer must be sites, cells, or repeaters'}), 400
+
+    tech = (body.get('tech') or '').strip()
+    tech_value = (body.get('tech_value') or '').strip()
+    vendor = (body.get('vendor') or 'all').strip()
+    area = (body.get('area') or 'all').strip()
+    cluster = (body.get('cluster') or 'all').strip()
+
+    try:
+        items = _collect_within_polygon(
+            ring,
+            layer=layer,
+            tech=tech,
+            tech_value=tech_value,
+            vendor=vendor,
+            area=area,
+            cluster=cluster,
+        )
+
+        HDR_FILL = PatternFill(start_color='1F4E79', end_color='1F4E79', fill_type='solid')
+        HDR_FONT = Font(bold=True, color='FFFFFF')
+        CTR = Alignment(horizontal='center')
+
+        def _style_header(ws):
+            for cell in ws[1]:
+                cell.font = HDR_FONT
+                cell.fill = HDR_FILL
+                cell.alignment = CTR
+
+        def _autofit(ws):
+            for col in ws.columns:
+                w = max((len(str(c.value or '')) for c in col), default=10)
+                ws.column_dimensions[col[0].column_letter].width = min(w + 4, 45)
+
+        wb = openpyxl.Workbook()
+
+        if layer == 'repeaters':
+            ws = wb.active
+            ws.title = 'Repeaters'
+            ws.append([
+                'Repeater ID', 'Name', 'Refcode', 'Site Name', 'Type',
+                'Supported RATs', 'Contact', 'Technician', 'Latitude', 'Longitude',
+            ])
+            _style_header(ws)
+            for r in items:
+                ws.append([
+                    r.get('repeater_id'), r.get('name'), r.get('refcode'),
+                    r.get('site_name'), r.get('repeater_type'), r.get('supported_rats'),
+                    r.get('contact_number'), r.get('technician'),
+                    r.get('latitude'), r.get('longitude'),
+                ])
+            _autofit(ws)
+            count_label = f'{len(items)} repeaters'
+            export_count = len(items)
+        elif layer == 'cells':
+            ws = wb.active
+            ws.title = 'Cells'
+            ws.append([
+                'Cell Name', 'Site ID', 'Site Name', 'Technology', 'Frequency Band',
+                'Azimuth (°)', 'Mech. Tilt (°)', 'Elec. Tilt (°)',
+                'PCI / SC / BCCH', 'Activity status', 'Vendor', 'Latitude', 'Longitude',
+            ])
+            _style_header(ws)
+            for r in items:
+                ws.append([
+                    r.get('cell_name'), r.get('site_id'), r.get('site_name'),
+                    r.get('technology'), r.get('frequency_band'), r.get('azimuth'),
+                    r.get('mechanical_tilt'), r.get('electrical_tilt'), r.get('pci'),
+                    r.get('activity_status') or r.get('status'), r.get('vendor'),
+                    r.get('latitude'), r.get('longitude'),
+                ])
+            _autofit(ws)
+            count_label = f'{len(items)} cells'
+            export_count = len(items)
+        else:
+            ws_s = wb.active
+            ws_s.title = 'Sites'
+            ws_s.append([
+                'Site ID', 'Site Name', 'Latitude', 'Longitude',
+                'Region', 'Site Type', 'Vendor', 'Area', 'Cluster',
+            ])
+            _style_header(ws_s)
+            all_cells = []
+            for r in items:
+                ws_s.append([
+                    r.get('site_id'), r.get('site_name'), r.get('latitude'), r.get('longitude'),
+                    r.get('region'), r.get('site_type'), r.get('vendor'),
+                    r.get('area'), r.get('cluster'),
+                ])
+                all_cells.extend(r.get('_cells') or [])
+            _autofit(ws_s)
+
+            ws_c = wb.create_sheet('Cells')
+            ws_c.append([
+                'Cell Name', 'Site ID', 'Site Name', 'Technology', 'Frequency Band',
+                'Azimuth (°)', 'Mech. Tilt (°)', 'Elec. Tilt (°)',
+                'PCI / SC / BCCH', 'Activity status', 'Vendor', 'Latitude', 'Longitude',
+            ])
+            _style_header(ws_c)
+            all_cells.sort(key=lambda c: (str(c.get('site_name') or ''), str(c.get('cell_name') or '')))
+            for r in all_cells:
+                ws_c.append([
+                    r.get('cell_name'), r.get('site_id'), r.get('site_name'),
+                    r.get('technology'), r.get('frequency_band'), r.get('azimuth'),
+                    r.get('mechanical_tilt'), r.get('electrical_tilt'), r.get('pci'),
+                    r.get('activity_status') or r.get('status'), r.get('vendor'),
+                    r.get('latitude'), r.get('longitude'),
+                ])
+            _autofit(ws_c)
+            count_label = f'{len(items)} sites, {len(all_cells)} cells'
+            export_count = len(items)
+
+        if export_count == 0:
+            return jsonify({'error': f'No {layer} found inside polygon'}), 404
+
+        buf = BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        tech_label = (tech or 'All').replace('-', '_')
+        fname = f'polygon_{layer}_{tech_label}_{dt.now().strftime("%Y%m%d_%H%M")}.xlsx'
+        uid = (user.get('id') if isinstance(user, dict) else user[0])
+        log_activity(uid, 'export', f'Polygon Excel export ({layer}): {count_label}')
+        return send_file(
+            buf,
+            as_attachment=True,
+            download_name=fname,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @network_map_bp.route('/api/map/repeaters', methods=['GET'])
 def get_map_repeaters():
     """Repeater devices from manual Excel/CSV (network-map/repeater)."""
