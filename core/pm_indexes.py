@@ -130,35 +130,69 @@ def _create_single_index(
         return False
 
 
+def _all_alias_cols(cols: list[str], aliases: tuple[str, ...]) -> list[str]:
+    """Return every physical column matching aliases (not just the first)."""
+    low_map = {_norm_col(c): c for c in cols}
+    out: list[str] = []
+    seen: set[str] = set()
+    for alias in aliases:
+        hit = low_map.get(alias)
+        if hit and hit not in seen:
+            seen.add(hit)
+            out.append(hit)
+    return out
+
+
 def ensure_table_indexes(conn: sqlite3.Connection, table: str) -> list[str]:
     """
     Create indexes for ``table`` when a time column exists.
     Returns names of indexes created or already present (IF NOT EXISTS).
+
+    Area partitions often have empty legacy ``cell_name``/``timestamp`` columns
+    beside populated vendor axes (``LNCEL name`` / ``PERIOD_START_TIME``). Index
+    every matching pair so lookups on the live axis stay index-backed.
     """
     cols = _table_columns(conn, table)
     if not cols:
         return []
 
-    time_col = _pick_from_aliases(cols, _TIME_ALIASES)
-    if not time_col:
+    time_cols = _all_alias_cols(cols, _TIME_ALIASES)
+    if not time_cols:
         return []
 
     created: list[str] = []
     suf = _index_suffix(table)
-    cell_name_col = _pick_from_aliases(cols, _CELL_NAME_ALIASES)
-    cell_id_col = _pick_cell_id_col(cols, cell_name_col)
+    cell_name_cols = _all_alias_cols(cols, _CELL_NAME_ALIASES)
+    # Prefer a vendor-native cell col for id pairing when legacy cell_name is empty.
+    primary_cell = next((c for c in cell_name_cols if _norm_col(c) != "cell_name"), None)
+    if primary_cell is None and cell_name_cols:
+        primary_cell = cell_name_cols[0]
+    cell_id_col = _pick_cell_id_col(cols, primary_cell)
     group_col = _pick_from_aliases(cols, _GROUP_ALIASES)
+    primary_time = time_cols[0]
 
     pairs: list[tuple[str, str, str]] = []
 
     if "cell_name" in cols and "timestamp" in cols:
         pairs.append((f"idx_{suf}_cn_ts", "cell_name", "timestamp"))
-    if cell_name_col:
-        pairs.append((f"idx_{suf}_cell_ts", cell_name_col, time_col))
-    if cell_id_col and cell_id_col != cell_name_col:
-        pairs.append((f"idx_{suf}_id_ts", cell_id_col, time_col))
+
+    vendor_cell_i = 0
+    for cell_col in cell_name_cols:
+        if _norm_col(cell_col) == "cell_name" and "timestamp" in cols:
+            # Already covered by cn_ts above.
+            continue
+        time_for_cell = next(
+            (t for t in time_cols if _norm_col(t) != "timestamp"),
+            primary_time,
+        )
+        tag = "cell" if vendor_cell_i == 0 else f"cell{vendor_cell_i}"
+        vendor_cell_i += 1
+        pairs.append((f"idx_{suf}_{tag}_ts", cell_col, time_for_cell))
+
+    if cell_id_col and cell_id_col not in cell_name_cols:
+        pairs.append((f"idx_{suf}_id_ts", cell_id_col, primary_time))
     if group_col:
-        pairs.append((f"idx_{suf}_grp_ts", group_col, time_col))
+        pairs.append((f"idx_{suf}_grp_ts", group_col, primary_time))
 
     seen_pairs: set[tuple[str, str]] = set()
     for idx_name, col_a, col_b in pairs:
@@ -169,9 +203,10 @@ def ensure_table_indexes(conn: sqlite3.Connection, table: str) -> list[str]:
         if _create_composite_index(conn, table, idx_name, col_a, col_b):
             created.append(idx_name)
 
-    ts_idx = f"idx_{suf}_ts"
-    if _create_single_index(conn, table, ts_idx, time_col):
-        created.append(ts_idx)
+    for i, time_col in enumerate(time_cols):
+        ts_idx = f"idx_{suf}_ts" if i == 0 else f"idx_{suf}_ts{i}"
+        if _create_single_index(conn, table, ts_idx, time_col):
+            created.append(ts_idx)
 
     return created
 

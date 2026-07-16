@@ -45,6 +45,7 @@ from sync_config import (
 from core.site_area import (
     list_pm_partition_tables,
     preferred_pm_table,
+    site_id_from_cell_name,
 )
 from db.runtime import connect_app, connect_metadata, execute_query
 from database_enhanced import get_user_by_session, log_activity
@@ -1004,17 +1005,22 @@ def _normalize_group_tech(tech: str) -> str:
     return t
 
 
-def _axis_column_nonempty_count(conn: sqlite3.Connection, table: str, col: str) -> int:
+def _axis_column_sample_score(conn: sqlite3.Connection, table: str, col: str, *, sample: int = 64) -> int:
+    """Cheap populated-ness score from the first rows (avoids full-table COUNT)."""
     try:
-        return int(
-            conn.execute(
-                f'SELECT COUNT(*) FROM {_sqlite_ident(table)} '
-                f'WHERE {_sqlite_ident(col)} IS NOT NULL '
-                f'AND TRIM(CAST({_sqlite_ident(col)} AS TEXT)) != ""'
-            ).fetchone()[0]
-        )
+        rows = conn.execute(
+            f'SELECT {_sqlite_ident(col)} FROM {_sqlite_ident(table)} LIMIT ?',
+            (sample,),
+        ).fetchall()
     except sqlite3.OperationalError:
         return 0
+    score = 0
+    for (val,) in rows:
+        if val is None:
+            continue
+        if str(val).strip():
+            score += 1
+    return score
 
 
 def _pick_axis_column_from_aliases(
@@ -1028,16 +1034,24 @@ def _pick_axis_column_from_aliases(
     candidates = [low_to_real[a] for a in aliases if low_to_real.get(a)]
     if not candidates:
         return None
-    return max(candidates, key=lambda c: _axis_column_nonempty_count(conn, table, c))
+    return max(candidates, key=lambda c: _axis_column_sample_score(conn, table, c))
+
+
+_PM_AXIS_COL_CACHE: dict[str, tuple[str | None, str | None]] = {}
 
 
 def _resolve_pm_axis_columns_sqlite(conn: sqlite3.Connection, table: str) -> tuple[str | None, str | None]:
+    cached = _PM_AXIS_COL_CACHE.get(table)
+    if cached is not None:
+        return cached
     try:
         cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
     except sqlite3.OperationalError:
+        _PM_AXIS_COL_CACHE[table] = (None, None)
         return None, None
     cell_col = _pick_axis_column_from_aliases(conn, table, cols, _CELL_COL_ALIASES)
     time_col = _pick_axis_column_from_aliases(conn, table, cols, _TIME_COL_ALIASES)
+    _PM_AXIS_COL_CACHE[table] = (cell_col, time_col)
     return cell_col, time_col
 
 
@@ -1125,6 +1139,9 @@ def _resolve_pm_table_sqlite(
     tables = [r[0] for r in rows]
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
     base = pm_table_name(tech) if tech else None
+    if not preferred and cell_name:
+        preferred = _preferred_pm_table_for_cell_name(technology, cell_name)
+
     candidates: list[str] = []
     for t in tables:
         tt = _table_technology(t)
@@ -1144,20 +1161,37 @@ def _resolve_pm_table_sqlite(
         _prefer_first(preferred)
     if not cell_name:
         return candidates[0] if candidates else None
-    for t in candidates:
+
+    needle = str(cell_name).strip()
+    needle_l = needle.lower()
+
+    def _table_has_cell(t: str) -> bool:
         c_col, _ = _resolve_pm_axis_columns_sqlite(conn, t)
         if not c_col:
-            continue
-        q = (
-            f"SELECT 1 FROM {_sqlite_ident(t)} "
-            f"WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) = LOWER(TRIM(?)) "
-            f"LIMIT 1"
-        )
+            return False
+        # Index-friendly equality first (area tables are keyed on vendor-native names).
         try:
-            if conn.execute(q, (cell_name,)).fetchone():
-                return t
+            if conn.execute(
+                f'SELECT 1 FROM {_sqlite_ident(t)} '
+                f'WHERE {_sqlite_ident(c_col)} = ? LIMIT 1',
+                (needle,),
+            ).fetchone():
+                return True
         except sqlite3.OperationalError:
-            continue
+            pass
+        try:
+            return bool(conn.execute(
+                f'SELECT 1 FROM {_sqlite_ident(t)} '
+                f'WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) = ? '
+                f'LIMIT 1',
+                (needle_l,),
+            ).fetchone())
+        except sqlite3.OperationalError:
+            return False
+
+    for t in candidates:
+        if _table_has_cell(t):
+            return t
     # Fallback: tolerate minor naming drift (suffix/prefix/noise) via contains match.
     for t in candidates:
         c_col, _ = _resolve_pm_axis_columns_sqlite(conn, t)
@@ -1165,11 +1199,11 @@ def _resolve_pm_table_sqlite(
             continue
         q = (
             f"SELECT 1 FROM {_sqlite_ident(t)} "
-            f"WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) LIKE LOWER(TRIM(?)) "
+            f"WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) LIKE ? "
             f"LIMIT 1"
         )
         try:
-            if conn.execute(q, (f"%{cell_name}%",)).fetchone():
+            if conn.execute(q, (f"%{needle_l}%",)).fetchone():
                 return t
         except sqlite3.OperationalError:
             continue
@@ -1179,6 +1213,13 @@ def _resolve_pm_table_sqlite(
 def _preferred_pm_table_for_site(technology: str, site_id) -> str:
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else (technology or '4G')
     return preferred_pm_table(pm_table_name(tech), site_id)
+
+
+def _preferred_pm_table_for_cell_name(technology: str, cell_name: str) -> str | None:
+    sid = site_id_from_cell_name(cell_name)
+    if not sid:
+        return None
+    return _preferred_pm_table_for_site(technology, sid)
 
 
 def _sqlite_table_names(conn: sqlite3.Connection) -> set[str]:
@@ -2882,8 +2923,9 @@ def get_pm_table():
         conn = _open_pm_db(db_path)
         preferred = None
         if scoped_cell_names:
+            preferred = _preferred_pm_table_for_cell_name(technology, scoped_cell_names[0])
             preferred = _resolve_pm_table_sqlite(
-                conn, vendor, technology, scoped_cell_names[0], None
+                conn, vendor, technology, scoped_cell_names[0], preferred
             )
         bundle = _resolve_pm_table_bundle(conn, db_path, vendor, technology, preferred=preferred)
         if not bundle:
