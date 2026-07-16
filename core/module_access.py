@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from urllib.parse import urlparse
 
+from modules.cm_parameter_audit import MODULE_VERSION_LABEL
+
 # visibility:
 #   all          — any authenticated user
 #   admin        — owner (admin) only
@@ -47,7 +49,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Parameter Dictionary", "href": "/parameter-dictionary", "visibility": "all"},
             {"label": "Performance Dictionary", "href": "/performance-dictionary", "visibility": "all"},
             {"label": "Configuration Data Extractor", "href": "/cm-extractor", "visibility": "all"},
-            {"label": "CM Parameter Audit", "href": "/cm-parameter-audit", "visibility": "all"},
+            {"label": f"CM Parameter Audit {MODULE_VERSION_LABEL}", "href": "/cm-parameter-audit", "visibility": "all"},
             {"label": "XML Parser", "href": "/xml-parser", "visibility": "all"},
             {"label": "XML Generator", "href": "/excel-generator", "visibility": "all"},
             {"label": "NE Comparison", "href": "/ne-comparison", "visibility": "all"},

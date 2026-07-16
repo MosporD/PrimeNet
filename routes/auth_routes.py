@@ -14,6 +14,7 @@ from database_enhanced import (
 )
 from db.runtime import connect_metadata, execute_query
 from core.module_access import allowed_hrefs_for_role, navigation_sections_for_role
+from modules.cm_parameter_audit import MODULE_VERSION_LABEL
 from modules.sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
 
 logger = logging.getLogger(__name__)
@@ -225,6 +226,7 @@ def dashboard():
         allowed_hrefs=allowed_hrefs_for_role(user_data),
         tech_site_columns=tech_site_columns,
         total_sites=total_sites,
+        cm_parameter_audit_version=MODULE_VERSION_LABEL,
     )
 
 # ============================================================================

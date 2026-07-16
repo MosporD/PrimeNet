@@ -112,6 +112,15 @@
     }
 
     function paramComboItems(term) {
+        if (!selectedMoId) {
+            const typed = (term || '').trim();
+            if (!typed) return [];
+            return [{
+                value: typed,
+                label: typed,
+                title: 'Use this parameter name, then select an MO class',
+            }];
+        }
         const params = parametersByMo.get(selectedMoId) || [];
         const q = (term || '').trim().toLowerCase();
         return params
@@ -137,9 +146,6 @@
             ? (mo.label ? `${mo.id} — ${mo.label}` : mo.id)
             : selectedMoId;
         els.moList.hidden = true;
-        selectedParam = '';
-        els.paramInput.value = '';
-        els.paramInput.disabled = !selectedMoId;
         els.paramList.hidden = true;
         updateScanButton();
         if (selectedMoId) {
@@ -148,10 +154,22 @@
     }
 
     function selectParam(paramId) {
-        selectedParam = paramId || '';
+        selectedParam = (paramId || '').trim();
         els.paramInput.value = selectedParam;
         els.paramList.hidden = true;
         updateScanButton();
+    }
+
+    function commitTypedParam() {
+        const typed = (els.paramInput.value || '').trim();
+        if (!typed) {
+            selectedParam = '';
+            updateScanButton();
+            return;
+        }
+        if (typed !== selectedParam) {
+            selectParam(typed);
+        }
     }
 
     async function loadAreas() {
@@ -214,8 +232,13 @@
             }
             moClasses = items;
             items.forEach((item) => moCatalog.set(item.id, item));
-            els.moInput.disabled = !items.length;
-            els.moInput.placeholder = items.length ? 'Search and select MO…' : 'No MO classes';
+            const ready = !!items.length;
+            els.moInput.disabled = !ready;
+            els.paramInput.disabled = !ready;
+            els.moInput.placeholder = ready ? 'Search and select MO…' : 'No MO classes';
+            els.paramInput.placeholder = ready
+                ? 'Type or select parameter…'
+                : 'No parameters';
             setStatus('');
         } catch (err) {
             setStatus(err.message || 'Failed to load MO classes', 'error');
@@ -227,6 +250,7 @@
         updateScanButton();
         if (!moId) return;
 
+        const preservedParam = selectedParam;
         setStatus('Loading parameters…', 'loading');
         try {
             let params = [];
@@ -253,8 +277,15 @@
                 params = (data.parameters && data.parameters[moId.toUpperCase()]) || [];
             }
             parametersByMo.set(moId, params);
-            els.paramInput.disabled = !params.length;
-            els.paramInput.placeholder = params.length ? 'Search and select parameter…' : 'No parameters';
+            els.paramInput.disabled = false;
+            els.paramInput.placeholder = params.length
+                ? 'Search and select parameter…'
+                : 'Type parameter name…';
+            if (preservedParam) {
+                selectedParam = preservedParam;
+                els.paramInput.value = preservedParam;
+            }
+            updateScanButton();
             setStatus('');
         } catch (err) {
             setStatus(err.message || 'Failed to load parameters', 'error');
@@ -533,9 +564,6 @@
             const label = mo ? (mo.label ? `${mo.id} — ${mo.label}` : mo.id) : selectedMoId;
             if (els.moInput.value !== label) {
                 selectedMoId = '';
-                selectedParam = '';
-                els.paramInput.value = '';
-                els.paramInput.disabled = true;
                 updateScanButton();
             }
         }
@@ -550,6 +578,18 @@
 
     els.paramInput.addEventListener('focus', () => {
         closeComboLists(els.paramList);
+        if (!selectedMoId) {
+            renderComboList(
+                els.paramList,
+                paramComboItems(els.paramInput.value),
+                { activeValue: selectedParam },
+            );
+            if (!(els.paramInput.value || '').trim()) {
+                els.paramList.innerHTML = '<li class="combo-empty">Type a parameter name, then select an MO</li>';
+                els.paramList.hidden = false;
+            }
+            return;
+        }
         renderComboList(els.paramList, paramComboItems(els.paramInput.value), { activeValue: selectedParam });
     });
     els.paramInput.addEventListener('input', () => {
@@ -558,6 +598,15 @@
             updateScanButton();
         }
         renderComboList(els.paramList, paramComboItems(els.paramInput.value), { activeValue: selectedParam });
+    });
+    els.paramInput.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            commitTypedParam();
+        }
+    });
+    els.paramInput.addEventListener('blur', () => {
+        commitTypedParam();
     });
     els.paramList.addEventListener('mousedown', (ev) => {
         const option = ev.target.closest('.combo-option');

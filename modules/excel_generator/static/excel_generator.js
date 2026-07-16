@@ -72,15 +72,15 @@ function displayOperations(moClasses) {
             <div class="mo-name">${moClass}</div>
             <div class="operation-selector">
                 <label>
-                    <input type="radio" name="op_${moClass}" value="Create">
+                    <input type="radio" name="op_${moClass}" value="create">
                     <span>Create</span>
                 </label>
                 <label>
-                    <input type="radio" name="op_${moClass}" value="Update" checked>
+                    <input type="radio" name="op_${moClass}" value="update" checked>
                     <span>Update</span>
                 </label>
                 <label>
-                    <input type="radio" name="op_${moClass}" value="Delete">
+                    <input type="radio" name="op_${moClass}" value="delete">
                     <span>Delete</span>
                 </label>
             </div>
@@ -101,7 +101,7 @@ async function generateXML() {
     const operations = {};
     moClasses.forEach(moClass => {
         const selected = document.querySelector(`input[name="op_${moClass}"]:checked`);
-        operations[moClass] = selected ? selected.value : 'Update';
+        operations[moClass] = selected ? selected.value : 'update';
     });
 
     const statusDiv = document.getElementById('upload-status');
