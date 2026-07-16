@@ -21,6 +21,20 @@
     var REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     var TAU = Math.PI * 2;
 
+    /** CSS --ui-zoom (layout fill under html zoom). Falls back to 1. */
+    function uiZoom() {
+        var z = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-zoom'));
+        return (z > 0 && isFinite(z)) ? z : 1;
+    }
+
+    function viewportCssSize() {
+        var z = uiZoom();
+        return {
+            w: Math.max(1, Math.round(window.innerWidth / z)),
+            h: Math.max(1, Math.round(window.innerHeight / z))
+        };
+    }
+
     /* Deterministic PRNG so blip layouts stay stable between refreshes. */
     function mulberry32(seed) {
         var a = seed >>> 0;
@@ -651,8 +665,9 @@
         }
 
         function resize() {
-            vw = window.innerWidth;
-            vh = window.innerHeight;
+            var vp = viewportCssSize();
+            vw = vp.w;
+            vh = vp.h;
             ctx = fitCanvas(canvas, vw, vh);
             cx = vw > 980 ? vw * 0.33 : vw * 0.5;
             cy = vh * 0.52;
