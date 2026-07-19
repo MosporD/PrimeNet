@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ portal.name }} — Coming soon</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portals.css') }}?v=1.0">
+</head>
+<body class="portal-page no-constellation-bg">
+    <canvas id="constellation-canvas" aria-hidden="true"></canvas>
+    <div class="hud-overlay" aria-hidden="true"></div>
+    <div class="portal-theme-mount" aria-label="Theme controls"></div>
+
+    <main class="portal-shell">
+        <header class="portal-brand">
+            <img src="/static/images/favicon.png?v=4" alt="PrimeNet logo" class="portal-brand-logo">
+            <div class="portal-brand-name">PrimeNet</div>
+        </header>
+
+        <section class="portal-soon-panel" aria-labelledby="portal-soon-title">
+            <div class="portal-soon-kicker">Portal</div>
+            <h1 class="portal-soon-title" id="portal-soon-title">{{ portal.name }}</h1>
+            <div class="portal-soon-status">Coming soon</div>
+            <p class="portal-soon-copy">
+                {{ portal.blurb }}
+                This portal ships with the next project. Engineering Portal remains available for PrimeNet today.
+            </p>
+            <div class="portal-soon-actions">
+                <a class="portal-btn portal-btn-primary" href="/portals">Back to portals</a>
+                <button type="button" class="portal-btn" id="portal-logout">Logout</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.7"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.5"></script>
+    <script>
+        (function () {
+            if (window.PrimeNetConstellation) {
+                PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
+            }
+            document.getElementById('portal-logout')?.addEventListener('click', async () => {
+                if (!confirm('Logout?')) return;
+                try {
+                    await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+                } catch (_) { /* ignore */ }
+                window.location.href = '/login';
+            });
+        })();
+    </script>
+</body>
+</html>

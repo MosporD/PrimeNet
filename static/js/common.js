@@ -40,11 +40,16 @@ function _isPublicAuthPage() {
     return p === '/login' || p === '/login/' || p === '/register' || p === '/register/';
 }
 
+function _isPortalPage() {
+    const p = String(window.location?.pathname || '').trim().replace(/\/+$/, '') || '/';
+    return p === '/portals' || p.startsWith('/portals/');
+}
+
 const CONSTELLATION_CSS_VERSION = '1.9';
 const CONSTELLATION_JS_VERSION = '1.7';
 
 function _constellationBgExcluded(path) {
-    return /^\/(login|register|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
+    return /^\/(login|register|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
 }
 
 function _shouldMountConstellationBackground() {
@@ -269,11 +274,12 @@ function _ensureThemeToggle() {
         || document.querySelector('.son-topbar .son-topbar-actions')
         || document.querySelector('.nh-header .nh-header-right')
         || document.querySelector('.nh-select-header')
-        || document.querySelector('.login-theme-mount');
+        || document.querySelector('.login-theme-mount')
+        || document.querySelector('.portal-theme-mount');
     if (!mount) return;
     if (mount.classList && mount.classList.contains('header-actions')) {
         btn.classList.add('btn-header', 'btn-header-outline');
-    } else if (mount.classList && mount.classList.contains('login-theme-mount')) {
+    } else if (mount.classList && (mount.classList.contains('login-theme-mount') || mount.classList.contains('portal-theme-mount'))) {
         btn.className = 'login-theme-btn';
     }
     mount.appendChild(btn);
@@ -507,7 +513,7 @@ function _wirePageTransitionRestoreGuards() {
 }
 
 function _ensureFeatureNavButton() {
-    if (_isDashboardPage() || _isPublicAuthPage()) return;
+    if (_isDashboardPage() || _isPublicAuthPage() || _isPortalPage()) return;
     if (document.getElementById('feature-nav-btn')) return;
     const headerContent = document.querySelector('header .header-content');
     const mapHeaderLeft = document.querySelector('.map-header .header-left');
@@ -529,7 +535,7 @@ function _ensureFeatureNavButton() {
 }
 
 function _ensureHeaderNavCluster() {
-    if (_isDashboardPage() || _isPublicAuthPage()) return;
+    if (_isDashboardPage() || _isPublicAuthPage() || _isPortalPage()) return;
     const headerContent = document.querySelector('header .header-content');
     if (!headerContent) return;
 
@@ -571,7 +577,7 @@ function _injectModuleAdminLink(actions) {
 }
 
 function _ensureModuleHeaderActions() {
-    if (_isDashboardPage() || _isPublicAuthPage()) return;
+    if (_isDashboardPage() || _isPublicAuthPage() || _isPortalPage()) return;
     const headerRight = document.querySelector('header .header-right');
     if (!headerRight || headerRight.querySelector('.header-actions')) return;
 

@@ -1,6 +1,6 @@
 """
 Authentication Routes
-Handles login, logout, registration, and dashboard access
+Handles login, logout, registration, portal selection, and dashboard access
 """
 
 import logging
@@ -194,10 +194,10 @@ def format_user_data(user):
 
 @auth_bp.route('/')
 def index():
-    """Redirect to dashboard or login"""
+    """Redirect to portal picker or login"""
     user = get_current_user()
     if user:
-        return redirect(url_for('auth.dashboard'))
+        return redirect(url_for('auth.portal_select'))
     return redirect(url_for('auth.login_page'))
 
 @auth_bp.route('/login')
@@ -209,6 +209,56 @@ def login_page():
 def register_page():
     """Registration is disabled for internal-only deployment."""
     return redirect(url_for('auth.login_page'))
+
+_PORTAL_COMING_SOON = {
+    'marketing': {
+        'id': 'marketing',
+        'name': 'Marketing Portal',
+        'blurb': 'Campaigns, outreach, and brand operations.',
+    },
+    'sales': {
+        'id': 'sales',
+        'name': 'Sales Portal',
+        'blurb': 'Pipeline, accounts, and commercial workflows.',
+    },
+    'support': {
+        'id': 'support',
+        'name': 'Customer Support Portal',
+        'blurb': 'Tickets, customer care, and service tools.',
+    },
+}
+
+@auth_bp.route('/portals')
+def portal_select():
+    """Post-login portal picker."""
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('auth.login_page'))
+    return render_template(
+        'portal_select.html',
+        user=format_user_data(user),
+    )
+
+@auth_bp.route('/portals/<portal_id>')
+def portal_enter(portal_id):
+    """Enter a portal, or show Coming soon for future portals."""
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('auth.login_page'))
+
+    key = (portal_id or '').strip().lower()
+    if key == 'engineering':
+        return redirect(url_for('auth.dashboard'))
+
+    portal = _PORTAL_COMING_SOON.get(key)
+    if not portal:
+        return redirect(url_for('auth.portal_select'))
+
+    return render_template(
+        'portal_coming_soon.html',
+        user=format_user_data(user),
+        portal=portal,
+    )
 
 @auth_bp.route('/dashboard')
 def dashboard():
