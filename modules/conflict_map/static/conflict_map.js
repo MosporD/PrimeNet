@@ -62,7 +62,10 @@ window.addEventListener('DOMContentLoaded', () => {
     initConflictMap();
     bindFilters();
     syncPanelAnchors();
-    window.addEventListener('resize', syncPanelAnchors);
+    window.addEventListener('resize', () => {
+        syncPanelAnchors();
+        if (conflictMap) conflictMap.invalidateSize();
+    });
     applyDeepLinkFromUrl();
 });
 
@@ -75,7 +78,12 @@ function initConflictMap() {
         maxZoom: 18,
     }).addTo(conflictMap);
     conflictLayerGroup = L.layerGroup().addTo(conflictMap);
-    setTimeout(() => conflictMap.invalidateSize(), 50);
+    const fixMapSize = () => {
+        if (conflictMap) conflictMap.invalidateSize();
+    };
+    setTimeout(fixMapSize, 50);
+    setTimeout(fixMapSize, 250);
+    setTimeout(fixMapSize, 600);
 }
 
 function bindFilters() {
@@ -154,23 +162,15 @@ async function refreshBandOptionsForArea() {
 }
 
 function syncPanelAnchors() {
-    const header = document.querySelector('header');
     const panel = document.getElementById('conf-filter-panel');
     const stats = document.getElementById('conf-map-stats');
-    const mapEl = document.getElementById('conflict-map');
-    if (!header || !panel || !stats || !mapEl) return;
+    if (!panel || !stats) return;
 
-    const hb = header.getBoundingClientRect();
-    const panelTop = Math.max(8, hb.bottom + 8);
-    panel.style.top = `${panelTop}px`;
-
-    const panelRect = panel.getBoundingClientRect();
-    const statsTop = panelRect.bottom + 8;
+    // Use layout offsets (same CSS-pixel space as `top`) — not getBoundingClientRect,
+    // which mismatches under html { zoom } and was breaking Leaflet tile alignment.
+    panel.style.top = '12px';
+    const statsTop = panel.offsetTop + panel.offsetHeight + 8;
     stats.style.top = `${statsTop}px`;
-
-    // Map starts right below header; filter/stats float on top of map.
-    const mapTop = Math.max(hb.bottom + 8, 80);
-    mapEl.style.top = `${mapTop}px`;
     if (conflictMap) setTimeout(() => conflictMap.invalidateSize(), 30);
 }
 

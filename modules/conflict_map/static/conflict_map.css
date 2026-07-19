@@ -1,20 +1,37 @@
+/* Full-page map layout under html { zoom: var(--ui-zoom) }.
+   Do not use position:fixed + 100vh/100vw here — that breaks Leaflet tiles. */
+
 .conflict-map-page {
-    height: 100vh;
+    height: var(--ui-vh, 100vh);
+    width: var(--ui-vw, 100%);
+    max-width: none;
+    overflow: hidden;
+    background: #89aeca;
 }
 
 .conflict-map-page .container {
-    height: 100vh;
+    height: var(--ui-vh, 100vh);
+    width: 100%;
+    max-width: none;
     display: flex;
     flex-direction: column;
-    max-width: none;
-    width: 100vw;
     padding: 0;
+    margin: 0;
+}
+
+.conflict-map-page header {
+    flex-shrink: 0;
+    z-index: 1000;
+    width: 100%;
 }
 
 .conflict-map-page .main-content {
     flex: 1;
     display: flex;
     min-height: 0;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
     padding: 0 !important;
 }
 
@@ -25,15 +42,17 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    width: 100%;
     position: relative;
 }
 
 .conf-filter-panel {
-    position: fixed;
+    position: absolute;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1200;
-    width: min(1280px, calc(100vw - 24px));
+    width: min(1280px, calc(var(--ui-vw, 100vw) - 24px));
     background: rgba(255, 255, 255, 0.97);
     border: 1px solid #d7e0ea;
     border-radius: 12px;
@@ -104,15 +123,13 @@
 }
 
 .conf-map-stats {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    color: #4b5563;
-    font-size: 0.92em;
-    position: fixed;
+    position: absolute;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1190;
-    width: min(1280px, calc(100vw - 24px));
+    width: min(1280px, calc(var(--ui-vw, 100vw) - 24px));
+    color: #4b5563;
+    font-size: 0.92em;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #d7e0ea;
     border-radius: 10px;
@@ -120,15 +137,28 @@
 }
 
 #conflict-map {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 120px;
-    border-radius: 0;
+    position: absolute;
+    inset: 0;
     border: none;
+    border-radius: 0;
     overflow: hidden;
     z-index: 1;
+    background: #89aeca;
+}
+
+/* Guard against global img rules / zoom rounding gaps between OSM tiles */
+#conflict-map .leaflet-container {
+    width: 100%;
+    height: 100%;
+    background: #89aeca;
+}
+
+#conflict-map .leaflet-tile-pane img,
+#conflict-map img.leaflet-tile {
+    max-width: none !important;
+    max-height: none !important;
+    width: 256px !important;
+    height: 256px !important;
 }
 
 body.dark-mode.conflict-map-page .conf-filter-panel,
@@ -171,12 +201,11 @@ body.dark-mode.conflict-map-page .conf-strictness-help code {
 
 @media (max-width: 768px) {
     .conf-filter-panel {
-        width: calc(100vw - 12px);
+        width: calc(var(--ui-vw, 100vw) - 12px);
         border-radius: 10px;
         padding: 8px;
     }
     .conf-map-stats {
-        width: calc(100vw - 12px);
+        width: calc(var(--ui-vw, 100vw) - 12px);
     }
-    #conflict-map { top: 108px; }
 }
