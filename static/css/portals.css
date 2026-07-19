@@ -137,28 +137,6 @@ body.portal-page:not(.dark-mode) .portal-brand-name {
     color: transparent;
 }
 
-.portal-headline {
-    font-size: clamp(1.05rem, 2vw, 1.25rem);
-    font-weight: 600;
-    color: var(--pn-ink);
-    letter-spacing: 0.02em;
-}
-
-.portal-sub {
-    font-size: 0.95rem;
-    color: var(--pn-muted);
-    max-width: 420px;
-    line-height: 1.45;
-}
-
-.portal-user-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
 .portal-user-name {
     font-size: 0.9rem;
     font-weight: 600;
@@ -198,96 +176,6 @@ body.portal-page:not(.dark-mode) .portal-btn:hover {
 
 .portal-btn-ghost {
     background: transparent;
-}
-
-.portal-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 280px));
-    gap: 16px;
-    width: min(600px, 100%);
-}
-
-@media (max-width: 640px) {
-    .portal-grid {
-        grid-template-columns: 1fr;
-        width: min(360px, 100%);
-    }
-}
-
-.portal-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 22px 20px;
-    border-radius: 14px;
-    border: 1px solid var(--pn-line);
-    background: var(--pn-glass);
-    backdrop-filter: blur(8px);
-    text-decoration: none;
-    color: inherit;
-    box-shadow: 0 16px 40px rgba(2, 8, 24, 0.28);
-    transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
-    min-height: 148px;
-}
-
-.portal-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--pn-cyan-soft);
-    box-shadow: 0 20px 48px rgba(56, 189, 248, 0.18);
-}
-
-body.portal-page:not(.dark-mode) .portal-card {
-    box-shadow: 0 16px 40px rgba(127, 166, 194, 0.16);
-}
-
-body.portal-page:not(.dark-mode) .portal-card:hover {
-    box-shadow: 0 20px 48px rgba(127, 166, 194, 0.28);
-}
-
-.portal-card-kicker {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--pn-cyan-soft);
-}
-
-.portal-card-title {
-    font-size: 1.15rem;
-    font-weight: 760;
-    color: var(--pn-ink);
-    line-height: 1.2;
-}
-
-.portal-card-blurb {
-    font-size: 0.88rem;
-    color: var(--pn-muted);
-    line-height: 1.4;
-    flex: 1;
-}
-
-.portal-card-badge {
-    display: inline-block;
-    align-self: flex-start;
-    margin-top: 4px;
-    padding: 3px 8px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    background: rgba(56, 189, 248, 0.18);
-    color: var(--pn-cyan-soft);
-    border: 1px solid rgba(56, 189, 248, 0.35);
-}
-
-body.portal-page:not(.dark-mode) .portal-card-badge {
-    background: rgba(127, 166, 194, 0.18);
-    color: #5a7a96;
-    border-color: rgba(127, 166, 194, 0.4);
-}
-
-.portal-card-active {
-    border-color: rgba(56, 189, 248, 0.55);
 }
 
 .portal-soon-panel {
@@ -364,7 +252,608 @@ body.portal-page:not(.dark-mode) .portal-btn-primary:hover {
     color: #fff;
 }
 
+/* ====================================================================
+ * PORTAL TOWER — scrollable 3D telecom-tower portal selection
+ * ==================================================================== */
+
+html.tower-html {
+    scroll-behavior: smooth;
+}
+
+body.tower-page {
+    background: var(--pn-bg-0);
+    overflow-y: scroll;
+}
+
+body.tower-page:not(.dark-mode) {
+    background: #f5f7fa;
+}
+
+#tower-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body.tower-page .hud-overlay { z-index: 1; }
+
+/* --- fixed top bar ------------------------------------------------- */
+.tower-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0) 100%);
+    pointer-events: none;
+}
+
+body.tower-page:not(.dark-mode) .tower-topbar {
+    background: linear-gradient(180deg, rgba(245, 247, 250, 0.75) 0%, rgba(245, 247, 250, 0) 100%);
+}
+
+.tower-topbar > * { pointer-events: auto; }
+
+.tower-topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.tower-topbar-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 3px;
+    box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.35), 0 0 18px rgba(56, 189, 248, 0.3);
+}
+
+.tower-topbar-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    background: linear-gradient(92deg, #ffffff 0%, #bfe3ff 45%, #60c2f8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+body.tower-page:not(.dark-mode) .tower-topbar-name {
+    background: linear-gradient(92deg, #2c3e50 0%, #6d95b3 45%, #7fa6c2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.tower-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tower-topbar-actions .portal-theme-mount {
+    position: static;
+}
+
+/* --- elevation HUD (bottom left) ----------------------------------- */
+.tower-hud {
+    position: fixed;
+    left: 22px;
+    bottom: 20px;
+    z-index: 25;
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--pn-line);
+    background: rgba(8, 20, 52, 0.55);
+    backdrop-filter: blur(6px);
+    font-family: 'Cascadia Code', Consolas, 'Roboto Mono', monospace;
+    pointer-events: none;
+}
+
+body.tower-page:not(.dark-mode) .tower-hud {
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.tower-hud-elev {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--pn-cyan-soft);
+    min-width: 2.4ch;
+    text-align: right;
+    line-height: 1;
+}
+
+.tower-hud-unit {
+    font-size: 0.8rem;
+    color: var(--pn-muted);
+}
+
+.tower-hud-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--pn-muted);
+    padding-left: 10px;
+    border-left: 1px solid var(--pn-line);
+}
+
+/* --- level rail (right edge) --------------------------------------- */
+.tower-rail {
+    position: fixed;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 18px;
+}
+
+.tower-rail-dot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: var(--pn-muted);
+}
+
+.tower-rail-dot::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1.5px solid var(--pn-muted);
+    background: transparent;
+    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.tower-rail-dot span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.25s, transform 0.25s;
+    white-space: nowrap;
+}
+
+.tower-rail-dot:hover span,
+.tower-rail-dot.is-active span {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.tower-rail-dot.is-active { color: var(--pn-cyan-soft); }
+
+.tower-rail-dot.is-active::after {
+    background: var(--pn-cyan);
+    border-color: var(--pn-cyan);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.75);
+    transform: scale(1.25);
+}
+
+/* --- scroll sections ------------------------------------------------ */
+.tower-scroll {
+    position: relative;
+    z-index: 3;
+}
+
+.tower-hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 90px 24px 40px;
+}
+
+.tower-hero-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    will-change: transform, opacity;
+}
+
+.tower-hero-logo-wrap {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    margin-bottom: 6px;
+}
+
+.tower-hero-logo {
+    position: relative;
+    z-index: 2;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 8px;
+    box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.35), 0 0 40px rgba(56, 189, 248, 0.4);
+}
+
+body.tower-page:not(.dark-mode) .tower-hero-logo {
+    box-shadow: 0 0 0 1px rgba(127, 166, 194, 0.45), 0 0 30px rgba(143, 177, 202, 0.35);
+}
+
+.tower-hero-logo-wrap::before,
+.tower-hero-logo-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(125, 211, 252, 0.55);
+    animation: tower-ping 3.2s cubic-bezier(0, 0.55, 0.45, 1) infinite;
+}
+
+.tower-hero-logo-wrap::after { animation-delay: 1.6s; }
+
+body.tower-page:not(.dark-mode) .tower-hero-logo-wrap::before,
+body.tower-page:not(.dark-mode) .tower-hero-logo-wrap::after {
+    border-color: rgba(127, 166, 194, 0.6);
+}
+
+@keyframes tower-ping {
+    0%   { transform: scale(1); opacity: 0.85; }
+    80%, 100% { transform: scale(2.1); opacity: 0; }
+}
+
+.tower-hero-kicker {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--pn-cyan-soft);
+}
+
+.tower-hero-headline {
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    background: linear-gradient(92deg, #ffffff 0%, #bfe3ff 45%, #60c2f8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+body.tower-page:not(.dark-mode) .tower-hero-headline {
+    background: linear-gradient(92deg, #2c3e50 0%, #4d6d8c 45%, #6d95b3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.tower-hero-sub {
+    font-size: 1rem;
+    color: var(--pn-muted);
+    max-width: 460px;
+    line-height: 1.55;
+}
+
+.tower-scroll-hint {
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--pn-muted);
+}
+
+.tower-chevron {
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid var(--pn-cyan-soft);
+    border-bottom: 2px solid var(--pn-cyan-soft);
+    transform: rotate(45deg);
+    animation: tower-chev 1.8s ease-in-out infinite;
+}
+
+.tower-chevron + .tower-chevron {
+    margin-top: -7px;
+    animation-delay: 0.22s;
+}
+
+.tower-scroll-hint > span:last-of-type { margin-bottom: 8px; }
+
+@keyframes tower-chev {
+    0%, 100% { opacity: 0.25; transform: rotate(45deg) translate(0, 0); }
+    50%      { opacity: 1;    transform: rotate(45deg) translate(4px, 4px); }
+}
+
+/* --- portal stops --------------------------------------------------- */
+.tower-stop {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 60px 7vw;
+}
+
+.tower-stop[data-side="right"] { justify-content: flex-end; }
+.tower-stop[data-side="left"]  { justify-content: flex-start; }
+
+.tower-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(400px, 86vw);
+    padding: 26px 26px 22px;
+    border-radius: 16px;
+    border: 1px solid var(--pn-line);
+    background: var(--pn-glass);
+    backdrop-filter: blur(14px);
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 18px 48px rgba(2, 8, 24, 0.35);
+    opacity: 0;
+    transform: translateY(46px) scale(0.97);
+    transition:
+        opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.3s, box-shadow 0.3s;
+}
+
+.tower-stop.in-view .tower-card {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.tower-card:hover {
+    border-color: var(--pn-cyan-soft);
+    box-shadow: 0 22px 56px rgba(56, 189, 248, 0.22);
+    transform: translateY(-4px) scale(1.005);
+}
+
+.tower-stop.is-active .tower-card {
+    border-color: rgba(56, 189, 248, 0.6);
+    box-shadow:
+        0 22px 56px rgba(2, 8, 24, 0.4),
+        0 0 0 1px rgba(56, 189, 248, 0.22),
+        0 0 42px rgba(56, 189, 248, 0.14);
+}
+
+body.tower-page:not(.dark-mode) .tower-card {
+    box-shadow: 0 18px 48px rgba(127, 166, 194, 0.2);
+}
+
+body.tower-page:not(.dark-mode) .tower-stop.is-active .tower-card {
+    border-color: rgba(109, 149, 179, 0.75);
+    box-shadow:
+        0 22px 56px rgba(127, 166, 194, 0.3),
+        0 0 0 1px rgba(109, 149, 179, 0.3);
+}
+
+/* HUD corner brackets on the active card */
+.tower-card::before,
+.tower-card::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+}
+
+.tower-card::before {
+    top: -5px;
+    left: -5px;
+    border-top: 2px solid var(--pn-cyan);
+    border-left: 2px solid var(--pn-cyan);
+    border-top-left-radius: 6px;
+}
+
+.tower-card::after {
+    bottom: -5px;
+    right: -5px;
+    border-bottom: 2px solid var(--pn-cyan);
+    border-right: 2px solid var(--pn-cyan);
+    border-bottom-right-radius: 6px;
+}
+
+.tower-stop.is-active .tower-card::before,
+.tower-stop.is-active .tower-card::after {
+    opacity: 0.9;
+}
+
+.tower-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.tower-card-level {
+    font-family: 'Cascadia Code', Consolas, 'Roboto Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--pn-cyan-soft);
+}
+
+.tower-card-chip {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--pn-line);
+    color: var(--pn-muted);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tower-chip-live {
+    color: #4ade80;
+    border-color: rgba(74, 222, 128, 0.45);
+    background: rgba(74, 222, 128, 0.12);
+}
+
+body.tower-page:not(.dark-mode) .tower-chip-live {
+    color: #15803d;
+    border-color: rgba(21, 128, 61, 0.35);
+    background: rgba(74, 222, 128, 0.16);
+}
+
+.tower-card-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--pn-line);
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--pn-cyan-soft);
+}
+
+body.tower-page:not(.dark-mode) .tower-card-icon {
+    background: rgba(109, 149, 179, 0.12);
+    color: #4d6d8c;
+}
+
+.tower-card-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.tower-card-title {
+    font-size: 1.3rem;
+    font-weight: 780;
+    color: var(--pn-ink);
+    line-height: 1.2;
+}
+
+.tower-card-blurb {
+    font-size: 0.9rem;
+    color: var(--pn-muted);
+    line-height: 1.5;
+}
+
+.tower-card-foot {
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--pn-line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.tower-card-badge {
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background: rgba(56, 189, 248, 0.16);
+    color: var(--pn-cyan-soft);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+body.tower-page:not(.dark-mode) .tower-card-badge {
+    background: rgba(127, 166, 194, 0.18);
+    color: #5a7a96;
+    border-color: rgba(127, 166, 194, 0.4);
+}
+
+.tower-card-enter {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--pn-cyan-soft);
+    opacity: 0.65;
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.tower-card:hover .tower-card-enter {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+/* --- ground / footer section ---------------------------------------- */
+.tower-base {
+    min-height: 58vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px 24px 70px;
+    text-align: center;
+}
+
+.tower-base-line {
+    font-size: 0.85rem;
+    color: var(--pn-muted);
+    letter-spacing: 0.06em;
+}
+
+/* --- responsive ------------------------------------------------------ */
+@media (max-width: 900px) {
+    .tower-rail span { display: none; }
+}
+
+@media (max-width: 760px) {
+    .tower-rail { display: none; }
+
+    .tower-topbar .portal-user-name { display: none; }
+
+    .tower-stop,
+    .tower-stop[data-side="right"],
+    .tower-stop[data-side="left"] {
+        justify-content: center;
+        padding: 60px 18px;
+    }
+
+    .tower-card {
+        width: min(420px, 94vw);
+        background: var(--pn-glass);
+    }
+
+    .tower-hud {
+        left: 14px;
+        bottom: 14px;
+        padding: 8px 11px;
+    }
+
+    .tower-hud-elev { font-size: 1.1rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .portal-card { transition: none; }
-    .portal-card:hover { transform: none; }
+    html.tower-html { scroll-behavior: auto; }
+    .tower-card {
+        opacity: 1;
+        transform: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .tower-card:hover { transform: none; }
+    .tower-hero-logo-wrap::before,
+    .tower-hero-logo-wrap::after { animation: none; opacity: 0; }
+    .tower-chevron { animation: none; opacity: 0.7; }
+    .tower-hero-inner { transform: none !important; opacity: 1 !important; }
 }
