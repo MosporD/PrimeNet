@@ -1380,19 +1380,19 @@ function renderKPIModal(cell) {
         const shown = rows.slice(0, max);
         const more = rows.length - shown.length;
         return `
-            <div style="margin-top:14px;">
-                <div style="font-weight:800;color:#2c3e50;margin-bottom:8px;">All KPI fields</div>
-                <div style="max-height:260px; overflow:auto; border:1px solid #eee; border-radius:8px;">
-                    <table style="width:100%; border-collapse:collapse; font-size:0.88em;">
+            <div class="kpi-modal-section">
+                <div class="kpi-modal-section-title">All KPI fields</div>
+                <div class="kpi-modal-table-wrap">
+                    <table class="kpi-modal-table">
                         ${shown.map(r => `
                           <tr>
-                            <td style="padding:8px 10px; border-bottom:1px solid #f1f1f1; color:#666; width:55%;">${r.k}</td>
-                            <td style="padding:8px 10px; border-bottom:1px solid #f1f1f1; font-weight:700; color:#2c3e50;">${r.v}</td>
+                            <td class="kpi-modal-key">${r.k}</td>
+                            <td class="kpi-modal-val">${r.v}</td>
                           </tr>
                         `).join('')}
                     </table>
                 </div>
-                ${more > 0 ? `<div style="margin-top:6px;color:#7f8c8d;font-size:0.82em;">Showing ${shown.length}/${rows.length} fields</div>` : ''}
+                ${more > 0 ? `<div class="kpi-modal-muted">Showing ${shown.length}/${rows.length} fields</div>` : ''}
             </div>
         `;
     })() : '';
@@ -1407,42 +1407,42 @@ function renderKPIModal(cell) {
         const shown = rows.slice(0, max);
         const more = rows.length - shown.length;
         return `
-            <div style="margin-top:14px;">
-                <div style="font-weight:800;color:#2c3e50;margin-bottom:8px;">All cell metadata fields</div>
-                <div style="max-height:260px; overflow:auto; border:1px solid #eee; border-radius:8px;">
-                    <table style="width:100%; border-collapse:collapse; font-size:0.88em;">
+            <div class="kpi-modal-section">
+                <div class="kpi-modal-section-title">All cell metadata fields</div>
+                <div class="kpi-modal-table-wrap">
+                    <table class="kpi-modal-table">
                         ${shown.map(r => `
                           <tr>
-                            <td style="padding:8px 10px; border-bottom:1px solid #f1f1f1; color:#666; width:55%;">${r.k}</td>
-                            <td style="padding:8px 10px; border-bottom:1px solid #f1f1f1; font-weight:700; color:#2c3e50;">${r.v}</td>
+                            <td class="kpi-modal-key">${r.k}</td>
+                            <td class="kpi-modal-val">${r.v}</td>
                           </tr>
                         `).join('')}
                     </table>
                 </div>
-                ${more > 0 ? `<div style="margin-top:6px;color:#7f8c8d;font-size:0.82em;">Showing ${shown.length}/${rows.length} fields</div>` : ''}
+                ${more > 0 ? `<div class="kpi-modal-muted">Showing ${shown.length}/${rows.length} fields</div>` : ''}
             </div>
         `;
     })() : '';
 
     const kpiHtml = kpis
         ? `${summaryGrid}
-           <div style="font-size:0.82em;color:#7f8c8d;margin-top:10px;">
+           <div class="kpi-modal-muted kpi-modal-last">
                Last: ${kpis.timestamp ? new Date(kpis.timestamp).toLocaleString() : '—'}
            </div>
            ${detailsTable}`
-        : `<p style="color:#95a5a6;">No KPI data available</p>`;
+        : `<p class="kpi-modal-empty">No KPI data available</p>`;
 
     const perfUrl = performanceUrlForCell(cell);
 
     document.getElementById('kpi-content').innerHTML = `
         <span class="close-modal" onclick="closeKPIModal()">&times;</span>
-        <h2 style="margin-top:0;color:#0a0a0a;border-bottom:3px solid ${color};
-                   padding-bottom:8px;">
+        <h2 class="kpi-modal-title" style="border-bottom-color:${color};">
             ${cell.cell_name}
         </h2>
-        <div style="margin-bottom:14px;color:#444;font-size:0.9em;line-height:1.7;">
-            <strong style="color:#0a0a0a;">Site:</strong> <span style="color:#0a0a0a;font-weight:600;">${cell.site_name || '—'}</span> &nbsp;|&nbsp;
-            <strong style="color:${color};">${cell.technology || '—'}</strong>
+        <div class="kpi-modal-meta">
+            <strong class="kpi-modal-emphasis">Site:</strong>
+            <span class="kpi-modal-emphasis">${cell.site_name || '—'}</span> &nbsp;|&nbsp;
+            <strong class="kpi-modal-tech" style="color:${color} !important;">${cell.technology || '—'}</strong>
             &nbsp;|&nbsp; Vendor: ${cell.vendor || '—'}
             &nbsp;|&nbsp; Az: ${cell.azimuth ?? '—'}°
             &nbsp;|&nbsp; PCI/SC/BCCH: ${cell.pci ?? '—'}
@@ -1451,9 +1451,7 @@ function renderKPIModal(cell) {
             &nbsp;|&nbsp; <strong>Band:</strong> ${cell.frequency_band || '—'}
             &nbsp;|&nbsp; <strong>Tilts:</strong> M ${cell.mechanical_tilt ?? '—'}° / E ${cell.electrical_tilt ?? '—'}°
         </div>
-        <a href="${perfUrl}"
-           style="display:inline-block;margin:2px 0 12px;padding:8px 12px;background:${color};
-                  color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:0.88em;">
+        <a href="${perfUrl}" class="kpi-modal-perf-btn" style="background:${color};">
             📈 Open in Performance Page
         </a>
         ${kpiHtml}
