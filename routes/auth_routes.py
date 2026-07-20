@@ -84,11 +84,31 @@ def reset_login_rate_limits() -> None:
 reset_login_rate_limits()
 
 _DEFAULT_SITE_COLUMNS = [
-    {'key': '2G', 'title': '2G', 'subtitle': 'GSM / EDGE', 'count': 0},
-    {'key': '3G', 'title': '3G', 'subtitle': 'WCDMA / UMTS', 'count': 0},
-    {'key': '4G-FDD', 'title': '4G - FDD', 'subtitle': 'LTE FDD', 'count': 0},
-    {'key': '4G-TDD', 'title': '4G - TDD', 'subtitle': 'LTE TDD', 'count': 0},
-    {'key': '5G', 'title': '5G', 'subtitle': 'NR', 'count': 0},
+    {
+        'key': '2G', 'title': '2G', 'subtitle': 'GSM / EDGE', 'count': 0,
+        'vendor_counts': {'Huawei': 0, 'Nokia': 0},
+        'children': [{'label': 'Huawei', 'count': 0}, {'label': 'Nokia', 'count': 0}],
+    },
+    {
+        'key': '3G', 'title': '3G', 'subtitle': 'WCDMA / UMTS', 'count': 0,
+        'vendor_counts': {'Huawei': 0, 'Nokia': 0},
+        'children': [{'label': 'Huawei', 'count': 0}, {'label': 'Nokia', 'count': 0}],
+    },
+    {
+        'key': '4G-FDD', 'title': '4G - FDD', 'subtitle': 'LTE FDD', 'count': 0,
+        'vendor_counts': {'Huawei': 0, 'Nokia': 0},
+        'children': [{'label': 'Huawei', 'count': 0}, {'label': 'Nokia', 'count': 0}],
+    },
+    {
+        'key': '4G-TDD', 'title': '4G - TDD', 'subtitle': 'LTE TDD', 'count': 0,
+        'vendor_counts': {'Huawei': 0, 'Nokia': 0},
+        'children': [{'label': 'Huawei', 'count': 0}, {'label': 'Nokia', 'count': 0}],
+    },
+    {
+        'key': '5G', 'title': '5G', 'subtitle': 'NR', 'count': 0,
+        'vendor_counts': {'Huawei': 0, 'Nokia': 0},
+        'children': [{'label': 'Huawei', 'count': 0}, {'label': 'Nokia', 'count': 0}],
+    },
 ]
 
 def get_current_user():
@@ -262,19 +282,22 @@ def portal_enter(portal_id):
 
 @auth_bp.route('/dashboard')
 def dashboard():
-    """Render main dashboard"""
+    """Render main dashboard.
+
+    Site counts load asynchronously via ``/api/dashboard/operational-sites``
+    so this page can paint immediately after portal entry.
+    """
     user = get_current_user()
     if not user:
         return redirect(url_for('auth.login_page'))
 
-    tech_site_columns, total_sites = get_operational_site_stats()
     user_data = format_user_data(user)
     return render_template(
         'dashboard.html',
         user=user_data,
         allowed_hrefs=allowed_hrefs_for_role(user_data),
-        tech_site_columns=tech_site_columns,
-        total_sites=total_sites,
+        tech_site_columns=[dict(c) for c in _DEFAULT_SITE_COLUMNS],
+        total_sites=0,
     )
 
 # ============================================================================

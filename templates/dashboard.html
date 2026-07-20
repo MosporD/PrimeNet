@@ -51,7 +51,7 @@
                 <div class="constellation-radar-wrap">
                     <canvas id="network-radar-canvas"></canvas>
                     <div class="radar-center-total map-total-badge">
-                        <strong id="radar-total-sites">{{ total_sites }}</strong>
+                        <strong id="radar-total-sites">…</strong>
                         <span>on-air sites</span>
                     </div>
                     <div class="radar-tooltip" id="radar-tooltip" hidden></div>
@@ -717,15 +717,18 @@
             renderVendorDials(data.columns);
         }
 
-        async function refreshConstellationData() {
+        async function refreshConstellationData(options = {}) {
+            const silent = Boolean(options.silent);
             const refreshBtn = document.getElementById('constellation-refresh-btn');
-            if (!refreshBtn || refreshBtn.disabled) {
+            if (!silent && (!refreshBtn || refreshBtn.disabled)) {
                 return;
             }
 
             const defaultLabel = 'Refresh';
-            refreshBtn.disabled = true;
-            refreshBtn.textContent = 'Refreshing...';
+            if (refreshBtn && !silent) {
+                refreshBtn.disabled = true;
+                refreshBtn.textContent = 'Refreshing...';
+            }
 
             try {
                 const response = await fetch('/api/dashboard/operational-sites', {
@@ -743,17 +746,17 @@
                     throw new Error(data.error || 'Request failed');
                 }
                 const columns = Array.isArray(data.tech_site_columns) ? data.tech_site_columns : [];
-                const totalEl = document.getElementById('radar-total-sites');
-                if (totalEl) {
-                    totalEl.textContent = data.total_sites != null ? Number(data.total_sites).toLocaleString() : '0';
-                }
                 updateNetworkRadar(columns, data.total_sites);
                 await loadSiteMap();
             } catch (error) {
-                alert(error.message || 'Could not refresh network constellation');
+                if (!silent) {
+                    alert(error.message || 'Could not refresh network constellation');
+                }
             } finally {
-                refreshBtn.disabled = false;
-                refreshBtn.textContent = defaultLabel;
+                if (refreshBtn && !silent) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = defaultLabel;
+                }
             }
         }
 
@@ -1802,6 +1805,7 @@
                 window.primeNetAmbientBg = window.dashboardAmbientBg;
             }
             initNetworkRadar();
+            refreshConstellationData({ silent: true });
             setupDashboardToolSearch();
             setupGlobalSearchDropdown();
             refreshNetworkActivity();
