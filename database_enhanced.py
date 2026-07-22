@@ -205,6 +205,24 @@ def init_db():
     ''')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_saved_views_user_module ON saved_views(user_id, module)')
 
+    # Per-user vendor CM credentials (RET management)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_vendor_credentials (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            vendor TEXT NOT NULL,
+            username TEXT NOT NULL,
+            password_encrypted TEXT NOT NULL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, vendor),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    cursor.execute(
+        'CREATE INDEX IF NOT EXISTS idx_user_vendor_credentials_user '
+        'ON user_vendor_credentials(user_id)'
+    )
+
     # Configuration task scheduler tables
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS config_scheduler_tasks (

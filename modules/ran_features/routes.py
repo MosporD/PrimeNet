@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, abort,
 from functools import wraps
 
 from database_enhanced import get_user_by_session
-from .hdx import HDX_DIR, TECH_FILES, get_home_page, read_file, guess_mimetype
+from .hdx import HDX_DIR, TECH_FILES, get_home_page, read_file, guess_mimetype, patch_hdx_html
 from .navi import get_navi_payload, search_docs, warm_search_index
 
 ran_features_bp = Blueprint(
@@ -128,6 +128,8 @@ def ran_features_view(tech, filepath=None):
         abort(404)
 
     mimetype = guess_mimetype(filepath)
+    if mimetype.startswith("text/html"):
+        data = patch_hdx_html(data, tech, filepath)
     if mimetype.startswith("text/") or mimetype in ("application/javascript", "application/xml"):
         mimetype = f"{mimetype}; charset=utf-8"
     return Response(data, mimetype=mimetype)

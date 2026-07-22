@@ -20,6 +20,7 @@ from core.cm_extractor.huawei_semantics import _selection_rows, get_mo_object_ca
 from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.nokia_semantics import extract_nokia_selection, get_mo_class_catalog
 from core.cm_extractor.site_catalog import list_huawei_db_sites, list_nokia_inventory_sites
+from modules.ne_comparison.comparison_report import build_comparison_workbook
 
 ne_comparison_bp = Blueprint(
     'ne_comparison', __name__,
@@ -759,6 +760,8 @@ def compare_cm_nes():
         result['success'] = True
         result['left_ne'] = ne1
         result['right_ne'] = ne2
+        if vendor == 'nokia':
+            result['conf_id'] = conf_id
         log_activity(
             _user_id(user),
             'ne_cm_comparison',
@@ -896,53 +899,34 @@ def download_report():
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
+        if not isinstance(data, dict):
+            return jsonify({'error': 'Invalid report payload'}), 400
 
-        import openpyxl
-        from openpyxl.styles import Font, PatternFill
+        if data.get('parameter_summary') is not None and not data.get('differences'):
+            return jsonify({'error': 'NW audit reports are not available for Excel download yet'}), 400
 
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Comparison Report"
+        username = ''
+        if isinstance(user, dict):
+            username = str(user.get('username') or '')
+        elif user:
+            username = str(user[1] if len(user) > 1 else '')
 
-        ws['A1'] = 'Type'
-        ws['B1'] = 'Parameter/MO'
-        ws['C1'] = 'Old Value'
-        ws['D1'] = 'New Value'
-        ws['E1'] = 'Path'
-
-        for cell in ws[1]:
-            cell.font = Font(bold=True)
-            cell.fill = PatternFill(start_color="CCE5FF", end_color="CCE5FF", fill_type="solid")
-
-        row = 2
-        for diff in data.get('differences', []):
-            changes = diff.get('changes') or []
-            if changes:
-                for change in changes:
-                    ws[f'A{row}'] = diff.get('type', '')
-                    ws[f'B{row}'] = change.get('parameter', diff.get('section', ''))
-                    ws[f'C{row}'] = str(change.get('old_value', ''))
-                    ws[f'D{row}'] = str(change.get('new_value', ''))
-                    ws[f'E{row}'] = diff.get('path', '')
-                    row += 1
-                continue
-            ws[f'A{row}'] = diff.get('type', '')
-            ws[f'B{row}'] = diff.get('parameter', diff.get('section', diff.get('mo_class', '')))
-            ws[f'C{row}'] = str(diff.get('old_value', ''))
-            ws[f'D{row}'] = str(diff.get('new_value', ''))
-            ws[f'E{row}'] = diff.get('path', '')
-            row += 1
+        report_payload = dict(data)
+        report_payload['operator'] = username or 'PrimeNet User'
+        buffer, filename = build_comparison_workbook(report_payload)
 
         temp_path = os.path.join(tempfile.gettempdir(), f"report_{uuid.uuid4()}.xlsx")
-        wb.save(temp_path)
+        with open(temp_path, 'wb') as handle:
+            handle.write(buffer.getvalue())
 
-        log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'report_download', 'Downloaded comparison report')
+        log_activity(_user_id(user), 'report_download', 'Downloaded NE comparison report')
 
         return send_file(
             temp_path,
             as_attachment=True,
-            download_name='comparison_report.xlsx'
+            download_name=filename,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
 
     except Exception as e:

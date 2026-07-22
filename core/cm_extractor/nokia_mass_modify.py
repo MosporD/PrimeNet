@@ -42,6 +42,7 @@ def apply_mass_modifications(
     wait: bool = True,
     mo_class: str = _DEFAULT_MO_CLASS,
     operation_timeout_sec: int = 900,
+    client: NokiaOperationsClient | None = None,
 ) -> dict[str, Any]:
     """
     Apply CM parameter changes via Provision_Mass_Modification.
@@ -51,7 +52,7 @@ def apply_mass_modifications(
     if not updates:
         raise ValueError('No parameter updates provided')
 
-    client = build_nokia_operations_client()
+    client = client or build_nokia_operations_client()
     operations: list[dict[str, Any]] = []
 
     for item in updates:

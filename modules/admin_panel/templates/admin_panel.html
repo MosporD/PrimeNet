@@ -110,7 +110,10 @@
 
             <div class="admin-page-panel" data-page="sync-status">
                 <div class="sync-section">
-                    <h2 class="section-title">Last Sync per Source</h2>
+                    <div class="section-title-row">
+                        <h2 class="section-title">Last Sync per Source</h2>
+                        <button type="button" class="btn-history-reload" onclick="exportAdminTable('sync_status')">Download Excel</button>
+                    </div>
                     <table class="sync-table">
                         <thead>
                             <tr>
@@ -132,7 +135,10 @@
 
             <div class="admin-page-panel" data-page="sync-history">
                 <div class="sync-section">
-                    <h2 class="section-title">Recent Sync History</h2>
+                    <div class="section-title-row">
+                        <h2 class="section-title">Recent Sync History</h2>
+                        <button type="button" class="btn-history-reload" onclick="exportAdminTable('sync_history')">Download Excel</button>
+                    </div>
                     <h3 class="section-subtitle">Filters
                         <input type="date" id="sync-history-day" onchange="loadSyncHistory()" title="Filter history by day">
                         <select id="sync-history-type" onchange="loadSyncHistory()" title="Filter history by sync type">
@@ -214,6 +220,29 @@
             <div class="admin-page-panel {% if not can_manage_sync %}active{% endif %}" data-page="user-admin">
                 <h2 class="section-title user-admin-title">User Administration</h2>
 
+                <div class="sync-section ret-fallback-section">
+                    <h3 class="section-subtitle">RET Credential Accountability Alerts</h3>
+                    <p class="api-connections-intro">
+                        Logged when a user performs RET actions without personal MantaRay/U2020 credentials,
+                        or when their credentials fail and the shared service account is used instead.
+                    </p>
+                    <button type="button" class="btn-user-secondary" onclick="loadRetCredentialFallbacks()">↻ Refresh</button>
+                    <button type="button" class="btn-user-secondary" onclick="exportAdminTable('ret_credential_alerts')">Download Excel</button>
+                    <table class="sync-table" style="margin-top:12px;">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Type</th>
+                                <th>User</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ret-fallback-body">
+                            <tr><td colspan="4" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <div id="add-user-panel" class="add-user-panel" hidden>
                     <h3 class="section-subtitle">Add New User</h3>
                     <form id="add-user-form" class="add-user-form" onsubmit="submitAddUser(event)">
@@ -269,6 +298,7 @@
                         <option value="0">Inactive</option>
                     </select>
                     <span class="user-admin-hint">Default password: <code id="default-user-password-label">{{ default_user_password }}</code></span>
+                    <button type="button" class="btn-user-secondary" onclick="exportAdminTable('users')">Download Excel</button>
                 </div>
 
                 <div class="users-table-container">
@@ -296,6 +326,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
-    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.3"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.4"></script>
 </body>
 </html>

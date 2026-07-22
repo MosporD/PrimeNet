@@ -86,3 +86,55 @@ def guess_mimetype(filepath: str) -> str:
         return overrides[ext]
     guessed, _ = mimetypes.guess_type(filepath)
     return guessed or "application/octet-stream"
+
+
+def hdx_base_url(tech: str, filepath: str) -> str:
+    dir_part = os.path.dirname(filepath.replace("\\", "/"))
+    base = f"/ran-features/view/{tech}/"
+    if dir_part:
+        base += dir_part.replace("\\", "/").rstrip("/") + "/"
+    return base
+
+
+def patch_hdx_html(data: bytes, tech: str, filepath: str) -> bytes:
+    """Inject responsive layout helpers into HedEx HTML pages."""
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
+
+    lower = text.lower()
+    if "<html" not in lower:
+        return data
+
+    patch = (
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '<style id="primenet-hdx-patch">'
+        "html,body{margin:0!important;padding:8px 12px!important;width:100%!important;"
+        "max-width:none!important;box-sizing:border-box;}"
+        "body{overflow-x:auto;}"
+        "body *{box-sizing:border-box;}"
+        "table{max-width:100%!important;}"
+        "img,svg,iframe{max-width:100%;}"
+        "</style>"
+    )
+    if "<base " not in lower:
+        patch = f'<base href="{hdx_base_url(tech, filepath)}">' + patch
+
+    head_idx = lower.find("<head>")
+    if head_idx != -1:
+        insert_at = head_idx + len("<head>")
+        if 'id="primenet-hdx-patch"' not in text:
+            text = text[:insert_at] + patch + text[insert_at:]
+        return text.encode("utf-8")
+
+    html_idx = lower.find("<html")
+    if html_idx != -1:
+        tag_end = text.find(">", html_idx)
+        if tag_end != -1:
+            insert_at = tag_end + 1
+            if 'id="primenet-hdx-patch"' not in text:
+                text = text[:insert_at] + "<head>" + patch + "</head>" + text[insert_at:]
+            return text.encode("utf-8")
+
+    return data

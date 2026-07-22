@@ -60,6 +60,9 @@ _SITE_LEVEL_MO_PATH_ALL_PLMNS: dict[tuple[str, str], str] = {
     ('NOKIA', 'MRBTS'): '/NetActCommon:PLMN/MRBTS',
 }
 
+# NetAct CM adaptations excluded from catalog, scope discovery, and extraction.
+_EXCLUDED_ADAPTATIONS = frozenset({'NOKBTSFM'})
+
 _RAN_ADAPTATION_PREFIXES = ('NOKLTE', 'NOKNR', 'NOKRNC', 'NOKBSC', 'NOKIA', 'NetActCommon', 'MRBTS')
 # Fallback adaptation set when the full-catalog discovery call fails. The
 # preferred path fetches every adaptation and classifies it by anchor class, so
@@ -75,7 +78,7 @@ _DEFAULT_TREE_PATH_BY_SCOPE: dict[str, str] = {
     'BSC': '/NetActCommon:PLMN//{adapt}:{abbr}',
 }
 
-_MO_CLASS_CACHE_VERSION = 5
+_MO_CLASS_CACHE_VERSION = 6
 
 
 def invalidate_mo_class_cache() -> None:
@@ -103,6 +106,14 @@ _CONTROLLER_ROOT_ABBREV = {'NOKRNC': 'RNC', 'NOKBSC': 'BSC'}
 _RNC_OPEN_API_EMPTY_HINT_CLASSES = frozenset({'WBTS', 'WCEL', 'WAC'})
 _RNC_OPEN_API_INCOMPLETE_HINT_CLASSES = frozenset({'FMCS', 'WBTS', 'WCEL', 'WAC'})
 _WORKING_QUERY_PARAMS_CACHE: dict[str, list[str]] = {}
+
+
+def _is_excluded_adaptation(adaptation: str | None) -> bool:
+    return (adaptation or '').strip() in _EXCLUDED_ADAPTATIONS
+
+
+def _without_excluded_adaptations(items: list[dict[str, str]]) -> list[dict[str, str]]:
+    return [item for item in items if not _is_excluded_adaptation(item.get('adaptation'))]
 
 
 def _load_scope_tree() -> dict[str, dict[str, frozenset[str]]]:
@@ -146,6 +157,8 @@ def discover_scope_adaptations(items: list[dict[str, str]]) -> dict[str, frozens
         level: set(_ADAPTATIONS_BY_SCOPE[level]) for level in SCOPE_LEVELS
     }
     for adapt, abbrs in abbrs_by_adapt.items():
+        if _is_excluded_adaptation(adapt):
+            continue
         for level in SCOPE_LEVELS:
             if abbrs & anchors[level]:
                 result[level].add(adapt)
@@ -252,6 +265,7 @@ def _fetch_and_classify_mo_classes(
     if not items:
         items = flatten_mo_classes(client.get_mo_classes(RAN_ADAPT_IDS))
 
+    items = _without_excluded_adaptations(items)
     by_scope = discover_scope_adaptations(items)
     if ran_only:
         ran_adaptations: set[str] = set()

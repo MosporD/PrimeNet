@@ -7,6 +7,7 @@ let filteredUsers = [];
 let syncMsgTimer = null;
 let syncStatusRows = [];
 let syncHistoryRows = [];
+let retFallbackRows = [];
 let usersPage = 1;
 let syncStatusPage = 1;
 let syncHistoryPage = 1;
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultPage = sectionFromUrl || (firstTab ? firstTab.getAttribute('data-page') : 'user-admin');
     openAdminPage(defaultPage || 'user-admin');
     loadAllUsers();
+    loadRetCredentialFallbacks();
     if (document.querySelector('.admin-page-tab[data-page="data-sync"]')) {
         loadSyncStatus();
         loadSyncHistory();
@@ -911,5 +913,209 @@ async function testAllApiConnections() {
         await testApiConnection('all');
     } finally {
         if (btn) btn.disabled = false;
+    }
+}
+
+async function loadRetCredentialFallbacks() {
+    const body = document.getElementById('ret-fallback-body');
+    if (!body) return;
+    try {
+        const res = await fetch('/api/admin/ret-credential-fallbacks?limit=500');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load fallback alerts');
+        retFallbackRows = data.items || [];
+        if (!retFallbackRows.length) {
+            body.innerHTML = '<tr><td colspan="4" style="text-align:center;">No credential accountability alerts recorded.</td></tr>';
+            return;
+        }
+        body.innerHTML = retFallbackRows.map((item) => {
+            const action = item.action || '';
+            const typeLabel = action === 'ret_missing_credentials'
+                ? 'Missing credentials'
+                : (action === 'ret_credential_fallback' ? 'Credential fallback' : action);
+            return `
+            <tr>
+                <td>${(item.timestamp || '').slice(0, 19).replace('T', ' ')}</td>
+                <td>${typeLabel}</td>
+                <td>${_escapeHtml(item.username || ('User #' + (item.user_id || '?')))}</td>
+                <td>${_escapeHtml(item.details || '')}</td>
+            </tr>
+        `;
+        }).join('');
+    } catch (error) {
+        retFallbackRows = [];
+        body.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#c0392b;">${_escapeHtml(error.message || 'Load failed')}</td></tr>`;
+    }
+}
+
+function _retAlertTypeLabel(action) {
+    if (action === 'ret_missing_credentials') return 'Missing credentials';
+    if (action === 'ret_credential_fallback') return 'Credential fallback';
+    return action || '';
+}
+
+function _syncRowExport(row) {
+    return {
+        sync_type: row.sync_type || '',
+        technology: row.technology || '',
+        status: row.status || '',
+        rows_affected: row.rows_affected != null ? row.rows_affected : '',
+        message: row.message || '',
+        started_at: row.started_at || '',
+    };
+}
+
+async function downloadAdminExcel(payload) {
+    const res = await fetch('/api/admin/export/excel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        let message = 'Excel export failed';
+        try {
+            const data = await res.json();
+            message = data.error || message;
+        } catch (_) {
+            /* ignore */
+        }
+        throw new Error(message);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="?([^";]+)"?/i);
+    const filename = match ? match[1] : `${payload.filename_stem || 'export'}_${Date.now()}.xlsx`;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+}
+
+async function exportAdminTable(tableKey) {
+    try {
+        let payload;
+        if (tableKey === 'users') {
+            if (!filteredUsers.length) {
+                showNotification('No users to export', 'error');
+                return;
+            }
+            payload = {
+                table: 'users',
+                report_title: 'User Administration',
+                sheet_title: 'Users',
+                filename_stem: 'Admin_Users',
+                columns: ['id', 'username', 'email', 'role', 'status', 'created_at', 'last_activity'],
+                column_labels: {
+                    id: 'ID',
+                    username: 'Username',
+                    email: 'Email',
+                    role: 'Role',
+                    status: 'Status',
+                    created_at: 'Created',
+                    last_activity: 'Last Activity',
+                },
+                rows: filteredUsers.map((user) => ({
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role_label || ROLE_LABELS[user.role] || user.role,
+                    status: user.is_active ? 'Active' : 'Inactive',
+                    created_at: formatDate(user.created_at),
+                    last_activity: user.last_activity || 'Never',
+                })),
+                meta: {
+                    'Search Filter': document.getElementById('user-search')?.value?.trim() || '(none)',
+                    'Role Filter': document.getElementById('role-filter')?.value || '(all)',
+                    'Status Filter': document.getElementById('status-filter')?.value || '(all)',
+                },
+            };
+        } else if (tableKey === 'sync_status') {
+            if (!syncStatusRows.length) {
+                showNotification('No sync status rows to export', 'error');
+                return;
+            }
+            payload = {
+                table: 'sync_status',
+                report_title: 'Last Sync per Source',
+                sheet_title: 'Sync Status',
+                filename_stem: 'Admin_Sync_Status',
+                columns: ['sync_type', 'technology', 'status', 'rows_affected', 'message', 'started_at'],
+                column_labels: {
+                    sync_type: 'Type',
+                    technology: 'Technology',
+                    status: 'Status',
+                    rows_affected: 'Rows',
+                    message: 'Message',
+                    started_at: 'When',
+                },
+                rows: syncStatusRows.map(_syncRowExport),
+            };
+        } else if (tableKey === 'sync_history') {
+            if (!syncHistoryRows.length) {
+                showNotification('No sync history rows to export', 'error');
+                return;
+            }
+            const day = document.getElementById('sync-history-day')?.value || '';
+            const syncType = document.getElementById('sync-history-type')?.value || '';
+            payload = {
+                table: 'sync_history',
+                report_title: 'Recent Sync History',
+                sheet_title: 'Sync History',
+                filename_stem: 'Admin_Sync_History',
+                columns: ['sync_type', 'technology', 'status', 'rows_affected', 'message', 'started_at'],
+                column_labels: {
+                    sync_type: 'Type',
+                    technology: 'Technology',
+                    status: 'Status',
+                    rows_affected: 'Rows',
+                    message: 'Message',
+                    started_at: 'When',
+                },
+                rows: syncHistoryRows.map(_syncRowExport),
+                meta: {
+                    'Day Filter': day || '(all)',
+                    'Type Filter': syncType || '(all)',
+                },
+            };
+        } else if (tableKey === 'ret_credential_alerts') {
+            if (!retFallbackRows.length) {
+                await loadRetCredentialFallbacks();
+            }
+            if (!retFallbackRows.length) {
+                showNotification('No RET credential alerts to export', 'error');
+                return;
+            }
+            payload = {
+                table: 'ret_credential_alerts',
+                report_title: 'RET Credential Accountability Alerts',
+                sheet_title: 'RET Alerts',
+                filename_stem: 'Admin_RET_Credential_Alerts',
+                columns: ['timestamp', 'type', 'username', 'details'],
+                column_labels: {
+                    timestamp: 'When',
+                    type: 'Type',
+                    username: 'User',
+                    details: 'Details',
+                },
+                rows: retFallbackRows.map((item) => ({
+                    timestamp: (item.timestamp || '').slice(0, 19).replace('T', ' '),
+                    type: _retAlertTypeLabel(item.action),
+                    username: item.username || (`User #${item.user_id || '?'}`),
+                    details: item.details || '',
+                })),
+            };
+        } else {
+            showNotification('Unknown table export', 'error');
+            return;
+        }
+
+        await downloadAdminExcel(payload);
+        showNotification(`Downloaded ${payload.rows.length} row(s) to Excel`, 'success');
+    } catch (error) {
+        showNotification(error.message || 'Excel export failed', 'error');
     }
 }

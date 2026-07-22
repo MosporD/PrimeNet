@@ -19,6 +19,11 @@ from database_enhanced import (
     verify_password,
     _unique_constraint_error,
 )
+from core.user_vendor_credentials import (
+    delete_user_vendor_credentials,
+    list_user_vendor_credential_status,
+    save_user_vendor_credentials,
+)
 from db.runtime import execute_query
 from sync_config import PROJECT_ROOT
 
@@ -304,6 +309,60 @@ def change_password():
 
     log_activity(user['id'], 'password_change', 'User changed their password')
     return jsonify({'success': True, 'message': 'Password changed successfully'})
+
+
+# ── API: vendor CM credentials (RET management) ───────────────────────────────
+
+@user_profile_bp.route('/api/profile/vendor-credentials')
+@login_required
+def get_vendor_credentials():
+    user = get_current_user()
+    status = list_user_vendor_credential_status(user['id'])
+    return jsonify({'success': True, 'credentials': status})
+
+
+@user_profile_bp.route('/api/profile/vendor-credentials', methods=['POST'])
+@login_required
+def save_vendor_credentials():
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+    vendor = (data.get('vendor') or '').strip().lower()
+    username = (data.get('username') or '').strip()
+    password = data.get('password') or ''
+    if vendor not in ('nokia', 'huawei'):
+        return jsonify({'error': 'vendor must be nokia or huawei'}), 400
+    try:
+        save_user_vendor_credentials(user['id'], vendor, username, password)
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    label = 'MantaRay' if vendor == 'nokia' else 'U2020'
+    log_activity(user['id'], 'vendor_credentials_save', f'Saved {label} credentials for RET management')
+    return jsonify({
+        'success': True,
+        'message': f'{label} credentials saved.',
+        'credentials': list_user_vendor_credential_status(user['id']),
+    })
+
+
+@user_profile_bp.route('/api/profile/vendor-credentials/<vendor>', methods=['DELETE'])
+@login_required
+def remove_vendor_credentials(vendor: str):
+    user = get_current_user()
+    vendor = (vendor or '').strip().lower()
+    if vendor not in ('nokia', 'huawei'):
+        return jsonify({'error': 'vendor must be nokia or huawei'}), 400
+    try:
+        deleted = delete_user_vendor_credentials(user['id'], vendor)
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    if deleted:
+        label = 'MantaRay' if vendor == 'nokia' else 'U2020'
+        log_activity(user['id'], 'vendor_credentials_clear', f'Cleared {label} credentials')
+    return jsonify({
+        'success': True,
+        'message': 'Credentials removed.' if deleted else 'No credentials were stored.',
+        'credentials': list_user_vendor_credential_status(user['id']),
+    })
 
 
 # ── API: preferences ──────────────────────────────────────────────────────────

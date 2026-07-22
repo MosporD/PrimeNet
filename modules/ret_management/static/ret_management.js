@@ -10,9 +10,11 @@
     const neSelect = document.getElementById('ne-select');
     const loadBtn = document.getElementById('load-rets-btn');
     const reloadBtn = document.getElementById('reload-btn');
+    const exportBtn = document.getElementById('export-excel-btn');
     const saveBtn = document.getElementById('save-changes-btn');
     const loadStatus = document.getElementById('load-status');
     const configStatus = document.getElementById('cm-config-status');
+    const userCredStatus = document.getElementById('user-cred-status');
     const resultsPanel = document.getElementById('results-panel');
     const resultsTitle = document.getElementById('results-title');
     const warningsBox = document.getElementById('results-warnings');
@@ -128,6 +130,7 @@
         tableFilter = '';
         if (tableFilterInput) tableFilterInput.value = '';
         resultsPanel.hidden = true;
+        if (exportBtn) exportBtn.disabled = true;
         loadNeList();
     }
 
@@ -152,6 +155,21 @@
             if (!data.cm_write_allowed) {
                 writeHint.hidden = false;
                 saveBtn.hidden = true;
+            }
+
+            if (userCredStatus) {
+                const creds = data.user_credentials || {};
+                const vendorKey = vendor === 'huawei' ? 'huawei' : 'nokia';
+                const info = creds[vendorKey] || {};
+                if (info.configured) {
+                    setStatus(userCredStatus, `Using your ${vendorKey === 'huawei' ? 'U2020' : 'MantaRay'} account (${info.username})`, 'ok');
+                } else {
+                    setStatus(
+                        userCredStatus,
+                        `No personal ${vendorKey === 'huawei' ? 'U2020' : 'MantaRay'} credentials — actions will be flagged for admin`,
+                        'error',
+                    );
+                }
             }
         } catch (err) {
             setStatus(configStatus, err.message, 'error');
@@ -315,12 +333,14 @@
             emptyState.hidden = false;
             retTable.hidden = true;
             saveBtn.hidden = true;
+            if (exportBtn) exportBtn.disabled = true;
             updateTableMeta(0, 0);
             return;
         }
 
         emptyState.hidden = true;
         retTable.hidden = false;
+        if (exportBtn) exportBtn.disabled = false;
         const columns = displayColumns(currentRows);
         const editCol = resolveEditColumn(columns);
         const hasEditColumn = vendor === 'huawei'
@@ -453,6 +473,7 @@
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Nokia update failed');
+                showCredentialFallbackNotice(data);
             } else {
                 const payload = {
                     site_id: ne.site_id,
@@ -473,6 +494,7 @@
                         : '';
                     throw new Error((data.error || 'Huawei MOD failed') + detail);
                 }
+                showCredentialFallbackNotice(data);
             }
             setStatus(loadStatus, 'Change applied successfully', 'ok');
             await loadRets();
@@ -480,6 +502,104 @@
             setStatus(loadStatus, err.message, 'error');
         } finally {
             saveBtn.disabled = false;
+        }
+    }
+
+    function showCredentialFallbackNotice(data) {
+        if (!data || (!data.credential_fallback && !data.credential_missing)) return;
+        const notice = data.credential_notice
+            || (data.credential_missing
+                ? 'You have not configured personal vendor credentials. The shared service account was used and an administrator has been notified.'
+                : 'Your personal vendor credentials could not complete this action. The shared service account was used instead.');
+        setStatus(loadStatus, notice, 'warn');
+        if (typeof window.showToast === 'function') {
+            window.showToast(notice, 'warn', 8000);
+        } else {
+            window.alert(notice);
+        }
+    }
+
+    function mergeResponseWarnings(data, existingWarnings) {
+        const warnings = Array.isArray(existingWarnings) ? [...existingWarnings] : [];
+        if (data && (data.credential_fallback || data.credential_missing) && data.credential_notice) {
+            warnings.push(data.credential_notice);
+        }
+        return warnings;
+    }
+
+    async function exportExcelReport() {
+        if (!currentRows.length) {
+            setStatus(loadStatus, 'Load RET data before exporting', 'error');
+            return;
+        }
+        const ne = selectedNe();
+        const columns = displayColumns(currentRows);
+        const editCol = resolveEditColumn(columns);
+        const visible = visibleRows(editCol);
+        if (!visible.length) {
+            setStatus(loadStatus, 'No rows match the current filter', 'error');
+            return;
+        }
+
+        const exportRows = visible.map(({ row }) => {
+            const out = {};
+            columns.forEach((col) => {
+                out[col] = cellDisplayValue(row, col, editCol);
+            });
+            return out;
+        });
+        const columnLabels = {};
+        columns.forEach((col) => {
+            columnLabels[col] = huaweiTiltColumnLabel(col);
+        });
+
+        if (exportBtn) exportBtn.disabled = true;
+        setStatus(loadStatus, 'Preparing Excel report…');
+        try {
+            const res = await fetch('/api/ret-management/export/excel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vendor,
+                    site_id: ne?.site_id || '',
+                    ne_label: ne?.label || '',
+                    ne_name: ne?.ne_name || '',
+                    mo_class: nokiaMoClass || '',
+                    columns,
+                    column_labels: columnLabels,
+                    rows: exportRows,
+                    table_filter: tableFilter,
+                    total_rows: currentRows.length,
+                    exported_rows: exportRows.length,
+                }),
+            });
+            if (!res.ok) {
+                let message = 'Excel export failed';
+                try {
+                    const data = await res.json();
+                    message = data.error || message;
+                } catch (_) {
+                    /* binary or empty body */
+                }
+                throw new Error(message);
+            }
+            const blob = await res.blob();
+            const disposition = res.headers.get('Content-Disposition') || '';
+            const match = disposition.match(/filename="?([^";]+)"?/i);
+            const filename = match ? match[1] : `RET_${vendor}_${Date.now()}.xlsx`;
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            setStatus(loadStatus, `Downloaded ${exportRows.length} row(s) to Excel`, 'ok');
+        } catch (err) {
+            setStatus(loadStatus, err.message, 'error');
+        } finally {
+            if (exportBtn) exportBtn.disabled = !currentRows.length;
         }
     }
 
@@ -513,12 +633,13 @@
             const res = await fetch(url);
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to load RET data');
+            showCredentialFallbackNotice(data);
             serverColumns = data.columns || [];
             nokiaMoClass = data.mo_class || '';
             sortState = { col: null, dir: 1 };
             tableFilter = '';
             if (tableFilterInput) tableFilterInput.value = '';
-            showWarnings(data.warnings);
+            showWarnings(mergeResponseWarnings(data, data.warnings));
             renderTable(data.rows || []);
             const moLabel = nokiaMoClass ? ` [${nokiaMoClass}]` : '';
             setStatus(loadStatus, `Loaded ${(data.rows || []).length} record(s) for ${ne.label}${moLabel}`, 'ok');
@@ -552,6 +673,7 @@
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Nokia update failed');
+                showCredentialFallbackNotice(data);
             } else {
                 for (const { row, value } of pendingChanges.values()) {
                     const payload = {
@@ -568,6 +690,7 @@
                     });
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.error || 'Huawei MOD failed');
+                    showCredentialFallbackNotice(data);
                 }
             }
             setStatus(loadStatus, 'Changes applied successfully', 'ok');
@@ -600,6 +723,7 @@
 
     loadBtn.addEventListener('click', loadRets);
     reloadBtn.addEventListener('click', loadRets);
+    if (exportBtn) exportBtn.addEventListener('click', exportExcelReport);
     saveBtn.addEventListener('click', saveChanges);
     if (tableFilterInput) {
         tableFilterInput.addEventListener('input', () => {

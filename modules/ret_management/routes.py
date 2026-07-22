@@ -6,15 +6,22 @@ import os
 from functools import wraps
 from typing import Any
 
-from flask import Blueprint, current_app, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, jsonify, redirect, render_template, request, send_file, url_for
 
 from core.cm_extractor.config import huawei_configured, nokia_configured
-from core.cm_extractor.extraction import build_huawei_client, build_nokia_client
+from core.cm_extractor.extraction import build_nokia_client
 from core.cm_extractor.huawei_client import HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.nokia_operations_client import NokiaOperationsError
+from core.user_vendor_credentials import list_user_vendor_credential_status
 from database_enhanced import get_user_by_session, log_activity
 from modules.ret_management import logic as ret_logic
+from modules.ret_management.credentials import (
+    run_huawei_with_user_credentials,
+    run_nokia_read_with_user_credentials,
+    run_nokia_write_with_user_credentials,
+)
+from modules.ret_management.export import build_ret_workbook
 
 ret_management_bp = Blueprint(
     'ret_management',
@@ -95,6 +102,14 @@ def _huawei_feature_enabled() -> bool:
     return raw not in ('0', 'false', 'no', 'off')
 
 
+def _cred_activity_suffix(cred_meta: dict[str, Any]) -> str:
+    if cred_meta.get('credential_fallback'):
+        return f' [fallback: {cred_meta.get("fallback_account")}]'
+    if cred_meta.get('credential_missing'):
+        return f' [no personal credentials; shared: {cred_meta.get("fallback_account")}]'
+    return ''
+
+
 def _json_body() -> dict:
     return request.get_json(silent=True) or {}
 
@@ -123,12 +138,14 @@ def ret_management_page():
 def ret_defaults():
     user = get_current_user()
     status = ret_logic.vendor_status()
+    cred_status = list_user_vendor_credential_status(_user_id(user))
     return jsonify({
         'success': True,
         'nokia_configured': status['nokia_configured'],
         'huawei_configured': status['huawei_configured'],
         'huawei_enabled': _huawei_feature_enabled(),
         'cm_write_allowed': _cm_write_allowed(user),
+        'user_credentials': cred_status,
     })
 
 
@@ -153,13 +170,21 @@ def huawei_ret_list():
     if not huawei_configured():
         return jsonify({'error': 'Huawei U2020 CM is not configured.'}), 400
     try:
+        user = get_current_user()
         site_id = (request.args.get('site_id') or '').strip()
         ne_name = (request.args.get('ne_name') or '').strip()
         ne_name = ret_logic.resolve_huawei_ne(site_id, ne_name)
 
-        client = build_huawei_client()
-        client.login()
-        rows, warnings = ret_logic.fetch_huawei_rets(client, ne_name=ne_name)
+        def _load(client):
+            client.login()
+            return ret_logic.fetch_huawei_rets(client, ne_name=ne_name)
+
+        (rows, warnings), cred_meta = run_huawei_with_user_credentials(
+            _user_id(user),
+            prime_username=_username(user),
+            action=f'LST RETSUBUNIT on {ne_name}',
+            operation=_load,
+        )
 
         return jsonify({
             'success': True,
@@ -169,6 +194,7 @@ def huawei_ret_list():
             'rows': rows,
             'columns': list(ret_logic.HUAWEI_TABLE_COLUMNS),
             'warnings': warnings,
+            **cred_meta,
         })
     except (HuaweiCmError, ValueError) as exc:
         return jsonify({'error': str(exc)}), 400
@@ -186,24 +212,42 @@ def huawei_ret_update():
         return jsonify({'error': 'Huawei U2020 CM is not configured.'}), 400
     data = _json_body()
     try:
+        user = get_current_user()
         site_id = str(data.get('site_id') or '').strip()
         ne_name = ret_logic.resolve_huawei_ne(site_id, str(data.get('ne_name') or '').strip())
-        client = build_huawei_client()
-        client.login()
-        result = ret_logic.apply_huawei_ret_update(
-            client,
-            ne_name=ne_name,
-            device_no=str(data.get('device_no') or data.get('deviceNo') or ''),
-            subunit_no=str(data.get('subunit_no') or data.get('subunitNo') or ''),
-            tilt=str(data.get('tilt') or ''),
+        device_no = str(data.get('device_no') or data.get('deviceNo') or '')
+        subunit_no = str(data.get('subunit_no') or data.get('subunitNo') or '')
+        tilt = str(data.get('tilt') or '')
+
+        def _apply(client):
+            client.login()
+            return ret_logic.apply_huawei_ret_update(
+                client,
+                ne_name=ne_name,
+                device_no=device_no,
+                subunit_no=subunit_no,
+                tilt=tilt,
+            )
+
+        result, cred_meta = run_huawei_with_user_credentials(
+            _user_id(user),
+            prime_username=_username(user),
+            action=(
+                f'MOD RETSUBUNIT on {ne_name} device={device_no} '
+                f'subunit={subunit_no} tilt={tilt}'
+            ),
+            operation=_apply,
         )
-        user = get_current_user()
         log_activity(
             _user_id(user),
             'ret_management_huawei_mod',
-            f'MOD RETSUBUNIT on {ne_name} device={data.get("device_no")} subunit={data.get("subunit_no")} tilt={data.get("tilt")}',
+            (
+                f'MOD RETSUBUNIT on {ne_name} device={device_no} subunit={subunit_no} '
+                f'tilt={tilt}'
+                + _cred_activity_suffix(cred_meta)
+            ),
         )
-        return jsonify({'success': True, **result})
+        return jsonify({'success': True, **result, **cred_meta})
     except HuaweiCmError as exc:
         body: dict[str, Any] = {'error': str(exc)}
         payload = getattr(exc, 'payload', None)
@@ -226,13 +270,22 @@ def nokia_retu_list():
     if not nokia_configured():
         return jsonify({'error': 'Nokia NetAct CM is not configured.'}), 400
     try:
+        user = get_current_user()
         site_id = (request.args.get('site_id') or '').strip()
         conf_id = 1  # Always live network for RET management
-        client = build_nokia_client()
-        rows, warnings, mo_class = ret_logic.fetch_nokia_retu_angles(
-            client,
-            site_id=site_id,
-            conf_id=conf_id,
+
+        def _load(client):
+            return ret_logic.fetch_nokia_retu_angles(
+                client,
+                site_id=site_id,
+                conf_id=conf_id,
+            )
+
+        (rows, warnings, mo_class), cred_meta = run_nokia_read_with_user_credentials(
+            _user_id(user),
+            prime_username=_username(user),
+            action=f'RETU_R read on site {site_id or "all"}',
+            operation=_load,
         )
         return jsonify({
             'success': True,
@@ -243,6 +296,7 @@ def nokia_retu_list():
             'columns': list(ret_logic.NOKIA_DISPLAY_COLUMNS),
             'rows': rows,
             'warnings': warnings,
+            **cred_meta,
         })
     except (NokiaCmError, ValueError) as exc:
         return jsonify({'error': str(exc)}), 400
@@ -269,18 +323,31 @@ def nokia_retu_update():
                 mo_class = ret_logic.resolve_nokia_retu_mo_class(build_nokia_client())
             except Exception:
                 mo_class = ret_logic.NOKIA_MO_CLASS_FALLBACK
-        result = ret_logic.apply_nokia_angle_changes(
-            _username(user),
-            updates,
-            wait=bool(data.get('wait', True)),
-            mo_class=mo_class,
+
+        def _apply(ops_client):
+            return ret_logic.apply_nokia_angle_changes(
+                _username(user),
+                updates,
+                wait=bool(data.get('wait', True)),
+                mo_class=mo_class,
+                operations_client=ops_client,
+            )
+
+        result, cred_meta = run_nokia_write_with_user_credentials(
+            _user_id(user),
+            prime_username=_username(user),
+            action=f'RETU angle update ({len(updates)} change(s)) on {mo_class}',
+            operation=_apply,
         )
         log_activity(
             _user_id(user),
             'ret_management_nokia_angle',
-            f'Updated RETU angle via RETU_R read ({len(updates)} change(s)) on {mo_class}',
+            (
+                f'Updated RETU angle via RETU_R read ({len(updates)} change(s)) on {mo_class}'
+                + _cred_activity_suffix(cred_meta)
+            ),
         )
-        return jsonify({'success': True, 'mo_class': mo_class, **result})
+        return jsonify({'success': True, 'mo_class': mo_class, **result, **cred_meta})
     except (NokiaCmError, NokiaOperationsError, ValueError, RuntimeError) as exc:
         return jsonify({'error': str(exc)}), 400
     except OSError as exc:
@@ -298,4 +365,40 @@ def nokia_retu_update():
         return jsonify({'error': str(exc)}), 500
     except Exception as exc:
         current_app.logger.exception('Nokia RET apply failed')
+        return jsonify({'error': str(exc)}), 500
+
+
+@ret_management_bp.route('/api/ret-management/export/excel', methods=['POST'])
+@login_required
+def ret_export_excel():
+    """Download the currently viewed RET table as an Excel workbook."""
+    user = get_current_user()
+    data = _json_body()
+    try:
+        rows = data.get('rows')
+        if not isinstance(rows, list) or not rows:
+            return jsonify({'error': 'No table rows to export. Load RET data first.'}), 400
+        payload = {
+            **data,
+            'username': _username(user),
+        }
+        workbook, filename = build_ret_workbook(payload)
+        log_activity(
+            _user_id(user),
+            'ret_management_export',
+            (
+                f'Exported RET Excel ({payload.get("vendor")}) '
+                f'site={payload.get("site_id") or ""} rows={len(rows)}'
+            ),
+        )
+        return send_file(
+            workbook,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        current_app.logger.exception('RET Excel export failed')
         return jsonify({'error': str(exc)}), 500

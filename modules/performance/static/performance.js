@@ -18,6 +18,11 @@ let filteredSites = [];
 
 let KPI_DEFS = [];
 let perfAreaTreeData = new Map();
+let perfAreaLoadCache = new Map();
+let perfCellSearchTimer = null;
+let perfTimeFrame = { id: 'full', hours: null, label: 'Full retention', date_from: null, date_to: null, date_from_hour: null, date_to_hour: null };
+let perfTimeFramePresets = [];
+let perfTotalCellCount = 0;
 let KPI_HEADER_MAP = {};
 
 /** Keys from the KPI scope list that are selected for charts / export */
@@ -157,12 +162,18 @@ async function applyPerfDeepLinkChart(dl) {
     const cellRef = (document.getElementById('filter-cell')?.value || p.cell_name || '').trim();
     if (!cellRef) return;
     await loadCellCharts(cellRef);
+    const searchInput = document.getElementById('cell-search');
+    if (searchInput && cellRef) {
+        searchInput.value = cellRef;
+        await _filterCellChipsDebounced(cellRef);
+    } else {
+        await _materializeAllAreas();
+    }
     const resolved = _resolveCellKeyFromDeepLink(cellRef, p);
     if (!resolved) return;
     const cellHidden = document.getElementById('filter-cell');
     if (cellHidden) cellHidden.value = resolved;
     activeCellId = resolved;
-    _materializeAllAreas();
     _activatePerfTreeCellKey(resolved);
 }
 
@@ -1047,7 +1058,13 @@ function _captureCurrentReportConfig() {
         selected_cell_value: (document.getElementById('filter-cell')?.value || '').trim(),
         data_scope: _currentDataScope(),
         kpi_keys: [...kpiSelectedKeys],
-        hours: 'full',
+        hours: _currentTimeFrameHours() != null ? String(_currentTimeFrameHours()) : 'full',
+        time_frame_id: perfTimeFrame?.id || 'full',
+        time_frame_label: perfTimeFrame?.label || 'Full retention',
+        date_from: perfTimeFrame?.date_from || '',
+        date_to: perfTimeFrame?.date_to || '',
+        date_from_hour: perfTimeFrame?.date_from_hour ?? '',
+        date_to_hour: perfTimeFrame?.date_to_hour ?? '',
     };
 }
 
@@ -1280,7 +1297,24 @@ async function _applyReportConfig(cfg) {
             });
         }
     }
-    // Time window is fixed to full retained duration.
+    // Restore saved time frame when available.
+    if (cfg.time_frame_id || cfg.hours != null || cfg.date_from || cfg.date_to) {
+        const presetId = String(cfg.time_frame_id || 'full');
+        const hoursRaw = cfg.hours;
+        const hours = (hoursRaw == null || String(hoursRaw).toLowerCase() === 'full')
+            ? null
+            : Number(hoursRaw);
+        perfTimeFrame = {
+            id: presetId,
+            hours: Number.isFinite(hours) ? hours : null,
+            label: String(cfg.time_frame_label || 'Full retention'),
+            date_from: cfg.date_from || null,
+            date_to: cfg.date_to || null,
+            date_from_hour: cfg.date_from_hour ?? null,
+            date_to_hour: cfg.date_to_hour ?? null,
+        };
+        _updateTimeFrameButtonLabel();
+    }
     if (Array.isArray(cfg.kpi_keys) && cfg.kpi_keys.length) {
         kpiSelectedKeys = new Set(cfg.kpi_keys.map(String));
         updateKpiScopeUI();
@@ -1964,10 +1998,14 @@ async function addChartsFromLastQuery() {
 }
 
 function _pmChartCacheSig() {
+    const tf = perfTimeFrame?.date_from && perfTimeFrame?.date_to
+        ? `range:${perfTimeFrame.date_from}|${perfTimeFrame.date_from_hour ?? ''}|${perfTimeFrame.date_to}|${perfTimeFrame.date_to_hour ?? ''}`
+        : (_currentTimeFrameHours() != null ? String(_currentTimeFrameHours()) : 'full');
     return [
         hwCurrentVendor || '',
         hwCurrentTech || '',
         _currentDataScope(),
+        tf,
         [...(hwCurrentScopedCellNames || [])].sort().join('|'),
         [...(hwCurrentScopedGroupRefs || [])].sort().join('|'),
     ].join('||');
@@ -1988,6 +2026,7 @@ async function _fetchPmTableForCharts() {
     if (kpiSelectedKeys.size > 0) {
         params.set('kpi', [...kpiSelectedKeys].join(','));
     }
+    _appendTimeFrameParams(params);
     (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
     (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
     const res = await fetch('/api/performance/pm-table?' + params.toString());
@@ -2041,7 +2080,7 @@ function _addChartTabsFromPmTable(tableData, cellKeys) {
         const nameKey = _cellNameFromQueryKey(key).trim().toLowerCase();
         const trend = byCell.get(nameKey);
         if (!trend?.length) return;
-        upsertPerfChartTab({ cell: _cellMetaFromQueryKey(key), trend }, 'full', key);
+        upsertPerfChartTab({ cell: _cellMetaFromQueryKey(key), trend }, _currentTimeFrameHours() != null ? _currentTimeFrameHours() : 'full', key);
         added++;
     });
     return added;
@@ -2054,6 +2093,7 @@ async function _fetchAndUpsertGroupChartTab(key) {
             granularity: _currentTrendGranularity(),
             data_scope: _currentDataScope(),
         });
+        _appendTimeFrameParams(params);
         if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
             params.set('kpi', [...kpiSelectedKeys].join(','));
         }
@@ -2070,7 +2110,7 @@ async function _fetchAndUpsertGroupChartTab(key) {
                 cell_key: key,
             },
             trend,
-        }, 'full', key);
+        }, _currentTimeFrameHours() != null ? _currentTimeFrameHours() : 'full', key);
         return true;
     } catch (_) {
         return false;
@@ -2082,7 +2122,7 @@ async function _fetchAndUpsertCellChartTab(key) {
         const data = await fetchCellTrendData(key);
         const trend = Array.isArray(data.trend) ? data.trend : [];
         if (!trend.length) return false;
-        upsertPerfChartTab(data, 'full', key);
+        upsertPerfChartTab(data, _currentTimeFrameHours() != null ? _currentTimeFrameHours() : 'full', key);
         return true;
     } catch (_) {
         return false;
@@ -2096,6 +2136,7 @@ function _buildCellTrendParamsFromKey(cellId) {
         granularity: _currentTrendGranularity(),
         data_scope: _currentDataScope(),
     });
+    _appendTimeFrameParams(params);
     if (selected) {
         params.set('cell_name', String(selected.cell_name || ''));
         params.set('technology', String(selected.technology || ''));
@@ -2136,6 +2177,7 @@ async function _fetchPmTableTrendForCell(cellId) {
         for_charts: '1',
         data_scope: _currentDataScope(),
     });
+    _appendTimeFrameParams(params);
     params.append('cell_name', cellName);
     const res = await fetch('/api/performance/pm-table?' + params.toString());
     const data = await res.json();
@@ -2203,13 +2245,14 @@ async function loadGroupCharts(groupRef) {
     document.getElementById('btn-export').style.display     = 'none';
     document.getElementById('btn-refresh').style.display    = 'inline-flex';
 
-    const hours = 'full';
+    const hours = _currentTimeFrameHours() != null ? _currentTimeFrameHours() : 'full';
     try {
         const params = new URLSearchParams({
             group_ref: String(groupRef || ''),
             granularity: _currentTrendGranularity(),
             data_scope: _currentDataScope(),
         });
+        _appendTimeFrameParams(params);
         if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
             params.set('kpi', [...kpiSelectedKeys].join(','));
         }
@@ -2241,6 +2284,276 @@ async function onPerfTimeWindowChange() {
 /** Match trend bucketing to selected data scope (hourly vs daily). */
 function _currentTrendGranularity() {
     return _currentDataScope() === 'daily' ? 'day' : 'hour';
+}
+
+function _currentTimeFrameHours() {
+    return perfTimeFrame && perfTimeFrame.hours != null ? Number(perfTimeFrame.hours) : null;
+}
+
+function _appendTimeFrameParams(params) {
+    if (perfTimeFrame?.date_from && perfTimeFrame?.date_to) {
+        params.set('date_from', perfTimeFrame.date_from);
+        params.set('date_to', perfTimeFrame.date_to);
+        if (_currentDataScope() !== 'daily') {
+            if (perfTimeFrame.date_from_hour != null && perfTimeFrame.date_from_hour !== '') {
+                params.set('date_from_hour', String(perfTimeFrame.date_from_hour));
+            }
+            if (perfTimeFrame.date_to_hour != null && perfTimeFrame.date_to_hour !== '') {
+                params.set('date_to_hour', String(perfTimeFrame.date_to_hour));
+            }
+        }
+        params.set('hours', 'full');
+    } else {
+        const hours = _currentTimeFrameHours();
+        if (hours != null) params.set('hours', String(hours));
+        else params.set('hours', 'full');
+    }
+    return params;
+}
+
+function _formatPerfDateInput(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function _defaultCustomTimeFrameDates(retentionDays) {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - Math.max(1, Number(retentionDays || 7) - 1));
+    return { from: _formatPerfDateInput(from), to: _formatPerfDateInput(to) };
+}
+
+function _syncTimeFrameCustomInputs() {
+    const modal = document.querySelector('.perf-time-frame-modal');
+    const isDaily = _currentDataScope() === 'daily';
+    if (modal) modal.classList.toggle('perf-time-frame-modal--daily', isDaily);
+
+    const fromDateEl = document.getElementById('perf-tf-from-date');
+    const toDateEl = document.getElementById('perf-tf-to-date');
+    const fromHourEl = document.getElementById('perf-tf-from-hour');
+    const toHourEl = document.getElementById('perf-tf-to-hour');
+    if (!fromDateEl || !toDateEl) return;
+
+    if (perfTimeFrame?.date_from && perfTimeFrame?.date_to) {
+        fromDateEl.value = perfTimeFrame.date_from;
+        toDateEl.value = perfTimeFrame.date_to;
+        if (fromHourEl) fromHourEl.value = perfTimeFrame.date_from_hour ?? '';
+        if (toHourEl) toHourEl.value = perfTimeFrame.date_to_hour ?? '';
+        return;
+    }
+
+    const retentionDays = _currentDataScope() === 'daily' ? 120 : 14;
+    const defaults = _defaultCustomTimeFrameDates(retentionDays);
+    fromDateEl.value = defaults.from;
+    toDateEl.value = defaults.to;
+    if (fromHourEl) fromHourEl.value = isDaily ? '' : '0';
+    if (toHourEl) toHourEl.value = isDaily ? '' : '23';
+}
+
+async function applyCustomTimeFrame() {
+    const fromDate = document.getElementById('perf-tf-from-date')?.value || '';
+    const toDate = document.getElementById('perf-tf-to-date')?.value || '';
+    if (!fromDate || !toDate) {
+        alert('Choose both start and end dates.');
+        return;
+    }
+    const isDaily = _currentDataScope() === 'daily';
+    let fromHour = document.getElementById('perf-tf-from-hour')?.value;
+    let toHour = document.getElementById('perf-tf-to-hour')?.value;
+    if (isDaily) {
+        fromHour = null;
+        toHour = null;
+    } else {
+        fromHour = fromHour === '' ? '0' : String(Math.max(0, Math.min(23, Number(fromHour) || 0)));
+        toHour = toHour === '' ? '23' : String(Math.max(0, Math.min(23, Number(toHour) || 23)));
+    }
+
+    const label = isDaily
+        ? `${fromDate} – ${toDate}`
+        : `${fromDate} ${String(fromHour).padStart(2, '0')}:00 – ${toDate} ${String(toHour).padStart(2, '0')}:00`;
+
+    perfTimeFrame = {
+        id: 'custom',
+        hours: null,
+        label,
+        date_from: fromDate,
+        date_to: toDate,
+        date_from_hour: fromHour,
+        date_to_hour: toHour,
+    };
+    _updateTimeFrameButtonLabel();
+    _renderTimeFramePresets();
+    hwChartTrendCache = null;
+    hwChartTrendCacheSig = '';
+    closeTimeFrameModal();
+    if (lastQueryCellKeys.length) {
+        const v = document.getElementById('filter-vendor')?.value;
+        const t = document.getElementById('filter-tech')?.value;
+        if (v && t) {
+            await loadPmTable(v, t, hwCurrentSearch, 1, hwCurrentScopedCellNames);
+        }
+    }
+}
+
+function _updateTimeFrameButtonLabel() {
+    const btn = document.getElementById('btn-time-frame');
+    if (!btn) return;
+    btn.textContent = (perfTimeFrame && perfTimeFrame.label) ? perfTimeFrame.label : 'Full retention';
+    btn.title = `PM time window: ${btn.textContent}`;
+}
+
+async function loadTimeFrameConfig() {
+    try {
+        const params = new URLSearchParams({ data_scope: _currentDataScope() });
+        const data = await _perfFetchJson('/api/performance/time-frame?' + params.toString());
+        perfTimeFramePresets = Array.isArray(data.presets) ? data.presets : [];
+        const hint = document.getElementById('time-frame-retention-hint');
+        if (hint) {
+            const days = Number(data.retention_days || 0);
+            hint.textContent = days
+                ? `Data is retained for up to ${days} day${days !== 1 ? 's' : ''} in ${_currentDataScope()} mode. Choose a shorter window to query less history.`
+                : 'Choose how much PM history to include in queries.';
+        }
+        const activeId = perfTimeFrame?.id || 'full';
+        const stillValid = activeId === 'custom' || perfTimeFramePresets.some(p => p.id === activeId);
+        if (!stillValid) {
+            const fullPreset = perfTimeFramePresets.find(p => p.id === 'full')
+                || perfTimeFramePresets[perfTimeFramePresets.length - 1]
+                || { id: 'full', label: 'Full retention', hours: null };
+            perfTimeFrame = {
+                id: fullPreset.id,
+                hours: fullPreset.hours == null ? null : Number(fullPreset.hours),
+                label: fullPreset.label || 'Full retention',
+            };
+        }
+        _updateTimeFrameButtonLabel();
+    } catch (_) {
+        perfTimeFramePresets = [];
+    }
+}
+
+function _renderTimeFramePresets() {
+    const wrap = document.getElementById('time-frame-presets');
+    if (!wrap) return;
+    const activeId = perfTimeFrame?.id || 'full';
+    wrap.innerHTML = perfTimeFramePresets.map(p => `
+        <label class="perf-time-frame-option${p.id === activeId ? ' is-active' : ''}">
+            <input type="radio" name="perf-time-frame" value="${escAttr(p.id)}"
+                   ${p.id === activeId ? 'checked' : ''}
+                   onchange="selectTimeFramePreset('${escAttr(p.id)}')">
+            <span>${escHtml(p.label || p.id)}</span>
+        </label>
+    `).join('');
+    if (activeId === 'custom') {
+        wrap.insertAdjacentHTML('beforeend', `
+            <label class="perf-time-frame-option is-active">
+                <input type="radio" name="perf-time-frame" value="custom" checked>
+                <span>${escHtml(perfTimeFrame.label || 'Custom range')}</span>
+            </label>`);
+    }
+}
+
+function openTimeFrameModal() {
+    void loadTimeFrameConfig().then(() => {
+        _renderTimeFramePresets();
+        _syncTimeFrameCustomInputs();
+        const modal = document.getElementById('time-frame-modal');
+        if (modal) modal.style.display = 'flex';
+    });
+}
+
+function closeTimeFrameModal() {
+    const modal = document.getElementById('time-frame-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function selectTimeFramePreset(presetId) {
+    const preset = perfTimeFramePresets.find(p => p.id === presetId);
+    if (!preset) return;
+    perfTimeFrame = {
+        id: preset.id,
+        hours: preset.hours == null ? null : Number(preset.hours),
+        label: preset.label || 'Full retention',
+        date_from: null,
+        date_to: null,
+        date_from_hour: null,
+        date_to_hour: null,
+    };
+    _updateTimeFrameButtonLabel();
+    _renderTimeFramePresets();
+    hwChartTrendCache = null;
+    hwChartTrendCacheSig = '';
+    closeTimeFrameModal();
+    if (lastQueryCellKeys.length) {
+        const v = document.getElementById('filter-vendor')?.value;
+        const t = document.getElementById('filter-tech')?.value;
+        if (v && t) {
+            await loadPmTable(v, t, hwCurrentSearch, 1, hwCurrentScopedCellNames);
+        }
+    }
+}
+
+function _buildCellListParams(extra = {}) {
+    const vendor = document.getElementById('filter-vendor')?.value || '';
+    const tech = document.getElementById('filter-tech')?.value || '';
+    const cluster = document.getElementById('filter-cluster')?.value || '';
+    const area = document.getElementById('filter-area')?.value || '';
+    const site = (document.getElementById('filter-site')?.value
+        || window.perfDeepLinkParams?.site_id || '').trim();
+    const params = new URLSearchParams();
+    if (vendor) params.set('vendor', vendor);
+    const dlTech = window.perfDeepLinkParams?.technologyRaw;
+    if (dlTech && /^(2G|3G|4G-FDD|4G-TDD|5G)$/i.test(dlTech)) {
+        params.set('technology', dlTech);
+    } else if (tech) {
+        params.set('technology', tech);
+    }
+    if (cluster) params.set('cluster', cluster);
+    if (area) params.set('area', area);
+    if (site) params.set('site_id', site);
+    params.set('data_scope', _currentDataScope());
+    if (extra.search) params.set('search', extra.search);
+    if (extra.area) params.set('area', extra.area);
+    return params;
+}
+
+function _mergeCellsIntoAreaTree(areaKey, cells) {
+    if (!cells || !cells.length) return;
+    const byCluster = perfAreaTreeData.get(areaKey) || new Map();
+    cells.forEach(c => {
+        const ck = _perfNormCluster(c);
+        const sid = String(c.site_id != null ? c.site_id : '');
+        const siteName = c.site_name || (sid ? `Site ${sid}` : 'Unknown site');
+        if (!byCluster.has(ck)) byCluster.set(ck, new Map());
+        const bySite = byCluster.get(ck);
+        if (!bySite.has(sid)) bySite.set(sid, { site_id: sid, site_name: siteName, cells: [] });
+        const bucket = bySite.get(sid).cells;
+        const key = String(c.cell_key || c.cell_id);
+        if (!bucket.some(x => String(x.cell_key || x.cell_id) === key)) bucket.push(c);
+    });
+    perfAreaTreeData.set(areaKey, byCluster);
+
+    const seen = new Set(allCells.map(c => String(c.cell_key || c.cell_id)));
+    cells.forEach(c => {
+        const key = String(c.cell_key || c.cell_id);
+        if (!seen.has(key)) {
+            seen.add(key);
+            allCells.push(c);
+        }
+    });
+}
+
+async function _fetchCellsForArea(areaKey) {
+    const params = _buildCellListParams({ area: areaKey });
+    const res = await fetch('/api/performance/cells?' + params.toString());
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Failed to load cells');
+    const vendor = document.getElementById('filter-vendor')?.value || '';
+    let cells = Array.isArray(data.cells) ? data.cells : [];
+    if (vendor) cells = cells.filter(c => String(c.vendor || '') === vendor);
+    return cells;
 }
 
 /**
@@ -2288,25 +2601,18 @@ async function applyFilters(opts = {}) {
         return;
     }
 
-    const params = new URLSearchParams();
-    if (vendor)  params.set('vendor',     vendor);
-    const dlTech = window.perfDeepLinkParams?.technologyRaw;
-    if (dlTech && /^(2G|3G|4G-FDD|4G-TDD|5G)$/i.test(dlTech)) {
-        params.set('technology', dlTech);
-    } else if (tech) {
-        params.set('technology', tech);
-    }
-    if (cluster) params.set('cluster',    cluster);
-    if (area)    params.set('area',       area);
-    if (site)    params.set('site_id',    site);
-    params.set('data_scope', _currentDataScope());
+    const params = _buildCellListParams();
 
     const listEl = document.getElementById('cell-list');
-    if (listEl && !allCells.length) {
-        listEl.innerHTML = '<p class="perf-tree-empty">Loading cells…</p>';
+    if (listEl) {
+        listEl.innerHTML = '<p class="perf-tree-empty">Loading areas…</p>';
     }
 
-    const res  = await fetch('/api/performance/cells?' + params);
+    allCells = [];
+    perfAreaTreeData = new Map();
+    perfAreaLoadCache = new Map();
+
+    const res  = await fetch('/api/performance/cells/areas?' + params);
     if (!_isPerfTreeLoadCurrent(token)) return;
     const data = await res.json();
     if (!_isPerfTreeLoadCurrent(token)) return;
@@ -2314,17 +2620,14 @@ async function applyFilters(opts = {}) {
     // User may have switched to Groups while this cell fetch was in flight.
     if (_currentSelectionType() !== 'cell') return;
 
-    allCells = data.cells;
-    if (vendor) {
-        allCells = allCells.filter(c => String(c.vendor || '') === vendor);
-    }
-    _rebuildGeoFiltersFromCells(allCells);
+    perfTotalCellCount = Number(data.total_cells || 0);
+    const areas = Array.isArray(data.areas) ? data.areas : [];
 
     if (!_isPerfTreeLoadCurrent(token) || _currentSelectionType() !== 'cell') return;
 
     _resetPerfChartStateForNewScope();
 
-    showCellPicker(allCells, { fromApply: true });
+    showAreaPicker(areas, perfTotalCellCount, { fromApply: true });
 
     const tView = document.getElementById('pm-table-view');
     if (tView && tView.style.display !== 'none') {
@@ -2459,8 +2762,79 @@ function _rebuildGeoFiltersFromCells(cells) {
     _populateSites(allSites);
 }
 
+function showAreaPicker(areas, totalCells, opts = {}) {
+    const fromApply = opts && opts.fromApply === true;
+    const count = Number(totalCells || 0);
+
+    if (fromApply) {
+        document.getElementById('btn-refresh').style.display = 'inline-flex';
+    }
+
+    if (count) {
+        document.getElementById('charts-title').textContent =
+            `${count} cell${count !== 1 ? 's' : ''} in ${areas.length} area${areas.length !== 1 ? 's' : ''} — expand an area, pick KPIs, then Query`;
+    } else if (fromApply) {
+        document.getElementById('charts-title').textContent = 'No cells match these filters';
+    } else {
+        document.getElementById('charts-title').textContent = _perfDefaultChartsTitle();
+    }
+
+    const wrap = document.getElementById('cell-list-wrap');
+    const list = document.getElementById('cell-list');
+    if (!list || !wrap) return;
+    list.innerHTML = '';
+
+    if (!areas.length || !count) {
+        list.innerHTML = fromApply
+            ? '<p class="perf-tree-empty">No cells match these filters.</p>'
+            : '<p class="perf-tree-empty">No cells yet. Choose a <strong>vendor</strong> and <strong>technology</strong> above (areas load automatically).</p>';
+        const searchInput = document.getElementById('cell-search');
+        if (searchInput) searchInput.value = '';
+        _updateCellCountBadge(0, 0);
+        onPerfSelectionModeChange();
+        return;
+    }
+
+    const searchInput = document.getElementById('cell-search');
+    if (searchInput) searchInput.value = '';
+    _updateCellCountBadge(count, count);
+    onPerfSelectionModeChange();
+
+    const sortedAreas = [...areas].sort((a, b) => _perfSortAreaKeys(String(a.area || ''), String(b.area || '')));
+    const areasHtml = sortedAreas.map(entry => {
+        const areaKey = String(entry.area || PERF_GEO_EM_DASH);
+        const areaCellCount = Number(entry.cell_count || 0);
+        const aTitle = areaKey === PERF_GEO_EM_DASH ? 'No area' : areaKey;
+        return `<div class="hw-tree-area" data-area="${escAttr(areaKey)}">
+            <div class="hw-tree-node-block">
+                <div class="hw-tree-folder-row">
+                    <button type="button" class="hw-tree-twisty" aria-expanded="false">+</button>
+                    <span class="hw-tree-ico" aria-hidden="true">📁</span>
+                    <span class="hw-tree-folder-name" title="${escAttr(aTitle)}">${escHtml(areaKey)}</span>
+                    <span class="hw-tree-folder-meta">${areaCellCount}</span>
+                </div>
+                <div class="hw-tree-children hw-collapsed" data-area-loaded="0"></div>
+            </div>
+        </div>`;
+    }).join('');
+
+    list.innerHTML = `
+        <div class="hw-tree" role="tree">
+            <div class="hw-tree-node-block hw-tree-root-block">
+                <div class="hw-tree-folder-row">
+                    <button type="button" class="hw-tree-twisty" aria-expanded="true">−</button>
+                    <span class="hw-tree-ico" aria-hidden="true">📁</span>
+                    <span class="hw-tree-folder-name">Whole network</span>
+                    <span class="hw-tree-folder-meta">${count}</span>
+                </div>
+                <div class="hw-tree-children hw-tree-root-sites">${areasHtml}</div>
+            </div>
+        </div>`;
+}
+
 function showCellPicker(cells, opts = {}) {
     const fromApply = opts && opts.fromApply === true;
+    const searchMode = opts && opts.searchMode === true;
 
     if (fromApply) {
         document.getElementById('btn-refresh').style.display = 'inline-flex';
@@ -2492,7 +2866,7 @@ function showCellPicker(cells, opts = {}) {
     }
 
     const searchInput = document.getElementById('cell-search');
-    if (searchInput) searchInput.value = '';
+    if (searchInput && !searchMode) searchInput.value = '';
     _updateCellCountBadge(cells.length, cells.length);
 
     onPerfSelectionModeChange();
@@ -2523,15 +2897,20 @@ function showCellPicker(cells, opts = {}) {
         });
 
         const aTitle = areaKey === PERF_GEO_EM_DASH ? 'No area' : areaKey;
+        const childrenHtml = searchMode ? _buildAreaChildrenHtml(areaKey) : '';
+        const loadedAttr = searchMode ? '1' : '0';
+        const expanded = searchMode ? 'true' : 'false';
+        const twisty = searchMode ? '−' : '+';
+        const collapsedClass = searchMode ? '' : ' hw-collapsed';
         return `<div class="hw-tree-area" data-area="${escAttr(areaKey)}">
             <div class="hw-tree-node-block">
                 <div class="hw-tree-folder-row">
-                    <button type="button" class="hw-tree-twisty" aria-expanded="false">+</button>
+                    <button type="button" class="hw-tree-twisty" aria-expanded="${expanded}">${twisty}</button>
                     <span class="hw-tree-ico" aria-hidden="true">📁</span>
                     <span class="hw-tree-folder-name" title="${escAttr(aTitle)}">${escHtml(areaKey)}</span>
                     <span class="hw-tree-folder-meta">${areaCellCount}</span>
                 </div>
-                <div class="hw-tree-children hw-collapsed" data-area-loaded="0"></div>
+                <div class="hw-tree-children${collapsedClass}" data-area-loaded="${loadedAttr}">${childrenHtml}</div>
             </div>
         </div>`;
     }).join('');
@@ -2542,7 +2921,7 @@ function showCellPicker(cells, opts = {}) {
                 <div class="hw-tree-folder-row">
                     <button type="button" class="hw-tree-twisty" aria-expanded="true">−</button>
                     <span class="hw-tree-ico" aria-hidden="true">📁</span>
-                    <span class="hw-tree-folder-name">Whole network</span>
+                    <span class="hw-tree-folder-name">${searchMode ? 'Search results' : 'Whole network'}</span>
                     <span class="hw-tree-folder-meta">${cells.length}</span>
                 </div>
                 <div class="hw-tree-children hw-tree-root-sites">${areasHtml}</div>
@@ -2574,7 +2953,7 @@ function _buildAreaChildrenHtml(areaKey) {
                 const inactive = onAir ? '' : ' hw-tree-leaf--metadata-inactive';
                 const active = key === activeCellId ? ' active' : '';
                 const tech = c.technology || '';
-                const ds = (c.cell_name + ' ' + site.site_name + ' ' + (c.cluster || '') + ' ' + (c.area || '') + ' ' + tech).toLowerCase();
+                const ds = (c.cell_name + ' ' + site.site_name + ' ' + site.site_id + ' ' + (c.cluster || '') + ' ' + (c.area || '') + ' ' + tech).toLowerCase();
                 const stTitle = escAttr(cellMetadataStatusTitle(onAir));
                 return `<div class="hw-tree-leaf${inactive}${active}" role="treeitem" data-cell-key="${escAttr(key)}" data-metadata-on-air="${onAir ? '1' : '0'}" data-search="${escAttr(ds)}">
             <input type="checkbox" class="hw-tree-cb" onclick="event.stopPropagation()" aria-label="Select cell">
@@ -2612,47 +2991,138 @@ function _buildAreaChildrenHtml(areaKey) {
 }
 
 function _materializeArea(areaEl) {
-    if (!areaEl) return;
+    if (!areaEl) return Promise.resolve();
     const children = areaEl.querySelector(':scope > .hw-tree-node-block > .hw-tree-children');
-    if (!children) return;
-    if (children.getAttribute('data-area-loaded') === '1') return;
+    if (!children) return Promise.resolve();
+    if (children.getAttribute('data-area-loaded') === '1') return Promise.resolve();
+    if (children.getAttribute('data-area-loading') === '1') return Promise.resolve();
+
     const areaKey = areaEl.getAttribute('data-area');
-    if (!areaKey) return;
-    children.innerHTML = _buildAreaChildrenHtml(areaKey);
-    children.setAttribute('data-area-loaded', '1');
+    if (!areaKey) return Promise.resolve();
+
+    if (perfAreaLoadCache.has(areaKey) && perfAreaTreeData.has(areaKey)) {
+        children.innerHTML = _buildAreaChildrenHtml(areaKey);
+        children.setAttribute('data-area-loaded', '1');
+        return Promise.resolve();
+    }
+
+    children.setAttribute('data-area-loading', '1');
+    children.innerHTML = '<div class="hw-tree-area-loading"><span class="loading-spinner"></span><span>Loading cells…</span></div>';
+
+    return _fetchCellsForArea(areaKey)
+        .then(cells => {
+            if (!areaEl.isConnected) return;
+            perfAreaLoadCache.set(areaKey, cells);
+            _mergeCellsIntoAreaTree(areaKey, cells);
+            _rebuildGeoFiltersFromCells(allCells);
+            children.innerHTML = _buildAreaChildrenHtml(areaKey);
+            children.setAttribute('data-area-loaded', '1');
+        })
+        .catch(() => {
+            if (!areaEl.isConnected) return;
+            children.innerHTML = '<p class="perf-tree-empty">Could not load cells for this area.</p>';
+        })
+        .finally(() => {
+            children.removeAttribute('data-area-loading');
+        });
 }
 
 function _materializeAllAreas() {
-    document.querySelectorAll('#cell-list .hw-tree-area').forEach(_materializeArea);
+    const tasks = [...document.querySelectorAll('#cell-list .hw-tree-area')]
+        .map(_materializeArea);
+    return Promise.all(tasks);
 }
 
 function filterCellChips(query) {
-    const q = query.toLowerCase().trim();
-    if (q) _materializeAllAreas();
+    clearTimeout(perfCellSearchTimer);
+    perfCellSearchTimer = setTimeout(() => {
+        void _filterCellChipsDebounced(query);
+    }, 300);
+}
+
+async function _filterCellChipsDebounced(query) {
+    const q = String(query || '').trim().toLowerCase();
+    if (!q) {
+        filterCellChipsVisibleOnly('');
+        return;
+    }
+
+    const vendor = document.getElementById('filter-vendor')?.value || '';
+    const tech = document.getElementById('filter-tech')?.value || '';
+    if (!vendor || !tech) {
+        const listEl = document.getElementById('cell-list');
+        if (listEl) {
+            listEl.innerHTML = '<p class="perf-tree-empty">Select <strong>vendor</strong> and <strong>technology</strong> to search cells.</p>';
+        }
+        return;
+    }
+
+    const loadedLeaves = document.querySelectorAll('#cell-list .hw-tree-leaf');
+    if (loadedLeaves.length > 0) {
+        filterCellChipsVisibleOnly(q);
+        return;
+    }
+
+    // No expanded area yet — fall back to server search (deep links, search before expand).
+    const listEl = document.getElementById('cell-list');
+    if (listEl) listEl.innerHTML = '<p class="perf-tree-empty">Searching cells…</p>';
+
+    try {
+        const params = _buildCellListParams({ search: q });
+        const res = await fetch('/api/performance/cells?' + params.toString());
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Search failed');
+        allCells = Array.isArray(data.cells) ? data.cells : [];
+        if (vendor) allCells = allCells.filter(c => String(c.vendor || '') === vendor);
+        _rebuildGeoFiltersFromCells(allCells);
+        perfAreaTreeData = new Map();
+        perfAreaLoadCache = new Map();
+        showCellPicker(allCells, { fromApply: true, searchMode: true });
+        _updateCellCountBadge(allCells.length, allCells.length);
+    } catch (_) {
+        if (listEl) listEl.innerHTML = '<p class="perf-tree-empty">Search failed.</p>';
+    }
+}
+
+function _expandPerfTreeAncestors(el) {
+    let node = el && el.parentElement;
+    while (node && node.id !== 'cell-list') {
+        if (node.classList && node.classList.contains('hw-tree-children') && node.classList.contains('hw-collapsed')) {
+            node.classList.remove('hw-collapsed');
+            const block = node.parentElement;
+            const twisty = block && block.querySelector(':scope > .hw-tree-folder-row > .hw-tree-twisty');
+            if (twisty) {
+                twisty.textContent = '−';
+                twisty.setAttribute('aria-expanded', 'true');
+            }
+        }
+        node = node.parentElement;
+    }
+}
+
+function filterCellChipsVisibleOnly(query) {
+    const q = String(query || '').trim().toLowerCase();
     const leaves = document.querySelectorAll('#cell-list .hw-tree-leaf');
     let visible = 0;
     leaves.forEach(leaf => {
         const ds = (leaf.getAttribute('data-search') || '').toLowerCase();
         const match = !q || ds.includes(q);
         leaf.style.display = match ? '' : 'none';
-        if (match) visible++;
+        if (match) {
+            visible++;
+            if (q) _expandPerfTreeAncestors(leaf);
+        }
     });
     document.querySelectorAll('#cell-list .hw-tree-site').forEach(siteEl => {
-        const any = [...siteEl.querySelectorAll('.hw-tree-leaf')].some(
-            l => l.style.display !== 'none'
-        );
+        const any = [...siteEl.querySelectorAll('.hw-tree-leaf')].some(l => l.style.display !== 'none');
         siteEl.style.display = any ? '' : 'none';
     });
     document.querySelectorAll('#cell-list .hw-tree-cluster').forEach(el => {
-        const any = [...el.querySelectorAll('.hw-tree-site')].some(
-            s => s.style.display !== 'none'
-        );
+        const any = [...el.querySelectorAll('.hw-tree-site')].some(s => s.style.display !== 'none');
         el.style.display = any ? '' : 'none';
     });
     document.querySelectorAll('#cell-list .hw-tree-area').forEach(el => {
-        const any = [...el.querySelectorAll('.hw-tree-cluster')].some(
-            c => c.style.display !== 'none'
-        );
+        const any = [...el.querySelectorAll('.hw-tree-cluster')].some(c => c.style.display !== 'none');
         el.style.display = any ? '' : 'none';
     });
     _updateCellCountBadge(visible, leaves.length);
@@ -2669,7 +3139,7 @@ function perfTreeClick(e) {
         const ch = block && block.querySelector(':scope > .hw-tree-children');
         if (!ch) return;
         const areaEl = twisty.closest('.hw-tree-area');
-        if (areaEl) _materializeArea(areaEl);
+        if (areaEl) void _materializeArea(areaEl);
         const collapsed = ch.classList.toggle('hw-collapsed');
         twisty.textContent = collapsed ? '+' : '−';
         twisty.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
@@ -2710,13 +3180,14 @@ function perfTreeCollapseAll() {
 }
 
 function perfTreeExpandAll() {
-    _materializeAllAreas();
-    document.querySelectorAll('#cell-list .hw-tree-children').forEach(ch => {
-        ch.classList.remove('hw-collapsed');
-    });
-    document.querySelectorAll('#cell-list .hw-tree-twisty').forEach(btn => {
-        btn.textContent = '−';
-        btn.setAttribute('aria-expanded', 'true');
+    void _materializeAllAreas().then(() => {
+        document.querySelectorAll('#cell-list .hw-tree-children').forEach(ch => {
+            ch.classList.remove('hw-collapsed');
+        });
+        document.querySelectorAll('#cell-list .hw-tree-twisty').forEach(btn => {
+            btn.textContent = '−';
+            btn.setAttribute('aria-expanded', 'true');
+        });
     });
 }
 
@@ -2750,6 +3221,8 @@ let activeKpiCategoryByTabId = {};
 function _perfHoursLabel(hoursVal) {
     if (String(hoursVal) === 'full') return 'Full';
     const h = Number(hoursVal);
+    if (h === 2160) return '90d';
+    if (h === 1440) return '60d';
     if (h === 720) return '30d';
     if (h === 336) return '14d';
     if (h === 168) return '7d';
@@ -2968,7 +3441,7 @@ async function loadCellCharts(cellId) {
     document.getElementById('btn-export').style.display     = 'none';
     document.getElementById('btn-refresh').style.display    = 'inline-flex';
 
-    const hours = 'full';
+    const hours = _currentTimeFrameHours() != null ? _currentTimeFrameHours() : 'full';
 
     try {
         let data = await _fetchPmTableTrendForCell(cellId).catch(() => null);
@@ -3395,6 +3868,7 @@ async function exportCSV() {
         data_scope: _currentDataScope(),
     });
     if (hwCurrentSearch) params.set('search', hwCurrentSearch);
+    _appendTimeFrameParams(params);
     (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
     (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
 
@@ -3540,6 +4014,7 @@ async function loadPmTable(vendor, technology, search, page, scopedCellNames = n
     if (kpiSelectedKeys.size > 0) {
         params.set('kpi', [...kpiSelectedKeys].join(','));
     }
+    _appendTimeFrameParams(params);
     (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
     (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
 
@@ -3677,6 +4152,7 @@ async function onDataScopeChange() {
     hwCurrentScopedCellNames = [];
     hwCurrentScopedGroupRefs = [];
     _setPerfChartChoiceVisible(false);
+    await loadTimeFrameConfig();
     await loadKpiHeaderMap();
     if (!_isPerfTreeLoadCurrent(scopeToken)) return;
     await Promise.all([
@@ -3712,6 +4188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setPerfBottomMode('kpis');
     ensureKpiCategoryConfigLoaded();
     perfPmViewPrefPromise = loadPmViewPreference();
+    void loadTimeFrameConfig();
 });
 
 // ============================================================
@@ -3742,6 +4219,10 @@ async function applyPerformanceState(state /* , opts */) {
 
 window.getPerformanceState = getPerformanceState;
 window.applyPerformanceState = applyPerformanceState;
+window.openTimeFrameModal = openTimeFrameModal;
+window.closeTimeFrameModal = closeTimeFrameModal;
+window.selectTimeFramePreset = selectTimeFramePreset;
+window.applyCustomTimeFrame = applyCustomTimeFrame;
 
 // ============================================================
 // Multi-cell comparison (overlay up to 6 cells per KPI)

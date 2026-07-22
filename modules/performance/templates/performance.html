@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.5">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.7">
     <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
 </head>
 <body class="perf-page">
@@ -70,6 +70,13 @@
                                         <option value="Nokia">Nokia</option>
                                         <option value="Huawei">Huawei</option>
                                     </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Time frame</span>
+                                    <button type="button" id="btn-time-frame" class="perf-time-frame-btn"
+                                            onclick="openTimeFrameModal()" title="Choose PM data time window">
+                                        Full retention
+                                    </button>
                                 </div>
                             </div>
                             <div class="hw-tree-toolbar-row">
@@ -229,7 +236,7 @@
             <!-- Placeholder when no cell is selected -->
             <div id="no-selection" class="no-selection">
                 <div class="no-selection-icon">📊</div>
-                <p>Choose vendor and technology (cells load automatically). Select cell(s), check KPIs, then click <strong>Query</strong>.</p>
+                <p>Choose vendor and technology (areas load automatically). Expand an area to browse cells, select cell(s), check KPIs, then click <strong>Query</strong>.</p>
             </div>
 
             <div id="charts-wrap" class="charts-wrap" style="display:none;">
@@ -255,6 +262,34 @@
                     <p class="hw-empty-msg">Select a vendor + technology, then click <strong>PM Database</strong>.</p>
                 </div>
                 <div id="hw-pagination" class="hw-pagination"></div>
+            </div>
+
+            <div id="time-frame-modal" class="perf-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeTimeFrameModal()">
+                <div class="perf-modal-card perf-time-frame-modal" role="dialog" aria-labelledby="time-frame-modal-title">
+                    <div class="perf-modal-head">
+                        <h3 id="time-frame-modal-title">Time frame</h3>
+                        <button type="button" class="perf-modal-close" onclick="closeTimeFrameModal()">&times;</button>
+                    </div>
+                    <p class="perf-time-frame-hint" id="time-frame-retention-hint"></p>
+                    <div id="time-frame-presets" class="perf-time-frame-presets"></div>
+                    <div class="perf-time-frame-custom">
+                        <div class="perf-time-frame-custom-title">Custom range</div>
+                        <div class="perf-time-frame-range-row">
+                            <label class="perf-time-frame-range-label" for="perf-tf-from-date">From:</label>
+                            <input type="date" id="perf-tf-from-date" class="perf-tf-date">
+                            <input type="number" id="perf-tf-from-hour" class="perf-tf-hour"
+                                   min="0" max="23" step="1" placeholder="HH" title="Start hour (0–23)">
+                            <span class="perf-time-frame-to-label">to:</span>
+                            <input type="date" id="perf-tf-to-date" class="perf-tf-date">
+                            <input type="number" id="perf-tf-to-hour" class="perf-tf-hour"
+                                   min="0" max="23" step="1" placeholder="HH" title="End hour (0–23)">
+                        </div>
+                        <button type="button" class="btn-query perf-tf-apply-btn" onclick="applyCustomTimeFrame()">Apply range</button>
+                    </div>
+                    <div class="perf-modal-actions">
+                        <button type="button" class="btn-query" onclick="closeTimeFrameModal()">Close</button>
+                    </div>
+                </div>
             </div>
 
             <div id="chart-config-modal" class="perf-modal-backdrop" style="display:none;">
@@ -290,7 +325,7 @@
 <script>
     window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
 </script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=9.5"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=9.8"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);

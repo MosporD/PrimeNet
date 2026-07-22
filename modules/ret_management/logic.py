@@ -1040,8 +1040,9 @@ def apply_nokia_angle_changes(
     *,
     wait: bool = True,
     mo_class: str | None = None,
+    operations_client=None,
 ) -> dict[str, Any]:
-    del username  # mass modification uses CM REST credentials, not per-user SFTP staging
+    del username  # PrimeNet username is tracked in activity_log; CM auth uses vendor creds
     if not updates:
         raise ValueError('No angle updates provided')
 
@@ -1074,7 +1075,12 @@ def apply_nokia_angle_changes(
             'mo_class': item_class,
         })
 
-    return apply_mass_modifications(mass_updates, wait=wait, mo_class=class_id)
+    return apply_mass_modifications(
+        mass_updates,
+        wait=wait,
+        mo_class=class_id,
+        client=operations_client,
+    )
 
 
 def vendor_status() -> dict[str, bool]:

@@ -4,6 +4,7 @@ window.addEventListener('DOMContentLoaded', () => {
     maybeShowForcedPasswordNotice();
     loadProfile();
     loadPreferences();
+    loadVendorCredentials();
     if (document.getElementById('activityList')) {
         loadActivity();
     }
@@ -254,6 +255,104 @@ function formatAction(action) {
         profile_update:     '✏️ Profile Updated',
         password_change:    '🔒 Password Changed',
         performance_view:   '📈 Performance Viewed',
+        vendor_credentials_save:  '🔐 Vendor Credentials Saved',
+        vendor_credentials_clear: '🗑️ Vendor Credentials Cleared',
+        ret_credential_fallback:  '⚠️ RET Credential Fallback',
+        ret_missing_credentials:  '⚠️ RET Missing Credentials',
     };
     return map[action] || action;
+}
+
+// ── Vendor credentials (RET management) ─────────────────────────────────────
+
+function _vendorCredUi(vendor) {
+    const label = vendor === 'nokia' ? 'MantaRay' : 'U2020';
+    return {
+        vendor,
+        label,
+        usernameId: `${vendor}CredUsername`,
+        passwordId: `${vendor}CredPassword`,
+        statusId: `${vendor}CredStatus`,
+        messageId: `${vendor}CredMessage`,
+    };
+}
+
+function applyVendorCredentialStatus(credentials) {
+    ['nokia', 'huawei'].forEach((vendor) => {
+        const ui = _vendorCredUi(vendor);
+        const statusEl = document.getElementById(ui.statusId);
+        const usernameEl = document.getElementById(ui.usernameId);
+        const info = (credentials && credentials[vendor]) || {};
+        if (usernameEl && info.configured && info.username) {
+            usernameEl.value = info.username;
+        }
+        if (statusEl) {
+            if (info.configured) {
+                statusEl.textContent = `Configured (${info.username})`;
+                statusEl.className = 'vendor-cred-pill configured';
+            } else {
+                statusEl.textContent = 'Not configured';
+                statusEl.className = 'vendor-cred-pill';
+            }
+        }
+    });
+}
+
+async function loadVendorCredentials() {
+    if (!document.getElementById('nokiaCredUsername')) return;
+    const res = await fetch('/api/profile/vendor-credentials');
+    const data = await res.json();
+    if (data.success) {
+        applyVendorCredentialStatus(data.credentials);
+    }
+}
+
+async function saveVendorCredentials(vendor) {
+    const ui = _vendorCredUi(vendor);
+    const username = document.getElementById(ui.usernameId).value.trim();
+    const password = document.getElementById(ui.passwordId).value;
+    const messageEl = document.getElementById(ui.messageId);
+    if (!username) {
+        messageEl.className = 'status-message error';
+        messageEl.textContent = 'Username is required.';
+        return;
+    }
+    if (!password) {
+        messageEl.className = 'status-message error';
+        messageEl.textContent = 'Enter your password to save credentials.';
+        return;
+    }
+    const res = await fetch('/api/profile/vendor-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vendor, username, password }),
+    });
+    const data = await res.json();
+    if (data.success) {
+        messageEl.className = 'status-message success';
+        messageEl.textContent = data.message;
+        document.getElementById(ui.passwordId).value = '';
+        applyVendorCredentialStatus(data.credentials);
+    } else {
+        messageEl.className = 'status-message error';
+        messageEl.textContent = data.error || 'Save failed';
+    }
+}
+
+async function clearVendorCredentials(vendor) {
+    const ui = _vendorCredUi(vendor);
+    if (!confirm(`Remove your saved ${ui.label} credentials?`)) return;
+    const res = await fetch(`/api/profile/vendor-credentials/${vendor}`, { method: 'DELETE' });
+    const data = await res.json();
+    const messageEl = document.getElementById(ui.messageId);
+    if (data.success) {
+        messageEl.className = 'status-message success';
+        messageEl.textContent = data.message;
+        document.getElementById(ui.usernameId).value = '';
+        document.getElementById(ui.passwordId).value = '';
+        applyVendorCredentialStatus(data.credentials);
+    } else {
+        messageEl.className = 'status-message error';
+        messageEl.textContent = data.error || 'Clear failed';
+    }
 }

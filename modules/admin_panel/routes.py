@@ -6,7 +6,7 @@ Handles user management and administration
 import os
 import sqlite3
 from datetime import datetime
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, send_file
 from functools import wraps
 
 from database_enhanced import (
@@ -20,7 +20,9 @@ from database_enhanced import (
     set_user_force_password_change,
     update_user_role,
     update_user_status,
+    get_db,
 )
+from db.runtime import execute_query
 from core.cm_extractor.config import (
     huawei_configured,
     huawei_defaults,
@@ -31,6 +33,7 @@ from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.huawei_pm.config import build_pm_client, pm_configured
 from core.huawei_pm.client import HuaweiPmError
+from modules.admin_panel.export import build_table_workbook
 from sync_config import (
     DATABASES_ROOT,
     HUAWEI_PM_DAILY_DB,
@@ -692,3 +695,85 @@ def pm_latest_timestamps():
         return jsonify({'success': True, 'databases': databases})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_panel_bp.route('/api/admin/ret-credential-fallbacks', methods=['GET'])
+def ret_credential_fallbacks():
+    """RET accountability alerts: missing personal credentials or failed credential fallback."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+
+    limit = min(max(int(request.args.get('limit') or 50), 1), 200)
+    conn = get_db()
+    rows = execute_query(conn, '''
+        SELECT a.timestamp, a.action, a.details, a.user_id, u.username
+        FROM activity_log a
+        LEFT JOIN users u ON u.id = a.user_id
+        WHERE a.action IN ('ret_credential_fallback', 'ret_missing_credentials')
+        ORDER BY a.timestamp DESC
+        LIMIT ?
+    ''', (limit,)).fetchall()
+    conn.close()
+    return jsonify({
+        'success': True,
+        'items': [dict(row) for row in rows],
+    })
+
+
+_EXPORT_TABLES_OWNER = frozenset({'sync_status', 'sync_history', 'ret_credential_alerts'})
+_EXPORT_TABLES_USER_ADMIN = frozenset({'users', 'ret_credential_alerts'})
+
+
+@admin_panel_bp.route('/api/admin/export/excel', methods=['POST'])
+@admin_required
+def admin_export_excel():
+    """Download an Admin Panel table view as Excel."""
+    user = get_current_user()
+    data = request.get_json(silent=True) or {}
+    table_key = str(data.get('table') or '').strip().lower()
+    columns = [str(c) for c in (data.get('columns') or []) if str(c).strip()]
+    rows = data.get('rows')
+    if table_key not in _EXPORT_TABLES_OWNER | _EXPORT_TABLES_USER_ADMIN:
+        return jsonify({'error': 'Unknown export table'}), 400
+    if table_key in _EXPORT_TABLES_OWNER and not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    if table_key == 'users' and not _can_access_user_admin(user):
+        return jsonify({'error': 'Owner or NOC SYS access required'}), 403
+    if not isinstance(rows, list) or not rows:
+        return jsonify({'error': 'No rows to export'}), 400
+
+    report_title = str(data.get('report_title') or table_key.replace('_', ' ').title())
+    sheet_title = str(data.get('sheet_title') or report_title)[:31]
+    filename_stem = str(data.get('filename_stem') or f'Admin_{table_key}')
+    meta = data.get('meta') if isinstance(data.get('meta'), dict) else {}
+    column_labels = data.get('column_labels') if isinstance(data.get('column_labels'), dict) else {}
+
+    try:
+        workbook, filename = build_table_workbook(
+            filename_stem=filename_stem,
+            report_title=report_title,
+            sheet_title=sheet_title,
+            columns=columns,
+            rows=rows,
+            meta={
+                **meta,
+                'Exported By': (user.get('username') if isinstance(user, dict) else user[1]),
+                'Row Count': len(rows),
+            },
+        )
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'admin_table_export',
+            f'Exported {table_key} ({len(rows)} rows)',
+        )
+        return send_file(
+            workbook,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500

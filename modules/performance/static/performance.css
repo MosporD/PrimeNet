@@ -219,6 +219,150 @@ body.perf-page .perf-container {
     font-size: 0.85em;
 }
 
+.perf-time-frame-btn {
+    width: 100%;
+    min-width: 120px;
+    padding: 6px 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.85em;
+    color: #303133;
+    text-align: left;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.perf-time-frame-btn:hover {
+    border-color: #409eff;
+    background: #f5faff;
+}
+
+.perf-time-frame-modal {
+    width: min(420px, 92vw);
+}
+
+.perf-time-frame-hint {
+    margin: 0 0 12px;
+    font-size: 0.85em;
+    color: #606266;
+    line-height: 1.45;
+}
+
+.perf-time-frame-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.perf-time-frame-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e4e7ed;
+    border-radius: 6px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.perf-time-frame-option:hover {
+    border-color: #409eff;
+    background: #f0f7ff;
+}
+
+.perf-time-frame-option.is-active {
+    border-color: #3498db;
+    background: #ecf5ff;
+    box-shadow: inset 0 0 0 1px rgba(52, 152, 219, 0.25);
+}
+
+.perf-time-frame-option input {
+    flex-shrink: 0;
+}
+
+.perf-time-frame-option span {
+    font-size: 0.9em;
+    color: #303133;
+}
+
+.hw-tree-area-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px 10px 28px;
+    color: #909399;
+    font-size: 0.82em;
+}
+
+.hw-tree-area-loading .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+.perf-time-frame-custom {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e4e7ed;
+}
+
+.perf-time-frame-custom-title {
+    font-size: 0.72em;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #606266;
+    margin-bottom: 10px;
+}
+
+.perf-time-frame-range-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.perf-time-frame-range-label,
+.perf-time-frame-to-label {
+    font-size: 0.85em;
+    color: #606266;
+    white-space: nowrap;
+}
+
+.perf-tf-date {
+    padding: 6px 8px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.85em;
+    min-width: 130px;
+}
+
+.perf-tf-hour {
+    width: 52px;
+    padding: 6px 8px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.perf-tf-apply-btn {
+    margin-top: 10px;
+}
+
+.perf-time-frame-modal.perf-time-frame-modal--daily .perf-tf-hour {
+    display: none;
+}
+
 .hw-tree-panel {
     flex: 1 1 auto;
     min-height: 200px;
@@ -2203,10 +2347,38 @@ body.dark-mode.perf-page .hw-tree-toolbar {
 body.dark-mode.perf-page .hw-real-select,
 body.dark-mode.perf-page .hw-tree-search,
 body.dark-mode.perf-page .perf-time-window-select,
+body.dark-mode.perf-page .perf-time-frame-btn,
 body.dark-mode.perf-page .perf-report-select {
     background: var(--dm-input) !important;
     color: var(--dm-text) !important;
     border-color: var(--dm-border) !important;
+}
+
+body.dark-mode.perf-page .perf-time-frame-option {
+    background: var(--dm-surface-2, #1e2936);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+body.dark-mode.perf-page .perf-time-frame-option.is-active {
+    background: rgba(52, 152, 219, 0.15);
+    border-color: #3498db;
+}
+
+body.dark-mode.perf-page .perf-tf-date,
+body.dark-mode.perf-page .perf-tf-hour {
+    background: var(--dm-input) !important;
+    color: var(--dm-text) !important;
+    border-color: var(--dm-border) !important;
+}
+
+body.dark-mode.perf-page .perf-time-frame-custom {
+    border-top-color: var(--dm-border);
+}
+
+body.dark-mode.perf-page .perf-time-frame-hint,
+body.dark-mode.perf-page .hw-tree-area-loading {
+    color: var(--dm-muted, #95a5a6);
 }
 
 body.dark-mode.perf-page .hw-tree-search::placeholder {

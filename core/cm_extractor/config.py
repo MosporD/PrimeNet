@@ -165,7 +165,7 @@ def nokia_fm_configured() -> bool:
     return not nokia_fm_missing_settings()
 
 
-def build_nokia_operations_client():
+def build_nokia_operations_client(conn: dict[str, Any] | None = None):
     """CM Operations REST client (Import_Export) using NOKIA_CM_* credentials."""
     from core.cm_extractor.nokia_operations_client import NokiaOperationsClient
 
@@ -175,14 +175,15 @@ def build_nokia_operations_client():
             'and NOKIA_CM_PASSWORD in .env.'
         )
     cfg = nokia_defaults()
+    conn = conn or {}
     return NokiaOperationsClient(
-        host=cfg['host'],
-        username=cfg['username'],
-        password=cfg['password'],
-        base_url=cfg.get('base_url') or '',
-        use_https=cfg.get('use_https', True),
-        verify_ssl=cfg.get('verify_ssl', False),
-        timeout=int(cfg.get('timeout') or 180),
+        host=conn.get('host') or cfg['host'],
+        username=conn.get('username') or cfg['username'],
+        password=conn.get('password') or cfg['password'],
+        base_url=conn.get('base_url') or cfg.get('base_url') or '',
+        use_https=bool(conn.get('use_https', cfg.get('use_https', True))),
+        verify_ssl=bool(conn.get('verify_ssl', cfg.get('verify_ssl', False))),
+        timeout=int(conn.get('timeout') or cfg.get('timeout') or 180),
     )
 
 
