@@ -20,6 +20,8 @@ from sync_config import (
     METADATA_DB,
     NOKIA_PM_DB,
     NCMUSERS_DB,
+    SQLITE_PM_CACHE_SIZE_KB,
+    SQLITE_PM_MMAP_SIZE_MB,
 )
 
 
@@ -80,6 +82,30 @@ def _configure_sqlite_conn(conn: sqlite3.Connection) -> sqlite3.Connection:
     except Exception:
         pass
     return conn
+
+
+def apply_pm_read_pragmas(conn: sqlite3.Connection) -> None:
+    """Tune SQLite for large PM reads without reserving excessive RAM."""
+    from core.load_monitor import effective_sqlite_cache_kb, effective_sqlite_mmap_mb
+
+    cache_kb = effective_sqlite_cache_kb(SQLITE_PM_CACHE_SIZE_KB)
+    mmap_mb = effective_sqlite_mmap_mb(SQLITE_PM_MMAP_SIZE_MB)
+    try:
+        conn.execute('PRAGMA journal_mode=WAL')
+        conn.execute('PRAGMA synchronous=NORMAL')
+        conn.execute('PRAGMA temp_store=MEMORY')
+    except Exception:
+        pass
+    if cache_kb > 0:
+        try:
+            conn.execute(f'PRAGMA cache_size=-{int(cache_kb)}')
+        except Exception:
+            pass
+    if mmap_mb > 0:
+        try:
+            conn.execute(f'PRAGMA mmap_size={int(mmap_mb) * 1024 * 1024}')
+        except Exception:
+            pass
 
 
 def connect_app():

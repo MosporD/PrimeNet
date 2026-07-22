@@ -38,15 +38,12 @@ from sync_config import (
     PM_TECHNOLOGIES,
     PM_SYNC_FULL_CLEAR,
     PM_INSERT_BATCH_SIZE,
+    PM_INGEST_PARALLEL_WORKERS,
 )
 
 logger = logging.getLogger(__name__)
 
-# Nokia/Huawei PM SQLite: parallel per-RAT writers contend on one file — cap workers and use busy_timeout.
-try:
-    _PM_PARALLEL_CAP = max(1, min(5, int((os.environ.get('PM_INGEST_PARALLEL_WORKERS') or '5').strip())))
-except ValueError:
-    _PM_PARALLEL_CAP = 5
+_PM_PARALLEL_CAP = PM_INGEST_PARALLEL_WORKERS
 
 
 def _parallel_pm_zeroarg_tasks(
@@ -64,6 +61,11 @@ def _parallel_pm_zeroarg_tasks(
         return {key: fn() for key, fn in tasks}
     mw = max_workers if max_workers is not None else _PM_PARALLEL_CAP
     mw = max(1, min(mw, len(tasks)))
+    try:
+        from core.load_monitor import effective_worker_count
+        mw = effective_worker_count(mw, len(tasks))
+    except Exception:
+        pass
     out: dict = {}
     with ThreadPoolExecutor(max_workers=mw) as pool:
         fut_map = {pool.submit(fn): key for key, fn in tasks}

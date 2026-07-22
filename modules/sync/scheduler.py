@@ -49,6 +49,22 @@ _scheduler_mode_summary = {
 }
 _sync_progress_lock = threading.Lock()
 _pipeline_cycle_lock = threading.Lock()
+
+
+def _defer_pipeline_if_low_memory(job_label: str) -> bool:
+    """Return True when the cycle should be skipped due to low free RAM."""
+    try:
+        from core.load_monitor import pipeline_start_allowed, resource_snapshot
+        allowed, reason = pipeline_start_allowed()
+        if allowed:
+            return False
+        snap = resource_snapshot()
+        msg = reason or f'{job_label} deferred due to low memory'
+        _log_sync(job_label, 'all', 'error', 0, msg)
+        logger.warning('%s (snapshot=%s)', msg, snap)
+        return True
+    except Exception:
+        return False
 _sync_progress = {
     'nokia_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
     'huawei_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
@@ -208,6 +224,9 @@ def run_full_sync_cycle():
         return
 
     try:
+        if _defer_pipeline_if_low_memory('db_loader'):
+            return
+
         logger.info('Starting hourly orchestrator script: %s', orchestrator)
         proc = subprocess.run(
             [sys.executable, orchestrator],
@@ -264,7 +283,17 @@ def run_daily_sync_cycle():
         _log_sync('daily_full_sync', 'all', 'error', 0, f'missing script: {script}')
         logger.error('Daily pipeline script not found: %s', script)
         return
+
+    if not _pipeline_cycle_lock.acquire(blocking=False):
+        msg = 'Daily orchestrator skipped: another pipeline cycle is already running'
+        _log_sync('daily_full_sync', 'all', 'error', 0, msg)
+        logger.warning(msg)
+        return
+
     try:
+        if _defer_pipeline_if_low_memory('daily_full_sync'):
+            return
+
         proc = subprocess.run([sys.executable, script], cwd=project_root, capture_output=True, text=True)
         if proc.stdout:
             logger.info('daily full sync stdout:\n%s', proc.stdout.strip())
@@ -279,6 +308,8 @@ def run_daily_sync_cycle():
     except Exception as e:
         _log_sync('daily_full_sync', 'all', 'error', 0, str(e))
         logger.exception('Daily full sync failed: %s', e)
+    finally:
+        _pipeline_cycle_lock.release()
 
 
 def run_manual_category_sync(category: str):
@@ -794,6 +825,9 @@ def run_remote_pull_watcher_once():
         logger.warning('Remote pull watcher skipped: another pipeline cycle is already running')
         return
     try:
+        if _defer_pipeline_if_low_memory('pull_watcher'):
+            return
+
         logger.info('Starting remote pull watcher orchestrator (--once)...')
         proc = subprocess.run(
             [sys.executable, script],

@@ -260,11 +260,51 @@ _PM_SYNC_RAW = (os.getenv('PM_SYNC_MODE', 'full') or 'full').strip().lower()
 PM_SYNC_FULL_CLEAR = _PM_SYNC_RAW not in ('incremental', 'incr', 'merge')
 
 # After each successful PM ingest, delete PM rows with timestamp older than N calendar days.
-# Default 9; set PM_RETENTION_DAYS=0 in .env to disable.
-PM_RETENTION_DAYS = _env_int('PM_RETENTION_DAYS', 9)
+# Default 14; set PM_RETENTION_DAYS=0 in .env to disable.
+PM_RETENTION_DAYS = _env_int('PM_RETENTION_DAYS', 14)
 
 # Rows per SQLite executemany batch inside _insert_df (tune for speed vs. memory).
 PM_INSERT_BATCH_SIZE = max(200, min(20000, _env_int('PM_INSERT_BATCH_SIZE', 2500)))
+
+# ── Resource limits (RAM / concurrency) ─────────────────────────────────────
+# Lower defaults keep the web UI responsive on shared hosts during pipeline + PM queries.
+
+# Parallel RAT writers inside pm_processor (each contends on one SQLite file).
+PM_INGEST_PARALLEL_WORKERS = max(1, min(8, _env_int('PM_INGEST_PARALLEL_WORKERS', 2)))
+# Parallel folder loads in load_raw_csv_to_databases.py (was unbounded = len(mappings)).
+PIPELINE_MAX_PARALLEL_LOADERS = max(1, min(16, _env_int('PIPELINE_MAX_PARALLEL_LOADERS', 2)))
+# CSV rows per pandas chunk during raw → DB load.
+PIPELINE_CSV_CHUNK_SIZE = max(5000, min(200_000, _env_int('PIPELINE_CSV_CHUNK_SIZE', 50_000)))
+
+# Concurrent heavy PM table / export / chart queries across Gunicorn threads.
+HEAVY_QUERY_MAX_CONCURRENT = max(1, min(8, _env_int('HEAVY_QUERY_MAX_CONCURRENT', 2)))
+# Seconds to wait for a query slot (0 = fail immediately with HTTP 503).
+HEAVY_QUERY_SLOT_TIMEOUT_SEC = max(0, min(120, _env_int('HEAVY_QUERY_SLOT_TIMEOUT_SEC', 15)))
+
+# PM table export/chart row caps (performance module).
+PM_EXPORT_MAX_ROWS = max(1000, min(500_000, _env_int('PM_EXPORT_MAX_ROWS', 200_000)))
+PM_CHARTS_MAX_ROWS = max(500, min(50_000, _env_int('PM_CHARTS_MAX_ROWS', 15_000)))
+
+# SQLite read tuning for PM routes (negative cache_size = KiB; 0 = skip custom pragma).
+SQLITE_PM_CACHE_SIZE_KB = max(0, min(512_000, _env_int('SQLITE_PM_CACHE_SIZE_KB', 20_000)))
+SQLITE_PM_MMAP_SIZE_MB = max(0, min(2048, _env_int('SQLITE_PM_MMAP_SIZE_MB', 64)))
+
+# Adaptive scaling: env ceilings above are reduced automatically when free RAM is low.
+def _env_bool(key: str, default: bool) -> bool:
+    raw = (os.getenv(key) or '').strip().lower()
+    if raw in ('0', 'false', 'no', 'off'):
+        return False
+    if raw in ('1', 'true', 'yes', 'on'):
+        return True
+    return default
+
+
+RESOURCE_ADAPTIVE = _env_bool('RESOURCE_ADAPTIVE', True)
+# Never start pipeline / drop to minimum concurrency below this free-RAM reserve (MiB).
+RESOURCE_MIN_FREE_MB = max(512, min(64_000, _env_int('RESOURCE_MIN_FREE_MB', 2048)))
+# Below this free RAM, concurrency scales toward 1; above RESOURCE_HIGH_MEMORY_MB use full ceiling.
+RESOURCE_LOW_MEMORY_MB = max(RESOURCE_MIN_FREE_MB, min(64_000, _env_int('RESOURCE_LOW_MEMORY_MB', 4096)))
+RESOURCE_HIGH_MEMORY_MB = max(RESOURCE_LOW_MEMORY_MB + 256, min(128_000, _env_int('RESOURCE_HIGH_MEMORY_MB', 18_432)))
 
 # Hourly pipeline interval (hours) — pull+load orchestrator cadence when scheduler is on.
 RAW_PULL_INTERVAL_HOURS = max(1, _env_int('RAW_PULL_INTERVAL_HOURS', 1))
@@ -273,7 +313,7 @@ DAILY_PULL_HOUR = max(0, min(23, _env_int('DAILY_PULL_HOUR', 7)))
 # scripts/pipeline/watch_remote_new_files_and_pull.py — poll remote SFTP signatures; same env as the CLI script.
 PULL_WATCHER_POLL_INTERVAL_SEC = max(60, _env_int('WATCH_POLL_INTERVAL_SEC', 30 * 60))
 # Daily PM/groups DB retention window in days.
-DAILY_RETENTION_DAYS = max(1, _env_int('DAILY_RETENTION_DAYS', 60))
+DAILY_RETENTION_DAYS = max(1, _env_int('DAILY_RETENTION_DAYS', 120))
 
 # Femto PM SQLite: prune rows older than N days (wide + values tables). Set FEMTO_RETENTION_DAYS=0 to disable.
 FEMTO_RETENTION_DAYS = max(0, _env_int('FEMTO_RETENTION_DAYS', 30))

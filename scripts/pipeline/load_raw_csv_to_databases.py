@@ -52,6 +52,8 @@ from sync_config import (
     RAW_DELETE_ALL_AFTER_LOAD,
     RAW_PRUNE_AFTER_LOAD,
     RAW_KEEP_FILES_PER_TECH,
+    PIPELINE_MAX_PARALLEL_LOADERS,
+    PIPELINE_CSV_CHUNK_SIZE,
 )
 from core.raw_pm_files import (  # noqa: E402
     clear_tabular_files,
@@ -159,7 +161,7 @@ def _drop_non_canonical_tables(conn: sqlite3.Connection, label: str, scope: str 
 
 
 _TABULAR_EXTS = (".csv", ".txt", ".tsv", ".xlsx", ".xlsm", ".xls")
-CSV_CHUNK_SIZE = 50000
+CSV_CHUNK_SIZE = PIPELINE_CSV_CHUNK_SIZE
 
 # Huawei/Nokia exports may append " DST" / " STD"; pandas treats them as TZ tokens.
 _PSEUDO_TZ_SUFFIX_RE = re.compile(r"\s+(DST|STD)\s*$", re.IGNORECASE)
@@ -1238,7 +1240,13 @@ def main() -> int:
 
     total_loaded = 0
     total_failed = 0
-    with ThreadPoolExecutor(max_workers=len(mappings)) as pool:
+    try:
+        from core.load_monitor import effective_worker_count
+        loader_cap = effective_worker_count(PIPELINE_MAX_PARALLEL_LOADERS, len(mappings))
+    except Exception:
+        loader_cap = PIPELINE_MAX_PARALLEL_LOADERS
+    loader_workers = min(len(mappings), loader_cap)
+    with ThreadPoolExecutor(max_workers=loader_workers) as pool:
         futures = {
             pool.submit(
                 _load_folder_tabular_to_db,

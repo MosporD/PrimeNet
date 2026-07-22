@@ -40,8 +40,14 @@ from sync_config import (
     NOKIA_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DAILY_DB,
     PM_TECHNOLOGIES,
+    PM_RETENTION_DAYS,
+    DAILY_RETENTION_DAYS,
+    PM_EXPORT_MAX_ROWS,
+    PM_CHARTS_MAX_ROWS,
     pm_table_name,
 )
+from core.resource_limits import heavy_query_required
+from db.runtime import apply_pm_read_pragmas
 from core.site_area import (
     list_pm_partition_tables,
     preferred_pm_table,
@@ -95,6 +101,147 @@ def _clamp_trend_hours(raw) -> int:
     except (TypeError, ValueError):
         h = 168
     return max(1, min(h, 8760))
+
+
+def _retention_days_for_scope(scope: str = 'hourly') -> int:
+    s = _normalize_data_scope(scope)
+    if s == 'daily':
+        return max(1, int(DAILY_RETENTION_DAYS or 120))
+    days = int(PM_RETENTION_DAYS or 14)
+    return max(1, days) if days > 0 else 14
+
+
+def _retention_hours_for_scope(scope: str = 'hourly') -> int:
+    return _retention_days_for_scope(scope) * 24
+
+
+def _parse_hours_param(raw, scope: str = 'hourly') -> int | None:
+    """Return None for full retention window; otherwise clamp to scope retention."""
+    if raw is None:
+        return None
+    s = str(raw).strip().lower()
+    if not s or s in ('full', 'all', 'retention'):
+        return None
+    try:
+        h = int(float(s))
+    except (TypeError, ValueError):
+        return None
+    max_h = _retention_hours_for_scope(scope)
+    return max(1, min(h, max_h))
+
+
+def _hours_from_request(scope: str | None = None) -> int | None:
+    scope = scope or _normalize_data_scope(request.args.get('data_scope'))
+    if _date_range_from_request(scope)[0] is not None:
+        return None
+    return _parse_hours_param(request.args.get('hours'), scope)
+
+
+def _parse_range_datetime(raw, hour_raw=None, *, scope: str = 'hourly') -> datetime | None:
+    s = str(raw or '').strip()
+    if not s:
+        return None
+    dt = _parse_trend_ts(s)
+    if dt is None and len(s) >= 10 and s[4] == '-':
+        try:
+            dt = datetime.strptime(s[:10], '%Y-%m-%d')
+        except ValueError:
+            dt = None
+    if dt is None:
+        return None
+    if scope != 'daily':
+        try:
+            hh = int(hour_raw) if hour_raw is not None and str(hour_raw).strip() != '' else dt.hour
+        except (TypeError, ValueError):
+            hh = dt.hour
+        hh = max(0, min(23, hh))
+        dt = dt.replace(hour=hh, minute=0, second=0, microsecond=0)
+    else:
+        dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    return dt
+
+
+def _date_range_from_request(scope: str | None = None) -> tuple[datetime | None, datetime | None]:
+    scope = scope or _normalize_data_scope(request.args.get('data_scope'))
+    start = _parse_range_datetime(
+        request.args.get('date_from'),
+        request.args.get('date_from_hour'),
+        scope=scope,
+    )
+    end = _parse_range_datetime(
+        request.args.get('date_to'),
+        request.args.get('date_to_hour'),
+        scope=scope,
+    )
+    if start is None or end is None:
+        return None, None
+    if scope == 'daily':
+        end = end.replace(hour=23, minute=59, second=59, microsecond=0)
+    else:
+        try:
+            eh = int(request.args.get('date_to_hour')) if request.args.get('date_to_hour') not in (None, '') else end.hour
+        except (TypeError, ValueError):
+            eh = end.hour
+        end = end.replace(hour=max(0, min(23, eh)), minute=59, second=59, microsecond=0)
+    if end < start:
+        start, end = end, start
+    retention_days = _retention_days_for_scope(scope)
+    earliest = datetime.now().replace(minute=0, second=0, microsecond=0) - timedelta(days=retention_days)
+    if start < earliest:
+        start = earliest
+    return start, end
+
+
+def _filter_trend_rows_by_range(
+    rows: list[dict],
+    start: datetime,
+    end: datetime,
+    granularity: str = 'hour',
+) -> list[dict]:
+    if not rows:
+        return rows
+    gran = (granularity or 'hour').lower()
+    out = []
+    for row in rows:
+        ts_raw, prefer_dayfirst = _pick_trend_time_value(row, gran)
+        dt = _parse_trend_ts(ts_raw, prefer_dayfirst=prefer_dayfirst)
+        if dt is None:
+            continue
+        if start <= dt <= end:
+            out.append(row)
+    return out
+
+
+def _resolved_time_frame(scope: str | None = None) -> tuple[int | None, str, datetime | None, datetime | None]:
+    scope = scope or _normalize_data_scope(request.args.get('data_scope'))
+    gran = 'day' if scope == 'daily' else 'hour'
+    date_start, date_end = _date_range_from_request(scope)
+    hours = _hours_from_request(scope)
+    return hours, gran, date_start, date_end
+
+
+def _time_frame_cache_token(scope: str | None = None) -> str:
+    scope = scope or _normalize_data_scope(request.args.get('data_scope'))
+    hours, _, date_start, date_end = _resolved_time_frame(scope)
+    if date_start is not None and date_end is not None:
+        return f'range:{format_pm_timestamp(date_start)}..{format_pm_timestamp(date_end)}'
+    return f'hours:{hours if hours is not None else "full"}'
+
+
+def _apply_time_frame_rows(
+    rows: list[dict],
+    hours: int | None,
+    granularity: str = 'hour',
+    date_start: datetime | None = None,
+    date_end: datetime | None = None,
+) -> list[dict]:
+    if not rows:
+        return rows
+    if date_start is not None and date_end is not None:
+        return _filter_trend_rows_by_range(rows, date_start, date_end, granularity)
+    if hours is None:
+        return rows
+    return _filter_trend_rows_by_hours(rows, hours, granularity)
 
 
 def _normalize_granularity(arg) -> str:
@@ -480,8 +627,8 @@ def _trend_cache_set(key: str, payload):
     _TREND_CACHE[key] = (time.time() + _TREND_CACHE_TTL_SEC, payload)
 
 
-_PM_EXPORT_MAX_ROWS = 200_000
-_PM_CHARTS_MAX_ROWS = 15_000
+_PM_EXPORT_MAX_ROWS = PM_EXPORT_MAX_ROWS
+_PM_CHARTS_MAX_ROWS = PM_CHARTS_MAX_ROWS
 
 
 def _pm_table_csv_response(
@@ -864,9 +1011,7 @@ def _ensure_reports_table():
 
 def _meta_conn():
     conn = sqlite3.connect(METADATA_DB, timeout=15)
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.execute('PRAGMA synchronous=NORMAL')
-    conn.execute('PRAGMA cache_size=-80000')
+    apply_pm_read_pragmas(conn)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -963,11 +1108,7 @@ def _open_pm_db(db_path: str) -> sqlite3.Connection:
                 pass
     conn = sqlite3.connect(db_path, timeout=15)
     conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.execute('PRAGMA synchronous=NORMAL')
-    conn.execute('PRAGMA temp_store=MEMORY')
-    conn.execute('PRAGMA cache_size=-80000')
-    conn.execute('PRAGMA mmap_size=268435456')
+    apply_pm_read_pragmas(conn)
     return conn
 
 
@@ -2244,6 +2385,7 @@ def get_group_trend():
     group_ref = (request.args.get('group_ref') or '').strip()
     granularity = _normalize_granularity(request.args.get('granularity'))
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    hours = _hours_from_request(data_scope)
     requested_kpis = _requested_trend_kpi_names()
     if not group_ref:
         return jsonify({'error': 'group_ref is required'}), 400
@@ -2289,6 +2431,8 @@ def get_group_trend():
             ).fetchall()
         ]
         rows = _aggregate_trend_rows(rows, granularity)
+        _hours, _gran, _start, _end = _resolved_time_frame(data_scope)
+        rows = _apply_time_frame_rows(rows, _hours, _gran, _start, _end)
         return jsonify({
             'success': True,
             'group': {'name': group_name, 'vendor': source_vendor, 'table': table},
@@ -2446,6 +2590,183 @@ def get_filters():
 
 
 # ---------------------------------------------------------------------------
+# API: time-frame config (retention limits + presets)
+# ---------------------------------------------------------------------------
+
+@performance_bp.route('/api/performance/time-frame', methods=['GET'])
+def get_time_frame_config():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    retention_days = _retention_days_for_scope(data_scope)
+    retention_hours = retention_days * 24
+    if data_scope == 'daily':
+        presets = [
+            {'id': '7d', 'label': 'Last 7 days', 'hours': min(168, retention_hours)},
+            {'id': '14d', 'label': 'Last 14 days', 'hours': min(336, retention_hours)},
+            {'id': '30d', 'label': 'Last 30 days', 'hours': min(720, retention_hours)},
+            {'id': '60d', 'label': 'Last 60 days', 'hours': min(1440, retention_hours)},
+            {'id': '90d', 'label': 'Last 90 days', 'hours': min(2160, retention_hours)},
+            {'id': 'full', 'label': f'Full retention ({retention_days} days)', 'hours': None},
+        ]
+    else:
+        presets = [
+            {'id': '24h', 'label': 'Last 24 hours', 'hours': min(24, retention_hours)},
+            {'id': '48h', 'label': 'Last 48 hours', 'hours': min(48, retention_hours)},
+            {'id': '72h', 'label': 'Last 72 hours', 'hours': min(72, retention_hours)},
+            {'id': '7d', 'label': 'Last 7 days', 'hours': min(168, retention_hours)},
+            {'id': '14d', 'label': 'Last 14 days', 'hours': min(336, retention_hours)},
+            {'id': 'full', 'label': f'Full retention ({retention_days} days)', 'hours': None},
+        ]
+    presets = [p for p in presets if p['hours'] is None or p['hours'] <= retention_hours]
+    if not any(p['hours'] is None for p in presets):
+        presets.append({
+            'id': 'full',
+            'label': f'Full retention ({retention_days} days)',
+            'hours': None,
+        })
+
+    return jsonify({
+        'success': True,
+        'data_scope': data_scope,
+        'retention_days': retention_days,
+        'retention_hours': retention_hours,
+        'presets': presets,
+    })
+
+
+def _cells_filter_where(vendor, technology, site_id, cluster, area, search=''):
+    """Shared metadata WHERE clause for cell list / area summary queries."""
+    where = ['1=1']
+    params: list = []
+
+    if vendor:
+        where.append("LOWER(TRIM(COALESCE(v.vendor, ''))) = LOWER(TRIM(?))")
+        params.append(vendor)
+    if technology:
+        if technology == '4G':
+            where.append("(v.technology = '4G-FDD' OR v.technology = '4G-TDD')")
+        else:
+            where.append('v.technology = ?')
+            params.append(technology)
+    if site_id:
+        where.append('CAST(v.site_id AS TEXT) = ?')
+        params.append(str(site_id).strip())
+    if search:
+        q = f'%{str(search).strip().lower()}%'
+        where.append('''(
+            LOWER(v.cell_name) LIKE ?
+            OR LOWER(COALESCE(st.site_name, '')) LIKE ?
+            OR CAST(v.site_id AS TEXT) LIKE ?
+            OR LOWER(COALESCE(v.technology, '')) LIKE ?
+        )''')
+        params.extend([q, q, q, q])
+
+    return where, params
+
+
+def _cells_matching_site_ids(meta, area_index, cluster, area):
+    if not cluster and not area:
+        return None
+    all_sites = [dict(r) for r in _meta_exec(
+        meta,
+        "SELECT site_id FROM sites WHERE site_id IS NOT NULL",
+    ).fetchall()]
+    matching_ids = []
+    for s in all_sites:
+        c_num, a_name = area_index.get(str(s['site_id']), _derive_cluster_area(s['site_id']))
+        if cluster and str(c_num) != str(cluster):
+            continue
+        if area:
+            normalized = (a_name or '').strip() or '—'
+            if area == '—':
+                if normalized != '—':
+                    continue
+            elif normalized != area:
+                continue
+        matching_ids.append(s['site_id'])
+    return matching_ids
+
+
+# ---------------------------------------------------------------------------
+# API: cell area summaries (lazy tree — load cells per area on expand)
+# ---------------------------------------------------------------------------
+
+@performance_bp.route('/api/performance/cells/areas', methods=['GET'])
+def get_cell_areas():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    vendor = request.args.get('vendor', '')
+    technology = request.args.get('technology', '')
+    site_id = request.args.get('site_id', '')
+    cluster = request.args.get('cluster', '')
+    area = request.args.get('area', '')
+    search = request.args.get('search', '').strip()
+    cache_key = _cell_cache_key(
+        vendor,
+        technology,
+        site_id,
+        cluster,
+        area,
+        _db_mtime_token(METADATA_DB) + '||areas||' + search.lower(),
+    )
+    cached = _cell_cache_get(cache_key)
+    if cached is not None:
+        return jsonify({'success': True, 'areas': cached['areas'], 'total_cells': cached['total_cells'], 'cached': True})
+
+    where, params = _cells_filter_where(vendor, technology, site_id, cluster, area, search)
+
+    meta = _meta_conn()
+    area_index = _build_site_area_index(meta)
+
+    matching_ids = _cells_matching_site_ids(meta, area_index, cluster, area)
+    if matching_ids is not None:
+        if matching_ids:
+            placeholders = ','.join(['?'] * len(matching_ids))
+            where.append(f'v.site_id IN ({placeholders})')
+            params.extend(matching_ids)
+        else:
+            meta.close()
+            payload = {'areas': [], 'total_cells': 0}
+            _cell_cache_set(cache_key, payload)
+            return jsonify({'success': True, 'areas': [], 'total_cells': 0, 'cached': False})
+    meta.close()
+
+    where_sql = ' AND '.join(where)
+    source_sql = perf_cell_source_sql_with_activity(technology)
+
+    conn = _meta_conn()
+    try:
+        sql = f'''
+            SELECT v.cell_name, v.site_id
+            FROM ({source_sql}) v
+            WHERE {where_sql}
+        '''
+        rows = [dict(r) for r in _meta_exec(conn, sql, params).fetchall()]
+    finally:
+        conn.close()
+
+    area_counts: dict[str, int] = defaultdict(int)
+    for row in rows:
+        _c_num, a_name = area_index.get(str(row.get('site_id')), _derive_cluster_area(row.get('site_id')))
+        key = (a_name or '').strip() or '—'
+        area_counts[key] += 1
+
+    areas_out = [
+        {'area': k, 'cell_count': area_counts[k]}
+        for k in sorted(area_counts.keys(), key=lambda x: (x == '—', x.lower()))
+    ]
+    total_cells = len(rows)
+    payload = {'areas': areas_out, 'total_cells': total_cells}
+    _cell_cache_set(cache_key, payload)
+    return jsonify({'success': True, 'areas': areas_out, 'total_cells': total_cells, 'cached': False})
+
+
+# ---------------------------------------------------------------------------
 # API: cells list with latest KPI snapshot
 # ---------------------------------------------------------------------------
 
@@ -2460,6 +2781,7 @@ def get_cells():
     site_id    = request.args.get('site_id', '')
     cluster    = request.args.get('cluster', '')
     area       = request.args.get('area', '')
+    search     = request.args.get('search', '').strip()
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
     cache_key = _cell_cache_key(
         vendor,
@@ -2467,52 +2789,25 @@ def get_cells():
         site_id,
         cluster,
         area,
-        _db_mtime_token(METADATA_DB),
+        _db_mtime_token(METADATA_DB) + '||' + search.lower(),
     )
     cached_cells = _cell_cache_get(cache_key)
     if cached_cells is not None:
         return jsonify({'success': True, 'cells': cached_cells, 'cached': True})
 
-    where  = ["1=1"]
-    params = []
-
-    if vendor:
-        where.append("LOWER(TRIM(COALESCE(v.vendor, ''))) = LOWER(TRIM(?))")
-        params.append(vendor)
-    if technology:
-        if technology == '4G':
-            where.append("(v.technology = '4G-FDD' OR v.technology = '4G-TDD')")
-        else:
-            where.append('v.technology = ?')
-            params.append(technology)
-    if site_id:
-        where.append('CAST(v.site_id AS TEXT) = ?')
-        params.append(str(site_id).strip())
+    where, params = _cells_filter_where(vendor, technology, site_id, cluster, area, search)
 
     meta = _meta_conn()
     area_index = _build_site_area_index(meta)
 
-    # cluster / area filtering: derive/infer from site_id, then filter by matching site_ids
-    if cluster or area:
-        all_sites = [dict(r) for r in _meta_exec(
-            meta,
-            "SELECT site_id FROM sites WHERE site_id IS NOT NULL",
-        ).fetchall()]
-        matching_ids = []
-        for s in all_sites:
-            c_num, a_name = area_index.get(str(s['site_id']), _derive_cluster_area(s['site_id']))
-            if cluster and str(c_num) != str(cluster):
-                continue
-            if area and a_name != area:
-                continue
-            matching_ids.append(s['site_id'])
+    matching_ids = _cells_matching_site_ids(meta, area_index, cluster, area)
+    if matching_ids is not None:
         if matching_ids:
             placeholders = ','.join(['?'] * len(matching_ids))
             where.append(f'v.site_id IN ({placeholders})')
             params.extend(matching_ids)
         else:
             meta.close()
-            # No sites match — return empty
             return jsonify({'success': True, 'cells': []})
     meta.close()
 
@@ -2570,6 +2865,7 @@ def get_cell_trend(cell_id):
 
     granularity = _normalize_granularity(request.args.get('granularity'))
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    hours = _hours_from_request(data_scope)
 
     meta_conn = _meta_conn()
     area_index = _build_site_area_index(meta_conn)
@@ -2602,7 +2898,7 @@ def get_cell_trend(cell_id):
         str(cell_id),
         str(vendor or ""),
         str(table or ""),
-        0,
+        hours or 0,
         granularity,
         requested_kpis,
         _pm_data_version_token(vendor or "", include_metadata=True, scope=data_scope),
@@ -2646,6 +2942,8 @@ def get_cell_trend(cell_id):
         trend = []
 
     trend = _aggregate_trend_rows(trend, granularity)
+    _hours, _gran, _start, _end = _resolved_time_frame(data_scope)
+    trend = _apply_time_frame_rows(trend, _hours, _gran, _start, _end)
     _trend_cache_set(trend_cache_key, trend)
     return jsonify({'success': True, 'cell': cell, 'trend': trend, 'cached': False})
 
@@ -2665,6 +2963,7 @@ def get_cell_trend_by_name():
         return jsonify({'error': 'cell_name is required'}), 400
     granularity = _normalize_granularity(request.args.get('granularity'))
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    hours = _hours_from_request(data_scope)
 
     meta_conn = _meta_conn()
     area_index = _build_site_area_index(meta_conn)
@@ -2716,7 +3015,7 @@ def get_cell_trend_by_name():
         "||".join([str(cell_name), str(technology), str(site_id)]),
         str(vendor or ""),
         str(table or ""),
-        0,
+        hours or 0,
         granularity,
         requested_kpis,
         _pm_data_version_token(vendor or "", include_metadata=True, scope=data_scope),
@@ -2764,6 +3063,8 @@ def get_cell_trend_by_name():
         trend = []
 
     trend = _aggregate_trend_rows(trend, granularity)
+    _hours, _gran, _start, _end = _resolved_time_frame(data_scope)
+    trend = _apply_time_frame_rows(trend, _hours, _gran, _start, _end)
     _trend_cache_set(trend_cache_key, trend)
     return jsonify({'success': True, 'cell': cell, 'trend': trend, 'cached': False})
 
@@ -2773,6 +3074,7 @@ def get_cell_trend_by_name():
 # ---------------------------------------------------------------------------
 
 @performance_bp.route('/api/performance/pm-table')
+@heavy_query_required
 def get_pm_table():
     user = get_current_user()
     if not user:
@@ -2788,6 +3090,8 @@ def get_pm_table():
     page       = request.args.get('page', 1, type=int)
     page_size  = min(request.args.get('page_size', 100, type=int), 500)
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    hours, trend_granularity, date_start, date_end = _resolved_time_frame(data_scope)
+    tf_token = _time_frame_cache_token(data_scope)
 
     if str(vendor or '').strip().lower() not in ('nokia', 'huawei'):
         return jsonify({'error': 'Vendor must be Nokia or Huawei'}), 400
@@ -2910,6 +3214,9 @@ def get_pm_table():
         else:
             all_rows.sort(key=lambda r: str(r.get('group_name') or ''), reverse=False)
 
+        if hours is not None or (date_start is not None and date_end is not None):
+            all_rows = _apply_time_frame_rows(all_rows, hours, trend_granularity, date_start, date_end)
+
         total = len(all_rows)
 
         static_cols = [c for c in ('group_name', 'vendor', 'group_ref') if c in merged_cols]
@@ -3009,7 +3316,7 @@ def get_pm_table():
             vendor,
             technology,
             table_cache_key_name,
-            f'{search}||{scoped_sig}||{group_sig}||{kpi_sig}',
+            f'{search}||{scoped_sig}||{group_sig}||{kpi_sig}||{tf_token}',
             page,
             page_size,
             _pm_data_version_token(vendor, include_metadata=False, scope=data_scope),
@@ -3136,12 +3443,21 @@ def get_pm_table():
         scoped_query = bool(scoped_cell_names)
         if scoped_query and not export_csv and not for_charts:
             offset = (page - 1) * page_size
-            row_dicts, total = _fetch_from_dual(
-                f'{_sqlite_ident(resolved_time_col)} DESC',
-                limit=page_size,
-                offset=offset,
-                ascending_dedupe=False,
-            )
+            if hours is not None or (date_start is not None and date_end is not None):
+                row_dicts, _total_raw = _fetch_from_dual(
+                    f'{_sqlite_ident(resolved_time_col)} DESC',
+                    ascending_dedupe=False,
+                )
+                row_dicts = _apply_time_frame_rows(row_dicts, hours, trend_granularity, date_start, date_end)
+                total = len(row_dicts)
+                row_dicts = row_dicts[offset:offset + page_size]
+            else:
+                row_dicts, total = _fetch_from_dual(
+                    f'{_sqlite_ident(resolved_time_col)} DESC',
+                    limit=page_size,
+                    offset=offset,
+                    ascending_dedupe=False,
+                )
             conn.close()
             payload = {
                 'success':       True,
@@ -3164,6 +3480,10 @@ def get_pm_table():
             f'{_sqlite_ident(resolved_time_col)} DESC',
             ascending_dedupe=False,
         )
+
+        if hours is not None or (date_start is not None and date_end is not None):
+            row_dicts = _apply_time_frame_rows(row_dicts, hours, trend_granularity, date_start, date_end)
+            total = len(row_dicts)
 
         if export_csv:
             if total > _PM_EXPORT_MAX_ROWS:
@@ -3206,12 +3526,15 @@ def get_pm_table():
             return jsonify(payload)
 
         offset = (page - 1) * page_size
-        page_rows, _ = _fetch_from_dual(
-            f'{_sqlite_ident(resolved_time_col)} DESC',
-            limit=page_size,
-            offset=offset,
-            ascending_dedupe=False,
-        )
+        if hours is not None or (date_start is not None and date_end is not None):
+            page_rows = row_dicts[offset:offset + page_size]
+        else:
+            page_rows, total = _fetch_from_dual(
+                f'{_sqlite_ident(resolved_time_col)} DESC',
+                limit=page_size,
+                offset=offset,
+                ascending_dedupe=False,
+            )
         conn.close()
 
         payload = {
