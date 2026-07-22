@@ -7,6 +7,11 @@ code. Read this once and every module reads the same way.
 > Companion docs: `AGENTS.md` (short conventions), `progress.md` (current work +
 > `NEXT` pointer), `checklist.md` (active scope). Vendor references live under
 > `docs/*_CM_OPEN_API_*.md` and `docs/FRONTEND_THEME.md`.
+>
+> **Want the deep version?** `docs/course/` is a full code-level course (12
+> lessons) that teaches every layer and module in order, with `file:line`
+> references. Start at `docs/course/README.md`. This page is the one-page map;
+> the course is the guided walkthrough.
 
 ---
 
