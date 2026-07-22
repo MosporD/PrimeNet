@@ -21,6 +21,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Network Map", "href": "/network-map", "visibility": "all"},
             {"label": "Neighbor Analysis", "href": "/neighbor-analysis", "visibility": "all"},
             {"label": "Performance Reports", "href": "/reports", "visibility": "all"},
+            {"label": "Power BI Reports", "href": "/power-bi", "visibility": "all"},
             {"label": "Sector Health Monitor", "href": "/sector-health", "visibility": "all"},
             {"label": "Sector Health (All Cells)", "href": "/sector-health-all", "visibility": "all"},
             {"label": "Conflict Map", "href": "/conflict-map", "visibility": "all"},

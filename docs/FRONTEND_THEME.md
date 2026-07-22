@@ -4,6 +4,22 @@ How light/dark mode works across the UI, and how to build or fix module pages so
 
 ---
 
+## Mandatory for every new module
+
+Dark mode is **not automatic** for new modules. `common.css` covers shared primitives (header, inputs, `.panel`, `.card`, tables), but **module-specific CSS almost always needs explicit dark rules**. Shipping a module without them is a known regression pattern.
+
+Before marking a module done:
+
+1. Load `common.css` then module CSS, and `common.js` (see [Required template wiring](#required-template-wiring)).
+2. Add `<body class="your-module-page">` for scoped overrides.
+3. In module CSS, define light tokens on `:root` and override them under `body.dark-mode.your-module-page` (see [Recommended patterns](#recommended-patterns-for-new-module-css)).
+4. Run the [Checklist — new module page](#checklist--new-module-page) in **both** light and dark.
+5. Run the [Quick audit command](#quick-audit-command) on your new CSS file — zero hits for naked `#fff` / `#ffffff` without a dark path.
+
+**Do not merge** a new module if cards, toolbars, or custom widgets stay white in dark mode.
+
+---
+
 ## How theme switching works
 
 | Piece | Location | Role |
@@ -271,6 +287,7 @@ Do not copy constellation colors into normal module pages.
 | **Sector Health** | CSS variables (partial) + scoped `body.dark-mode.sector-health-page` overrides + Chart.js listener |
 | **Network Health** | `:root` `--pn-*` tokens (light only today — needs `body.dark-mode` token overrides) |
 | **Reports / Admin** | Mostly standard `.section`, `.report-card` from `common.css` allowlist |
+| **Power BI** | `:root` module tokens + `body.dark-mode.pbi-page` overrides (`modules/power_bi/static/power_bi.css`) |
 | **Performance** | Large `common.css` coverage for `.hw-toolbar`, `.kpi-chart-card`, etc. |
 
 **Good target:** RET Management style (explicit dark section at bottom of module CSS) **or** token override on `body.dark-mode` (less duplication).
@@ -322,4 +339,4 @@ rg -L "dark-mode" modules/*/static/*.css
 
 ---
 
-*Last updated: 2026-07-12 — matches `common.js` theme API and `common.css` dark baseline.*
+*Last updated: 2026-07-22 — mandatory module checklist; Power BI token pattern added.*

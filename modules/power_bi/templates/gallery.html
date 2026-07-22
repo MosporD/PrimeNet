@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Reports - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
+    <link rel="stylesheet" href="{{ url_for('power_bi.static', filename='power_bi.css') }}?v=1.1">
+</head>
+<body class="pbi-page">
+    <div class="container pbi-container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">Dashboard</a>
+                    <h1>Power BI Reports</h1>
+                    <p>Browse and open published Power BI reports</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content pbi-main">
+
+            <section class="pbi-toolbar">
+                <label class="pbi-search-wrap">
+                    <span class="pbi-search-label">Search</span>
+                    <input type="search" id="pbi-search" class="pbi-search" placeholder="Filter reports by title..." autocomplete="off">
+                </label>
+                <div class="pbi-count" id="pbi-count">{{ report_count }} report{{ 's' if report_count != 1 else '' }}</div>
+            </section>
+
+            {% if reports %}
+            <section class="pbi-grid" id="pbi-grid" aria-label="Power BI reports">
+                {% for report in reports %}
+                <a href="{{ report.url }}"
+                   class="pbi-card"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   data-title="{{ report.title | e }}"
+                   data-slug="{{ report.slug | e }}">
+                    <div class="pbi-card-icon" aria-hidden="true">&#128202;</div>
+                    <div class="pbi-card-body">
+                        <h2 class="pbi-card-title">{{ report.title }}</h2>
+                        {% if report.description %}
+                        <p class="pbi-card-desc">{{ report.description }}</p>
+                        {% endif %}
+                    </div>
+                    <span class="pbi-card-action">Open in Power BI &#8599;</span>
+                </a>
+                {% endfor %}
+            </section>
+            <p class="pbi-empty pbi-empty-filter" id="pbi-empty-filter" hidden>No reports match your search.</p>
+            {% else %}
+            <section class="pbi-empty-state" aria-label="No reports configured">
+                <div class="pbi-empty-icon" aria-hidden="true">&#128202;</div>
+                <h2>No reports configured yet</h2>
+                <p>Add entries to <code>modules/power_bi/catalog.json</code> on the server, then refresh this page.</p>
+                <pre class="pbi-sample">[
+  {
+    "slug": "daily-kpi",
+    "title": "Daily KPI Dashboard",
+    "url": "https://app.powerbi.com/groups/{workspaceId}/reports/{reportId}",
+    "description": "Optional short description",
+    "visibility": "all"
+  }
+]</pre>
+            </section>
+            {% endif %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
+    <script src="{{ url_for('power_bi.static', filename='power_bi.js') }}?v=1.0"></script>
+</body>
+</html>
