@@ -17,6 +17,13 @@ def _role(user) -> str:
     return str(user[6] or "").strip().lower()
 
 
+def _deny():
+    """403 for API/JSON requests, redirect to dashboard for page requests."""
+    if (request.path or "").startswith("/api/") or request.is_json:
+        return jsonify({"success": False, "error": "Access denied."}), 403
+    return redirect(url_for("auth.dashboard"))
+
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -27,6 +34,13 @@ def login_required(f):
         if not user:
             return redirect(url_for("auth.login_page"))
         request.current_user = user
+        # Honor configurable feature access: only block when a feature owns this
+        # path AND the role is not permitted. Unmatched paths stay allowed.
+        from core.module_access import path_access
+
+        allowed, matched = path_access(request.path or "", user)
+        if matched and not allowed:
+            return _deny()
         return f(*args, **kwargs)
 
     return decorated
@@ -42,9 +56,17 @@ def admin_required(f):
         if not user:
             return redirect(url_for("auth.login_page"))
         request.current_user = user
-        if _role(user) != "admin":
-            return jsonify({"success": False, "error": "Administrator access required."}), 403
-        return f(*args, **kwargs)
+        if _role(user) == "admin":
+            return f(*args, **kwargs)
+        # Non-admins are allowed only when an admin has granted their role access
+        # to the feature that owns this path (defaults keep admin-only modules
+        # admin-only).
+        from core.module_access import path_access
+
+        allowed, matched = path_access(request.path or "", user)
+        if matched and allowed:
+            return f(*args, **kwargs)
+        return _deny()
 
     return decorated
 

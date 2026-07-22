@@ -1824,5 +1824,47 @@
             setTimeout(showOnce, 700);
         });
     </script>
+
+    <script id="allowed-hrefs-data" type="application/json">{{ allowed_hrefs | tojson }}</script>
+    <script>
+    // Hide tool tiles the current role isn't allowed to see (configurable via
+    // Admin Panel → Feature Access), then hide any primary tab left with no
+    // visible tiles. Owner sees everything.
+    (function () {
+        "use strict";
+        var allowed;
+        try { allowed = JSON.parse(document.getElementById('allowed-hrefs-data').textContent) || []; }
+        catch (e) { return; }
+        var allowedSet = {};
+        allowed.forEach(function (h) { allowedSet[h] = true; });
+
+        function norm(h) { return (h || '').split('?')[0].replace(/\/+$/, '') || '/'; }
+        function isAllowed(href) {
+            href = norm(href);
+            if (allowedSet[href]) return true;
+            // allow sub-paths of an allowed root
+            for (var i = 0; i < allowed.length; i++) {
+                if (allowed[i] !== '/' && href.indexOf(allowed[i] + '/') === 0) return true;
+            }
+            return false;
+        }
+
+        document.querySelectorAll('.function-card[data-module-href]').forEach(function (card) {
+            if (!isAllowed(card.getAttribute('data-module-href'))) card.style.display = 'none';
+        });
+
+        // Hide a primary tab if its section panel has no visible tiles.
+        document.querySelectorAll('.section-panel').forEach(function (panel) {
+            var cards = panel.querySelectorAll('.function-card[data-module-href]');
+            if (cards.length === 0) return;
+            var anyVisible = Array.prototype.some.call(cards, function (c) { return c.style.display !== 'none'; });
+            if (!anyVisible) {
+                var id = panel.getAttribute('data-page') || (panel.id || '').replace('section-', '');
+                var tab = document.getElementById('tab-' + id);
+                if (tab) tab.style.display = 'none';
+            }
+        });
+    })();
+    </script>
 </body>
 </html>
