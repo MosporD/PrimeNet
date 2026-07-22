@@ -16,11 +16,28 @@ from db.runtime import execute_query
 VENDORS = frozenset({'nokia', 'huawei'})
 
 
-def _fernet() -> Fernet:
+def _resolve_app_secret() -> str:
+    """Match Flask session secret resolution in app.py (env first, then app config)."""
     secret = (os.getenv('FLASK_SECRET_KEY') or os.getenv('SECRET_KEY') or '').strip()
+    if secret:
+        return secret
+    try:
+        from flask import current_app
+
+        cfg_secret = current_app.config.get('SECRET_KEY')
+        if cfg_secret:
+            return str(cfg_secret).strip()
+    except RuntimeError:
+        pass
+    return ''
+
+
+def _fernet() -> Fernet:
+    secret = _resolve_app_secret()
     if not secret:
         raise RuntimeError(
-            'FLASK_SECRET_KEY is required to store vendor credentials securely.'
+            'Application secret is not configured. Set FLASK_SECRET_KEY in .env '
+            'so vendor credentials can be stored securely across restarts.'
         )
     key = base64.urlsafe_b64encode(hashlib.sha256(secret.encode()).digest())
     return Fernet(key)

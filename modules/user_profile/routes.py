@@ -3,7 +3,7 @@ User Profile & Dashboard Personalization Routes
 Allows users to update their profile, change password, and customize the dashboard.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, current_app
 from functools import wraps
 import sqlite3
 import json
@@ -335,6 +335,12 @@ def save_vendor_credentials():
         save_user_vendor_credentials(user['id'], vendor, username, password)
     except ValueError as exc:
         return jsonify({'error': str(exc)}), 400
+    except RuntimeError as exc:
+        current_app.logger.exception('Vendor credential save failed')
+        return jsonify({'error': str(exc)}), 503
+    except Exception as exc:
+        current_app.logger.exception('Vendor credential save failed')
+        return jsonify({'error': f'Could not save credentials: {exc}'}), 500
     label = 'MantaRay' if vendor == 'nokia' else 'U2020'
     log_activity(user['id'], 'vendor_credentials_save', f'Saved {label} credentials for RET management')
     return jsonify({
@@ -355,6 +361,11 @@ def remove_vendor_credentials(vendor: str):
         deleted = delete_user_vendor_credentials(user['id'], vendor)
     except ValueError as exc:
         return jsonify({'error': str(exc)}), 400
+    except RuntimeError as exc:
+        return jsonify({'error': str(exc)}), 503
+    except Exception as exc:
+        current_app.logger.exception('Vendor credential delete failed')
+        return jsonify({'error': f'Could not remove credentials: {exc}'}), 500
     if deleted:
         label = 'MantaRay' if vendor == 'nokia' else 'U2020'
         log_activity(user['id'], 'vendor_credentials_clear', f'Cleared {label} credentials')
