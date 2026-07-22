@@ -45,6 +45,7 @@
                 <button class="admin-page-tab" data-page="sync-status" type="button" onclick="openAdminPage('sync-status')">Sync Status</button>
                 <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
                 <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                <button class="admin-page-tab" data-page="feature-access" type="button" onclick="openAdminPage('feature-access')">Feature Access</button>
                 <button class="admin-page-tab" data-page="api-connections" type="button" onclick="openAdminPage('api-connections')">API Connections</button>
                 {% else %}
                 <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
@@ -212,6 +213,34 @@
                             <p class="api-connection-message" id="api-message-huawei_pm">Click Test to verify credentials and reachability.</p>
                             <button type="button" class="btn-user-secondary" onclick="testApiConnection('huawei_pm')">Test Huawei PM</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="feature-access">
+                <div class="sync-section feature-access-section">
+                    <h2 class="section-title">Feature Access</h2>
+                    <p class="feature-access-intro">
+                        Choose which roles can see and open each feature. <strong>Owner</strong> always
+                        has full access. Locked core features (Dashboard, Profile, Admin Panel) can't be
+                        restricted. Changes apply within a few seconds.
+                    </p>
+                    <div class="feature-access-toolbar">
+                        <input type="search" id="feature-access-search" class="feature-access-search"
+                               placeholder="Filter features…" autocomplete="off" oninput="filterFeatureAccess()">
+                        <div class="feature-access-actions">
+                            <span class="feature-access-status" id="feature-access-status"></span>
+                            <button type="button" class="btn-user-secondary" onclick="resetFeatureAccess()">Reset to defaults</button>
+                            <button type="button" class="btn-sync test" id="feature-access-save-btn" onclick="saveFeatureAccess()">Save changes</button>
+                        </div>
+                    </div>
+                    <div class="feature-access-table-wrap">
+                        <table class="feature-access-table" id="feature-access-table">
+                            <thead id="feature-access-head"></thead>
+                            <tbody id="feature-access-body">
+                                <tr><td class="feature-access-loading">Loading…</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

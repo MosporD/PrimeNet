@@ -51,6 +51,124 @@ function openAdminPage(pageName) {
     } else {
         stopProgressPolling();
     }
+    if (pageName === 'feature-access' && !featureAccessLoaded) {
+        loadFeatureAccess();
+    }
+}
+
+// ── Feature Access ─────────────────────────────────────────────────────────
+let featureAccessLoaded = false;
+let featureAccessRoles = [];
+
+function _setFeatureStatus(msg, isError) {
+    const el = document.getElementById('feature-access-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('is-error', !!isError);
+}
+
+async function loadFeatureAccess() {
+    try {
+        const res = await fetch('/api/admin/feature-access');
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            _setFeatureStatus((data && data.error) || 'Failed to load.', true);
+            return;
+        }
+        featureAccessRoles = data.editable_roles || [];
+        renderFeatureAccess(data.features || []);
+        featureAccessLoaded = true;
+        _setFeatureStatus('');
+    } catch (e) {
+        _setFeatureStatus('Network error loading feature access.', true);
+    }
+}
+
+function renderFeatureAccess(features) {
+    const head = document.getElementById('feature-access-head');
+    const body = document.getElementById('feature-access-body');
+    if (!head || !body) return;
+
+    let headHtml = '<tr><th>Feature</th><th>Section</th><th class="fa-owner-col">Owner</th>';
+    featureAccessRoles.forEach(r => { headHtml += `<th>${r.label}</th>`; });
+    headHtml += '</tr>';
+    head.innerHTML = headHtml;
+
+    let rows = '';
+    features.forEach(f => {
+        const enabled = new Set(f.roles || []);
+        let cells = '';
+        featureAccessRoles.forEach(r => {
+            const checked = enabled.has(r.key) ? 'checked' : '';
+            const dis = f.locked ? 'disabled' : '';
+            cells += `<td class="fa-check"><input type="checkbox" data-href="${f.href}" data-role="${r.key}" ${checked} ${dis}></td>`;
+        });
+        const lockBadge = f.locked ? ' <span class="fa-lock" title="Core feature — cannot be restricted">🔒</span>' : '';
+        rows += `<tr class="fa-row" data-label="${(f.label + ' ' + f.href).toLowerCase()}">
+            <td class="fa-name">${f.label}${lockBadge}<span class="fa-href">${f.href}</span></td>
+            <td class="fa-section">${f.section}</td>
+            <td class="fa-check fa-owner-col"><input type="checkbox" checked disabled title="Owner always has access"></td>
+            ${cells}
+        </tr>`;
+    });
+    body.innerHTML = rows || '<tr><td class="feature-access-loading">No features found.</td></tr>';
+}
+
+function filterFeatureAccess() {
+    const q = (document.getElementById('feature-access-search').value || '').trim().toLowerCase();
+    document.querySelectorAll('#feature-access-body .fa-row').forEach(row => {
+        const hit = (row.getAttribute('data-label') || '').indexOf(q) !== -1;
+        row.style.display = hit ? '' : 'none';
+    });
+}
+
+async function saveFeatureAccess() {
+    const btn = document.getElementById('feature-access-save-btn');
+    const byHref = {};
+    document.querySelectorAll('#feature-access-body input[type="checkbox"][data-href]').forEach(cb => {
+        if (cb.disabled) return;
+        const href = cb.getAttribute('data-href');
+        if (!byHref[href]) byHref[href] = [];
+        if (cb.checked) byHref[href].push(cb.getAttribute('data-role'));
+    });
+    const updates = Object.keys(byHref).map(href => ({ href, roles: byHref[href] }));
+    if (btn) btn.disabled = true;
+    _setFeatureStatus('Saving…');
+    try {
+        const res = await fetch('/api/admin/feature-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ updates }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            _setFeatureStatus((data && data.error) || 'Save failed.', true);
+        } else {
+            if (data.features) renderFeatureAccess(data.features);
+            _setFeatureStatus(`Saved ${data.updated} feature(s).`);
+        }
+    } catch (e) {
+        _setFeatureStatus('Network error while saving.', true);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+async function resetFeatureAccess() {
+    if (!confirm('Reset all feature visibility to defaults? This clears every override.')) return;
+    _setFeatureStatus('Resetting…');
+    try {
+        const res = await fetch('/api/admin/feature-access/reset', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            _setFeatureStatus((data && data.error) || 'Reset failed.', true);
+        } else {
+            if (data.features) renderFeatureAccess(data.features);
+            _setFeatureStatus('Restored defaults.');
+        }
+    } catch (e) {
+        _setFeatureStatus('Network error while resetting.', true);
+    }
 }
 
 function stopProgressPolling() {

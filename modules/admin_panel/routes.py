@@ -132,8 +132,81 @@ def admin_panel_page():
         user=format_user_data(user),
         role_labels=ROLE_LABELS,
         can_manage_sync=role == 'admin',
+        can_manage_access=role == 'admin',
         default_user_password=NCM_DEFAULT_USER_PASSWORD,
     )
+
+
+@admin_panel_bp.route('/api/admin/feature-access', methods=['GET'])
+def get_feature_access():
+    """Return every feature with its configurable access state (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    from core import feature_access
+    from core.module_access import feature_catalog
+    return jsonify({
+        'success': True,
+        'editable_roles': [
+            {'key': r, 'label': feature_access.ROLE_LABELS.get(r, r)}
+            for r in feature_access.EDITABLE_ROLES
+        ],
+        'features': feature_catalog(),
+    })
+
+
+@admin_panel_bp.route('/api/admin/feature-access', methods=['POST'])
+def update_feature_access():
+    """Persist role visibility for one or more features (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    from core import feature_access
+    from core.module_access import feature_catalog
+
+    data = request.get_json(silent=True) or {}
+    updates = data.get('updates')
+    if not isinstance(updates, list):
+        return jsonify({'error': 'Expected {"updates": [...]}'}), 400
+
+    known = {f['href']: f for f in feature_catalog()}
+    valid_roles = set(feature_access.EDITABLE_ROLES)
+    applied = 0
+    for item in updates:
+        if not isinstance(item, dict):
+            continue
+        href = str(item.get('href') or '').strip()
+        feat = known.get(href)
+        if not feat or feat.get('locked'):
+            continue
+        roles = [str(r).strip().lower() for r in (item.get('roles') or [])]
+        roles = [r for r in roles if r in valid_roles]
+        feature_access.set_feature_roles(href, roles, updated_by=str(user.get('username') if isinstance(user, dict) else user[1]))
+        applied += 1
+
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_feature_access_update',
+        f'Updated visibility for {applied} feature(s)',
+    )
+    return jsonify({'success': True, 'updated': applied, 'features': feature_catalog()})
+
+
+@admin_panel_bp.route('/api/admin/feature-access/reset', methods=['POST'])
+def reset_feature_access():
+    """Clear all overrides, restoring hardcoded defaults (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    from core import feature_access
+    from core.module_access import feature_catalog
+    feature_access.reset_all()
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_feature_access_reset',
+        'Reset all feature visibility to defaults',
+    )
+    return jsonify({'success': True, 'features': feature_catalog()})
 
 @admin_panel_bp.route('/api/admin/users', methods=['GET'])
 def get_users():

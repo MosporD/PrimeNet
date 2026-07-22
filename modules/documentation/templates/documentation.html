@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — Developer Documentation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('documentation.static', filename='documentation.css') }}?v=1.0">
+</head>
+<body class="doc-page">
+    <header class="doc-header">
+        <div class="doc-header-left">
+            <a href="/dashboard" class="doc-home-link" title="Dashboard">&#8962;</a>
+            <div class="doc-title-block">
+                <h1 class="doc-app-title">Developer Documentation</h1>
+                <p class="doc-app-subtitle">Code-level course &amp; architecture for PrimeNet · admin only</p>
+            </div>
+        </div>
+        <div class="doc-header-right">
+            {% if user %}<span class="doc-user">{{ user.username }} · {{ user.role }}</span>{% endif %}
+        </div>
+    </header>
+
+    <div class="doc-layout">
+        <aside class="doc-sidebar" id="doc-sidebar">
+            <input type="search" id="doc-search" class="doc-search" placeholder="Filter lessons…" autocomplete="off">
+            <nav class="doc-nav" id="doc-nav">
+                {% set groups = nav | groupby('group') %}
+                {% for group_name, items in groups %}
+                <div class="doc-nav-group">
+                    <div class="doc-nav-group-title">{{ group_name }}</div>
+                    {% for item in items %}
+                    <a href="#{{ item.id }}" class="doc-nav-link" data-id="{{ item.id }}">{{ item.title }}</a>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </nav>
+        </aside>
+
+        <main class="doc-content" id="doc-content">
+            <div class="doc-loading">Loading…</div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script>
+    (function () {
+        "use strict";
+        var DEFAULT_ID = {{ default_id | tojson }};
+        var content = document.getElementById("doc-content");
+        var nav = document.getElementById("doc-nav");
+        var search = document.getElementById("doc-search");
+        var cache = {};
+
+        function setActive(id) {
+            nav.querySelectorAll(".doc-nav-link").forEach(function (a) {
+                a.classList.toggle("active", a.getAttribute("data-id") === id);
+            });
+        }
+
+        function idFromHref(href) {
+            // Internal course links look like "04-data-model.md" or "docs/ARCHITECTURE.md".
+            var m = href.match(/([^\/]+)\.md(#.*)?$/i);
+            if (!m) return null;
+            var base = m[1];
+            if (/^ARCHITECTURE$/i.test(base)) return "ARCHITECTURE";
+            return base;
+        }
+
+        function render(doc) {
+            content.innerHTML = '<article class="doc-article">' + doc.html + "</article>";
+            content.scrollTop = 0;
+            window.scrollTo(0, 0);
+            // Rewrite in-doc links to other lessons so they load in-place.
+            content.querySelectorAll("a[href]").forEach(function (a) {
+                var id = idFromHref(a.getAttribute("href"));
+                if (id) {
+                    a.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        load(id, true);
+                    });
+                }
+            });
+        }
+
+        function load(id, push) {
+            if (!id) return;
+            setActive(id);
+            if (cache[id]) { render(cache[id]); if (push) history.replaceState(null, "", "#" + id); return; }
+            content.innerHTML = '<div class="doc-loading">Loading…</div>';
+            fetch("/api/documentation/page/" + encodeURIComponent(id), { credentials: "same-origin" })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data.success) {
+                        content.innerHTML = '<div class="doc-error">' + (data.error || "Failed to load.") + "</div>";
+                        return;
+                    }
+                    cache[id] = data;
+                    render(data);
+                    if (push) history.replaceState(null, "", "#" + id);
+                })
+                .catch(function () {
+                    content.innerHTML = '<div class="doc-error">Network error loading document.</div>';
+                });
+        }
+
+        nav.addEventListener("click", function (e) {
+            var link = e.target.closest(".doc-nav-link");
+            if (!link) return;
+            e.preventDefault();
+            load(link.getAttribute("data-id"), true);
+        });
+
+        search.addEventListener("input", function () {
+            var q = search.value.trim().toLowerCase();
+            nav.querySelectorAll(".doc-nav-link").forEach(function (a) {
+                var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+                a.style.display = hit ? "" : "none";
+            });
+        });
+
+        var initial = (location.hash || "").replace(/^#/, "") || DEFAULT_ID;
+        load(initial, false);
+    })();
+    </script>
+</body>
+</html>

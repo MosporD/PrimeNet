@@ -70,6 +70,7 @@ NAV_SECTIONS: list[dict] = [
                 "href": "/admin-panel?section=user-admin",
                 "visibility": "admin_or_noc",
             },
+            {"label": "Developer Documentation", "href": "/documentation", "visibility": "admin"},
             {"label": "User Profile", "href": "/profile", "visibility": "all"},
         ],
     },
@@ -87,12 +88,94 @@ def _role_key(user_or_role) -> str:
     return str(user_or_role or "").strip().lower()
 
 
-def _link_visible(visibility: str, role: str) -> bool:
-    if visibility == "admin":
-        return role == "admin"
-    if visibility == "admin_or_noc":
-        return role in {"admin", "noc_sys"}
-    return True
+def _default_visibility_map() -> dict[str, str]:
+    """Normalized href -> hardcoded default visibility, from NAV_SECTIONS."""
+    out: dict[str, str] = {}
+    for section in NAV_SECTIONS:
+        for link in section.get("links") or []:
+            out[normalize_href(link.get("href") or "")] = str(link.get("visibility") or "all")
+    return out
+
+
+def default_visibility_for(href: str) -> str:
+    return _default_visibility_map().get(normalize_href(href), "all")
+
+
+def _link_visible(href: str, visibility: str, role: str) -> bool:
+    """Config-aware visibility check (admin always visible)."""
+    if role == "admin":
+        return True
+    from core import feature_access
+
+    return feature_access.role_can_access(normalize_href(href), visibility, role)
+
+
+def feature_catalog(user_or_role=None) -> list[dict]:
+    """Flat list of every feature with its configurable access state.
+
+    Used by the admin panel. Each entry: section, label, href, default_visibility,
+    locked, and ``roles`` (editable roles currently enabled).
+    """
+    from core import feature_access
+
+    seen: set[str] = set()
+    out: list[dict] = []
+    for section in NAV_SECTIONS:
+        for link in section.get("links") or []:
+            href = normalize_href(link.get("href") or "")
+            if href in seen:
+                continue
+            seen.add(href)
+            visibility = str(link.get("visibility") or "all")
+            out.append({
+                "section": section["title"],
+                "label": link["label"],
+                "href": href,
+                "default_visibility": visibility,
+                "locked": href in feature_access.LOCKED_HREFS,
+                "roles": sorted(
+                    feature_access.effective_roles(href, visibility),
+                    key=lambda r: feature_access.ROLE_ORDER.index(r)
+                    if r in feature_access.ROLE_ORDER else 99,
+                ),
+            })
+    return out
+
+
+def feature_for_path(path: str) -> str | None:
+    """Longest feature href that matches ``path`` (or its /api-stripped form)."""
+    hrefs = list(_default_visibility_map().keys())
+
+    def _match(target: str) -> str | None:
+        target = normalize_href(target)
+        best: str | None = None
+        for href in hrefs:
+            if href == "/":
+                continue
+            if target == href or target.startswith(f"{href}/"):
+                if best is None or len(href) > len(best):
+                    best = href
+        return best
+
+    hit = _match(path)
+    if hit is None and (path or "").startswith("/api/"):
+        hit = _match("/" + path[len("/api/"):])
+    return hit
+
+
+def path_access(path: str, user_or_role) -> tuple[bool, bool]:
+    """Return (allowed, matched) for a request path under the current config.
+
+    ``matched`` is False when no feature owns the path — callers decide whether an
+    unmatched path is permitted (login_required: yes; admin_required: no).
+    """
+    role = _role_key(user_or_role)
+    href = feature_for_path(path)
+    if href is None:
+        return (role == "admin", False)
+    if role == "admin":
+        return (True, True)
+    return (_link_visible(href, default_visibility_for(href), role), True)
 
 
 def enforce_module_access(href: str, user_or_role):
@@ -136,7 +219,7 @@ def navigation_sections_for_role(user_or_role) -> list[dict]:
         links = [
             {"label": nav_label(link["label"], link["href"]), "href": link["href"]}
             for link in section.get("links") or []
-            if _link_visible(str(link.get("visibility") or "all"), role)
+            if _link_visible(link.get("href") or "", str(link.get("visibility") or "all"), role)
         ]
         if links:
             sections.append({"title": section["title"], "links": links})
