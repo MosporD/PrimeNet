@@ -67,6 +67,7 @@ NAV_SECTIONS: list[dict] = [
                 "href": "/admin-panel?section=user-admin",
                 "visibility": "admin_or_noc",
             },
+            {"label": "Developer Documentation", "href": "/documentation", "visibility": "admin"},
             {"label": "User Profile", "href": "/profile", "visibility": "all"},
         ],
     },
