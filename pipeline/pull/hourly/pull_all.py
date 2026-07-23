@@ -49,18 +49,6 @@ def main() -> int:
     succeeded = [n for n, rc in results.items() if rc == 0]
     failed = [n for n, rc in results.items() if rc != 0]
 
-    # Supplementary neighbor pulls only run on full (uncategorised) cycles and
-    # are always non-fatal.
-    if not args.category:
-        supplementary = [
-            ["scripts", "pipeline", "pull_nokia_neighbor_raw.py"],
-            ["scripts", "pipeline", "pull_huawei_neighbor_raw.py"],
-        ]
-        for parts in supplementary:
-            rc = _run(parts)
-            if rc != 0:
-                print(f"[pull] warning: {parts[-1]} exited {rc} (non-fatal, continuing)", file=sys.stderr)
-
     if failed:
         print(
             f"[pull] vendor summary: ok={succeeded or ['-']} failed={failed}",

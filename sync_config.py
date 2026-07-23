@@ -310,6 +310,15 @@ RESOURCE_HIGH_MEMORY_MB = max(RESOURCE_LOW_MEMORY_MB + 256, min(128_000, _env_in
 RAW_PULL_INTERVAL_HOURS = max(1, _env_int('RAW_PULL_INTERVAL_HOURS', 1))
 # Daily cycle trigger hour (24h clock) for daily raw+load job.
 DAILY_PULL_HOUR = max(0, min(23, _env_int('DAILY_PULL_HOUR', 7)))
+# Neighbor pull+load: own cadence, offset from top-of-hour PM ingest (default 3 h at :30).
+NEIGHBOR_PULL_INTERVAL_HOURS = max(1, min(24, _env_int('NEIGHBOR_PULL_INTERVAL_HOURS', 3)))
+NEIGHBOR_PULL_CRON_MINUTE = max(0, min(59, _env_int('NEIGHBOR_PULL_CRON_MINUTE', 30)))
+
+
+def neighbor_pull_cron_hours(interval_hours: int | None = None) -> str:
+    """Comma-separated hour field for APScheduler (e.g. ``0,3,6,...`` for every 3 h)."""
+    n = max(1, min(24, int(interval_hours if interval_hours is not None else NEIGHBOR_PULL_INTERVAL_HOURS)))
+    return ','.join(str(h) for h in range(0, 24, n))
 # scripts/pipeline/watch_remote_new_files_and_pull.py — poll remote SFTP signatures; same env as the CLI script.
 PULL_WATCHER_POLL_INTERVAL_SEC = max(60, _env_int('WATCH_POLL_INTERVAL_SEC', 30 * 60))
 # Daily PM/groups DB retention window in days.

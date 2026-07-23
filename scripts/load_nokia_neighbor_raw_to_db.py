@@ -139,6 +139,62 @@ def _drop_legacy_neighbor(conn: sqlite3.Connection) -> None:
     )
 
 
+def _empty_2g_slim_columns() -> list[str]:
+    return ["source_cell_id", "target_cell_id", "ho_attempts", "_source_file", "_ingested_at"]
+
+
+def _empty_3g_slim_columns() -> list[str]:
+    return [
+        "scid_id",
+        "tcid_id",
+        "ho_attempts",
+        "ho_completions",
+        "_source_file",
+        "_ingested_at",
+    ]
+
+
+def _nokia_neighbor_table_names(load: NeighborVendorLoad) -> list[str]:
+    names = list(load.tech_tables.values()) + [load.intra_4g, load.inter_4g]
+    if load.wide_4g_table:
+        names.append(load.wide_4g_table)
+    if load.legacy_wide_4g_table and load.legacy_wide_4g_table != load.wide_4g_table:
+        names.append(load.legacy_wide_4g_table)
+    return list(dict.fromkeys(names))
+
+
+def _drop_nokia_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad) -> None:
+    """Remove all Nokia neighbor tables so each load is a full replace, not an append."""
+    for table in _nokia_neighbor_table_names(load):
+        conn.execute(f'DROP TABLE IF EXISTS "{table}"')
+
+
+def _write_empty_nokia_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad) -> None:
+    """Create zero-row neighbor tables after a pull with no export files."""
+    if load.slim:
+        pd.DataFrame(columns=_empty_2g_slim_columns()).to_sql(
+            load.tech_tables["2G"], conn, if_exists="replace", index=False, chunksize=800
+        )
+        pd.DataFrame(columns=_empty_3g_slim_columns()).to_sql(
+            load.tech_tables["3G"], conn, if_exists="replace", index=False, chunksize=800
+        )
+        empty_4g = pd.DataFrame(columns=_empty_4g_slim_columns())
+        empty_4g.to_sql(load.intra_4g, conn, if_exists="replace", index=False, chunksize=800)
+        empty_4g.to_sql(load.inter_4g, conn, if_exists="replace", index=False, chunksize=800)
+        return
+
+    for table in load.tech_tables.values():
+        pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+            table, conn, if_exists="replace", index=False, chunksize=800
+        )
+    empty_4g = pd.DataFrame(columns=_empty_4g_slim_columns())
+    empty_4g.to_sql(load.intra_4g, conn, if_exists="replace", index=False, chunksize=800)
+    empty_4g.to_sql(load.inter_4g, conn, if_exists="replace", index=False, chunksize=800)
+    pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+        load.wide_4g_table, conn, if_exists="replace", index=False, chunksize=800
+    )
+
+
 def _build_2g_slim_dataframe(merged: pd.DataFrame) -> pd.DataFrame | None:
     """Reduce wide 2G export to source_cell_id, target_cell_id, ho_attempts (+ provenance)."""
     cols = list(merged.columns)
@@ -612,14 +668,14 @@ def main() -> int:
         )
         if load.drop_legacy_hourly:
             _drop_legacy_neighbor(conn)
+        _drop_nokia_neighbor_tables(conn, load)
         if n_files == 0:
+            _write_empty_nokia_neighbor_tables(conn, load)
             conn.commit()
             print(f"[neighbor-raw/{load.slug}] no tabular files under {load.raw_root}/2G|3G|4G")
+            print("[neighbor-raw] replaced all Nokia neighbor tables with empty schemas (full refresh)")
             if load.drop_legacy_hourly:
-                print("[neighbor-raw] legacy neighbor_hourly / neighbor_cell_index removed.")
                 print("[neighbor-raw] Pull exports: python scripts/pipeline/pull_nokia_neighbor_raw.py")
-            else:
-                print("[neighbor-raw] Pull exports: python scripts/pipeline/pull_huawei_neighbor_raw.py")
             return 0
         total = 0
         for tech, table in load.tech_tables.items():

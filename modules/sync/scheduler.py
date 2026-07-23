@@ -45,6 +45,8 @@ _scheduler_mode_summary = {
     'scheduled_ingest_enabled': False,
     'raw_pull_interval_hours': None,
     'daily_pull_hour': None,
+    'neighbor_pull_interval_hours': None,
+    'neighbor_pull_cron_minute': None,
     'watcher_poll_interval_sec': None,
 }
 _sync_progress_lock = threading.Lock()
@@ -271,6 +273,65 @@ def run_full_sync_cycle():
     except Exception as e:
         _log_sync('db_loader', 'all', 'error', 0, str(e))
         logger.exception('Full sync cycle failed during DB load: %s', e)
+    finally:
+        _pipeline_cycle_lock.release()
+
+
+def run_neighbor_sync_cycle():
+    """Neighbor-only pull + full-replace SQLite load (separate from PM pipeline)."""
+    project_root = _PROJECT_ROOT
+    orchestrator = os.path.join(project_root, 'pipeline', 'orchestrators', 'orchestrate_neighbor_sync.py')
+
+    if not os.path.isfile(orchestrator):
+        _log_sync('neighbor_sync', 'all', 'error', 0, f'missing script: {orchestrator}')
+        logger.error('Neighbor orchestrator script not found: %s', orchestrator)
+        return
+
+    if not _pipeline_cycle_lock.acquire(blocking=False):
+        msg = 'Neighbor sync skipped: another pipeline cycle is already running'
+        _log_sync('neighbor_sync', 'all', 'error', 0, msg)
+        logger.warning(msg)
+        return
+
+    try:
+        if _defer_pipeline_if_low_memory('neighbor_sync'):
+            return
+
+        logger.info('Starting neighbor orchestrator script: %s', orchestrator)
+        proc = subprocess.run(
+            [sys.executable, orchestrator],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+        )
+        if proc.stdout:
+            logger.info('neighbor sync stdout:\n%s', proc.stdout.strip())
+        if proc.stderr:
+            logger.warning('neighbor sync stderr:\n%s', proc.stderr.strip())
+
+        partial = proc.returncode == 2
+        if proc.returncode not in (0, 2):
+            details = _subprocess_failure_detail(proc)
+            msg = f'Neighbor orchestrator failed (code={proc.returncode})'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('neighbor_sync', 'all', 'error', 0, msg)
+            logger.error('Neighbor orchestrator failed with code %s', proc.returncode)
+            return
+
+        if partial:
+            details = _subprocess_failure_detail(proc)
+            msg = 'Neighbor sync partial: one or more SFTP pulls failed; SQLite load still ran'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('neighbor_sync', 'all', 'error', 0, msg)
+            logger.warning(msg)
+        else:
+            _log_sync('neighbor_sync', 'all', 'ok', 0, 'Neighbor pull + full-replace load completed')
+            logger.info('Neighbor sync cycle completed successfully.')
+    except Exception as e:
+        _log_sync('neighbor_sync', 'all', 'error', 0, str(e))
+        logger.exception('Neighbor sync cycle failed: %s', e)
     finally:
         _pipeline_cycle_lock.release()
 
@@ -997,6 +1058,8 @@ def _compute_scheduler_flags() -> dict:
         RAW_PULL_INTERVAL_HOURS,
         DAILY_PULL_HOUR,
         PULL_WATCHER_POLL_INTERVAL_SEC,
+        NEIGHBOR_PULL_INTERVAL_HOURS,
+        NEIGHBOR_PULL_CRON_MINUTE,
     )
 
     legacy_enabled = os.environ.get('NCM_ENABLE_LEGACY_PERFORMANCE_SCHEDULER', '').strip().lower() in ('1', 'true', 'yes')
@@ -1020,6 +1083,8 @@ def _compute_scheduler_flags() -> dict:
         'scheduled_ingest_enabled': bool(scheduled_ingest_enabled),
         'raw_pull_interval_hours': int(RAW_PULL_INTERVAL_HOURS),
         'daily_pull_hour': int(DAILY_PULL_HOUR),
+        'neighbor_pull_interval_hours': int(NEIGHBOR_PULL_INTERVAL_HOURS),
+        'neighbor_pull_cron_minute': int(NEIGHBOR_PULL_CRON_MINUTE),
         'watcher_poll_interval_sec': int(PULL_WATCHER_POLL_INTERVAL_SEC),
     }
 
@@ -1041,6 +1106,9 @@ def start_scheduler():
         RAW_PULL_INTERVAL_HOURS,
         DAILY_PULL_HOUR,
         PULL_WATCHER_POLL_INTERVAL_SEC,
+        NEIGHBOR_PULL_INTERVAL_HOURS,
+        NEIGHBOR_PULL_CRON_MINUTE,
+        neighbor_pull_cron_hours,
     )
 
     _scheduler = BackgroundScheduler(daemon=True)
@@ -1076,6 +1144,30 @@ def start_scheduler():
         logger.info(
             'Hourly/daily SFTP ingest jobs not registered because remote watcher is primary.'
         )
+
+    neighbor_disabled = os.environ.get('NCM_DISABLE_NEIGHBOR_SCHEDULER', '').strip().lower() in (
+        '1',
+        'true',
+        'yes',
+    )
+    if not neighbor_disabled:
+        _scheduler.add_job(
+            run_neighbor_sync_cycle,
+            trigger=CronTrigger(
+                minute=int(NEIGHBOR_PULL_CRON_MINUTE),
+                hour=neighbor_pull_cron_hours(NEIGHBOR_PULL_INTERVAL_HOURS),
+            ),
+            id='neighbor_ingest_sync',
+            name=(
+                f'Neighbor SFTP pull + DB load (every {NEIGHBOR_PULL_INTERVAL_HOURS}h '
+                f'at :{int(NEIGHBOR_PULL_CRON_MINUTE):02d})'
+            ),
+            replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+        )
+    else:
+        logger.info('Neighbor ingest job not registered (NCM_DISABLE_NEIGHBOR_SCHEDULER).')
 
     # Watcher: remote signature probe + DB ingest verification / retry.
     if watcher_enabled:
@@ -1140,11 +1232,15 @@ def start_scheduler():
     mode = flags['mode']
     _scheduler_mode_summary = dict(flags)
     logger.info(
-        'Scheduler started — mode=%s scheduled_ingest=%s hourly_every=%sh daily_at=%02d:05 watcher=%s watcher_every=%ss legacy_master=%s',
+        'Scheduler started — mode=%s scheduled_ingest=%s hourly_every=%sh daily_at=%02d:05 '
+        'neighbor_every=%sh at :%02d neighbor_job=%s watcher=%s watcher_every=%ss legacy_master=%s',
         mode,
         scheduled_ingest_enabled,
         RAW_PULL_INTERVAL_HOURS,
         DAILY_PULL_HOUR,
+        NEIGHBOR_PULL_INTERVAL_HOURS,
+        int(NEIGHBOR_PULL_CRON_MINUTE),
+        not neighbor_disabled,
         watcher_enabled,
         int(PULL_WATCHER_POLL_INTERVAL_SEC),
         legacy_enabled,
@@ -1176,6 +1272,7 @@ def trigger_metadata_now():  pull_metadata()
 def trigger_nokia_groups_now(): pull_nokia_groups()
 def trigger_huawei_groups_now(): pull_huawei_groups()
 def trigger_raw_master_now(): run_full_sync_cycle()
+def trigger_neighbor_sync_now(): run_neighbor_sync_cycle()
 def trigger_daily_full_now(): run_daily_sync_cycle()
 def trigger_cells_hourly_now(): run_manual_category_sync('cells-hourly')
 def trigger_groups_hourly_now(): run_manual_category_sync('groups-hourly')

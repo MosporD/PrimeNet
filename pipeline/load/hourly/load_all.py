@@ -1,15 +1,15 @@
 """
 Canonical hourly load entrypoint.
 
-Safe-transition wrapper that delegates to the existing hourly loader script.
+PM/groups only — neighbor SQLite is loaded on its own schedule (see orchestrate_neighbor_sync.py).
 """
 
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
 import sys
-import argparse
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
