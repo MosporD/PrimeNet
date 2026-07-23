@@ -207,3 +207,41 @@ def canonicalize_pm_timestamp(
     if dt is None:
         return None
     return format_pm_timestamp(dt)
+
+
+PM_REPORT_DATE_COL = 'report_date'
+PM_REPORT_TIME_COL = 'report_time'
+
+
+def format_pm_report_date(dt: datetime) -> str:
+    """PrimeNet PM date column (``YYYY-MM-DD``)."""
+    return dt.replace(microsecond=0).strftime('%Y-%m-%d')
+
+
+def format_pm_report_time(dt: datetime) -> str:
+    """PrimeNet PM time column for hourly scope (``HH:MM:SS``)."""
+    return dt.replace(microsecond=0).strftime('%H:%M:%S')
+
+
+def derive_pm_report_columns(
+    value,
+    *,
+    hourly: bool = True,
+    prefer_dayfirst: bool | None = None,
+) -> dict[str, str] | None:
+    """
+    Parse a vendor time cell into PrimeNet report columns.
+
+    Hourly: ``timestamp``, ``report_date``, ``report_time``.
+    Daily: ``timestamp`` (midnight), ``report_date``.
+    """
+    dt = parse_pm_datetime(value, prefer_dayfirst=prefer_dayfirst)
+    if dt is None:
+        return None
+    out = {
+        'timestamp': format_pm_timestamp(dt),
+        PM_REPORT_DATE_COL: format_pm_report_date(dt),
+    }
+    if hourly:
+        out[PM_REPORT_TIME_COL] = format_pm_report_time(dt)
+    return out

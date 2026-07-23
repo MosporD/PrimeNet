@@ -67,6 +67,10 @@ from modules.sync.pm_processor import (
     _pick_best_timestamp_column,
     _read_nokia_csv_best,
 )
+from core.pm_timestamp import (
+    PM_REPORT_DATE_COL,
+    PM_REPORT_TIME_COL,
+)
 from scripts.build_kpi_headers_db import build as build_kpi_headers_db
 from pipeline.paths import PM_RATS, raw_path
 
@@ -388,9 +392,54 @@ def _resolve_cell_time_key_columns(
     """Vendor-native (cell name, period start) columns for dedupe."""
     cell_det = _detect_cell_identifier_column(db_cols, _CELL_KEYWORDS)
     cell_col = _match_column_name(db_cols, cell_det)
-    ts_det = _pick_best_timestamp_column(sample, list(sample.columns))
-    ts_col = _match_column_name(db_cols, ts_det)
+    if 'timestamp' in db_cols:
+        ts_col = 'timestamp'
+    elif 'timestamp' in sample.columns:
+        ts_col = 'timestamp'
+    else:
+        ts_det = _pick_best_timestamp_column(sample, list(sample.columns))
+        ts_col = _match_column_name(db_cols, ts_det)
     return cell_col, ts_col
+
+
+def _infer_scope_from_table(table: str) -> str:
+    if 'DAILY' in str(table or '').upper():
+        return 'daily'
+    return 'hourly'
+
+
+def _enrich_pm_report_columns(
+    df: pd.DataFrame,
+    label: str,
+    *,
+    scope: str | None = None,
+    base_table: str = '',
+) -> pd.DataFrame:
+    """
+    Parse vendor time cells once at load and store PrimeNet report columns.
+
+    Hourly rows get ``timestamp``, ``report_date``, ``report_time``.
+    Daily rows get ``timestamp`` (midnight) and ``report_date``.
+    """
+    if df.empty:
+        return df
+    scope = scope or _infer_scope_from_table(base_table)
+    hourly = scope != 'daily'
+    out = df.copy()
+    _, ts_col = _resolve_cell_time_key_columns(list(out.columns), out)
+    if not ts_col or ts_col not in out.columns:
+        return out
+
+    parsed = _parse_timestamp_series(out[ts_col], label, ts_col)
+    valid = parsed.notna()
+    if not valid.any():
+        return out
+
+    out.loc[valid, 'timestamp'] = parsed.loc[valid].dt.strftime('%Y-%m-%d %H:%M:%S')
+    out.loc[valid, PM_REPORT_DATE_COL] = parsed.loc[valid].dt.strftime('%Y-%m-%d')
+    if hourly:
+        out.loc[valid, PM_REPORT_TIME_COL] = parsed.loc[valid].dt.strftime('%H:%M:%S')
+    return out
 
 
 def _dedupe_table_on_cell_time(
@@ -522,10 +571,12 @@ def _append_dataframe_to_table(
     label: str,
     *,
     apply_time_filter: bool,
+    scope: str | None = None,
 ) -> int:
     """Append rows to one SQLite table; optional (cell, time) dedupe filter."""
     if df.empty:
         return 0
+    df = _enrich_pm_report_columns(df, label, scope=scope, base_table=table)
     table_exists = _table_exists(conn, table)
     if not table_exists:
         df.to_sql(table, conn, if_exists="append", index=False)
@@ -561,6 +612,7 @@ def _load_pm_frame_to_tables(
     fn: str,
     *,
     apply_time_filter: bool,
+    scope: str | None = None,
 ) -> int:
     """
     Write a PM frame into area partition tables (cells) or the monotable (groups).
@@ -571,7 +623,7 @@ def _load_pm_frame_to_tables(
 
     if not _use_area_partitions(label):
         return _append_dataframe_to_table(
-            conn, base_table, df, label, apply_time_filter=apply_time_filter
+            conn, base_table, df, label, apply_time_filter=apply_time_filter, scope=scope
         )
 
     cell_col, _ts_col = _resolve_cell_time_key_columns(list(df.columns), df)
@@ -579,7 +631,7 @@ def _load_pm_frame_to_tables(
     parts = _partition_frames_by_area(df, base_table, cell_col)
     for table, sub in parts:
         n = _append_dataframe_to_table(
-            conn, table, sub, label, apply_time_filter=apply_time_filter
+            conn, table, sub, label, apply_time_filter=apply_time_filter, scope=scope
         )
         inserted += n
         if n:
@@ -593,6 +645,8 @@ def _load_csv_file_incremental_in_chunks(
     full_path: str,
     label: str,
     fn: str,
+    *,
+    scope: str = "hourly",
 ) -> None:
     it = _csv_chunk_iter(full_path, label, chunksize=CSV_CHUNK_SIZE)
     total_rows = 0
@@ -615,6 +669,7 @@ def _load_csv_file_incremental_in_chunks(
             label,
             fn,
             apply_time_filter=bool(RAW_LOADER_TIME_FILTER),
+            scope=scope,
         )
         inserted_rows += n
         if _use_area_partitions(label):
@@ -872,6 +927,8 @@ def _load_file_incremental(
     df_raw: pd.DataFrame,
     label: str,
     fn: str,
+    *,
+    scope: str = "hourly",
 ) -> None:
     if df_raw.empty:
         print(f"[{label}] incremental {fn} -> table {table}: skip (empty)")
@@ -883,6 +940,7 @@ def _load_file_incremental(
         label,
         fn,
         apply_time_filter=bool(RAW_LOADER_TIME_FILTER),
+        scope=scope,
     )
     split_note = " area-split" if _use_area_partitions(label) else ""
     print(
@@ -897,8 +955,11 @@ def _replace_pm_frame_to_tables(
     df: pd.DataFrame,
     label: str,
     fn: str,
+    *,
+    scope: str = "hourly",
 ) -> None:
     """Full replace for cells (area partitions) or groups (monotable)."""
+    df = _enrich_pm_report_columns(df, label, scope=scope, base_table=base_table)
     if not _use_area_partitions(label):
         df.to_sql(base_table, conn, if_exists="replace", index=False)
         print(f"[{label}] replaced {fn} -> table {base_table} ({len(df)} rows)")
@@ -1079,7 +1140,7 @@ def _load_folder_tabular_to_db(
                         print(f"[{label}] skipped {fn}: could not infer technology for canonical table")
                         failed += 1
                         continue
-                    _load_csv_file_incremental_in_chunks(conn, table, full_path, label, fn)
+                    _load_csv_file_incremental_in_chunks(conn, table, full_path, label, fn, scope=scope)
                 else:
                     df = _read_tabular_as_is(full_path)
                     table = _canonical_table_for_label(label, fn, list(df.columns), scope=scope)
@@ -1088,7 +1149,7 @@ def _load_folder_tabular_to_db(
                         failed += 1
                         continue
                     if incremental:
-                        _load_file_incremental(conn, table, df, label, fn)
+                        _load_file_incremental(conn, table, df, label, fn, scope=scope)
                     else:
                         if label == "metadata":
                             canonical = _metadata_canonical_table_from_file_name(fn)
@@ -1100,7 +1161,7 @@ def _load_folder_tabular_to_db(
                             out.to_sql(canonical, conn, if_exists="replace", index=False)
                             print(f"[metadata] replaced {fn} -> table {canonical} ({len(out)} rows)")
                         else:
-                            _replace_pm_frame_to_tables(conn, table, df, label, fn)
+                            _replace_pm_frame_to_tables(conn, table, df, label, fn, scope=scope)
                 loaded += 1
             except Exception as e:
                 print(f"[{label}] failed {fn}: {e}")

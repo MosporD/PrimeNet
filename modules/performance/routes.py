@@ -62,7 +62,14 @@ from modules.sync.metadata_active_sql import (
 )
 from .kpi_catalog import KPI_HEADERS_MAP
 from .kpi_mapping import get_kpi_mapping_payload
-from core.pm_timestamp import format_pm_timestamp, parse_pm_datetime
+from core.pm_timestamp import (
+    PM_REPORT_DATE_COL,
+    PM_REPORT_TIME_COL,
+    format_pm_report_date,
+    format_pm_report_time,
+    format_pm_timestamp,
+    parse_pm_datetime,
+)
 
 performance_bp = Blueprint(
     'performance', __name__,
@@ -77,10 +84,15 @@ def _meta_exec(conn, sql: str, params=()):
     return execute_query(conn, sql, params or ())
 
 
-_FIXED_COLS = {'id', 'cell_name', 'timestamp', 'Date', 'date', 'Time', 'PERIOD_START_TIME'}
+_FIXED_COLS = {
+    'id', 'cell_name', 'timestamp', 'Date', 'date', 'Time', 'PERIOD_START_TIME',
+    PM_REPORT_DATE_COL, PM_REPORT_TIME_COL, '__time_source',
+}
+_VENDOR_TIME_COLS = {'Date', 'date', 'Time', 'PERIOD_START_TIME', 'period start time'}
 # Match PRAGMA names after lower/strip (spaces kept); include spaced Nokia export headers.
 _TIME_COL_ALIASES = (
     'timestamp',
+    PM_REPORT_DATE_COL,
     'time',
     'period_start_time',
     'period start time',
@@ -298,7 +310,25 @@ def _parse_trend_ts(val, prefer_dayfirst: bool | None = None):
 
 
 def _pick_trend_time_value(row: dict, granularity: str) -> tuple[object, bool | None]:
-    """Pick row timestamp value plus parse hint (day-first Huawei vs month-first Nokia)."""
+    """Pick row time from PrimeNet report columns; legacy vendor columns are last resort."""
+    gran = (granularity or 'hour').lower()
+
+    rd = row.get(PM_REPORT_DATE_COL)
+    if rd is not None and str(rd).strip():
+        rd_s = str(rd).strip()
+        if gran == 'hour':
+            rt = row.get(PM_REPORT_TIME_COL)
+            if rt is not None and str(rt).strip():
+                return f'{rd_s} {str(rt).strip()}', None
+        else:
+            return rd_s, None
+
+    ts = row.get('timestamp')
+    if ts is not None:
+        s = str(ts).strip()
+        if s and s.lower() not in ('nan', 'nat', 'none') and len(s) >= 10 and s[4] == '-':
+            return ts, None
+
     source_col = str(row.get('__time_source') or '').strip().lower()
     if source_col in ('period_start_time', 'period start time'):
         v = row.get('timestamp')
@@ -309,7 +339,6 @@ def _pick_trend_time_value(row: dict, granularity: str) -> tuple[object, bool | 
         if v is not None and str(v).strip().lower() not in ('', 'nan', 'nat', 'none'):
             return v, True
 
-    gran = (granularity or 'hour').lower()
     if gran == 'hour':
         ordered_keys = ('timestamp', 'Time', 'PERIOD_START_TIME', 'Date', 'date')
     else:
@@ -322,17 +351,24 @@ def _pick_trend_time_value(row: dict, granularity: str) -> tuple[object, bool | 
         s = str(v).strip()
         if not s or s.lower() in ('nan', 'nat', 'none'):
             continue
-        # Column / shape hints for ambiguous vendor strings.
         if k in ('Date', 'date'):
-            return v, True  # Huawei Date: day/month/year
+            return v, True
         if k == 'PERIOD_START_TIME':
-            return v, False  # Nokia: month.day.year
+            return v, False
         if '/' in s and not (len(s) >= 10 and s[4] == '-'):
-            return v, True  # Huawei Time / slash dates are day-first
+            return v, True
         if '.' in s and not (len(s) >= 10 and s[4] == '-'):
-            return v, False  # Nokia dotted
+            return v, False
         return v, None
     return None, None
+
+
+def _trend_row_sort_key(row: dict, granularity: str = 'hour') -> tuple:
+    ts_raw, prefer_dayfirst = _pick_trend_time_value(row, granularity)
+    dt = _parse_trend_ts(ts_raw, prefer_dayfirst=prefer_dayfirst)
+    if dt is None:
+        return (0, datetime.min)
+    return (1, dt)
 
 
 def _log_trend_time_parse_sample(
@@ -409,9 +445,16 @@ def _aggregate_trend_rows(rows: list[dict], granularity: str) -> list[dict]:
     for label in sorted(buckets.keys()):
         group = buckets[label]
         merged = dict(group[0])
-        # One standard for chart clients — drop ambiguous vendor-raw date fields.
+        ts_raw, prefer_dayfirst = _pick_trend_time_value(group[0], gran)
+        dt = _parse_trend_ts(ts_raw, prefer_dayfirst=prefer_dayfirst)
         merged['timestamp'] = label
-        for raw_key in ('Date', 'date', 'Time', 'PERIOD_START_TIME'):
+        if dt is not None:
+            merged[PM_REPORT_DATE_COL] = format_pm_report_date(dt)
+            if gran == 'hour':
+                merged[PM_REPORT_TIME_COL] = format_pm_report_time(
+                    dt.replace(minute=0, second=0, microsecond=0)
+                )
+        for raw_key in _VENDOR_TIME_COLS:
             merged.pop(raw_key, None)
         keys = [k for k in group[0] if k not in skip]
         for k in keys:
@@ -520,8 +563,8 @@ _CELL_LIST_CACHE = {}
 _CELL_LIST_CACHE_TTL_SEC = 120
 _TREND_CACHE = {}
 _TREND_CACHE_TTL_SEC = 300
-_TREND_CACHE_SCHEMA_VER = "v5"
-_PM_TABLE_CACHE_SCHEMA_VER = "v4"
+_TREND_CACHE_SCHEMA_VER = "v6"
+_PM_TABLE_CACHE_SCHEMA_VER = "v5"
 _PM_TABLE_CACHE = {}
 _PM_TABLE_CACHE_TTL_SEC = 180
 _PM_CELL_NAMES_CACHE = {}
@@ -1054,7 +1097,7 @@ def _resolve_pm_table_bundle(
     if not all_cols:
         return None
     existing_static, ordered_cols = _build_pm_table_column_layout(
-        vendor, technology, all_cols, cell_col, time_col,
+        vendor, technology, all_cols, cell_col, time_col, scope=data_scope,
     )
     bundle = {
         'table': table,
@@ -1175,6 +1218,21 @@ def _axis_column_sample_score(conn: sqlite3.Connection, table: str, col: str, *,
     return score
 
 
+def _pick_time_column_from_aliases(
+    conn: sqlite3.Connection,
+    table: str,
+    cols: list[str],
+    aliases: tuple[str, ...],
+) -> str | None:
+    """Prefer canonical PrimeNet time columns in alias order (not vendor Date)."""
+    low_to_real = {_norm_col_name(c): c for c in cols}
+    for alias in aliases:
+        real = low_to_real.get(alias)
+        if real and _axis_column_sample_score(conn, table, real) > 0:
+            return real
+    return None
+
+
 def _pick_axis_column_from_aliases(
     conn: sqlite3.Connection,
     table: str,
@@ -1202,7 +1260,7 @@ def _resolve_pm_axis_columns_sqlite(conn: sqlite3.Connection, table: str) -> tup
         _PM_AXIS_COL_CACHE[table] = (None, None)
         return None, None
     cell_col = _pick_axis_column_from_aliases(conn, table, cols, _CELL_COL_ALIASES)
-    time_col = _pick_axis_column_from_aliases(conn, table, cols, _TIME_COL_ALIASES)
+    time_col = _pick_time_column_from_aliases(conn, table, cols, _TIME_COL_ALIASES)
     _PM_AXIS_COL_CACHE[table] = (cell_col, time_col)
     return cell_col, time_col
 
@@ -1224,50 +1282,51 @@ def _pm_table_select_col(
     return _sqlite_ident(col)
 
 
+def _pm_report_static_cols(scope: str) -> list[str]:
+    if _normalize_data_scope(scope) == 'daily':
+        return [PM_REPORT_DATE_COL]
+    return [PM_REPORT_DATE_COL, PM_REPORT_TIME_COL]
+
+
 def _build_pm_table_column_layout(
     vendor: str,
     technology: str,
     all_cols: list[str],
     resolved_cell_col: str | None,
     resolved_time_col: str | None,
+    scope: str = 'hourly',
 ) -> tuple[list[str], list[str]]:
     """
-    Legacy pm-table column order: timestamp, cell_name, vendor static IDs, then KPIs.
+    Legacy pm-table column order: report date/time, cell_name, vendor static IDs, then KPIs.
     Empty legacy cell_name/timestamp slots are mapped to populated vendor-native axes.
     """
     static_cfg = _PM_STATIC_COLS.get(vendor, {}).get(technology, [])
+    report_static = _pm_report_static_cols(scope)
     existing_static: list[str] = []
+    if any(c in all_cols for c in report_static):
+        for c in report_static:
+            if c in all_cols:
+                existing_static.append(c)
+    elif resolved_time_col:
+        existing_static.append('timestamp')
     for c in static_cfg:
+        if c in ('timestamp', PM_REPORT_DATE_COL, PM_REPORT_TIME_COL):
+            continue
         if c == 'cell_name':
             if resolved_cell_col:
                 existing_static.append('cell_name')
-        elif c == 'timestamp':
-            if resolved_time_col:
-                existing_static.append('timestamp')
         elif c in all_cols:
             existing_static.append(c)
-    # Huawei hourly exports may include a separate Date column beside Time.
-    # Daily exports use Date as the only time axis — do not duplicate it.
-    if vendor == 'Huawei':
-        for dc in ('Date', 'date'):
-            if dc not in all_cols or dc in existing_static:
-                break
-            if resolved_time_col and _norm_col_name(resolved_time_col) == _norm_col_name(dc):
-                break
-            if 'timestamp' in existing_static:
-                i = existing_static.index('timestamp') + 1
-                existing_static.insert(i, dc)
-            else:
-                existing_static.insert(0, dc)
-            break
     static_set = set(existing_static)
     axis_source_cols = {c for c in (resolved_cell_col, resolved_time_col) if c}
+    axis_source_cols.update(_VENDOR_TIME_COLS)
     kpi_cols = [
         c for c in all_cols
         if c not in _PM_EXCLUDE_COLS
         and c not in static_set
         and c not in _DUPLICATE_KPI_NAMES
         and c not in axis_source_cols
+        and c not in ('timestamp', PM_REPORT_DATE_COL, PM_REPORT_TIME_COL)
     ]
     ordered_cols = existing_static + kpi_cols
     return existing_static, ordered_cols
@@ -1507,7 +1566,7 @@ def _query_cell_trend_from_tables(
             ).fetchall()
         _absorb(rows)
 
-    merged.sort(key=lambda r: str(r.get('timestamp') or ''))
+    merged.sort(key=lambda r: _trend_row_sort_key(r, 'hour'))
     return merged, primary, cell_col, time_col
 
 
@@ -1795,19 +1854,16 @@ def _get_pm_cols(db_path, technology=None):
 
 
 def _pm_extra_trend_time_columns(conn, table: str) -> str:
-    """
-    Extra SELECT columns for trend rows (Huawei files often keep a literal ``Date`` column
-    for display while ``timestamp`` drives SQL ordering).
-    """
+    """Extra SELECT columns: PrimeNet report date/time (never vendor Date/Time)."""
     try:
         names = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
     except sqlite3.OperationalError:
         return ''
-    if 'Date' in names:
-        return ', "Date"'
-    if 'date' in names:
-        return ', "date"'
-    return ''
+    extras = []
+    for col in (PM_REPORT_DATE_COL, PM_REPORT_TIME_COL):
+        if col in names:
+            extras.append(f'"{col}"')
+    return (', ' + ', '.join(extras)) if extras else ''
 
 
 def _load_pm_cols_for_table(db_path, table):
@@ -3256,7 +3312,6 @@ def get_pm_table():
 
     static_cfg = _PM_STATIC_COLS.get(vendor, {}).get(technology, [])
     cell_label = _PM_CELL_LABEL.get(vendor, {}).get(technology, 'Cell Name')
-    ts_label   = 'Period Start' if vendor == 'Nokia' else 'Date'
 
     empty = {
         'success': True, 'columns': [], 'static_cols': [],
@@ -3422,7 +3477,7 @@ def get_pm_table():
                     seen.add(key)
                     merged.append(row)
             merged.sort(
-                key=lambda r: str(r.get('timestamp') or ''),
+                key=lambda r: _trend_row_sort_key(r, trend_granularity),
                 reverse=not ascending_dedupe,
             )
             total_n = len(merged)
@@ -3432,13 +3487,13 @@ def get_pm_table():
                 merged = merged[start:end]
             return merged, total_n
 
-        column_labels = {'timestamp': ts_label, 'cell_name': cell_label}
-        for dc in ('Date', 'date'):
-            if dc in ordered_cols:
-                column_labels[dc] = 'Date'
-                if 'timestamp' in ordered_cols:
-                    column_labels['timestamp'] = 'Timestamp'
-                break
+        column_labels = {
+            PM_REPORT_DATE_COL: 'Report Date',
+            PM_REPORT_TIME_COL: 'Report Time',
+            'cell_name': cell_label,
+        }
+        if data_scope == 'daily':
+            column_labels.pop(PM_REPORT_TIME_COL, None)
 
         scoped_query = bool(scoped_cell_names)
         if scoped_query and not export_csv and not for_charts:
@@ -3507,7 +3562,7 @@ def get_pm_table():
                     ),
                 }), 400
             # Charts want ascending time.
-            row_dicts.sort(key=lambda r: str(r.get('timestamp') or ''))
+            row_dicts.sort(key=lambda r: _trend_row_sort_key(r, trend_granularity))
             conn.close()
             payload = {
                 'success':       True,

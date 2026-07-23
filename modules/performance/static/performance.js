@@ -607,11 +607,18 @@ function fmt(value, unit, decimals = 2) {
     return Number(value).toFixed(decimals) + (unit ? ' ' + unit : '');
 }
 
-/** PM trend row: always prefer backend-normalized ``timestamp`` for chart axis. */
+/** PM trend row: prefer PrimeNet report_date/report_time over vendor or aliased timestamp. */
 function trendXRaw(row) {
     if (!row) return null;
-    // Backend aggregates to canonical ISO ``timestamp``; never fall back to vendor-raw Date/Time
-    // (Huawei DD/MM slash strings break JS Date which treats them as US MM/DD).
+    const rd = row.report_date != null ? String(row.report_date).trim() : '';
+    if (rd) {
+        if (_currentDataScope() !== 'daily') {
+            const rt = row.report_time != null ? String(row.report_time).trim() : '';
+            if (rt) return `${rd} ${rt}`;
+        } else {
+            return rd;
+        }
+    }
     const v = row.timestamp;
     if (v === null || v === undefined) return null;
     const s = String(v).trim();

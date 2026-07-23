@@ -14,6 +14,7 @@ from typing import Iterable
 
 _TIME_ALIASES = (
     "timestamp",
+    "report_date",
     "time",
     "period_start_time",
     "period start time",

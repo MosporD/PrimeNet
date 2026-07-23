@@ -23,14 +23,23 @@ from datetime import datetime, timedelta
 from functools import partial
 import csv
 import io
-
-import sys
 import os
 import re
-import zipfile
-import tempfile
 import shutil
+import sys
+import tempfile
+import zipfile
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from core.pm_timestamp import (
+    PM_REPORT_DATE_COL,
+    PM_REPORT_TIME_COL,
+    canonicalize_pm_timestamp,
+    format_pm_report_date,
+    format_pm_report_time,
+    parse_pm_datetime,
+)
 from sync_config import (
     NOKIA_PM_DB,
     HUAWEI_PM_DB,
@@ -806,18 +815,26 @@ def _resolve_key_cols(df):
 # Helpers: dynamic schema + insert
 # ---------------------------------------------------------------------------
 
-def _ensure_columns(conn, table, cols):
+def _ensure_columns(conn, table, cols, *, hourly: bool = True):
     existing = {r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()}
     if not existing:
-        col_defs = ['"cell_name" TEXT', '"timestamp" TEXT'] + [
-            f'"{c}" REAL' for c in cols
+        col_defs = [
+            '"cell_name" TEXT',
+            '"timestamp" TEXT',
+            f'"{PM_REPORT_DATE_COL}" TEXT',
         ]
+        if hourly:
+            col_defs.append(f'"{PM_REPORT_TIME_COL}" TEXT')
+        col_defs.extend(f'"{c}" REAL' for c in cols)
         conn.execute(
             f'CREATE TABLE IF NOT EXISTS "{table}" ('
             + ', '.join(col_defs)
             + ', UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE)'
         )
         return
+    for col in (PM_REPORT_DATE_COL, PM_REPORT_TIME_COL if hourly else None):
+        if col and col not in existing:
+            conn.execute(f'ALTER TABLE "{table}" ADD COLUMN "{col}" TEXT')
     for col in cols:
         if col not in existing:
             conn.execute(f'ALTER TABLE "{table}" ADD COLUMN "{col}" REAL')
@@ -864,9 +881,11 @@ def _insert_df(db_path, df, technology):
     from core.site_area import build_cell_area_index, pm_area_table_name, resolve_cell_area
 
     base_table = pm_table_name(technology)
+    hourly = 'DAILY' not in base_table.upper()
     kpi_cols = [
         c for c in df.columns
-        if c not in ('cell_name', 'timestamp') and c not in _DUPLICATE_KPI_NAMES
+        if c not in ('cell_name', 'timestamp', PM_REPORT_DATE_COL, PM_REPORT_TIME_COL)
+        and c not in _DUPLICATE_KPI_NAMES
     ]
     cell_index = build_cell_area_index()
 
@@ -882,7 +901,10 @@ def _insert_df(db_path, df, technology):
 
     inserted = 0
     skipped = 0
-    col_names = ['cell_name', 'timestamp'] + kpi_cols
+    col_names = ['cell_name', 'timestamp', PM_REPORT_DATE_COL]
+    if hourly:
+        col_names.append(PM_REPORT_TIME_COL)
+    col_names.extend(kpi_cols)
     quoted_cols = ', '.join(f'"{c}"' for c in col_names)
     placeholders = ', '.join(['?'] * len(col_names))
 
@@ -893,6 +915,7 @@ def _insert_df(db_path, df, technology):
 
     batches: dict[str, list[tuple]] = {}
     ensured: set[str] = set()
+    kpi_offset = 3 + (1 if hourly else 0)
 
     for i in range(n):
         cell_name = str(cell_arr[i]).strip()
@@ -905,17 +928,27 @@ def _insert_df(db_path, df, technology):
             skipped += 1
             continue
 
+        dt = parse_pm_datetime(ts)
+        if dt is None:
+            skipped += 1
+            continue
+        report_date = format_pm_report_date(dt)
+        report_time = format_pm_report_time(dt) if hourly else None
+
         area = resolve_cell_area(cell_name, cell_index=cell_index)
         table = pm_area_table_name(base_table, area)
         if table not in ensured:
-            _ensure_columns(conn, table, kpi_cols)
+            _ensure_columns(conn, table, kpi_cols, hourly=hourly)
             ensured.add(table)
 
         row_vals: list = [None] * len(col_names)
         row_vals[0] = cell_name
         row_vals[1] = ts
+        row_vals[2] = report_date
+        if hourly:
+            row_vals[3] = report_time
         for j, col in enumerate(kpi_cols):
-            row_vals[2 + j] = _coerce_kpi_cell_value(kpi_arrs[j][i])
+            row_vals[kpi_offset + j] = _coerce_kpi_cell_value(kpi_arrs[j][i])
 
         batches.setdefault(table, []).append(tuple(row_vals))
         inserted += 1
