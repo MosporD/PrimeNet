@@ -564,7 +564,7 @@ _CELL_LIST_CACHE_TTL_SEC = 120
 _TREND_CACHE = {}
 _TREND_CACHE_TTL_SEC = 300
 _TREND_CACHE_SCHEMA_VER = "v6"
-_PM_TABLE_CACHE_SCHEMA_VER = "v5"
+_PM_TABLE_CACHE_SCHEMA_VER = "v6"
 _PM_TABLE_CACHE = {}
 _PM_TABLE_CACHE_TTL_SEC = 180
 _PM_CELL_NAMES_CACHE = {}
@@ -1280,6 +1280,42 @@ def _pm_table_select_col(
             return _sqlite_ident(col)
         return f'{_sqlite_ident(resolved_time_col)} AS {_sqlite_ident(col)}'
     return _sqlite_ident(col)
+
+
+def _pm_table_sql_select_clause(
+    ordered_cols: list[str],
+    *,
+    resolved_cell_col: str | None,
+    resolved_time_col: str | None,
+) -> str:
+    """
+    Build SELECT list for PM table/chart queries.
+
+    When ``report_date`` / ``report_time`` exist in the schema but legacy rows only
+    have vendor time (e.g. Huawei ``Time``), still expose ``timestamp`` for filtering.
+    """
+    parts = [
+        _pm_table_select_col(
+            c,
+            resolved_cell_col=resolved_cell_col,
+            resolved_time_col=resolved_time_col,
+        )
+        for c in ordered_cols
+    ]
+    if resolved_time_col:
+        uses_report_only = (
+            PM_REPORT_DATE_COL in ordered_cols
+            and 'timestamp' not in ordered_cols
+            and resolved_time_col not in (PM_REPORT_DATE_COL, PM_REPORT_TIME_COL)
+        )
+        if uses_report_only:
+            parts.append(
+                f'{_sqlite_ident(resolved_time_col)} AS {_sqlite_ident("timestamp")}'
+            )
+            parts.append(
+                f'{_sqlite_text_lit(resolved_time_col)} AS {_sqlite_ident("__time_source")}'
+            )
+    return ', '.join(parts)
 
 
 def _pm_report_static_cols(scope: str) -> list[str]:
@@ -3354,13 +3390,10 @@ def get_pm_table():
             export_csv=export_csv,
             for_charts=for_charts,
         )
-        col_select = ', '.join(
-            _pm_table_select_col(
-                c,
-                resolved_cell_col=resolved_cell_col,
-                resolved_time_col=resolved_time_col,
-            )
-            for c in ordered_cols
+        col_select = _pm_table_sql_select_clause(
+            ordered_cols,
+            resolved_cell_col=resolved_cell_col,
+            resolved_time_col=resolved_time_col,
         )
         table_cache_key_name = '+'.join(dual_tables)
 
@@ -3437,13 +3470,10 @@ def get_pm_table():
                 if not c_col or not t_col:
                     continue
                 # Rebuild select against this table's axis columns.
-                t_col_select = ', '.join(
-                    _pm_table_select_col(
-                        c,
-                        resolved_cell_col=c_col,
-                        resolved_time_col=t_col,
-                    )
-                    for c in ordered_cols
+                t_col_select = _pm_table_sql_select_clause(
+                    ordered_cols,
+                    resolved_cell_col=c_col,
+                    resolved_time_col=t_col,
                 )
                 t_where = list(where_parts)
                 t_params = list(params)
