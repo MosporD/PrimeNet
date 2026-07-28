@@ -489,6 +489,7 @@ def list_nokia_db_sites(
                 label = f'{site_name} ({site_id} → NetAct {netact_id})'
             items.append({
                 'site_id': site_id,
+                'metadata_site_id': site_id,
                 'site_name': site_name,
                 'netact_instance_id': netact_id,
                 'area': area_info.get('area', ''),
@@ -1290,6 +1291,7 @@ def list_huawei_db_sites(
                 label = f'{site_name} ({site_id} → {u2020_ne_name})'
             items.append({
                 'site_id': site_id,
+                'metadata_site_id': site_id,
                 'site_name': site_name,
                 'ne_name': ne_name,
                 'u2020_ne_name': u2020_ne_name or ne_name,

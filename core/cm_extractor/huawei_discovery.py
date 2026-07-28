@@ -311,6 +311,19 @@ def resolve_u2020_ne_name(
     if not token:
         return None, ''
 
+    if allow_metadata_fallback:
+        meta_list = [str(name).strip() for name in (metadata_candidates or []) if str(name).strip()]
+        if not meta_list and site_name:
+            fallback = metadata_site_name_as_ne_name(token, site_name)
+            if fallback:
+                meta_list = [fallback]
+        if meta_list:
+            hint = site_name or (metadata_candidates[0] if metadata_candidates else '')
+            if len(meta_list) == 1:
+                return meta_list[0], 'metadata'
+            best = max(meta_list, key=lambda name: _name_similarity(hint, name))
+            return best, 'metadata'
+
     if by_site_id is None:
         by_site_id = _index_nes(catalog or [])
 
@@ -331,15 +344,6 @@ def resolve_u2020_ne_name(
         )
         return str(best['ne_name']), 'fm'
 
-    if allow_metadata_fallback:
-        meta_list = [str(name).strip() for name in (metadata_candidates or []) if str(name).strip()]
-        if not meta_list and site_name:
-            fallback = metadata_site_name_as_ne_name(token, site_name)
-            if fallback:
-                meta_list = [fallback]
-        if meta_list:
-            best = max(meta_list, key=lambda name: _name_similarity(site_name, name))
-            return best, 'metadata'
     return None, ''
 
 

@@ -60,8 +60,6 @@ from core.cm_extractor.nokia_semantics import (
 from core.cm_extractor.site_catalog import (
     list_nokia_areas,
     list_nokia_db_sites,
-    list_nokia_inventory_areas,
-    list_nokia_inventory_sites,
 )
 from core.cm_extractor.job_scheduler import (
     count_unread_notifications as cm_count_unread_notifications,
@@ -538,13 +536,16 @@ def nokia_sites():
         limit = 2000
 
     try:
-        sites, source = list_nokia_inventory_sites(query, scope_level=scope_level, limit=limit)
+        sites = list_nokia_db_sites(query, scope_level=scope_level, limit=limit)
+        for site in sites:
+            site.setdefault('source', 'metadata')
+            site.setdefault('metadata_site_id', site.get('site_id'))
         return jsonify({
             'success': True,
             'sites': sites,
             'count': len(sites),
             'scope_level': scope_level,
-            'source': source,
+            'source': 'metadata',
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': f'Failed to load Nokia sites: {exc}'}), 500
@@ -558,15 +559,13 @@ def nokia_areas():
 
     scope_level = (request.args.get('scope') or 'MRBTS').strip().upper()
     try:
-        from core.cm_extractor.nokia_discovery import _METADATA_ENRICHMENT_VERSION
-
-        areas = list_nokia_inventory_areas(scope_level=scope_level)
+        areas = list_nokia_areas(scope_level=scope_level)
         return jsonify({
             'success': True,
             'areas': areas,
             'count': len(areas),
             'scope_level': scope_level,
-            'enrichment_version': _METADATA_ENRICHMENT_VERSION,
+            'source': 'metadata',
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': f'Failed to load areas: {exc}'}), 500
@@ -588,7 +587,7 @@ def nokia_reconcile_inventory():
 
         reload_inventory_from_disk(force=True)
         changed = ensure_nokia_inventory_enriched(persist=True)
-        areas = list_nokia_inventory_areas(scope_level='MRBTS')
+        areas = list_nokia_areas(scope_level='MRBTS')
         south_jordan = next(
             (row for row in areas if row.get('area') == 'South Jordan'),
             None,
@@ -770,6 +769,7 @@ def huawei_sites():
             'sites': sites,
             'count': len(sites),
             'scope_level': scope_level,
+            'source': 'metadata',
             'u2020_catalog_size': len((cache or {}).get('nes') or []),
             'u2020_resolved_in_list': resolved_count,
         }
