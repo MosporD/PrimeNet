@@ -46,7 +46,7 @@ function _isPortalPage() {
 }
 
 const CONSTELLATION_CSS_VERSION = '1.9';
-const CONSTELLATION_JS_VERSION = '1.7';
+const CONSTELLATION_JS_VERSION = '1.9';
 
 function _constellationBgExcluded(path) {
     return /^\/(login|register|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
@@ -802,6 +802,231 @@ function hideLoading(elementId) {
         element.style.display = 'none';
     }
 }
+
+/** CSS --ui-zoom scale factor (PrimeNet global UI scale). */
+function getUiZoom() {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--ui-zoom').trim();
+    const z = parseFloat(raw);
+    return z > 0 && Number.isFinite(z) ? z : 1;
+}
+
+/**
+ * Map pointer client coordinates to element-local layout space.
+ * Fixes click/drag offset when ancestors use CSS zoom or transform scale.
+ */
+function pointerLocalXY(event, element) {
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+        return { x: 0, y: 0 };
+    }
+    const scaleX = element.offsetWidth / rect.width;
+    const scaleY = element.offsetHeight / rect.height;
+    return {
+        x: (event.clientX - rect.left) * scaleX,
+        y: (event.clientY - rect.top) * scaleY,
+    };
+}
+
+function _escapeLoadingText(text) {
+    return String(text || 'Loading…')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+/** Show animated spinner on a button while an async action runs. */
+function setButtonLoading(button, loading, labelWhileLoading) {
+    if (!button) return;
+    if (loading) {
+        if (!button.dataset.pnLoadingActive) {
+            button.dataset.pnLoadingOriginalHtml = button.innerHTML;
+            button.dataset.pnLoadingOriginalDisabled = button.disabled ? '1' : '0';
+            button.dataset.pnLoadingActive = '1';
+        }
+        button.disabled = true;
+        button.classList.add('is-loading');
+        button.setAttribute('aria-busy', 'true');
+        const label = _escapeLoadingText(labelWhileLoading || 'Loading…');
+        button.innerHTML = `<span class="btn-loading-spinner" aria-hidden="true"></span><span class="btn-loading-label">${label}</span>`;
+        return;
+    }
+    if (button.dataset.pnLoadingActive) {
+        button.innerHTML = button.dataset.pnLoadingOriginalHtml || button.innerHTML;
+        button.disabled = button.dataset.pnLoadingOriginalDisabled === '1';
+        delete button.dataset.pnLoadingOriginalHtml;
+        delete button.dataset.pnLoadingOriginalDisabled;
+        delete button.dataset.pnLoadingActive;
+    }
+    button.classList.remove('is-loading');
+    button.removeAttribute('aria-busy');
+}
+
+async function withButtonLoading(button, fn, labelWhileLoading) {
+    setButtonLoading(button, true, labelWhileLoading);
+    try {
+        return await fn();
+    } finally {
+        setButtonLoading(button, false);
+    }
+}
+
+/** Semi-transparent overlay with spinner over a panel/section. */
+function showPanelLoading(panelEl, message) {
+    if (!panelEl) return;
+    panelEl.classList.add('pn-loading-host');
+    let overlay = panelEl.querySelector(':scope > .pn-loading-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'pn-loading-overlay';
+        overlay.innerHTML = (
+            '<div class="pn-loading-overlay-inner">'
+            + '<div class="loading-spinner" aria-hidden="true"></div>'
+            + '<p class="pn-loading-message"></p>'
+            + '</div>'
+        );
+        panelEl.appendChild(overlay);
+    }
+    const msg = overlay.querySelector('.pn-loading-message');
+    if (msg) msg.textContent = message || 'Loading…';
+    overlay.hidden = false;
+    panelEl.setAttribute('aria-busy', 'true');
+}
+
+function hidePanelLoading(panelEl) {
+    if (!panelEl) return;
+    const overlay = panelEl.querySelector(':scope > .pn-loading-overlay');
+    if (overlay) overlay.hidden = true;
+    panelEl.removeAttribute('aria-busy');
+}
+
+/**
+ * Chart.js maps pointer coords using layout width but getBoundingClientRect is
+ * visual width under CSS zoom — hover/tooltip points drift.
+ *
+ * Important: Chart 4.x calls getRelativePosition (minified ve) internally as a
+ * closed-over function, so patching Chart.helpers.getRelativePosition alone
+ * does NOT fix hover. We register a global beforeEvent plugin instead.
+ */
+function _chartPointerFromNative(chart, native) {
+    const canvas = chart?.canvas;
+    if (!canvas || !native) return null;
+    const pt = native.touches?.length ? native.touches[0] : native;
+    if (!pt || typeof pt.clientX !== 'number') return null;
+
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+
+    const dpr = chart.currentDevicePixelRatio || 1;
+    const bufW = canvas.width / dpr;
+    const bufH = canvas.height / dpr;
+    if (!bufW || !bufH) return null;
+
+    return {
+        x: Math.round(((pt.clientX - rect.left) / rect.width) * bufW),
+        y: Math.round(((pt.clientY - rect.top) / rect.height) * bufH),
+    };
+}
+
+function _chartHelpersTarget() {
+    if (typeof Chart === 'undefined') return null;
+    const helpers = Chart.helpers;
+    if (!helpers) return null;
+    if (typeof helpers.getRelativePosition === 'function') return helpers;
+    if (helpers.dom && typeof helpers.dom.getRelativePosition === 'function') return helpers.dom;
+    return null;
+}
+
+function _canvasUiZoomScale(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const z = getUiZoom();
+    let scaleX = 1;
+    let scaleY = 1;
+    if (rect.width > 0 && rect.height > 0) {
+        scaleX = canvas.offsetWidth / rect.width;
+        scaleY = canvas.offsetHeight / rect.height;
+    }
+    if (!Number.isFinite(scaleX) || scaleX <= 0) scaleX = 1;
+    if (!Number.isFinite(scaleY) || scaleY <= 0) scaleY = 1;
+    if (Math.abs(scaleX - 1) < 0.015 && Math.abs(z - 1) > 0.015) {
+        scaleX = 1 / z;
+    }
+    if (Math.abs(scaleY - 1) < 0.015 && Math.abs(z - 1) > 0.015) {
+        scaleY = 1 / z;
+    }
+    return { scaleX, scaleY };
+}
+
+const PN_UI_ZOOM_CHART_PLUGIN = {
+    id: 'pnUiZoomFix',
+    beforeEvent(chart, args) {
+        if (Math.abs(getUiZoom() - 1) < 0.001) return;
+        const evt = args?.event;
+        if (!evt) return;
+        const native = evt.native || evt;
+        const pos = _chartPointerFromNative(chart, native);
+        if (!pos) return;
+        evt.x = pos.x;
+        evt.y = pos.y;
+        if (typeof chart.isPointInArea === 'function') {
+            args.inChartArea = chart.isPointInArea(evt);
+        }
+    },
+};
+
+function registerChartJsUiZoomPlugin() {
+    if (typeof Chart === 'undefined' || typeof Chart.register !== 'function') return false;
+    if (Chart.registry?.plugins?.get('pnUiZoomFix')) return true;
+    Chart.register(PN_UI_ZOOM_CHART_PLUGIN);
+    return true;
+}
+
+function patchChartJsForUiZoom() {
+    registerChartJsUiZoomPlugin();
+
+    const target = _chartHelpersTarget();
+    if (!target?.getRelativePosition || target._pnUiZoomPatched) {
+        return registerChartJsUiZoomPlugin();
+    }
+    const original = target.getRelativePosition.bind(target);
+    target.getRelativePosition = function (event, chart) {
+        if (event && 'native' in event) return event;
+        const native = event?.native || event;
+        const pos = _chartPointerFromNative(chart, native);
+        if (pos) return pos;
+        return original(event, chart);
+    };
+    target._pnUiZoomPatched = true;
+    return true;
+}
+
+/** Attach to each Chart config — guarantees zoom fix even if global register ran late. */
+function pnChartPlugins() {
+    patchChartJsForUiZoom();
+    return [PN_UI_ZOOM_CHART_PLUGIN];
+}
+
+function ensureChartJsUiZoomPatch() {
+    if (patchChartJsForUiZoom()) return;
+    let tries = 0;
+    const timer = setInterval(() => {
+        if (patchChartJsForUiZoom() || ++tries > 100) {
+            clearInterval(timer);
+        }
+    }, 50);
+}
+
+window.getUiZoom = getUiZoom;
+window.pointerLocalXY = pointerLocalXY;
+window.setButtonLoading = setButtonLoading;
+window.withButtonLoading = withButtonLoading;
+window.showPanelLoading = showPanelLoading;
+window.hidePanelLoading = hidePanelLoading;
+window.patchChartJsForUiZoom = patchChartJsForUiZoom;
+window.registerChartJsUiZoomPlugin = registerChartJsUiZoomPlugin;
+window.PN_UI_ZOOM_CHART_PLUGIN = PN_UI_ZOOM_CHART_PLUGIN;
+window.pnChartPlugins = pnChartPlugins;
+
+ensureChartJsUiZoomPatch();
 
 // Format file size
 function formatFileSize(bytes) {

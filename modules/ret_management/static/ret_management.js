@@ -620,6 +620,10 @@
             return;
         }
 
+        if (typeof setButtonLoading === 'function') {
+            setButtonLoading(loadBtn, true, 'Loading…');
+            setButtonLoading(reloadBtn, true, 'Loading…');
+        }
         setStatus(loadStatus, 'Loading RET data…');
         resultsPanel.hidden = false;
         try {
@@ -646,6 +650,11 @@
         } catch (err) {
             renderTable([]);
             setStatus(loadStatus, err.message, 'error');
+        } finally {
+            if (typeof setButtonLoading === 'function') {
+                setButtonLoading(loadBtn, false);
+                setButtonLoading(reloadBtn, false);
+            }
         }
     }
 

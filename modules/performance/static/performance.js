@@ -1821,10 +1821,15 @@ async function runPerformanceQuery() {
     onKpiSelectionChange();
 
     const btn = document.getElementById('btn-perf-query');
-    const btnLabel = btn ? btn.textContent : '';
-    if (btn) {
+    const chartsHost = document.querySelector('.charts-area');
+    if (typeof setButtonLoading === 'function') {
+        setButtonLoading(btn, true, 'Querying…');
+    } else if (btn) {
         btn.disabled = true;
         btn.textContent = 'Querying…';
+    }
+    if (typeof showPanelLoading === 'function') {
+        showPanelLoading(chartsHost, 'Running query…');
     }
 
     try {
@@ -1932,9 +1937,14 @@ async function runPerformanceQuery() {
     const noSel = document.getElementById('no-selection');
     if (noSel) noSel.style.display = 'none';
     } finally {
-        if (btn) {
+        if (typeof setButtonLoading === 'function') {
+            setButtonLoading(btn, false);
+        } else if (btn) {
             btn.disabled = false;
-            btn.textContent = btnLabel || 'Query';
+            btn.textContent = 'Query';
+        }
+        if (typeof hidePanelLoading === 'function') {
+            hidePanelLoading(document.querySelector('.charts-area'));
         }
     }
 }
@@ -1955,6 +1965,10 @@ async function addChartsFromLastQuery() {
     if (wrap) wrap.style.display = 'none';
     const loading = document.getElementById('loading-charts');
     if (loading) loading.style.display = 'flex';
+    const chartsHost = document.querySelector('.charts-area');
+    if (typeof showPanelLoading === 'function') {
+        showPanelLoading(chartsHost, 'Building charts…');
+    }
     const choiceBar = document.getElementById('perf-chart-choice-bar');
     if (choiceBar) choiceBar.style.display = 'none';
 
@@ -1992,6 +2006,7 @@ async function addChartsFromLastQuery() {
     added += results.filter(Boolean).length;
 
     if (loading) loading.style.display = 'none';
+    if (typeof hidePanelLoading === 'function') hidePanelLoading(chartsHost);
 
     if (!added) {
         _perfQueryUserMessage('No trend data found for the selected objects/KPIs.');
@@ -2976,6 +2991,7 @@ function _buildAreaChildrenHtml(areaKey) {
                 <button type="button" class="hw-tree-twisty" aria-expanded="true">−</button>
                 <span class="hw-tree-ico" aria-hidden="true">📁</span>
                 <span class="hw-tree-folder-name" title="${escAttr(site.site_name)}">${escHtml(site.site_name)}</span>
+                <button type="button" class="hw-tree-site-select-all" title="Select all cells at this site" aria-label="Select all cells at this site">All</button>
                 <span class="hw-tree-folder-meta">${site.cells.length}</span>
             </div>
             <div class="hw-tree-children">${siteLeaves}</div>
@@ -3137,6 +3153,21 @@ function filterCellChipsVisibleOnly(query) {
 
 function perfTreeClick(e) {
     if (e.target.closest('.hw-tree-cb')) return;
+
+    const siteSelectBtn = e.target.closest('.hw-tree-site-select-all');
+    if (siteSelectBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const mode = document.querySelector('input[name="perf-sel-mode"]:checked')?.value || 'single';
+        if (mode !== 'multiple') return;
+        const siteEl = siteSelectBtn.closest('.hw-tree-site');
+        if (!siteEl) return;
+        const checkboxes = [...siteEl.querySelectorAll('.hw-tree-leaf .hw-tree-cb')];
+        if (!checkboxes.length) return;
+        const allChecked = checkboxes.every(cb => cb.checked);
+        checkboxes.forEach(cb => { cb.checked = !allChecked; });
+        return;
+    }
 
     const twisty = e.target.closest('.hw-tree-twisty');
     if (twisty) {
@@ -3609,6 +3640,8 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
         if (wrap) wrap.innerHTML = '<p style="color:#e74c3c;padding:1rem">Chart library failed to load. Check network/CDN access.</p>';
         return;
     }
+    if (typeof patchChartJsForUiZoom === 'function') patchChartJsForUiZoom();
+    const pnPlugins = typeof pnChartPlugins === 'function' ? pnChartPlugins() : [];
 
     const ctx = canvas.getContext('2d');
 
@@ -3621,6 +3654,7 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
             if (!datasets.length) return;
 
             charts[canvasId] = new Chart(ctx, {
+                plugins: pnPlugins,
                 type: chartType,
                 data: { labels, datasets },
                 options: {
@@ -3662,6 +3696,7 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
         });
 
         charts[canvasId] = new Chart(ctx, {
+            plugins: pnPlugins,
             type: chartType,
             data: {
                 labels,
@@ -4451,9 +4486,12 @@ function renderCompareCharts(payload) {
 
         const canvas = document.getElementById(canvasId);
         if (!canvas || typeof Chart === 'undefined') return;
+        if (typeof patchChartJsForUiZoom === 'function') patchChartJsForUiZoom();
+        const pnPlugins = typeof pnChartPlugins === 'function' ? pnChartPlugins() : [];
         const ctx = canvas.getContext('2d');
         try {
             charts[canvasId] = new Chart(ctx, {
+                plugins: pnPlugins,
                 type: 'line',
                 data: { labels: axis.labels, datasets },
                 options: {

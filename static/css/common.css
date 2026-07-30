@@ -10,6 +10,12 @@
 }
 
 html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
     zoom: var(--ui-zoom);
     width: var(--ui-vw);
     min-height: var(--ui-vh);
@@ -352,6 +358,71 @@ body.dark-mode .btn-header-admin:hover {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Inline button loading state (setButtonLoading in common.js) */
+.btn-loading-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    vertical-align: -0.12em;
+    margin-right: 0.45em;
+    flex-shrink: 0;
+}
+
+button.is-loading,
+.btn-query.is-loading {
+    cursor: wait;
+    opacity: 0.92;
+}
+
+button.is-loading .btn-loading-label,
+.btn-query.is-loading .btn-loading-label {
+    vertical-align: middle;
+}
+
+/* Panel overlay while async work runs */
+.pn-loading-host {
+    position: relative;
+}
+
+.pn-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 247, 250, 0.82);
+    backdrop-filter: blur(1px);
+}
+
+.pn-loading-overlay[hidden] {
+    display: none !important;
+}
+
+.pn-loading-overlay-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px;
+    color: #5c6b7a;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.pn-loading-overlay-inner .loading-spinner {
+    margin: 0;
+}
+
+body.dark-mode .pn-loading-overlay {
+    background: rgba(15, 23, 34, 0.78);
+    color: #a8b7c8;
 }
 
 /* Section Styles */

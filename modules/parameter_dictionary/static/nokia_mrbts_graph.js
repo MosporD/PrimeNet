@@ -225,8 +225,11 @@ function graphBindStageInteractions(svg) {
     svg.addEventListener('wheel', (event) => {
         event.preventDefault();
         const rect = svg.getBoundingClientRect();
+        const local = typeof pointerLocalXY === 'function'
+            ? pointerLocalXY(event, svg)
+            : { x: event.clientX - rect.left, y: event.clientY - rect.top };
         const factor = Math.exp(-event.deltaY * 0.0016);
-        graphZoomBy(factor, event.clientX - rect.left, event.clientY - rect.top);
+        graphZoomBy(factor, local.x, local.y);
     }, { passive: false });
 
     let pressed = false;

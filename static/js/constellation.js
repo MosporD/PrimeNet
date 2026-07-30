@@ -29,9 +29,43 @@
 
     function viewportCssSize() {
         var z = uiZoom();
+        var vv = window.visualViewport;
+        if (vv) {
+            return {
+                w: Math.max(1, Math.round(vv.width / z)),
+                h: Math.max(1, Math.round(vv.height / z)),
+            };
+        }
         return {
             w: Math.max(1, Math.round(window.innerWidth / z)),
-            h: Math.max(1, Math.round(window.innerHeight / z))
+            h: Math.max(1, Math.round(window.innerHeight / z)),
+        };
+    }
+
+    /** Map viewport pointer coords to canvas scene space under CSS zoom. */
+    function clientToSceneXY(e, canvas) {
+        var z = uiZoom();
+        if (canvas) {
+            var rect = canvas.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                var scaleX = canvas.offsetWidth / rect.width;
+                var scaleY = canvas.offsetHeight / rect.height;
+                if (Math.abs(scaleX - 1) < 0.015 && Math.abs(z - 1) > 0.015) {
+                    scaleX = 1 / z;
+                    scaleY = 1 / z;
+                }
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY,
+                };
+            }
+        }
+        var vp = viewportCssSize();
+        var iw = window.innerWidth || vp.w;
+        var ih = window.innerHeight || vp.h;
+        return {
+            x: e.clientX * (vp.w / iw),
+            y: e.clientY * (vp.h / ih),
         };
     }
 
@@ -703,14 +737,16 @@
 
         window.addEventListener('resize', resize);
         window.addEventListener('mousemove', function (e) {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+            var p = clientToSceneXY(e, canvas);
+            mouse.x = p.x;
+            mouse.y = p.y;
         });
         window.addEventListener('mouseleave', function () {
             mouse.x = -1e4; mouse.y = -1e4;
         });
         window.addEventListener('pointerdown', function (e) {
-            ripples.push({ x: e.clientX, y: e.clientY, r: 4, a: 0.8 });
+            var p = clientToSceneXY(e, canvas);
+            ripples.push({ x: p.x, y: p.y, r: 4, a: 0.8 });
         });
         document.addEventListener('primenet:theme-change', function () {
             if (REDUCE_MOTION) frame(performance.now(), true);
@@ -948,9 +984,9 @@
         }
 
         canvas.addEventListener('mousemove', function (e) {
-            var rect = canvas.getBoundingClientRect();
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
+            var p = clientToSceneXY(e, canvas);
+            mouse.x = p.x;
+            mouse.y = p.y;
             if (REDUCE_MOTION) frame(performance.now(), true);
         });
         canvas.addEventListener('mouseleave', function () {
@@ -1183,9 +1219,9 @@
         }
 
         canvas.addEventListener('mousemove', function (e) {
-            var rect = canvas.getBoundingClientRect();
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
+            var p = clientToSceneXY(e, canvas);
+            mouse.x = p.x;
+            mouse.y = p.y;
             if (REDUCE_MOTION) frame(performance.now(), true);
         });
         canvas.addEventListener('mouseleave', function () {

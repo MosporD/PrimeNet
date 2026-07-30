@@ -1627,6 +1627,12 @@ function startExtractProgress(hint, label) {
     if (labelEl) labelEl.textContent = label || 'Extracting CM data…';
     hintEl.textContent = hint || '';
     setExtractButtonsDisabled(true);
+    ['nokia-extract-btn', 'huawei-extract-btn'].forEach((id) => {
+        const btn = document.getElementById(id);
+        if (btn && typeof setButtonLoading === 'function') {
+            setButtonLoading(btn, true, 'Extracting…');
+        }
+    });
 
     section.hidden = false;
     section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1660,6 +1666,12 @@ function finishExtractProgress(success) {
     clearInterval(extractElapsedTimer);
     stopControllerExtractPhaseTimer();
     setExtractButtonsDisabled(false);
+    ['nokia-extract-btn', 'huawei-extract-btn'].forEach((id) => {
+        const btn = document.getElementById(id);
+        if (btn && typeof setButtonLoading === 'function') {
+            setButtonLoading(btn, false);
+        }
+    });
     updateActionState();
     if (typeof updateHuaweiActionState === 'function' && document.getElementById('huawei-workflow')) {
         updateHuaweiActionState();

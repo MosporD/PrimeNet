@@ -90,7 +90,9 @@ function setSelectorBlockOpen(blockId, open) {
     const toggle = document.querySelector(`[data-target="${blockId}"]`);
     const section = toggle?.closest('.femto-selector-block');
     if (!block || !toggle) return;
-    block.style.display = open ? 'block' : 'none';
+    const useFlex = block.classList.contains('perf-sidebar-body')
+        || block.classList.contains('femto-selector-body');
+    block.style.display = open ? (useFlex ? 'flex' : 'block') : 'none';
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (section) section.classList.toggle('is-open', open);
     const arrow = toggle.querySelector('.femto-selector-arrow');
@@ -341,6 +343,8 @@ function syncSelectAll(itemClass, selectAllId) {
 
 async function loadFemtoTrendChart() {
     const status = document.getElementById('femto-status');
+    const btn = document.getElementById('femto-load-btn');
+    const chartsHost = document.querySelector('.femto-charts-area');
     const objectIds = selectedObjectIds();
     if (!objectIds.length) {
         if (status) status.textContent = 'Select at least one object.';
@@ -351,43 +355,50 @@ async function loadFemtoTrendChart() {
         if (status) status.textContent = 'Select at least one KPI or counter.';
         return;
     }
+    if (typeof setButtonLoading === 'function') setButtonLoading(btn, true, 'Querying…');
+    if (typeof showPanelLoading === 'function') showPanelLoading(chartsHost, 'Loading trend data…');
     if (status) status.textContent = `Loading ${femtoAggregation} ${series.length} series for ${objectIds.length} object(s)...`;
-    const requests = await Promise.all(objectIds.map(async uniqueId => {
-        const params = new URLSearchParams({
-            unique_id: uniqueId,
-            kpi: series.join(','),
-            granularity: femtoAggregation,
-            limit: femtoAggregation === 'daily' ? '90' : '300',
-        });
-        const res = await fetch('/api/femto-pm/trend?' + params.toString());
-        const data = await res.json();
-        return { uniqueId, data };
-    }));
-    femtoChartTabs = requests
-        .map(({ uniqueId, data }) => {
-            const rows = Array.isArray(data.rows) ? data.rows : [];
-            const device = femtoDevices.find(d => String(d.unique_id || '') === uniqueId) || {};
-            return {
-                id: `obj:${uniqueId}`,
-                uniqueId,
-                title: String(device.bsr_name || uniqueId || ''),
-                rows,
-                series,
-            };
-        })
-        .filter(tab => tab.rows.length);
-    if (!femtoChartTabs.length) {
+    try {
+        const requests = await Promise.all(objectIds.map(async uniqueId => {
+            const params = new URLSearchParams({
+                unique_id: uniqueId,
+                kpi: series.join(','),
+                granularity: femtoAggregation,
+                limit: femtoAggregation === 'daily' ? '90' : '300',
+            });
+            const res = await fetch('/api/femto-pm/trend?' + params.toString());
+            const data = await res.json();
+            return { uniqueId, data };
+        }));
+        femtoChartTabs = requests
+            .map(({ uniqueId, data }) => {
+                const rows = Array.isArray(data.rows) ? data.rows : [];
+                const device = femtoDevices.find(d => String(d.unique_id || '') === uniqueId) || {};
+                return {
+                    id: `obj:${uniqueId}`,
+                    uniqueId,
+                    title: String(device.bsr_name || uniqueId || ''),
+                    rows,
+                    series,
+                };
+            })
+            .filter(tab => tab.rows.length);
+        if (!femtoChartTabs.length) {
+            renderFemtoTabs();
+            renderFemtoChartsForActiveTab();
+            updateFemtoEmptyState(false);
+            if (status) status.textContent = 'No trend rows found for this selection.';
+            return;
+        }
+        activeFemtoTabId = femtoChartTabs[0].id;
         renderFemtoTabs();
         renderFemtoChartsForActiveTab();
-        updateFemtoEmptyState(false);
-        if (status) status.textContent = 'No trend rows found for this selection.';
-        return;
+        updateFemtoEmptyState(true);
+        if (status) status.textContent = `Loaded ${femtoAggregation} trends for ${femtoChartTabs.length} object tab(s).`;
+    } finally {
+        if (typeof setButtonLoading === 'function') setButtonLoading(btn, false);
+        if (typeof hidePanelLoading === 'function') hidePanelLoading(chartsHost);
     }
-    activeFemtoTabId = femtoChartTabs[0].id;
-    renderFemtoTabs();
-    renderFemtoChartsForActiveTab();
-    updateFemtoEmptyState(true);
-    if (status) status.textContent = `Loaded ${femtoAggregation} trends for ${femtoChartTabs.length} object tab(s).`;
 }
 
 function renderFemtoTabs() {
@@ -432,9 +443,11 @@ function renderFemtoChartsForActiveTab() {
     tab.series.forEach((name, idx) => {
         const canvas = document.getElementById(`femto-chart-${idx}`);
         if (!canvas) return;
+        const pnPlugins = typeof pnChartPlugins === 'function' ? pnChartPlugins() : [];
         const chartWidth = canvas.parentElement?.clientWidth || 480;
         const maxXAxisTicks = Math.max(3, Math.min(6, Math.floor(chartWidth / 95)));
         const chart = new Chart(canvas.getContext('2d'), {
+            plugins: pnPlugins,
             type: 'line',
             data: {
                 labels,

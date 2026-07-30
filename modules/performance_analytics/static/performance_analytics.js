@@ -439,7 +439,11 @@
 
         const tw = paTimeWindow();
         const loading = document.getElementById('loading-charts');
+        const queryBtn = document.getElementById('btn-perf-query');
+        const chartsHost = document.querySelector('.charts-area');
+        if (typeof setButtonLoading === 'function') setButtonLoading(queryBtn, true, 'Querying…');
         if (loading) loading.style.display = 'flex';
+        if (typeof showPanelLoading === 'function') showPanelLoading(chartsHost, 'Querying MAE…');
 
         try {
             const res = await fetch('/api/performance-analytics/query', {
@@ -499,6 +503,8 @@
             }
         } finally {
             if (loading) loading.style.display = 'none';
+            if (typeof setButtonLoading === 'function') setButtonLoading(queryBtn, false);
+            if (typeof hidePanelLoading === 'function') hidePanelLoading(chartsHost);
         }
     }
 

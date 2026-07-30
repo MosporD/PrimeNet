@@ -513,31 +513,71 @@
 
 .femto-pm-page {
     background: #f5f7fa;
+    height: calc(var(--ui-vh, 100vh));
+    overflow: hidden;
 }
 
 .femto-pm-page .femto-container {
-    min-height: 100vh;
+    height: calc(var(--ui-vh, 100vh));
+    min-height: 0;
+    overflow: hidden;
 }
 
 .femto-pm-page .femto-body {
-    align-items: flex-start;
-    min-height: calc(100vh - 80px);
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .femto-pm-page .femto-filter-panel {
     width: 600px;
     padding: 8px 10px 12px;
     gap: 8px;
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(var(--ui-vh, 100vh) - 80px);
+    max-height: calc(var(--ui-vh, 100vh) - 80px);
     overflow: hidden;
     position: sticky;
     top: 0;
     align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
-.femto-tree-panel {
-    height: calc(100vh - 150px);
+.femto-pm-page .femto-tree-panel {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.femto-pm-page .perf-sidebar-cells.femto-selector-block {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.femto-pm-page #femto-object-block {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.femto-pm-page .femto-object-list,
+.femto-pm-page .perf-cells-body .hw-object-tree {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .femto-selector-block {
@@ -559,10 +599,40 @@
     gap: 0;
 }
 
-.femto-catalog-wrap {
-    flex: 0 0 auto;
-    max-height: min(360px, 48vh);
+.femto-pm-page .femto-catalog-wrap {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: min(320px, 38vh);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.femto-pm-page .femto-catalog-wrap .femto-selector-block {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.femto-pm-page .femto-selector-block.is-open > .femto-selector-body,
+.femto-pm-page .femto-selector-block.is-open > .perf-sidebar-body {
+    display: flex;
+}
+
+.femto-pm-page .femto-catalog-wrap .femto-selector-block.is-open > .femto-selector-body,
+.femto-pm-page .femto-catalog-wrap .femto-selector-block.is-open > .perf-sidebar-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.femto-pm-page .femto-catalog-wrap .femto-kpi-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .femto-catalog-wrap > * + * {
@@ -625,6 +695,7 @@
     min-height: 48px;
     padding: 4px 6px 8px;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .femto-kpi-list-wrap,
@@ -694,6 +765,7 @@
 .femto-pm-page .femto-charts-area {
     padding: 0;
     background: #f5f7fa;
+    position: relative;
 }
 
 .femto-chart-wrap {
@@ -862,7 +934,8 @@ body.dark-mode.femto-pm-page .femto-chart-tab.active {
         border-bottom: 1px solid #e8ecf0;
     }
 
-    .femto-tree-panel {
+    .femto-pm-page .femto-tree-panel {
+        flex: 0 1 auto;
         height: auto;
         max-height: 70vh;
     }
@@ -1332,7 +1405,7 @@ body.dark-mode.femto-pm-page .femto-kpi-user-badge {
 
 body.dark-mode.femto-pm-page .femto-formula-feedback.is-ok { color: #6ee7b7 !important; }
 body.dark-mode.femto-pm-page .femto-formula-feedback.is-warn { color: #fcd34d !important; }
-<body.dark-mode.femto-pm-page .femto-formula-feedback.is-error { color: #fca5a5 !important; }
+body.dark-mode.femto-pm-page .femto-formula-feedback.is-error { color: #fca5a5 !important; }
 
 body.dark-mode.femto-pm-page .femto-kpi-modal-foot .btn-secondary {
     background: #162232 !important;
