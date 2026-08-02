@@ -2,6 +2,17 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
+## 2026-08-02
+
+- Done: `pm_warehouse/` pilot — raw NBI counter ingestion + aggregation in
+  PostgreSQL (Nokia TS 32.435 adapter, per-family fact tables, h/d/w/m rollups,
+  query-time KPI formula compiler). Verified end-to-end in sandbox Postgres 16:
+  idempotent double-ingest, hand-computed DRB SSR from raw XML == warehouse
+  value exact to 6 decimals, eNB/network object aggregation, 47k rows/s merge.
+  Measured results in `pm_warehouse/README.md`.
+- **NEXT**: obtain a real Huawei U2020 PM NBI sample + `data/huawei_pm_counters/`
+  CSVs; then a multi-eNB real-file day from NetAct for the phase-4 OSS diff.
+
 ## 2026-07-22
 
 - Done: Power BI link-out gallery module (`modules/power_bi/`) — catalog-driven report list, opens reports in Power BI Service
