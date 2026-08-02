@@ -3,6 +3,11 @@
 Flask telecom platform for radio network performance and configuration management.
 Entry point: `app.py`. Vendors: Nokia, Huawei. RATs: 2G–5G.
 
+> **New session? Read `context.md` first.** It carries the domain glossary, the
+> request spine, the non-obvious mechanisms (activation gate, area-partitioned
+> PM tables, KPI alias resolution), the module index, and the landmine list.
+> This file is the short conventions reference that follows it.
+
 ## Architecture
 
 - **App shell**: `app.py` registers blueprints, loads `.env`, runs activation gate.
@@ -36,4 +41,5 @@ Entry point: `app.py`. Vendors: Nokia, Huawei. RATs: 2G–5G.
 
 ## Session handoff
 
-Read `progress.md` for current work and the NEXT pointer. Scope is defined in `checklist.md`.
+Read `context.md` for project context, then `progress.md` for current work and the
+NEXT pointer. Scope is defined in `checklist.md`.
