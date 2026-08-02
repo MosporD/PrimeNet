@@ -305,6 +305,8 @@ RESOURCE_MIN_FREE_MB = max(512, min(64_000, _env_int('RESOURCE_MIN_FREE_MB', 204
 # Below this free RAM, concurrency scales toward 1; above RESOURCE_HIGH_MEMORY_MB use full ceiling.
 RESOURCE_LOW_MEMORY_MB = max(RESOURCE_MIN_FREE_MB, min(64_000, _env_int('RESOURCE_LOW_MEMORY_MB', 4096)))
 RESOURCE_HIGH_MEMORY_MB = max(RESOURCE_LOW_MEMORY_MB + 256, min(128_000, _env_int('RESOURCE_HIGH_MEMORY_MB', 18_432)))
+# Defer new pipeline / precalc work when the scheduler process RSS exceeds this (MiB).
+SCHEDULER_MAX_RSS_MB = max(1024, min(128_000, _env_int('SCHEDULER_MAX_RSS_MB', 6144)))
 
 # Hourly pipeline interval (hours) — pull+load orchestrator cadence when scheduler is on.
 RAW_PULL_INTERVAL_HOURS = max(1, _env_int('RAW_PULL_INTERVAL_HOURS', 1))

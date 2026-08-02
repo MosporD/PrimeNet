@@ -11,6 +11,7 @@ import logging
 import sqlite3
 import os
 import glob
+import gc
 import threading
 import subprocess
 import sys
@@ -22,6 +23,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
 
+from core.subprocess_runner import run_logged_subprocess
 from .sftp_client import SFTPClient
 from .pm_processor import (
     run_nokia_pm_sync,
@@ -56,8 +58,8 @@ _pipeline_cycle_lock = threading.Lock()
 def _defer_pipeline_if_low_memory(job_label: str) -> bool:
     """Return True when the cycle should be skipped due to low free RAM."""
     try:
-        from core.load_monitor import pipeline_start_allowed, resource_snapshot
-        allowed, reason = pipeline_start_allowed()
+        from core.load_monitor import scheduler_job_allowed, resource_snapshot
+        allowed, reason = scheduler_job_allowed()
         if allowed:
             return False
         snap = resource_snapshot()
@@ -67,6 +69,28 @@ def _defer_pipeline_if_low_memory(job_label: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def _trim_scheduler_memory(job_label: str = '') -> None:
+    """Encourage release of unused Python objects after a heavy scheduler job."""
+    gc.collect()
+    try:
+        from core.load_monitor import process_rss_mb, resource_snapshot
+        rss = process_rss_mb()
+        if rss is not None:
+            logger.info(
+                'Scheduler RSS after %s: %.0f MB (%s)',
+                job_label or 'job',
+                rss,
+                resource_snapshot(),
+            )
+    except Exception:
+        pass
+
+
+def _run_child_script(cmd: list[str], *, cwd: str | None = None) -> object:
+    """Run a pipeline child with streamed logging and bounded in-memory tail."""
+    return run_logged_subprocess(cmd, cwd=cwd or _PROJECT_ROOT, logger=logger)
 _sync_progress = {
     'nokia_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
     'huawei_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
@@ -83,16 +107,7 @@ def pull_all_raw_master():
         return
     try:
         logger.info('Starting raw master pull launcher: %s', script)
-        proc = subprocess.run(
-            [sys.executable, script],
-            cwd=_PROJECT_ROOT,
-            capture_output=True,
-            text=True,
-        )
-        if proc.stdout:
-            logger.info('raw master stdout:\n%s', proc.stdout.strip())
-        if proc.stderr:
-            logger.warning('raw master stderr:\n%s', proc.stderr.strip())
+        proc = _run_child_script([sys.executable, script])
         if proc.returncode == 0:
             _log_sync('raw_master_pull', 'all', 'ok', 0, 'Master raw pull completed')
             logger.info('Raw master pull completed successfully.')
@@ -117,6 +132,8 @@ def pull_all_raw_master():
     except Exception as e:
         _log_sync('raw_master_pull', 'all', 'error', 0, str(e))
         logger.exception('Raw master pull failed: %s', e)
+    finally:
+        _trim_scheduler_memory('raw_master_pull')
 
 
 def _all_table_row_counts(db_path: str) -> dict[str, int]:
@@ -158,11 +175,17 @@ def _extract_technology_key(table_name: str) -> str:
     return 'all'
 
 
-def _subprocess_failure_detail(proc: subprocess.CompletedProcess, *, max_len: int = 350) -> str:
+def _subprocess_failure_detail(proc, *, max_len: int = 350) -> str:
     """Last actionable line from child stdout/stderr for sync_log."""
     try:
-        err_lines = [ln.strip() for ln in (proc.stderr or '').splitlines() if ln.strip()]
-        out_lines = [ln.strip() for ln in (proc.stdout or '').splitlines() if ln.strip()]
+        stderr_raw = getattr(proc, 'stderr', None)
+        stdout_raw = getattr(proc, 'stdout', None)
+        if stderr_raw is None:
+            stderr_raw = getattr(proc, 'stderr_tail', '') or ''
+        if stdout_raw is None:
+            stdout_raw = getattr(proc, 'stdout_tail', '') or ''
+        err_lines = [ln.strip() for ln in str(stderr_raw).splitlines() if ln.strip()]
+        out_lines = [ln.strip() for ln in str(stdout_raw).splitlines() if ln.strip()]
         if err_lines:
             for ln in reversed(err_lines):
                 if 'Error' in ln or 'error' in ln or 'failed' in ln or 'Traceback' in ln:
@@ -230,16 +253,7 @@ def run_full_sync_cycle():
             return
 
         logger.info('Starting hourly orchestrator script: %s', orchestrator)
-        proc = subprocess.run(
-            [sys.executable, orchestrator],
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-        )
-        if proc.stdout:
-            logger.info('db loader stdout:\n%s', proc.stdout.strip())
-        if proc.stderr:
-            logger.warning('db loader stderr:\n%s', proc.stderr.strip())
+        proc = _run_child_script([sys.executable, orchestrator], cwd=project_root)
 
         # code=2 => partial pull (one vendor failed) but the load still ran on
         # whatever arrived. Record it as a visible warning, not a hard failure.
@@ -275,6 +289,7 @@ def run_full_sync_cycle():
         logger.exception('Full sync cycle failed during DB load: %s', e)
     finally:
         _pipeline_cycle_lock.release()
+        _trim_scheduler_memory('db_loader')
 
 
 def run_neighbor_sync_cycle():
@@ -298,16 +313,7 @@ def run_neighbor_sync_cycle():
             return
 
         logger.info('Starting neighbor orchestrator script: %s', orchestrator)
-        proc = subprocess.run(
-            [sys.executable, orchestrator],
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-        )
-        if proc.stdout:
-            logger.info('neighbor sync stdout:\n%s', proc.stdout.strip())
-        if proc.stderr:
-            logger.warning('neighbor sync stderr:\n%s', proc.stderr.strip())
+        proc = _run_child_script([sys.executable, orchestrator], cwd=project_root)
 
         partial = proc.returncode == 2
         if proc.returncode not in (0, 2):
@@ -334,6 +340,7 @@ def run_neighbor_sync_cycle():
         logger.exception('Neighbor sync cycle failed: %s', e)
     finally:
         _pipeline_cycle_lock.release()
+        _trim_scheduler_memory('neighbor_sync')
 
 
 def run_daily_sync_cycle():
@@ -355,11 +362,7 @@ def run_daily_sync_cycle():
         if _defer_pipeline_if_low_memory('daily_full_sync'):
             return
 
-        proc = subprocess.run([sys.executable, script], cwd=project_root, capture_output=True, text=True)
-        if proc.stdout:
-            logger.info('daily full sync stdout:\n%s', proc.stdout.strip())
-        if proc.stderr:
-            logger.warning('daily full sync stderr:\n%s', proc.stderr.strip())
+        proc = _run_child_script([sys.executable, script], cwd=project_root)
         if proc.returncode == 0:
             _log_sync('daily_full_sync', 'all', 'ok', 0, 'Daily full sync completed')
             logger.info('Daily full sync completed successfully.')
@@ -371,6 +374,7 @@ def run_daily_sync_cycle():
         logger.exception('Daily full sync failed: %s', e)
     finally:
         _pipeline_cycle_lock.release()
+        _trim_scheduler_memory('daily_full_sync')
 
 
 def run_manual_category_sync(category: str):
@@ -406,11 +410,7 @@ def run_manual_category_sync(category: str):
         return
 
     try:
-        pull_proc = subprocess.run([sys.executable, pull_path] + pull_args, cwd=project_root, capture_output=True, text=True)
-        if pull_proc.stdout:
-            logger.info('%s pull stdout:\n%s', category, pull_proc.stdout.strip())
-        if pull_proc.stderr:
-            logger.warning('%s pull stderr:\n%s', category, pull_proc.stderr.strip())
+        pull_proc = _run_child_script([sys.executable, pull_path] + pull_args, cwd=project_root)
         # code=2 => partial pull (one vendor failed); still load whatever arrived.
         pull_partial = pull_proc.returncode == 2
         if pull_proc.returncode not in (0, 2):
@@ -427,11 +427,7 @@ def run_manual_category_sync(category: str):
                 msg = f'{msg}: {details}'
             _log_sync(sync_type, 'all', 'error', 0, msg)
 
-        load_proc = subprocess.run([sys.executable, load_path] + load_args, cwd=project_root, capture_output=True, text=True)
-        if load_proc.stdout:
-            logger.info('%s load stdout:\n%s', category, load_proc.stdout.strip())
-        if load_proc.stderr:
-            logger.warning('%s load stderr:\n%s', category, load_proc.stderr.strip())
+        load_proc = _run_child_script([sys.executable, load_path] + load_args, cwd=project_root)
         if load_proc.returncode == 0:
             done_msg = 'Manual category sync completed (partial pull)' if pull_partial else 'Manual category sync completed'
             _log_sync(sync_type, 'all', 'ok', 0, done_msg)
@@ -444,6 +440,8 @@ def run_manual_category_sync(category: str):
     except Exception as e:
         _log_sync(sync_type, 'all', 'error', 0, str(e))
         logger.exception('Manual category sync failed (%s): %s', category, e)
+    finally:
+        _trim_scheduler_memory(f'manual_{sync_type}')
 
 
 def _set_progress(job_key: str, **fields) -> None:
@@ -890,20 +888,7 @@ def run_remote_pull_watcher_once():
             return
 
         logger.info('Starting remote pull watcher orchestrator (--once)...')
-        proc = subprocess.run(
-            [sys.executable, script],
-            cwd=root,
-            capture_output=True,
-            text=True,
-        )
-        if proc.stdout:
-            out = proc.stdout.strip()
-            if out:
-                logger.info('pull watcher stdout:\n%s', out[:12000])
-        if proc.stderr:
-            err = proc.stderr.strip()
-            if err:
-                logger.warning('pull watcher stderr:\n%s', err[:12000])
+        proc = _run_child_script([sys.executable, script], cwd=root)
         if proc.returncode != 0:
             logger.error('Remote pull watcher exited with code %s', proc.returncode)
         else:
@@ -912,6 +897,7 @@ def run_remote_pull_watcher_once():
         logger.exception('Remote pull watcher failed: %s', e)
     finally:
         _pipeline_cycle_lock.release()
+        _trim_scheduler_memory('pull_watcher')
 
 
 def pull_huawei_groups():
@@ -961,29 +947,36 @@ def run_network_health_precalc(force: bool = False):
     if os.environ.get('NH_DISABLE_PRECALC', '').strip().lower() in ('1', 'true', 'yes'):
         logger.info('Network Health precalc skipped (NH_DISABLE_PRECALC=1)')
         return
-    try:
-        from modules.network_health.precalc_job import build_all
+    if _defer_pipeline_if_low_memory('network_health_precalc'):
+        return
 
-        results = build_all(force=force)
-        built = [r for r in results if not r.get('skipped') and not r.get('error')]
-        skipped = [r for r in results if r.get('skipped')]
-        errors = [r for r in results if r.get('error')]
-        _log_sync(
-            'network_health_precalc',
-            'all',
-            'ok' if not errors else 'error',
-            sum(int(r.get('row_count') or 0) for r in built),
-            f'built={len(built)} skipped={len(skipped)} errors={len(errors)}',
-        )
-        logger.info(
-            'Network Health precalc finished: built=%s skipped=%s errors=%s',
-            len(built),
-            len(skipped),
-            len(errors),
-        )
+    script = os.path.join(_PROJECT_ROOT, 'scripts', 'pipeline', 'run_network_health_precalc.py')
+    if not os.path.isfile(script):
+        _log_sync('network_health_precalc', 'all', 'error', 0, f'missing script: {script}')
+        logger.error('Network Health precalc script not found: %s', script)
+        return
+
+    cmd = [sys.executable, script]
+    if force:
+        cmd.append('--force')
+
+    try:
+        proc = _run_child_script(cmd)
+        if proc.returncode == 0:
+            _log_sync('network_health_precalc', 'all', 'ok', 0, 'Network Health precalc completed')
+            logger.info('Network Health precalc subprocess completed.')
+        else:
+            details = _subprocess_failure_detail(proc)
+            msg = f'Network Health precalc failed (code={proc.returncode})'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('network_health_precalc', 'all', 'error', 0, msg)
+            logger.error(msg)
     except Exception as e:
         _log_sync('network_health_precalc', 'all', 'error', 0, str(e))
         logger.exception('Network Health precalc failed: %s', e)
+    finally:
+        _trim_scheduler_memory('network_health_precalc')
 
 
 def refresh_nokia_cm_inventory():
@@ -1020,6 +1013,8 @@ def refresh_nokia_cm_inventory():
     except Exception as e:
         _log_sync('nokia_cm_inventory', 'all', 'error', 0, str(e))
         logger.exception('Nokia CM inventory discovery failed: %s', e)
+    finally:
+        _trim_scheduler_memory('nokia_cm_inventory')
 
 
 def run_cm_extractor_scheduled_jobs():
@@ -1030,6 +1025,8 @@ def run_cm_extractor_scheduled_jobs():
         run_due_jobs()
     except Exception as e:
         logger.exception('CM extractor scheduled jobs tick failed: %s', e)
+    finally:
+        _trim_scheduler_memory('cm_extractor_jobs')
 
 
 def _network_health_precalc_cron_hour() -> int:
@@ -1227,6 +1224,17 @@ def start_scheduler():
             coalesce=True,
             max_instances=1,
         )
+
+    _scheduler.add_job(
+        _trim_scheduler_memory,
+        trigger=IntervalTrigger(hours=6),
+        id='scheduler_memory_trim',
+        name='Scheduler memory trim (gc)',
+        replace_existing=True,
+        kwargs={'job_label': 'periodic'},
+        coalesce=True,
+        max_instances=1,
+    )
 
     _scheduler.start()
     mode = flags['mode']

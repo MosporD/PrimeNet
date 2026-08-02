@@ -14,6 +14,7 @@ from sync_config import (
     RESOURCE_HIGH_MEMORY_MB,
     RESOURCE_LOW_MEMORY_MB,
     RESOURCE_MIN_FREE_MB,
+    SCHEDULER_MAX_RSS_MB,
 )
 
 logger = logging.getLogger(__name__)
@@ -85,6 +86,19 @@ def effective_query_concurrency(configured_max: int) -> int:
     return _scale_ceiling(configured_max)
 
 
+def process_rss_mb(pid: int | None = None) -> float | None:
+    """Return resident set size for a process in MiB (current process when pid omitted)."""
+    try:
+        import psutil
+    except ImportError:
+        return None
+    try:
+        proc = psutil.Process(pid) if pid is not None else psutil.Process()
+        return float(proc.memory_info().rss) / (1024 * 1024)
+    except Exception:
+        return None
+
+
 def pipeline_start_allowed() -> tuple[bool, str]:
     """
     Return ``(allowed, reason)`` before starting a pipeline subprocess cycle.
@@ -106,6 +120,20 @@ def pipeline_start_allowed() -> tuple[bool, str]:
     return True, ''
 
 
+def scheduler_job_allowed() -> tuple[bool, str]:
+    """
+    Gate scheduled work when the scheduler process itself is already large or
+    the host is low on free RAM.
+    """
+    rss = process_rss_mb()
+    if rss is not None and rss >= float(SCHEDULER_MAX_RSS_MB):
+        return False, (
+            f'Scheduler deferred: process RSS {rss:.0f} MB '
+            f'(limit {SCHEDULER_MAX_RSS_MB} MB — restart scheduler or wait for jobs to finish)'
+        )
+    return pipeline_start_allowed()
+
+
 def effective_sqlite_cache_kb(configured_kb: int) -> int:
     if not RESOURCE_ADAPTIVE or configured_kb <= 0:
         return configured_kb
@@ -123,9 +151,12 @@ def effective_sqlite_mmap_mb(configured_mb: int) -> int:
 def resource_snapshot() -> dict:
     """Lightweight status dict for logs / diagnostics."""
     avail = available_memory_mb()
+    rss = process_rss_mb()
     return {
         'adaptive': RESOURCE_ADAPTIVE,
         'available_mb': round(avail, 1) if avail is not None else None,
+        'scheduler_rss_mb': round(rss, 1) if rss is not None else None,
+        'scheduler_max_rss_mb': SCHEDULER_MAX_RSS_MB,
         'pressure': round(memory_pressure(), 3),
         'min_free_mb': RESOURCE_MIN_FREE_MB,
         'low_memory_mb': RESOURCE_LOW_MEMORY_MB,
