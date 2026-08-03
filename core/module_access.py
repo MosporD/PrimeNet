@@ -42,6 +42,8 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Overshooting Detector", "href": "/overshooting-detector", "visibility": "admin"},
             {"label": "Change Impact Tracker", "href": "/change-impact", "visibility": "admin"},
             {"label": "Radio Morning Report", "href": "/radio-morning-report", "visibility": "admin"},
+            {"label": "Nokia Load Balancing", "href": "/nokia-load-balancing", "visibility": "admin"},
+            {"label": "Huawei Load Balancing", "href": "/huawei-load-balancing", "visibility": "admin"},
         ],
     },
     {

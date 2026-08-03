@@ -2,6 +2,17 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
+## 2026-08-03
+
+- Done: AMLE Optimizer module (`modules/amle_optimizer/`) — admin-only Nokia AMLE workflow
+- Done: Network Balance share auto-load (`\\RNO-WAN\Network Balance`) for sector throughput
+- Done: Daily Nokia + Huawei balance CSV ingest → SQLite (`databases/network_balance/all/all/daily/network_balance.db`)
+- Done: File discovery from Mover.py logic (vendor/date from filename)
+- Done: Live CM extract (`NOKLTE:AMLEPR`) via existing CM Extractor client
+- Done: Proposed RAML XML + Excel export; rules in `config.py`
+- Modified: `app.py`, `core/module_access.py`, `core/module_versions.py`, `templates/dashboard.html`, `sync_config.py`, `db/runtime.py`, `modules/sync/scheduler.py`, `.env.example`
+- **NEXT**: Browser verify `/amle-optimizer` (sector pick → analyze → XML download) with NetAct CM credentials
+
 ## 2026-07-22
 
 - Done: Power BI link-out gallery module (`modules/power_bi/`) — catalog-driven report list, opens reports in Power BI Service

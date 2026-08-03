@@ -29,11 +29,14 @@ def resolve_scope_instance_id(
     Map a metadata site id to the NetAct MO instance() used in distNames.
 
     PrimeNet 3G RNC ids are often stored as 2012 (RNC12) while NetAct uses 12.
+    MRBTS metadata ids (e.g. 5635) often map to prefixed NetAct ids (e.g. 55635).
     """
     level = normalize_scope_level(scope_level)
     token = str(site_id or '').strip()
-    if not token or level == 'MRBTS':
-        return token
+    if not token:
+        return ''
+    if level == 'MRBTS':
+        return resolve_nokia_netact_site_id(token) or token
 
     if level == 'RNC':
         name = (site_name or '').strip().upper()
@@ -90,6 +93,11 @@ def scope_dn_needles(
 
     if level == 'MRBTS':
         tokens = {token, resolved}
+        if resolved and resolved != token:
+            tokens.add(resolved)
+        netact = resolve_nokia_netact_site_id(token)
+        if netact:
+            tokens.add(netact)
         return tuple(
             f'/{prefix}-{value}'
             for value in tokens
@@ -163,6 +171,77 @@ def resolve_nokia_metadata_site_id(
         for candidate in candidates:
             if known_metadata_ids is None or candidate in known_metadata_ids:
                 return candidate
+    return token
+
+
+def _lookup_netact_site_id_from_cache(
+    metadata_site_id: str,
+    known_metadata_ids: set[str],
+) -> str:
+    """Return the NetAct MRBTS instance id for a metadata site id from discovery cache."""
+    token = str(metadata_site_id or '').strip()
+    if not token:
+        return ''
+    try:
+        from core.cm_extractor.nokia_discovery import get_cached_nokia_inventory, reload_inventory_from_disk
+
+        reload_inventory_from_disk()
+        records = get_cached_nokia_inventory('MRBTS') or []
+    except Exception:
+        records = []
+    matches: list[str] = []
+    for rec in records:
+        netact = str(rec.get('site_id') or '').strip()
+        if not netact:
+            continue
+        if resolve_nokia_metadata_site_id(netact, known_metadata_ids=known_metadata_ids) == token:
+            matches.append(netact)
+    if not matches:
+        return ''
+    prefixed = [
+        netact for netact in matches
+        if len(netact) == 5 and netact.isdigit() and netact[:2] in _NOKIA_NETACT_MRBTS_PREFIXES
+    ]
+    return prefixed[0] if prefixed else matches[0]
+
+
+def _netact_candidates_for_metadata(metadata_site_id: str) -> list[str]:
+    """Build likely 5-digit NetAct MRBTS ids from a metadata site id."""
+    token = str(metadata_site_id or '').strip()
+    if not token or not token.isdigit():
+        return []
+    suffix = token.zfill(3) if len(token) <= 3 else token[-3:]
+    return [f'{prefix}{suffix}' for prefix in _NOKIA_NETACT_MRBTS_PREFIXES if len(f'{prefix}{suffix}') == 5]
+
+
+def resolve_nokia_netact_site_id(
+    metadata_site_id: str,
+    *,
+    known_metadata_ids: set[str] | None = None,
+) -> str:
+    """
+    Map a PrimeNet metadata ``site_id`` to the NetAct MRBTS instance() in distNames.
+
+    Inverse of :func:`resolve_nokia_metadata_site_id` — e.g. ``5635`` → ``55635``,
+    ``801`` → ``50801``. Falls back to the input token when no mapping is found.
+    """
+    token = str(metadata_site_id or '').strip()
+    if not token:
+        return ''
+    known = known_metadata_ids if known_metadata_ids is not None else _known_nokia_metadata_site_ids()
+
+    for candidate in _netact_candidates_for_metadata(token):
+        if resolve_nokia_metadata_site_id(candidate, known_metadata_ids=known) == token:
+            return candidate
+
+    cached = _lookup_netact_site_id_from_cache(token, known)
+    if cached and cached != token:
+        return cached
+
+    # Input may already be a NetAct instance id (e.g. 55635, 50801).
+    if resolve_nokia_metadata_site_id(token, known_metadata_ids=known) != token:
+        return token
+
     return token
 
 
@@ -324,7 +403,8 @@ def resolve_bulk_export_dns(
             token = str(raw_id or '').strip()
             if not token:
                 continue
-            dn = f'{plmn_prefix}/MRBTS-{token}'
+            instance = resolve_nokia_netact_site_id(token) or token
+            dn = f'{plmn_prefix}/MRBTS-{instance}'
             if dn not in seen:
                 seen.add(dn)
                 resolved.append(dn)

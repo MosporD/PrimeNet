@@ -41,6 +41,8 @@ MODULE_VERSIONS: dict[str, str] = {
     "overshooting-detector": "V1.0",
     "change-impact": "V1.0",
     "radio-morning-report": "V1.0",
+    "nokia-load-balancing": "V1.0",
+    "huawei-load-balancing": "V1.0",
     "admin-panel": "V1.0",
     "profile": "V1.0",
 }
@@ -81,6 +83,8 @@ HREF_MODULE_IDS: dict[str, str] = {
     "/overshooting-detector": "overshooting-detector",
     "/change-impact": "change-impact",
     "/radio-morning-report": "radio-morning-report",
+    "/nokia-load-balancing": "nokia-load-balancing",
+    "/huawei-load-balancing": "huawei-load-balancing",
     "/admin-panel": "admin-panel",
     "/profile": "profile",
 }

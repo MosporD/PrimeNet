@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — Nokia Load Balancing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
+    <link rel="stylesheet" href="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.css') }}?v=4.0">
+</head>
+<body class="amle-page"
+      data-nokia-configured="{{ 'true' if nokia_configured else 'false' }}"
+      data-balance-configured="{{ 'true' if balance_configured else 'false' }}"
+      data-oss-push-configured="{{ 'true' if oss_push_configured else 'false' }}"
+      data-apply-confirmation="{{ apply_confirmation }}">
+    <div class="container">
+        <header class="amle-topbar">
+            <div class="header-content">
+                <a href="/dashboard" class="back-link">Dashboard</a>
+                <div class="header-left">
+                    <h1>Nokia Load Balancing</h1>
+                    <p>Select NOK sectors, pull live AMLE from NetAct, review proposals, download OSS XML, or apply to the network.</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content amle-main">
+            <section class="panel" id="database-panel">
+                <h2>Network Balance database</h2>
+                <p class="field-hint">
+                    Sync Nokia and Huawei daily CSV exports into the local SQLite store. Use a date range to backfill history or refresh trends.
+                </p>
+
+                <div class="form-inline-row">
+                    <div class="inline-field">
+                        <label for="ingest-start">Ingest from</label>
+                        <input type="date" id="ingest-start" class="search-input">
+                    </div>
+                    <div class="inline-field">
+                        <label for="ingest-end">Ingest to</label>
+                        <input type="date" id="ingest-end" class="search-input">
+                    </div>
+                    <div class="inline-field inline-field-grow">
+                        <span class="inline-label">Actions</span>
+                        <div class="picker-actions">
+                            <label class="checkbox-inline"><input type="checkbox" id="ingest-force"> Force re-import</label>
+                            <button type="button" class="btn-secondary" id="sync-balance-btn">Sync to database</button>
+                            <button type="button" class="btn-secondary" id="refresh-db-btn">Refresh inventory</button>
+                        </div>
+                    </div>
+                </div>
+                <p id="db-path" class="meta-line"></p>
+                <p id="db-inventory" class="meta-line"></p>
+
+                <div class="table-wrap snapshot-table-wrap">
+                    <table id="snapshot-table" class="data-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Vendor</th>
+                                <th>Sectors</th>
+                                <th>Ingested</th>
+                                <th>Source file</th>
+                            </tr>
+                        </thead>
+                        <tbody id="snapshot-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="workflow-step trend-section">
+                    <h3>Balancing status trend</h3>
+                    <div class="form-inline-row">
+                        <div class="inline-field">
+                            <label for="trend-start">From</label>
+                            <input type="date" id="trend-start" class="search-input">
+                        </div>
+                        <div class="inline-field">
+                            <label for="trend-end">To</label>
+                            <input type="date" id="trend-end" class="search-input">
+                        </div>
+                        <div class="inline-field">
+                            <label for="trend-vendor">Vendor</label>
+                            <select id="trend-vendor" class="search-input">
+                                <option value="nokia">Nokia</option>
+                                <option value="huawei">Huawei</option>
+                            </select>
+                        </div>
+                        <div class="inline-field">
+                            <label for="trend-status">Sector filter</label>
+                            <select id="trend-status" class="search-input">
+                                <option value="NOK">NOK sectors (latest day)</option>
+                                <option value="ALL">All sectors</option>
+                                <option value="OK">OK sectors (latest day)</option>
+                            </select>
+                        </div>
+                        <div class="inline-field inline-field-grow">
+                            <span class="inline-label">&nbsp;</span>
+                            <button type="button" class="btn-secondary" id="load-trend-btn">Load trend</button>
+                        </div>
+                    </div>
+                    <p id="trend-status-text" class="status-text" aria-live="polite"></p>
+
+                    <h4 class="subheading">Daily summary</h4>
+                    <div class="table-wrap">
+                        <table id="daily-summary-table" class="data-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Vendor</th>
+                                    <th>Total</th>
+                                    <th>NOK</th>
+                                    <th>OK</th>
+                                    <th>Other</th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-summary-body"></tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="subheading">Sector trend</h4>
+                    <div class="table-wrap trend-table-wrap">
+                        <table id="sector-trend-table" class="data-table compact-table">
+                            <thead id="sector-trend-head"></thead>
+                            <tbody id="sector-trend-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="connection-bar">
+                    <span id="cm-status" class="connection-pill">Checking Nokia CM…</span>
+                    <span id="balance-status" class="connection-pill">Checking Network Balance…</span>
+                    <span id="db-status" class="connection-pill muted">Database…</span>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>1. Select sectors</h2>
+                    <p class="field-hint">
+                        Throughput comes from the local SQLite store when available (synced from the Network Balance share),
+                        otherwise read directly from <code class="path-inline">{{ balance_path }}</code>.
+                    </p>
+
+                    <div class="form-inline-row">
+                        <div class="inline-field">
+                            <label for="balance-date">Balance date</label>
+                            <input type="date" id="balance-date" class="search-input">
+                        </div>
+                        <div class="inline-field inline-field-grow">
+                            <span class="inline-label">Actions</span>
+                            <div class="picker-actions">
+                                <button type="button" class="btn-secondary" id="reload-sectors-btn">Load NOK sectors</button>
+                                <button type="button" class="btn-secondary" id="select-visible-btn" disabled>Select visible</button>
+                                <button type="button" class="btn-secondary" id="clear-all-btn" disabled>Clear selection</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="load-status" class="status-text" aria-live="polite"></p>
+                    <p id="source-file" class="meta-line"></p>
+
+                    <div id="sector-list" class="sector-table-section" hidden>
+                        <div class="table-toolbar">
+                            <label class="table-filter">
+                                <span class="sr-only">Filter sectors</span>
+                                <input type="search" id="sector-filter" class="search-input" placeholder="Filter by sector or layer…" autocomplete="off">
+                            </label>
+                            <span id="sector-count" class="table-meta" aria-live="polite"></span>
+                        </div>
+                        <div class="table-wrap sector-table-wrap">
+                            <table id="sector-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-check"><input type="checkbox" id="sector-check-all" title="Toggle visible"></th>
+                                        <th>Sector</th>
+                                        <th>Highest layer</th>
+                                        <th>Lowest layer</th>
+                                        <th>L18</th>
+                                        <th>L21</th>
+                                        <th>L9</th>
+                                        <th>L18+</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sector-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <details class="manual-sectors-block">
+                        <summary>Enter sector IDs manually</summary>
+                        <p class="field-hint">One per line — format <code>MRBTS_Letter</code> (e.g. <code>1201_A</code>)</p>
+                        <textarea id="manual-sectors" class="manual-textarea" rows="4" placeholder="1201_A&#10;1201_B"></textarea>
+                    </details>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>2. Analyze &amp; export</h2>
+                    <div class="picker-actions">
+                        <button type="button" class="btn-primary btn-large" id="analyze-btn" disabled>Extract AMLE &amp; compute proposals</button>
+                        <span id="analyze-status" class="status-text" aria-live="polite"></span>
+                    </div>
+                    <p class="field-hint rules-hint">Adjustment rules: <code>modules/nokia_load_balancing/config.py</code></p>
+                </div>
+            </section>
+
+            <section class="panel" id="results-panel" hidden>
+                <div class="results-head">
+                    <h2>Proposed changes</h2>
+                    <div class="results-actions">
+                        <button type="button" class="btn-secondary" id="download-excel-btn" disabled>Download Excel</button>
+                        <button type="button" class="btn-secondary" id="download-backup-xml-btn" disabled>Download backup XML</button>
+                        <button type="button" class="btn-secondary" id="download-xml-btn" disabled>Download OSS XML</button>
+                        <button type="button" class="btn-primary" id="apply-oss-btn" disabled title="Upload RAML plan to NetAct via CM Operations">Apply to network</button>
+                    </div>
+                </div>
+                <div id="warnings-box" class="warnings-box" hidden></div>
+                <div class="table-wrap">
+                    <table id="results-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sector</th>
+                                <th>Source</th>
+                                <th>Target</th>
+                                <th>Action</th>
+                                <th>Parameter</th>
+                                <th>Current</th>
+                                <th>Proposed</th>
+                                <th>Delta</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.5"></script>
+    <script src="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.js') }}?v=4.1"></script>
+</body>
+</html>

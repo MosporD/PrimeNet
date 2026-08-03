@@ -82,6 +82,8 @@ from modules.sleeping_cells import sleeping_cells_bp
 from modules.ret_management import ret_management_bp
 from modules.power_bi.routes import power_bi_bp
 from modules.documentation import documentation_bp
+from modules.nokia_load_balancing import nokia_load_balancing_bp
+from modules.huawei_load_balancing import huawei_load_balancing_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(activation_bp)
@@ -124,6 +126,17 @@ app.register_blueprint(sleeping_cells_bp)
 app.register_blueprint(ret_management_bp)
 app.register_blueprint(power_bi_bp)
 app.register_blueprint(documentation_bp)
+app.register_blueprint(nokia_load_balancing_bp)
+app.register_blueprint(huawei_load_balancing_bp)
+
+
+@app.route("/amle-optimizer")
+@app.route("/amle-optimizer/<path:rest>")
+def legacy_amle_optimizer_redirect(rest=""):
+    target = "/nokia-load-balancing"
+    if rest:
+        target = f"{target}/{rest}"
+    return redirect(target, 301)
 
 
 def _env_true(key: str, default: bool = False) -> bool:

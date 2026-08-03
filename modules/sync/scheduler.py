@@ -1029,6 +1029,38 @@ def run_cm_extractor_scheduled_jobs():
         _trim_scheduler_memory('cm_extractor_jobs')
 
 
+def run_network_balance_ingest():
+    """Ingest Nokia/Huawei Network Balance CSV exports into SQLite."""
+    if os.environ.get('NCM_DISABLE_NETWORK_BALANCE_INGEST', '').strip().lower() in ('1', 'true', 'yes'):
+        return
+    try:
+        from modules.nokia_load_balancing.ingest_job import run_balance_ingest
+
+        summary = run_balance_ingest()
+        ingested = summary.get('ingested') or []
+        skipped = summary.get('skipped') or []
+        errors = summary.get('errors') or []
+        msg = f'ingested={len(ingested)} skipped={len(skipped)} errors={len(errors)}'
+        status = 'ok' if summary.get('success') else 'error'
+        _log_sync('network_balance_ingest', 'all', status, len(ingested), msg)
+        if errors:
+            logger.warning('Network balance ingest errors: %s', errors[:3])
+    except Exception as e:
+        _log_sync('network_balance_ingest', 'all', 'error', 0, str(e))
+        logger.exception('Network balance ingest failed: %s', e)
+    finally:
+        _trim_scheduler_memory('network_balance_ingest')
+
+
+def _network_balance_ingest_cron_hour() -> int:
+    from sync_config import DAILY_PULL_HOUR
+    try:
+        offset = int(os.environ.get('NETWORK_BALANCE_INGEST_HOUR_OFFSET', '1'))
+    except ValueError:
+        offset = 1
+    return (int(DAILY_PULL_HOUR) + offset) % 24
+
+
 def _network_health_precalc_cron_hour() -> int:
     from modules.network_health import config as nh_cfg
     from sync_config import DAILY_PULL_HOUR
@@ -1221,6 +1253,18 @@ def start_scheduler():
             id='cm_extractor_scheduled_jobs',
             name='CM Extractor scheduled jobs dispatcher (every 1 min)',
             replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+        )
+
+    if os.environ.get('NCM_DISABLE_NETWORK_BALANCE_INGEST', '').strip().lower() not in ('1', 'true', 'yes'):
+        _scheduler.add_job(
+            run_network_balance_ingest,
+            trigger=CronTrigger(hour=_network_balance_ingest_cron_hour(), minute=15),
+            id='network_balance_ingest_daily',
+            name='Network Balance CSV ingest (Nokia + Huawei daily)',
+            replace_existing=True,
+            next_run_time=datetime.now(),
             coalesce=True,
             max_instances=1,
         )

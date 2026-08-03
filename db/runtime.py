@@ -18,6 +18,7 @@ install_sqlite_gate()
 from sync_config import (
     HUAWEI_PM_DB,
     METADATA_DB,
+    NETWORK_BALANCE_DB,
     NOKIA_PM_DB,
     NCMUSERS_DB,
     SQLITE_PM_CACHE_SIZE_KB,
@@ -129,6 +130,12 @@ def connect_nokia_pm():
 def connect_huawei_pm():
     require_activation()
     conn = sqlite3.connect(HUAWEI_PM_DB, timeout=120)
+    return _configure_sqlite_conn(conn)
+
+
+def connect_network_balance():
+    require_activation()
+    conn = sqlite3.connect(NETWORK_BALANCE_DB, timeout=120)
     return _configure_sqlite_conn(conn)
 
 

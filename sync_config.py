@@ -62,6 +62,7 @@ DB_METADATA_SNAPSHOT_DIR = os.path.join(DATABASES_ROOT, 'metadata', 'all', 'all'
 DB_ADMIN_SNAPSHOT_DIR = os.path.join(DATABASES_ROOT, 'admin', 'all', 'all', 'snapshot')
 DB_NEIGHBOR_NOKIA_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'neighbors', 'nokia', 'all', 'hourly')
 DB_NEIGHBOR_HUAWEI_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'neighbors', 'huawei', 'all', 'hourly')
+DB_NETWORK_BALANCE_DIR = os.path.join(DATABASES_ROOT, 'network_balance', 'all', 'all', 'daily')
 
 for _d in (
     CELLS_DB_DIR,
@@ -82,6 +83,7 @@ for _d in (
     DB_ADMIN_SNAPSHOT_DIR,
     DB_NEIGHBOR_NOKIA_HOURLY_DIR,
     DB_NEIGHBOR_HUAWEI_HOURLY_DIR,
+    DB_NETWORK_BALANCE_DIR,
 ):
     os.makedirs(_d, exist_ok=True)
 
@@ -100,6 +102,7 @@ NOKIA_GROUPS_DB = os.path.join(DB_GROUPS_NOKIA_HOURLY_DIR, 'nokia_cell_groups.db
 HUAWEI_GROUPS_DB = os.path.join(DB_GROUPS_HUAWEI_HOURLY_DIR, 'huawei_cell_groups.db')
 NOKIA_GROUPS_DAILY_DB = os.path.join(DB_GROUPS_NOKIA_DAILY_DIR, 'nokia_cell_groups_daily.db')
 HUAWEI_GROUPS_DAILY_DB = os.path.join(DB_GROUPS_HUAWEI_DAILY_DIR, 'huawei_cell_groups_daily.db')
+NETWORK_BALANCE_DB = os.path.join(DB_NETWORK_BALANCE_DIR, 'network_balance.db')
 
 # Backward-compatible directory aliases.
 NOKIA_NEIGHBOR_DB_DIR = DB_NEIGHBOR_NOKIA_HOURLY_DIR
