@@ -89,11 +89,14 @@ def guess_mimetype(filepath: str) -> str:
 
 
 def hdx_base_url(tech: str, filepath: str) -> str:
-    dir_part = os.path.dirname(filepath.replace("\\", "/"))
-    base = f"/ran-features/view/{tech}/"
-    if dir_part:
-        base += dir_part.replace("\\", "/").rstrip("/") + "/"
-    return base
+    """Return the document URL used as <base href> for HedEx HTML pages.
+
+    Must include the filename, not just the directory. HedEx bookmaps link to
+    in-page sections with fragment-only hrefs (#TOPIC_ID); with a directory-only
+    base those resolve to /view/<tech>/<dir>/ which is not a real archive path.
+    """
+    safe = filepath.replace("\\", "/").lstrip("/")
+    return f"/ran-features/view/{tech}/{safe}"
 
 
 def patch_hdx_html(data: bytes, tech: str, filepath: str) -> bytes:
