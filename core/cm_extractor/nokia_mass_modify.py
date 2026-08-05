@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 from core.cm_extractor.config import build_nokia_operations_client
@@ -34,6 +35,69 @@ def _failure_detail(feedbacks: list[dict[str, Any]]) -> str:
         if title:
             return title
     return 'CM Operations returned FAILED'
+
+
+def is_empty_plan_error(message: str) -> bool:
+    lower = (message or '').lower()
+    return 'plan generated' in lower and 'empty' in lower
+
+
+def _parameter_attempts(parameter: str, new_value: str, old_value: str = '') -> list[str]:
+    """Build parameterValuesByNames attempts (new-only first for planned CM writes)."""
+    attempts = [_parameter_values_expr(parameter, new_value, '')]
+    if old_value and old_value != new_value:
+        with_old = _parameter_values_expr(parameter, new_value, old_value)
+        if with_old not in attempts:
+            attempts.append(with_old)
+    return attempts
+
+
+def _wait_for_operations(
+    client: NokiaOperationsClient,
+    operations: list[dict[str, Any]],
+    *,
+    timeout_sec: int,
+) -> None:
+    """Poll NetAct until every started operation reaches a terminal state."""
+    pending = {
+        str(entry['operation_id']): entry
+        for entry in operations
+        if entry.get('operation_id')
+    }
+    if not pending:
+        return
+
+    deadline = time.time() + max(30, timeout_sec)
+    last_status = 'STARTED'
+    while pending and time.time() < deadline:
+        statuses = client.get_statuses(list(pending.keys()))
+        for item in statuses:
+            op_id = str(item.get('operationId') or item.get('operation_id') or '').strip()
+            if not op_id or op_id not in pending:
+                continue
+            last_status = str(item.get('status') or last_status)
+            if last_status not in client.TERMINAL_STATUSES:
+                continue
+            entry = pending.pop(op_id)
+            feedbacks = client.get_feedbacks(op_id)
+            entry['status'] = last_status
+            entry['feedbacks'] = feedbacks[:20]
+            if last_status != 'FINISHED':
+                dist_name = entry.get('dist_name') or op_id
+                param_expr = entry.get('parameter_values') or entry.get('parameter') or ''
+                raise NokiaOperationsError(
+                    f'Mass modification failed for {dist_name} ({param_expr}): '
+                    f'{_failure_detail(feedbacks)}',
+                    payload={'operation_id': op_id, 'feedbacks': feedbacks[:20]},
+                )
+        if pending:
+            time.sleep(client.poll_interval_sec)
+
+    if pending:
+        raise NokiaOperationsError(
+            f'CM Operations timed out after {timeout_sec}s waiting for '
+            f'{len(pending)} modification(s) (last status: {last_status}).',
+        )
 
 
 def apply_mass_modifications(
@@ -74,7 +138,7 @@ def apply_mass_modifications(
         if not new_value:
             raise ValueError(f'Each update requires a value for {parameter}')
 
-        param_expr = _parameter_values_expr(parameter, new_value, old_value)
+        param_expr = _parameter_attempts(parameter, new_value, old_value)[0]
         op_id = client.start_operation(
             _OPERATION_NAME,
             operation_alias=f'PrimeNet mass modify {parameter}',
@@ -84,25 +148,17 @@ def apply_mass_modifications(
                 'parameterValuesByNames': param_expr,
             },
         )
-        entry: dict[str, Any] = {
+        operations.append({
             'operation_id': op_id,
             'dist_name': dist_name,
             'mo_class': class_id,
             'parameter': parameter,
             'new_value': new_value,
             'parameter_values': param_expr,
-        }
-        if wait:
-            status, feedbacks = client.wait_for_operation(op_id, timeout_sec=operation_timeout_sec)
-            entry['status'] = status
-            entry['feedbacks'] = feedbacks[:20]
-            if status != 'FINISHED':
-                raise NokiaOperationsError(
-                    f'Mass modification failed for {dist_name} ({param_expr}): '
-                    f'{_failure_detail(feedbacks)}',
-                    payload={'operation_id': op_id, 'feedbacks': feedbacks[:20]},
-                )
-        operations.append(entry)
+        })
+
+    if wait and operations:
+        _wait_for_operations(client, operations, timeout_sec=operation_timeout_sec)
 
     return {
         'operation_name': _OPERATION_NAME,

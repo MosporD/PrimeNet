@@ -612,6 +612,13 @@ def _global_search_metadata(q: str) -> dict:
     return out
 
 
+def _truncate_global_search_text(text: str, limit: int = 120) -> str:
+    cleaned = ' '.join(str(text or '').split())
+    if len(cleaned) <= limit:
+        return cleaned
+    return cleaned[: limit - 1].rstrip() + '…'
+
+
 def _global_search_parameters(q: str) -> list:
     """Parameter dictionary matches (Nokia MO index + Huawei TOC), best-effort."""
     results = []
@@ -619,13 +626,32 @@ def _global_search_parameters(q: str) -> list:
         from modules.parameter_dictionary.nokia_loader import search_nokia_entries
 
         for entry in search_nokia_entries(q, limit=4):
+            entry_type = entry.get('type') or 'mo'
+            if entry_type == 'parameter':
+                param_name = entry.get('parameter') or ''
+                mo_list = entry.get('mo_list') or []
+                results.append({
+                    'vendor': 'Nokia',
+                    'name': param_name,
+                    'detail': entry.get('description') or '',
+                    'technology': '',
+                    'sub': _truncate_global_search_text(entry.get('description') or ''),
+                    'mo': mo_list[0] if mo_list else '',
+                    'param': param_name,
+                })
+                continue
+
+            mo_name = entry.get('mo') or ''
             params = entry.get('parameters') or []
+            first_param = params[0] if params else {}
             results.append({
                 'vendor': 'Nokia',
-                'name': entry.get('mo') or entry.get('description'),
+                'name': entry.get('description') or mo_name.split('/')[-1] or mo_name,
                 'detail': entry.get('description') or '',
                 'technology': entry.get('technology') or '',
-                'sub': (params[0].get('full_name') or params[0].get('name')) if params else '',
+                'sub': mo_name or (first_param.get('full_name') or first_param.get('name') or ''),
+                'mo': mo_name,
+                'param': first_param.get('name') or '',
             })
     except Exception:
         logger.debug('Nokia parameter search unavailable', exc_info=True)
@@ -643,6 +669,7 @@ def _global_search_parameters(q: str) -> list:
                     'detail': '',
                     'technology': '',
                     'sub': '',
+                    'huawei_url': entry.get('url') or '',
                 })
                 hits += 1
                 if hits >= 4:

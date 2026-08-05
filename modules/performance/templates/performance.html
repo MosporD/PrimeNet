@@ -222,11 +222,11 @@
             <div id="perf-chart-choice-bar" class="perf-chart-choice-bar" style="display:none;" aria-label="Chart options">
                 <div>
                     <strong>Visualize query</strong>
-                    <span>Use template charts, or build a chart from selected KPIs.</span>
+                    <span>Pick a graph style to overlay objects or KPIs, or drop in the default template charts.</span>
                 </div>
                 <div class="perf-chart-choice-actions">
-                    <button type="button" class="btn-query" onclick="addChartsFromLastQuery()">Template Charts</button>
                     <button type="button" class="btn-query" onclick="openChartConfigModal()">Add Chart</button>
+                    <button type="button" class="btn-query" onclick="addChartsFromLastQuery()">Template Charts</button>
                 </div>
             </div>
             <div id="perf-kpi-category-tabs-bar" class="perf-kpi-category-tabs-bar" style="display:none;" aria-label="KPI category tabs">
@@ -295,21 +295,42 @@
             <div id="chart-config-modal" class="perf-modal-backdrop" style="display:none;">
                 <div class="perf-modal-card perf-modal-card-wide">
                     <div class="perf-modal-head">
-                        <h3>Add Chart</h3>
+                        <h3 id="chart-config-modal-title">Select Graph Style</h3>
                         <button type="button" class="perf-modal-close" onclick="closeChartConfigModal()">&times;</button>
                     </div>
-                    <div class="perf-config-grid">
-                        <div class="perf-config-col">
-                            <div class="perf-config-title">Select Objects</div>
-                            <div id="chart-config-objects" class="perf-config-list"></div>
-                        </div>
-                        <div class="perf-config-col">
-                            <div class="perf-config-title">Select KPIs</div>
-                            <div id="chart-config-kpis" class="perf-config-list"></div>
+
+                    <div id="chart-config-step-style">
+                        <p class="perf-style-hint">Choose how objects and KPIs are laid out, then pick what to plot.</p>
+                        <div id="chart-style-grid" class="perf-style-grid"></div>
+                    </div>
+
+                    <div id="chart-config-step-data" style="display:none;">
+                        <div class="perf-style-selected" id="chart-style-selected-note"></div>
+                        <div class="perf-config-grid">
+                            <div class="perf-config-col">
+                                <div class="perf-config-title">
+                                    Select Objects
+                                    <span class="perf-config-count" id="chart-config-objects-count"></span>
+                                </div>
+                                <div id="chart-config-objects" class="perf-config-list"></div>
+                            </div>
+                            <div class="perf-config-col">
+                                <div class="perf-config-title">
+                                    Select KPIs
+                                    <span class="perf-config-count" id="chart-config-kpis-count"></span>
+                                </div>
+                                <div id="chart-config-kpis" class="perf-config-list"></div>
+                            </div>
                         </div>
                     </div>
+
                     <div class="perf-modal-actions">
-                        <button type="button" class="btn-query" onclick="applyChartConfigModal()">Apply</button>
+                        <button type="button" class="btn-query" id="chart-config-back"
+                                style="display:none;" onclick="chartConfigBackToStyle()">← Back</button>
+                        <button type="button" class="btn-query" id="chart-config-next"
+                                onclick="chartConfigGoToData()">Next →</button>
+                        <button type="button" class="btn-query" id="chart-config-apply"
+                                style="display:none;" onclick="applyChartConfigModal()">Apply</button>
                         <button type="button" class="btn-query btn-query-danger" onclick="closeChartConfigModal()">Cancel</button>
                     </div>
                 </div>

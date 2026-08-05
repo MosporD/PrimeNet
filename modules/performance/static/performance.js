@@ -379,15 +379,137 @@ function _labelForQueryKey(key) {
     return s;
 }
 
+// ============================================================
+// Graph style picker (objects × KPIs layout)
+// ============================================================
+
+/**
+ * `objects`/`kpis` describe how many of each go on ONE chart:
+ *   single → one per chart (repeated for every selection)
+ *   multi  → all overlaid on the same chart
+ */
+const PERF_CHART_STYLES = [
+    {
+        id: 'obj-multi-kpi-line',
+        label: 'Single-Object Multi-KPI Line',
+        hint: 'One chart per object, all selected KPIs overlaid.',
+        objects: 'single', kpis: 'multi', type: 'line',
+    },
+    {
+        id: 'kpi-multi-obj-line',
+        label: 'Single-KPI Multi-Object Line',
+        hint: 'One chart per KPI, all selected objects overlaid.',
+        objects: 'multi', kpis: 'single', type: 'line',
+    },
+    {
+        id: 'obj-multi-kpi-bar',
+        label: 'Single-Object Multi-KPI Column',
+        hint: 'One chart per object, all selected KPIs as columns.',
+        objects: 'single', kpis: 'multi', type: 'bar',
+    },
+    {
+        id: 'kpi-multi-obj-bar',
+        label: 'Single-KPI Multi-Object Column',
+        hint: 'One chart per KPI, all selected objects as columns.',
+        objects: 'multi', kpis: 'single', type: 'bar',
+    },
+    {
+        id: 'grid',
+        label: 'One Chart per KPI (classic)',
+        hint: 'A separate small chart for every KPI of every object.',
+        objects: 'single', kpis: 'single', type: 'line',
+    },
+];
+
+let perfChartStyleId = 'obj-multi-kpi-line';
+
+function _perfChartStyleById(id) {
+    return PERF_CHART_STYLES.find(s => s.id === id) || PERF_CHART_STYLES[0];
+}
+
+function _perfStyleThumb(style) {
+    const multiSeries = style.objects === 'multi' || style.kpis === 'multi';
+    const colors = multiSeries ? ['#1f77b4', '#e74c3c', '#27ae60'] : ['#1f77b4'];
+    if (style.type === 'bar') {
+        const bars = colors.map((c, si) => (
+            [0, 1, 2].map(gi => {
+                const x = 8 + gi * 26 + si * 7;
+                const h = 12 + ((gi + si * 2) % 3) * 9;
+                return `<rect x="${x}" y="${44 - h}" width="6" height="${h}" fill="${c}"></rect>`;
+            }).join('')
+        )).join('');
+        return `<svg viewBox="0 0 96 52" role="img" aria-hidden="true">${bars}</svg>`;
+    }
+    const paths = colors.map((c, si) => {
+        const pts = [0, 1, 2, 3].map(i => {
+            const x = 8 + i * 27;
+            const y = 40 - ((i + si) % 3) * 11;
+            return `${x},${y}`;
+        }).join(' ');
+        return `<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2.5"></polyline>`;
+    }).join('');
+    return `<svg viewBox="0 0 96 52" role="img" aria-hidden="true">${paths}</svg>`;
+}
+
+function _renderChartStyleTiles() {
+    const grid = document.getElementById('chart-style-grid');
+    if (!grid) return;
+    grid.innerHTML = PERF_CHART_STYLES.map(style => `
+        <button type="button" class="perf-style-tile${style.id === perfChartStyleId ? ' selected' : ''}"
+                data-style-id="${escAttr(style.id)}" aria-pressed="${style.id === perfChartStyleId}">
+            <span class="perf-style-thumb">${_perfStyleThumb(style)}</span>
+            <span class="perf-style-name">${escHtml(style.label)}</span>
+            <span class="perf-style-desc">${escHtml(style.hint)}</span>
+        </button>
+    `).join('');
+    grid.querySelectorAll('.perf-style-tile').forEach(btn => {
+        btn.addEventListener('click', () => {
+            perfChartStyleId = String(btn.getAttribute('data-style-id') || '');
+            _renderChartStyleTiles();
+        });
+    });
+}
+
+function _setChartConfigStep(step) {
+    const styleStep = document.getElementById('chart-config-step-style');
+    const dataStep = document.getElementById('chart-config-step-data');
+    const backBtn = document.getElementById('chart-config-back');
+    const nextBtn = document.getElementById('chart-config-next');
+    const applyBtn = document.getElementById('chart-config-apply');
+    const title = document.getElementById('chart-config-modal-title');
+    const onStyle = step === 'style';
+
+    if (styleStep) styleStep.style.display = onStyle ? '' : 'none';
+    if (dataStep) dataStep.style.display = onStyle ? 'none' : '';
+    if (backBtn) backBtn.style.display = onStyle ? 'none' : 'inline-flex';
+    if (nextBtn) nextBtn.style.display = onStyle ? 'inline-flex' : 'none';
+    if (applyBtn) applyBtn.style.display = onStyle ? 'none' : 'inline-flex';
+    if (title) title.textContent = onStyle ? 'Select Graph Style' : 'Select Objects & KPIs';
+}
+
 function openChartConfigModal() {
     if (!lastQueryCellKeys.length) {
         _perfQueryUserMessage('Run Query first to configure chart objects/KPIs.');
         return;
     }
     const modal = document.getElementById('chart-config-modal');
+    if (!modal) return;
+    _renderChartStyleTiles();
+    _setChartConfigStep('style');
+    modal.style.display = 'flex';
+}
+
+function chartConfigBackToStyle() {
+    _renderChartStyleTiles();
+    _setChartConfigStep('style');
+}
+
+function chartConfigGoToData() {
     const objWrap = document.getElementById('chart-config-objects');
     const kpiWrap = document.getElementById('chart-config-kpis');
-    if (!modal || !objWrap || !kpiWrap) return;
+    const note = document.getElementById('chart-style-selected-note');
+    if (!objWrap || !kpiWrap) return;
+    const style = _perfChartStyleById(perfChartStyleId);
 
     objWrap.innerHTML = lastQueryCellKeys.map(k => `
         <label><input type="checkbox" class="cfg-obj-cb" data-key="${escAttr(String(k))}" checked> ${escHtml(_labelForQueryKey(k))}</label>
@@ -397,7 +519,27 @@ function openChartConfigModal() {
         <label><input type="checkbox" class="cfg-kpi-cb" data-kpi="${escAttr(String(k))}" ${kpiSelectedKeys.has(k) ? 'checked' : ''}> ${escHtml(_kpiDisplayName(k))}</label>
     `).join('');
 
-    modal.style.display = 'flex';
+    if (note) {
+        note.innerHTML = `<strong>${escHtml(style.label)}</strong> — ${escHtml(style.hint)}`;
+    }
+    _wireChartConfigCounts();
+    _setChartConfigStep('data');
+}
+
+function _wireChartConfigCounts() {
+    const update = () => {
+        const objN = document.querySelectorAll('#chart-config-objects .cfg-obj-cb:checked').length;
+        const kpiN = document.querySelectorAll('#chart-config-kpis .cfg-kpi-cb:checked').length;
+        const objCount = document.getElementById('chart-config-objects-count');
+        const kpiCount = document.getElementById('chart-config-kpis-count');
+        if (objCount) objCount.textContent = `${objN} selected`;
+        if (kpiCount) kpiCount.textContent = `${kpiN} selected`;
+    };
+    ['chart-config-objects', 'chart-config-kpis'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', update);
+    });
+    update();
 }
 
 function closeChartConfigModal() {
@@ -426,7 +568,7 @@ async function applyChartConfigModal() {
     kpiSelectedKeys = new Set(kpis);
     updateKpiScopeUI();
     closeChartConfigModal();
-    await addChartsFromLastQuery();
+    await buildChartsForStyle(perfChartStyleId, objKeys, kpis);
 }
 
 async function loadKpiHeaderMap() {
@@ -874,6 +1016,20 @@ function _syncPerfDodRadiosFromState() {
     }
 }
 
+/** Re-draw the active tab with the renderer that matches its graph style. */
+function _rerenderActiveChartTab() {
+    const tab = chartTabs.find(t => t.id === activeChartTabId);
+    const payload = tab?.payload || lastTrendData;
+    if (!payload) return;
+    if (tab?.kind === 'compare') {
+        renderCompareCharts(payload);
+    } else if (tab?.kind === 'multikpi') {
+        renderMultiKpiChart(payload);
+    } else if (Array.isArray(payload.trend) && payload.trend.length) {
+        renderAllCharts(payload.trend);
+    }
+}
+
 function _wirePerfDodBarOnce() {
     if (perfDodBarWired) return;
     const bar = document.getElementById('perf-dod-bar');
@@ -889,7 +1045,7 @@ function _wirePerfDodBarOnce() {
                 if (_isPeriodCompareChartMode()) {
                     _populatePerfPeriodCheckboxes(lastTrendData.trend);
                 }
-                renderAllCharts(lastTrendData.trend);
+                _rerenderActiveChartTab();
             }
             return;
         }
@@ -898,7 +1054,7 @@ function _wirePerfDodBarOnce() {
             perfDodDayChangeTimer = setTimeout(() => {
                 _readPerfDodSelectionsFromDom();
                 if (Array.isArray(lastTrendData?.trend) && lastTrendData.trend.length) {
-                    renderAllCharts(lastTrendData.trend);
+                    _rerenderActiveChartTab();
                 }
             }, 60);
         }
@@ -1566,7 +1722,7 @@ async function onVendorChange() {
         if (tView && tView.style.display !== 'none') switchViewMode('charts');
     } else {
         const mode = perfPreferredPmViewMode === 'table' ? 'table' : 'charts';
-        switchViewMode(mode);
+        switchViewMode(mode, { skipTableLoad: true });
     }
     _resetObjectScopeFilters();
     lastQueryCellKeys = [];
@@ -2019,6 +2175,171 @@ async function addChartsFromLastQuery() {
     if (br) br.style.display = 'inline-flex';
 }
 
+async function _fetchGroupTrendPayload(key) {
+    try {
+        const params = new URLSearchParams({
+            group_ref: key,
+            granularity: _currentTrendGranularity(),
+            data_scope: _currentDataScope(),
+        });
+        _appendTimeFrameParams(params);
+        if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
+            params.set('kpi', [...kpiSelectedKeys].join(','));
+        }
+        const data = await _perfFetchJson(`/api/performance/group/trend?${params.toString()}`);
+        const group = data.group || {};
+        const trend = Array.isArray(data.trend) ? data.trend : [];
+        if (!trend.length) return null;
+        return {
+            key,
+            cell: {
+                cell_name: group.name || 'Group',
+                vendor: group.vendor || '',
+                technology: '',
+                site_id: '',
+                cell_key: key,
+            },
+            trend,
+        };
+    } catch (_) {
+        return null;
+    }
+}
+
+/** Load trend rows for every selected object, preferring the already-fetched PM table rows. */
+async function _loadTrendsForObjectKeys(keys) {
+    const unique = [...new Set((keys || []).map(k => String(k || '').trim()).filter(Boolean))];
+    const cellKeys = unique.filter(k => !k.includes(':raw:'));
+    const groupKeys = unique.filter(k => k.includes(':raw:'));
+    const byKey = new Map();
+
+    if (cellKeys.length && hwCurrentVendor && hwCurrentTech) {
+        try {
+            const tableData = await _fetchPmTableForCharts();
+            if (tableData?.success && Array.isArray(tableData.rows)) {
+                const byCell = new Map();
+                tableData.rows.forEach(row => {
+                    const cn = String(row.cell_name || '').trim().toLowerCase();
+                    if (!cn) return;
+                    if (!byCell.has(cn)) byCell.set(cn, []);
+                    byCell.get(cn).push(row);
+                });
+                cellKeys.forEach(k => {
+                    const trend = byCell.get(_cellNameFromQueryKey(k).trim().toLowerCase());
+                    if (trend?.length) byKey.set(k, { key: k, cell: _cellMetaFromQueryKey(k), trend });
+                });
+            }
+        } catch (_) {
+            // Fall back to the per-object trend API below.
+        }
+    }
+
+    const missingCells = cellKeys.filter(k => !byKey.has(k));
+    await Promise.all([
+        ...missingCells.map(async k => {
+            try {
+                const data = await fetchCellTrendData(k);
+                const trend = Array.isArray(data.trend) ? data.trend : [];
+                if (trend.length) byKey.set(k, { key: k, cell: data.cell || _cellMetaFromQueryKey(k), trend });
+            } catch (_) {
+                // Object without data is simply skipped.
+            }
+        }),
+        ...groupKeys.map(async k => {
+            const payload = await _fetchGroupTrendPayload(k);
+            if (payload) byKey.set(k, payload);
+        }),
+    ]);
+
+    return unique.map(k => byKey.get(k)).filter(Boolean);
+}
+
+function _resetChartTabsForNewBuild() {
+    chartTabs = [];
+    activeChartTabId = null;
+    activeKpiCategoryByTabId = {};
+    const tabBar = document.getElementById('perf-chart-tabs-bar');
+    if (tabBar) tabBar.style.display = 'none';
+}
+
+/** Build chart tabs according to the selected graph style. */
+async function buildChartsForStyle(styleId, objKeys, kpiKeys) {
+    const style = _perfChartStyleById(styleId);
+    if (style.objects === 'single' && style.kpis === 'single') {
+        await addChartsFromLastQuery();
+        return;
+    }
+
+    const noSel = document.getElementById('no-selection');
+    if (noSel) noSel.style.display = 'none';
+    const wrap = document.getElementById('charts-wrap');
+    if (wrap) wrap.style.display = 'none';
+    const loading = document.getElementById('loading-charts');
+    if (loading) loading.style.display = 'flex';
+    const chartsHost = document.querySelector('.charts-area');
+    if (typeof showPanelLoading === 'function') showPanelLoading(chartsHost, 'Building charts…');
+    const choiceBar = document.getElementById('perf-chart-choice-bar');
+    if (choiceBar) choiceBar.style.display = 'none';
+
+    _resetChartTabsForNewBuild();
+
+    let objects = [];
+    try {
+        objects = await _loadTrendsForObjectKeys(objKeys);
+    } finally {
+        if (loading) loading.style.display = 'none';
+        if (typeof hidePanelLoading === 'function') hidePanelLoading(chartsHost);
+    }
+
+    if (!objects.length) {
+        _perfQueryUserMessage('No trend data found for the selected objects/KPIs.');
+        return;
+    }
+
+    const hoursVal = _currentTimeFrameHours() != null ? _currentTimeFrameHours() : 'full';
+    const chartType = style.type === 'bar' ? 'bar' : 'line';
+
+    if (style.objects === 'single') {
+        objects.forEach(obj => {
+            upsertPerfChartTab({
+                kind: 'multikpi',
+                cell: obj.cell,
+                trend: obj.trend,
+                chartType,
+                kpiKeys: [...kpiKeys],
+            }, hoursVal, obj.key, 'multikpi', { deferRender: true });
+        });
+        // Show the first object's chart rather than the last tab created.
+        if (chartTabs.length) activeChartTabId = chartTabs[0].id;
+    } else {
+        const limited = objects.slice(0, PERF_COMPARE_MAX_CELLS);
+        if (objects.length > limited.length) {
+            showNotification(`Overlaying first ${limited.length} of ${objects.length} objects.`, 'info');
+        }
+        const payload = {
+            kind: 'compare',
+            cells: limited,
+            normalize: false,
+            chartType,
+            cell: {
+                cell_name: `Compare · ${limited.length} objects`,
+                vendor: limited[0].cell.vendor || '',
+                technology: limited[0].cell.technology || '',
+                site_id: '',
+            },
+            trend: limited[0].trend,
+            _compareTitle: `Compare · ${limited.length}`,
+        };
+        upsertPerfChartTab(payload, 'compare', `__compare__::${limited.map(c => c.key).join('||')}`, 'compare');
+    }
+
+    switchViewMode('charts');
+    if (activeChartTabId) switchPerfChartTab(activeChartTabId);
+    perfDodPickerNeedsReset = true;
+    const br = document.getElementById('btn-refresh');
+    if (br) br.style.display = 'inline-flex';
+}
+
 function _pmChartCacheSig() {
     const tf = perfTimeFrame?.date_from && perfTimeFrame?.date_to
         ? `range:${perfTimeFrame.date_from}|${perfTimeFrame.date_from_hour ?? ''}|${perfTimeFrame.date_to}|${perfTimeFrame.date_to_hour ?? ''}`
@@ -2030,6 +2351,7 @@ function _pmChartCacheSig() {
         tf,
         [...(hwCurrentScopedCellNames || [])].sort().join('|'),
         [...(hwCurrentScopedGroupRefs || [])].sort().join('|'),
+        [...kpiSelectedKeys].sort().join('|'),
     ].join('||');
 }
 
@@ -2614,12 +2936,7 @@ async function applyFilters(opts = {}) {
             showGroupPicker(allCellGroups);
         }
         if (!_isPerfTreeLoadCurrent(token) || _currentSelectionType() !== 'group') return;
-        const tView = document.getElementById('pm-table-view');
-        if (tView && tView.style.display !== 'none') {
-            const v = document.getElementById('filter-vendor').value;
-            const t2 = document.getElementById('filter-tech').value;
-            if (v && t2) loadPmTable(v, t2, hwCurrentSearch, 1);
-        }
+        _showPmTableQueryHint();
         return;
     }
 
@@ -2650,13 +2967,29 @@ async function applyFilters(opts = {}) {
     _resetPerfChartStateForNewScope();
 
     showAreaPicker(areas, perfTotalCellCount, { fromApply: true });
+    _showPmTableQueryHint();
+}
 
+/**
+ * PM rows are only read from the DB on Query. When the scope changes while the
+ * PM Database view is open, clear the stale table and prompt for a new Query.
+ */
+function _showPmTableQueryHint() {
     const tView = document.getElementById('pm-table-view');
-    if (tView && tView.style.display !== 'none') {
-        const v = document.getElementById('filter-vendor').value;
-        const t2 = document.getElementById('filter-tech').value;
-        if (v && t2) loadPmTable(v, t2, hwCurrentSearch, 1);
-    }
+    if (!tView || tView.style.display === 'none') return;
+    const container = document.getElementById('hw-table-container');
+    if (!container) return;
+    hwLastTablePayload = null;
+    hwCurrentScopedCellNames = [];
+    hwCurrentScopedGroupRefs = [];
+    const pager = document.getElementById('hw-pagination');
+    if (pager) pager.innerHTML = '';
+    const countEl = document.getElementById('hw-row-count');
+    if (countEl) countEl.textContent = '';
+    const exportBtn = document.getElementById('btn-export');
+    if (exportBtn) exportBtn.style.display = 'none';
+    container.innerHTML =
+        '<p class="hw-empty-msg">Select objects and KPIs, then click <strong>Query</strong> to load PM rows.</p>';
 }
 
 // ============================================================
@@ -3279,6 +3612,8 @@ function _perfChartQuerySig(apiData, hoursVal, treeCellId) {
         String(cell.technology ?? ''),
         String(cell.site_id ?? ''),
         String(cell.vendor ?? ''),
+        String(apiData.kind ?? ''),
+        String(apiData.chartType ?? ''),
     ].join('\0');
 }
 
@@ -3289,15 +3624,20 @@ function _scrollPerfActiveTabIntoView() {
 }
 
 /** New tab only for a new query; same cell + hours + identity replaces that tab’s data. */
-function upsertPerfChartTab(apiData, hoursVal, treeCellId, kind) {
+function upsertPerfChartTab(apiData, hoursVal, treeCellId, kind, opts = {}) {
+    const deferRender = !!opts.deferRender;
     const cell = apiData.cell || {};
     const rawName = cell.cell_name ? String(cell.cell_name) : 'Cell';
-    const title = (kind === 'compare' && apiData._compareTitle)
-        ? String(apiData._compareTitle)
-        : `${rawName} · ${_perfHoursLabel(hoursVal)}`;
+    const tabKind = (kind === 'compare' || kind === 'multikpi') ? kind : 'single';
+    let title = `${rawName} · ${_perfHoursLabel(hoursVal)}`;
+    if (tabKind === 'compare' && apiData._compareTitle) {
+        title = String(apiData._compareTitle);
+    } else if (tabKind === 'multikpi') {
+        const n = Array.isArray(apiData.kpiKeys) ? apiData.kpiKeys.length : 0;
+        title = `${rawName} · ${n || 'multi'} KPIs`;
+    }
     const treeKey = treeCellId != null && String(treeCellId).trim() !== '' ? String(treeCellId) : null;
     const querySig = _perfChartQuerySig(apiData, hoursVal, treeCellId);
-    const tabKind = kind === 'compare' ? 'compare' : 'single';
 
     const existing = chartTabs.find(t => t.querySig === querySig);
     if (existing) {
@@ -3309,7 +3649,9 @@ function upsertPerfChartTab(apiData, hoursVal, treeCellId, kind) {
         lastTrendData = apiData;
         renderPerfChartTabs();
         _scrollPerfActiveTabIntoView();
+        if (deferRender) return;
         if (tabKind === 'compare') renderCompareCharts(apiData);
+        else if (tabKind === 'multikpi') renderMultiKpiChart(apiData);
         return;
     }
 
@@ -3320,7 +3662,9 @@ function upsertPerfChartTab(apiData, hoursVal, treeCellId, kind) {
     renderPerfChartTabs();
     const strip = document.getElementById('perf-chart-tabs-strip');
     if (strip) strip.scrollLeft = strip.scrollWidth;
+    if (deferRender) return;
     if (tabKind === 'compare') renderCompareCharts(apiData);
+    else if (tabKind === 'multikpi') renderMultiKpiChart(apiData);
 }
 
 function renderPerfChartTabs() {
@@ -3400,6 +3744,8 @@ function switchPerfChartTab(tabId) {
 
     if (tab.kind === 'compare') {
         renderCompareCharts(tab.payload);
+    } else if (tab.kind === 'multikpi') {
+        renderMultiKpiChart(tab.payload);
     } else {
         renderAllCharts(tab.payload.trend || []);
     }
@@ -3610,9 +3956,7 @@ function renderKpiCategoryTabs(defs = []) {
         btn.addEventListener('click', () => {
             const cat = String(btn.getAttribute('data-kpi-category') || 'All').trim();
             _setActiveKpiCategory(cat || 'All');
-            if (Array.isArray(lastTrendData?.trend) && lastTrendData.trend.length) {
-                renderAllCharts(lastTrendData.trend);
-            }
+            _rerenderActiveChartTab();
         });
     });
 }
@@ -3842,6 +4186,171 @@ function renderAllCharts(trend) {
 }
 
 // ============================================================
+// Single object, many KPIs on one chart
+// ============================================================
+
+/** Map each KPI onto the left or right axis so mixed units stay readable. */
+function _multiKpiAxisAssignment(defs) {
+    const units = [];
+    defs.forEach(def => {
+        const unit = String(def.unit || '').trim();
+        if (!units.includes(unit)) units.push(unit);
+    });
+    const axisByKey = {};
+    defs.forEach(def => {
+        const unit = String(def.unit || '').trim();
+        axisByKey[def.key] = units.indexOf(unit) === 0 ? 'y' : 'y1';
+    });
+    return { axisByKey, units };
+}
+
+function renderMultiKpiChart(payload) {
+    Object.values(charts).forEach(c => { try { c.destroy(); } catch (_) { /* noop */ } });
+    Object.keys(charts).forEach(k => delete charts[k]);
+
+    const wrap = document.getElementById('charts-wrap');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    const trend = Array.isArray(payload?.trend) ? payload.trend : [];
+    const chartType = payload?.chartType === 'bar' ? 'bar' : 'line';
+    const { defs } = _defsForTrendRender(trend);
+    const wanted = Array.isArray(payload?.kpiKeys) && payload.kpiKeys.length
+        ? new Set(payload.kpiKeys.map(String))
+        : null;
+    const selectedDefs = wanted ? defs.filter(d => wanted.has(String(d.key))) : defs;
+
+    // DOD/MOM overlays are per-KPI concepts; they don't apply to a combined chart.
+    const dodBar = document.getElementById('perf-dod-bar');
+    if (dodBar) dodBar.style.display = 'none';
+
+    if (!selectedDefs.length) {
+        wrap.innerHTML = '<p style="padding:1rem;color:#888">No KPI data available for this object.</p>';
+        document.getElementById('loading-charts').style.display = 'none';
+        wrap.style.display = 'grid';
+        return;
+    }
+
+    renderKpiCategoryTabs(selectedDefs);
+    const activeCategory = _getActiveKpiCategory();
+    const scopedDefs = activeCategory === 'All'
+        ? selectedDefs
+        : selectedDefs.filter(def => _kpiCategoryForKey(def.key) === activeCategory);
+    const finalDefs = scopedDefs.length ? scopedDefs : selectedDefs;
+
+    const { axisByKey, units } = _multiKpiAxisAssignment(finalDefs);
+    const usesRightAxis = finalDefs.some(def => axisByKey[def.key] === 'y1');
+    const renderSeq = ++_perfChartRenderSeq;
+    const canvasId = `multiKpiCnv${renderSeq}`;
+    const objectName = payload?.cell?.cell_name || 'Object';
+
+    const card = document.createElement('div');
+    card.className = 'kpi-chart-card kpi-chart-card--full';
+    card.innerHTML = `
+        <div class="kpi-chart-top-controls">
+            <select class="perf-report-select kpi-chart-type-sel"
+                title="Chart type" aria-label="Chart type"
+                onchange="onPerfMultiKpiTypeChange(this.value)">
+                <option value="line"${chartType === 'line' ? ' selected' : ''}>Line</option>
+                <option value="bar"${chartType === 'bar' ? ' selected' : ''}>Column</option>
+            </select>
+            <button type="button" class="chart-gear-btn" title="Change graph style" onclick="openChartConfigModal()">⚙</button>
+        </div>
+        <div class="kpi-chart-title">
+            <span class="kpi-chart-name">${escHtml(objectName)} — ${finalDefs.length} KPIs</span>
+        </div>
+        <div class="kpi-chart-canvas-wrap kpi-chart-canvas-wrap--tall">
+            <canvas id="${canvasId}"></canvas>
+        </div>
+    `;
+    wrap.appendChild(card);
+
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || typeof Chart === 'undefined') {
+        document.getElementById('loading-charts').style.display = 'none';
+        wrap.style.display = 'grid';
+        return;
+    }
+    if (typeof patchChartJsForUiZoom === 'function') patchChartJsForUiZoom();
+    const pnPlugins = typeof pnChartPlugins === 'function' ? pnChartPlugins() : [];
+
+    const labels = trend.map(r => formatTrendXLabelHierarchy(trendXRaw(r)));
+    const datasets = finalDefs.map((def, idx) => {
+        const color = def.color || _CHART_COLORS[idx % _CHART_COLORS.length];
+        return {
+            label: def.unit ? `${def.label} (${def.unit})` : def.label,
+            data: trend.map(r => _toNumericOrNull(r[def.key])),
+            borderColor: color,
+            backgroundColor: chartType === 'bar' ? color : color + '18',
+            pointBackgroundColor: color,
+            pointRadius: trend.length > 48 ? 1.5 : 2.5,
+            pointHoverRadius: 5,
+            borderWidth: 2,
+            tension: 0.25,
+            fill: false,
+            spanGaps: true,
+            yAxisID: axisByKey[def.key] || 'y',
+            _unit: def.unit || '',
+        };
+    });
+
+    const theme = _perfChartTheme();
+    const scales = {
+        x: _perfChartXScaleOptions(trend, false),
+        y: _perfChartYScaleOptions({
+            position: 'left',
+            title: units[0] ? { display: true, text: units[0], color: theme.tick, font: { size: 10 } } : undefined,
+        }),
+    };
+    if (usesRightAxis) {
+        scales.y1 = _perfChartYScaleOptions({
+            position: 'right',
+            grid: { drawOnChartArea: false, color: theme.grid },
+            title: units[1] ? { display: true, text: units[1], color: theme.tick, font: { size: 10 } } : undefined,
+        });
+    }
+
+    try {
+        charts[canvasId] = new Chart(canvas.getContext('2d'), {
+            plugins: pnPlugins,
+            type: chartType,
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: true, position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10 } },
+                    tooltip: {
+                        callbacks: {
+                            title: items => _perfTooltipTitleTrend(trend, items),
+                            label: (item) => {
+                                const v = item.parsed.y;
+                                if (v == null) return `${item.dataset.label}: N/A`;
+                                return `${item.dataset.label}: ${Number(v).toFixed(2)}`;
+                            },
+                        },
+                    },
+                },
+                scales,
+            },
+        });
+    } catch (err) {
+        console.error('[performance] multi-KPI chart render failed', err);
+    }
+
+    document.getElementById('loading-charts').style.display = 'none';
+    wrap.style.display = 'grid';
+}
+
+function onPerfMultiKpiTypeChange(value) {
+    const tab = chartTabs.find(t => t.id === activeChartTabId);
+    if (!tab || tab.kind !== 'multikpi') return;
+    tab.payload.chartType = value === 'bar' ? 'bar' : 'line';
+    renderMultiKpiChart(tab.payload);
+}
+
+// ============================================================
 // Refresh
 // ============================================================
 
@@ -4006,11 +4515,18 @@ function switchViewMode(mode, opts = {}) {
 
         const vendor = document.getElementById('filter-vendor').value;
         const tech   = document.getElementById('filter-tech').value;
-        if (vendor && tech && !opts.skipTableLoad) {
-            loadPmTable(vendor, tech, '', 1, hwCurrentScopedCellNames);
-        } else if (!vendor || !tech) {
+        // PM rows are heavy: only hit the DB for an explicit query scope.
+        const hasQueryScope = !!(hwCurrentScopedCellNames?.length || hwCurrentScopedGroupRefs?.length);
+        if (!vendor || !tech) {
             document.getElementById('hw-table-container').innerHTML =
                 '<p class="hw-empty-msg" style="color:#e74c3c">Select a vendor and technology first.</p>';
+        } else if (opts.skipTableLoad) {
+            // Caller loads the table itself.
+        } else if (hasQueryScope) {
+            loadPmTable(vendor, tech, '', 1, hwCurrentScopedCellNames);
+        } else if (!hwLastTablePayload) {
+            document.getElementById('hw-table-container').innerHTML =
+                '<p class="hw-empty-msg">Select objects and KPIs, then click <strong>Query</strong> to load PM rows.</p>';
         }
     } else {
         if (exportBtn) exportBtn.style.display = 'none';
@@ -4411,6 +4927,7 @@ function renderCompareCharts(payload) {
 
     const cells = Array.isArray(payload?.cells) ? payload.cells : [];
     const normalize = !!payload.normalize;
+    const chartType = payload?.chartType === 'bar' ? 'bar' : 'line';
 
     const sampleTrend = cells.reduce((arr, c) => arr.length >= (c.trend?.length || 0) ? arr : c.trend, []);
     const { defs } = _defsForTrendRender(sampleTrend);
@@ -4440,10 +4957,17 @@ function renderCompareCharts(payload) {
     }).join('');
     header.innerHTML = `
         <div class="perf-compare-legend">${legend}</div>
-        <label class="perf-compare-norm">
-            <input type="checkbox" id="perf-compare-norm-toggle" ${normalize ? 'checked' : ''}>
-            Normalize axes (per-cell scale to 0–1 of its peak)
-        </label>
+        <div class="perf-compare-controls">
+            <select class="perf-report-select" id="perf-compare-type-sel" title="Chart type" aria-label="Chart type">
+                <option value="line"${chartType === 'line' ? ' selected' : ''}>Line</option>
+                <option value="bar"${chartType === 'bar' ? ' selected' : ''}>Column</option>
+            </select>
+            <label class="perf-compare-norm">
+                <input type="checkbox" id="perf-compare-norm-toggle" ${normalize ? 'checked' : ''}>
+                Normalize axes (per-cell scale to 0–1 of its peak)
+            </label>
+            <button type="button" class="chart-gear-btn" title="Change graph style" onclick="openChartConfigModal()">⚙</button>
+        </div>
     `;
     wrap.appendChild(header);
 
@@ -4473,7 +4997,7 @@ function renderCompareCharts(payload) {
                 label: _perfCompareCellShortLabel(c),
                 data: values,
                 borderColor: color,
-                backgroundColor: color + '22',
+                backgroundColor: chartType === 'bar' ? color : color + '22',
                 pointBackgroundColor: color,
                 pointRadius: axis.rawKeys.length > 48 ? 1.5 : 2.5,
                 pointHoverRadius: 5,
@@ -4492,7 +5016,7 @@ function renderCompareCharts(payload) {
         try {
             charts[canvasId] = new Chart(ctx, {
                 plugins: pnPlugins,
-                type: 'line',
+                type: chartType,
                 data: { labels: axis.labels, datasets },
                 options: {
                     responsive: true,
@@ -4533,6 +5057,13 @@ function renderCompareCharts(payload) {
     if (normToggle) {
         normToggle.addEventListener('change', () => {
             payload.normalize = !!normToggle.checked;
+            renderCompareCharts(payload);
+        });
+    }
+    const typeSel = document.getElementById('perf-compare-type-sel');
+    if (typeSel) {
+        typeSel.addEventListener('change', () => {
+            payload.chartType = typeSel.value === 'bar' ? 'bar' : 'line';
             renderCompareCharts(payload);
         });
     }

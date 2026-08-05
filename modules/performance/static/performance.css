@@ -1631,8 +1631,22 @@ body.dark-mode .perf-dod-hint {
     border: 1px solid rgba(0, 0, 0, 0.18);
 }
 
-.perf-compare-norm {
+.perf-compare-controls {
     margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.perf-compare-controls .perf-report-select {
+    min-width: 80px;
+    padding: 2px 6px;
+    font-size: 0.78rem;
+    height: 24px;
+    border-radius: 6px;
+}
+
+.perf-compare-norm {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1828,6 +1842,16 @@ body.dark-mode .perf-compare-norm-badge {
 .perf-config-title {
     font-weight: 700;
     margin-bottom: 8px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.perf-config-count {
+    font-weight: 500;
+    font-size: 0.78rem;
+    opacity: 0.7;
 }
 
 .perf-config-list {
@@ -1835,7 +1859,97 @@ body.dark-mode .perf-compare-norm-badge {
     overflow: auto;
     display: flex;
     flex-direction: column;
+    gap: 2px;
+}
+
+.perf-config-list label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.perf-config-list label:hover {
+    background: #f1f5f9;
+}
+
+/* Graph style picker */
+.perf-style-hint {
+    margin: 0 0 10px;
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.perf-style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.perf-style-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 6px;
+    text-align: left;
+    padding: 10px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.perf-style-tile:hover {
+    border-color: #93c5fd;
+}
+
+.perf-style-tile.selected {
+    border-color: #f0a500;
+    box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.15);
+}
+
+.perf-style-thumb {
+    display: block;
+    width: 100%;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+.perf-style-thumb svg {
+    display: block;
+    width: 100%;
+    height: 52px;
+}
+
+.perf-style-name {
+    font-weight: 700;
+    font-size: 0.86rem;
+}
+
+.perf-style-desc {
+    font-size: 0.76rem;
+    opacity: 0.7;
+    line-height: 1.3;
+}
+
+.perf-style-selected {
+    margin-bottom: 10px;
+    font-size: 0.82rem;
+    opacity: 0.85;
+}
+
+/* One large chart instead of the 2-per-row grid */
+.kpi-chart-card--full {
+    grid-column: 1 / -1;
+}
+
+.kpi-chart-canvas-wrap--tall {
+    height: 420px;
 }
 
 /* Loading state */
@@ -2409,6 +2523,67 @@ body.dark-mode.perf-page .perf-time-frame-custom {
 body.dark-mode.perf-page .perf-time-frame-hint,
 body.dark-mode.perf-page .hw-tree-area-loading {
     color: var(--dm-muted, #95a5a6);
+}
+
+/* Modal shells: time frame + graph style / object & KPI selection */
+body.dark-mode.perf-page .perf-modal-backdrop {
+    background: rgba(5, 10, 18, 0.6);
+}
+
+body.dark-mode.perf-page .perf-modal-card {
+    background: var(--dm-panel, #182230);
+    color: var(--dm-text, #e8eef7);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+}
+
+body.dark-mode.perf-page .perf-modal-close,
+body.dark-mode.perf-page .perf-config-count,
+body.dark-mode.perf-page .perf-style-hint,
+body.dark-mode.perf-page .perf-style-desc,
+body.dark-mode.perf-page .perf-style-selected {
+    color: var(--dm-muted, #a9b7c9);
+}
+
+body.dark-mode.perf-page .perf-config-col {
+    background: var(--dm-panel-2, #1b2736);
+    border-color: var(--dm-border, #304258);
+}
+
+body.dark-mode.perf-page .perf-config-list label {
+    color: var(--dm-text, #e8eef7);
+}
+
+body.dark-mode.perf-page .perf-config-list label:hover {
+    background: var(--dm-panel-3, #223246);
+}
+
+body.dark-mode.perf-page .perf-style-tile {
+    background: var(--dm-panel-2, #1b2736);
+    border-color: var(--dm-border, #304258);
+    color: var(--dm-text, #e8eef7);
+}
+
+body.dark-mode.perf-page .perf-style-tile:hover {
+    border-color: #3d6a97;
+}
+
+body.dark-mode.perf-page .perf-style-tile.selected {
+    border-color: #f0a500;
+    box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.22);
+}
+
+body.dark-mode.perf-page .perf-style-thumb {
+    background: var(--dm-input, #101b28);
+}
+
+body.dark-mode.perf-page .chart-gear-btn {
+    background: var(--dm-panel-2, #1b2736);
+    border-color: var(--dm-border, #304258);
+    color: var(--dm-text, #e8eef7);
+}
+
+body.dark-mode.perf-page .chart-gear-btn:hover {
+    background: var(--dm-panel-3, #223246);
 }
 
 body.dark-mode.perf-page .hw-tree-search::placeholder {

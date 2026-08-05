@@ -444,6 +444,38 @@
         saveBtn.hidden = !cmWriteAllowed || !hasEditColumn || pendingChanges.size === 0;
     }
 
+    function applyLocalRowUpdate(row, index, value) {
+        const editCol = resolveEditColumn(displayColumns(currentRows));
+        if (vendor === 'nokia') {
+            row.angle = value;
+            if (editCol) row[editCol] = value;
+        } else {
+            const tiltKey = Object.keys(row).find((k) => isHuaweiTiltColumn(k)) || 'Tilt';
+            row[tiltKey] = value;
+        }
+        const key = rowKey(row, index);
+        pendingChanges.delete(key);
+    }
+
+    function applyLocalPendingUpdates() {
+        pendingChanges.forEach(({ row, index, value }) => {
+            applyLocalRowUpdate(row, index, value);
+        });
+        pendingChanges.clear();
+        renderTable();
+    }
+
+    function nokiaUpdatePayload(row, angle, ne) {
+        return {
+            dist_name: row.DN || row.dn,
+            configDN: row.configDN || row.configDn || '',
+            runtime_DN: row.runtime_DN || '',
+            site_id: ne?.site_id || '',
+            angle,
+            mo_class: nokiaMoClass || undefined,
+        };
+    }
+
     async function saveSingleRow(row, index, tr) {
         const ne = selectedNe();
         if (!ne) return;
@@ -462,12 +494,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         mo_class: nokiaMoClass || undefined,
-                        updates: [{
-                            dist_name: row.DN || row.dn,
-                            angle: tiltValue,
-                            old_angle: row.angle ?? '',
-                            mo_class: nokiaMoClass || undefined,
-                        }],
+                        site_id: ne.site_id,
+                        updates: [nokiaUpdatePayload(row, tiltValue, ne)],
                         wait: true,
                     }),
                 });
@@ -497,7 +525,8 @@
                 showCredentialFallbackNotice(data);
             }
             setStatus(loadStatus, 'Change applied successfully', 'ok');
-            await loadRets();
+            applyLocalRowUpdate(row, index, tiltValue);
+            renderTable();
         } catch (err) {
             setStatus(loadStatus, err.message, 'error');
         } finally {
@@ -668,17 +697,17 @@
             if (vendor === 'nokia') {
                 const updates = [];
                 pendingChanges.forEach(({ row, value }) => {
-                    updates.push({
-                        dist_name: row.DN || row.dn,
-                        angle: value,
-                        old_angle: row.angle ?? row[NOKIA_EDIT_COL] ?? '',
-                        mo_class: nokiaMoClass || undefined,
-                    });
+                    updates.push(nokiaUpdatePayload(row, value, ne));
                 });
                 const res = await fetch('/api/ret-management/nokia/retu/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ updates, wait: true, mo_class: nokiaMoClass || undefined }),
+                    body: JSON.stringify({
+                        updates,
+                        wait: true,
+                        mo_class: nokiaMoClass || undefined,
+                        site_id: ne.site_id,
+                    }),
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Nokia update failed');
@@ -703,7 +732,7 @@
                 }
             }
             setStatus(loadStatus, 'Changes applied successfully', 'ok');
-            await loadRets();
+            applyLocalPendingUpdates();
         } catch (err) {
             setStatus(loadStatus, err.message, 'error');
         } finally {

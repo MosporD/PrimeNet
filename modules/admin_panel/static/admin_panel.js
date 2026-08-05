@@ -8,11 +8,16 @@ let syncMsgTimer = null;
 let syncStatusRows = [];
 let syncHistoryRows = [];
 let retFallbackRows = [];
+let activityRows = [];
+let filteredActivityRows = [];
 let usersPage = 1;
 let syncStatusPage = 1;
 let syncHistoryPage = 1;
+let activityPage = 1;
+let activityLoaded = false;
 const USERS_PAGE_SIZE = 12;
 const SYNC_PAGE_SIZE = 10;
+const ACTIVITY_PAGE_SIZE = 15;
 let progressPollTimer = null;
 const ROLE_LABELS = {
     admin: 'Owner',
@@ -53,6 +58,9 @@ function openAdminPage(pageName) {
     }
     if (pageName === 'feature-access' && !featureAccessLoaded) {
         loadFeatureAccess();
+    }
+    if (pageName === 'activity-log' && !activityLoaded) {
+        loadActivityLog();
     }
 }
 
@@ -1072,6 +1080,113 @@ function _retAlertTypeLabel(action) {
     return action || '';
 }
 
+// ── Activity Log ───────────────────────────────────────────────────────────
+const ACTIVITY_ACTION_LABELS = {
+    login: 'Login',
+    logout: 'Logout',
+    register: 'Registered',
+    config_upload: 'Config Uploaded',
+    config_download: 'Config Downloaded',
+    pci_conflict_check: 'PCI Check',
+    report_generated: 'Report Generated',
+    profile_update: 'Profile Updated',
+    password_change: 'Password Changed',
+    performance_view: 'Performance Viewed',
+    saved_view_delete: 'Saved View Deleted',
+    admin_table_export: 'Table Exported',
+    vendor_credentials_save: 'Vendor Credentials Saved',
+    vendor_credentials_clear: 'Vendor Credentials Cleared',
+    ret_credential_fallback: 'RET Credential Fallback',
+    ret_missing_credentials: 'RET Missing Credentials',
+};
+
+function _activityActionLabel(action) {
+    return ACTIVITY_ACTION_LABELS[action] || action || '';
+}
+
+function _activityUserLabel(item) {
+    return item.username || `User #${item.user_id || '?'}`;
+}
+
+async function loadActivityLog() {
+    const body = document.getElementById('activity-log-body');
+    if (!body) return;
+    activityLoaded = true;
+    const limit = document.getElementById('activity-limit')?.value || '200';
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading…</td></tr>';
+    try {
+        const res = await fetch(`/api/admin/activity?limit=${encodeURIComponent(limit)}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load activity log');
+        activityRows = data.activity || [];
+        filterActivityLog();
+    } catch (error) {
+        activityRows = [];
+        filteredActivityRows = [];
+        body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#c0392b;">${_escapeHtml(error.message || 'Load failed')}</td></tr>`;
+        renderPagination('activity-log-pagination', 0, ACTIVITY_PAGE_SIZE, 1, 'goToActivityPage');
+    }
+}
+
+function filterActivityLog() {
+    const term = (document.getElementById('activity-search')?.value || '').trim().toLowerCase();
+    filteredActivityRows = !term ? [...activityRows] : activityRows.filter((item) => {
+        const haystack = [
+            _activityUserLabel(item),
+            _activityActionLabel(item.action),
+            item.action,
+            item.details,
+            item.ip_address,
+        ].join(' ').toLowerCase();
+        return haystack.includes(term);
+    });
+    activityPage = 1;
+    renderActivityPage();
+}
+
+function clearActivityFilters() {
+    const search = document.getElementById('activity-search');
+    if (search) search.value = '';
+    filterActivityLog();
+}
+
+function goToActivityPage(page) {
+    activityPage = Math.max(1, page);
+    renderActivityPage();
+}
+
+function renderActivityPage() {
+    const body = document.getElementById('activity-log-body');
+    if (!body) return;
+    if (!filteredActivityRows.length) {
+        const message = activityRows.length ? 'No entries match the current filter.' : 'No activity recorded yet.';
+        body.innerHTML = `<tr><td colspan="5" style="text-align:center;">${message}</td></tr>`;
+        renderPagination('activity-log-pagination', 0, ACTIVITY_PAGE_SIZE, 1, 'goToActivityPage');
+        return;
+    }
+    const start = (activityPage - 1) * ACTIVITY_PAGE_SIZE;
+    body.innerHTML = filteredActivityRows.slice(start, start + ACTIVITY_PAGE_SIZE).map((item) => `
+        <tr>
+            <td>${_escapeHtml((item.timestamp || '').slice(0, 19).replace('T', ' '))}</td>
+            <td>${_escapeHtml(_activityActionLabel(item.action))}</td>
+            <td>${_escapeHtml(_activityUserLabel(item))}</td>
+            <td>${_escapeHtml(item.details || '')}</td>
+            <td>${_escapeHtml(item.ip_address || '')}</td>
+        </tr>
+    `).join('');
+    renderPagination('activity-log-pagination', filteredActivityRows.length, ACTIVITY_PAGE_SIZE, activityPage, 'goToActivityPage');
+}
+
+function _activityRowExport(item) {
+    return {
+        timestamp: (item.timestamp || '').slice(0, 19).replace('T', ' '),
+        action: _activityActionLabel(item.action),
+        username: _activityUserLabel(item),
+        details: item.details || '',
+        ip_address: item.ip_address || '',
+    };
+}
+
 function _syncRowExport(row) {
     return {
         sync_type: row.sync_type || '',
@@ -1225,6 +1340,33 @@ async function exportAdminTable(tableKey) {
                     username: item.username || (`User #${item.user_id || '?'}`),
                     details: item.details || '',
                 })),
+            };
+        } else if (tableKey === 'recent_activity') {
+            if (!activityLoaded) {
+                await loadActivityLog();
+            }
+            if (!filteredActivityRows.length) {
+                showNotification('No activity entries to export', 'error');
+                return;
+            }
+            payload = {
+                table: 'recent_activity',
+                report_title: 'Activity Log',
+                sheet_title: 'Activity Log',
+                filename_stem: 'Admin_Activity_Log',
+                columns: ['timestamp', 'action', 'username', 'details', 'ip_address'],
+                column_labels: {
+                    timestamp: 'When',
+                    action: 'Action',
+                    username: 'User',
+                    details: 'Details',
+                    ip_address: 'IP Address',
+                },
+                rows: filteredActivityRows.map(_activityRowExport),
+                meta: {
+                    'Search Filter': document.getElementById('activity-search')?.value?.trim() || '(none)',
+                    'Records Loaded': `Last ${document.getElementById('activity-limit')?.value || '200'}`,
+                },
             };
         } else {
             showNotification('Unknown table export', 'error');

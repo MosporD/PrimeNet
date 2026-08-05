@@ -47,6 +47,7 @@
                 <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
                 <button class="admin-page-tab" data-page="feature-access" type="button" onclick="openAdminPage('feature-access')">Feature Access</button>
                 <button class="admin-page-tab" data-page="api-connections" type="button" onclick="openAdminPage('api-connections')">API Connections</button>
+                <button class="admin-page-tab" data-page="activity-log" type="button" onclick="openAdminPage('activity-log')">Activity Log</button>
                 {% else %}
                 <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
                 {% endif %}
@@ -242,6 +243,42 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="activity-log">
+                <div class="sync-section">
+                    <div class="section-title-row">
+                        <h2 class="section-title">Activity Log</h2>
+                        <button type="button" class="btn-history-reload" onclick="exportAdminTable('recent_activity')">Download Excel</button>
+                    </div>
+                    <h3 class="section-subtitle">Filters
+                        <input type="search" id="activity-search" placeholder="Filter by user, action or details…"
+                               autocomplete="off" oninput="filterActivityLog()">
+                        <select id="activity-limit" onchange="loadActivityLog()" title="Number of records to load">
+                            <option value="100">Last 100</option>
+                            <option value="200" selected>Last 200</option>
+                            <option value="500">Last 500</option>
+                            <option value="1000">Last 1000</option>
+                        </select>
+                        <button class="btn-history-reload" onclick="clearActivityFilters()">Clear Filters</button>
+                        <button class="btn-history-reload" onclick="loadActivityLog()">↻ Refresh</button>
+                    </h3>
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-log-body">
+                            <tr><td colspan="5" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="activity-log-pagination" class="table-pagination"></div>
                 </div>
             </div>
             {% endif %}

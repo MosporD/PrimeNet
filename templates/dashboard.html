@@ -867,6 +867,22 @@
             return `/performance?${params.toString()}`;
         }
 
+        function parameterSearchLink(row) {
+            const params = new URLSearchParams();
+            const vendor = String(row.vendor || '').toLowerCase();
+            if (vendor === 'huawei') {
+                params.set('vendor', 'huawei');
+                if (row.huawei_url) params.set('page', row.huawei_url);
+                else if (row.name) params.set('q', row.name);
+            } else {
+                params.set('vendor', 'nokia');
+                if (row.mo) params.set('mo', row.mo);
+                if (row.param) params.set('param', row.param);
+                else if (row.name) params.set('q', row.name);
+            }
+            return `/parameter-dictionary?${params.toString()}`;
+        }
+
         function renderGlobalSearchResults(data) {
             const box = document.getElementById('global-search-results');
             const input = document.getElementById('dashboard-tool-search');
@@ -902,7 +918,7 @@
             }
             if ((data.parameters || []).length) {
                 sections.push(`<div class="gs-section-title">Parameters</div>` + data.parameters.map(row => `
-                    <a class="gs-item" href="/parameter-dictionary">
+                    <a class="gs-item" href="${parameterSearchLink(row)}">
                         <span class="gs-icon">&#128218;</span>
                         <span class="gs-main">${escapeSearchHtml(row.name)}${row.sub ? ` <small>${escapeSearchHtml(row.sub)}</small>` : ''}</span>
                         <span class="gs-meta">${escapeSearchHtml(row.vendor)}${row.technology ? ` &middot; ${escapeSearchHtml(row.technology)}` : ''}</span>

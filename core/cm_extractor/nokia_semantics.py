@@ -1156,6 +1156,17 @@ def query_selected_parameters(
             include_all_columns=True,
         )
     headers = expression_column_labels(expressions)
+    if site_id and rows:
+        dn_index = headers.index('DN') if 'DN' in headers else 0
+        rows = [
+            row for row in rows
+            if filter_mo_ids_for_site(
+                [str(row[dn_index]) if dn_index < len(row) else ''],
+                site_id,
+                scope_level=scope_level,
+                site_name=site_name,
+            )
+        ]
     return headers, rows
 
 

@@ -44,6 +44,85 @@ function showVendorGate() {
     if (gate) gate.style.display = '';
 }
 
+function readParameterDictionaryDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    const vendor = (params.get('vendor') || '').trim().toLowerCase();
+    if (!vendor) return null;
+    return {
+        vendor,
+        mo: (params.get('mo') || '').trim(),
+        param: (params.get('param') || '').trim(),
+        q: (params.get('q') || '').trim(),
+        page: (params.get('page') || '').trim(),
+    };
+}
+
+async function applyParameterDictionaryDeepLink(link) {
+    if (!link) return;
+
+    hideAllVendorSections();
+    if (typeof window.setParameterDictionaryAiVendor === 'function') {
+        window.setParameterDictionaryAiVendor(link.vendor === 'huawei' ? 'huawei' : 'nokia');
+    }
+
+    if (link.vendor === 'huawei') {
+        const huaweiContent = document.getElementById('huawei-content');
+        if (huaweiContent) huaweiContent.style.display = '';
+        if (!hwTocLoaded) {
+            await loadHuaweiToc();
+        }
+        const hwSearch = document.getElementById('huawei-search');
+        if (link.page) {
+            navigateHuawei(link.page);
+        } else if (link.q && hwSearch) {
+            hwSearch.value = link.q;
+            renderHuaweiResults();
+            const first = document.querySelector('#huawei-results .hw-toc-item');
+            if (first) first.click();
+        }
+        return;
+    }
+
+    const nokiaContent = document.getElementById('nokia-content');
+    if (nokiaContent) nokiaContent.style.display = '';
+    if (!nokiaLoaded) {
+        await loadNokiaData();
+    }
+
+    const searchTerm = link.param || link.q;
+    if (link.mo && nokiaMOIndex.some((item) => item.mo === link.mo)) {
+        selectNokiaMO(link.mo);
+    }
+
+    if (searchTerm) {
+        const paramSearch = document.getElementById('nokia-param-search');
+        if (paramSearch) paramSearch.value = searchTerm;
+        await fetchAndRenderNokiaParamTable();
+
+        const exact = nokiaActiveRows.find(
+            (row) => String(row['Abbreviated Name'] || '').toLowerCase() === searchTerm.toLowerCase()
+        );
+        const partial = nokiaActiveRows.find(
+            (row) => String(row['Abbreviated Name'] || '').toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        const match = exact || partial || nokiaActiveRows[0];
+        if (match) {
+            if (match._mo && match._mo !== nokiaActiveMO) {
+                selectNokiaMO(match._mo);
+                const paramSearchAgain = document.getElementById('nokia-param-search');
+                if (paramSearchAgain) paramSearchAgain.value = searchTerm;
+                await fetchAndRenderNokiaParamTable();
+                const rematch = nokiaActiveRows.find(
+                    (row) => String(row['Abbreviated Name'] || '').toLowerCase() === String(match['Abbreviated Name'] || '').toLowerCase()
+                );
+                if (rematch) openNokiaDetail(rematch);
+            } else {
+                openNokiaDetail(match);
+            }
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const nokiaBtn = document.getElementById('vendor-nokia-btn');
     const nokiaTreeBtn = document.getElementById('vendor-nokia-tree-btn');
@@ -137,6 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
             hwSearchTimer = setTimeout(renderHuaweiResults, 180);
         });
     }
+
+    applyParameterDictionaryDeepLink(readParameterDictionaryDeepLink());
 });
 
 /* ── Nokia browser ── */

@@ -316,6 +316,11 @@ def nokia_retu_update():
         updates = data.get('updates')
         if not isinstance(updates, list):
             updates = [data] if data.get('dist_name') or data.get('dn') else []
+        site_id = str(data.get('site_id') or '').strip()
+        if site_id:
+            for item in updates:
+                if isinstance(item, dict) and not str(item.get('site_id') or '').strip():
+                    item['site_id'] = site_id
         user = get_current_user()
         mo_class = str(data.get('mo_class') or '').strip() or None
         if not mo_class:

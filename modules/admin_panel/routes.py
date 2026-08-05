@@ -794,7 +794,34 @@ def ret_credential_fallbacks():
     })
 
 
-_EXPORT_TABLES_OWNER = frozenset({'sync_status', 'sync_history', 'ret_credential_alerts'})
+_ACTIVITY_DEFAULT_LIMIT = 200
+_ACTIVITY_MAX_LIMIT = 1000
+
+
+@admin_panel_bp.route('/api/admin/activity')
+def admin_recent_activity():
+    """Return the platform-wide activity log (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    try:
+        limit = int(request.args.get('limit') or _ACTIVITY_DEFAULT_LIMIT)
+    except (TypeError, ValueError):
+        limit = _ACTIVITY_DEFAULT_LIMIT
+    limit = min(max(limit, 1), _ACTIVITY_MAX_LIMIT)
+    conn = get_db()
+    rows = execute_query(conn, '''
+        SELECT a.timestamp, a.action, a.details, a.ip_address, a.user_id, u.username
+        FROM activity_log a
+        LEFT JOIN users u ON u.id = a.user_id
+        ORDER BY a.timestamp DESC
+        LIMIT ?
+    ''', (limit,)).fetchall()
+    conn.close()
+    return jsonify({'success': True, 'activity': [dict(row) for row in rows]})
+
+
+_EXPORT_TABLES_OWNER = frozenset({'sync_status', 'sync_history', 'ret_credential_alerts', 'recent_activity'})
 _EXPORT_TABLES_USER_ADMIN = frozenset({'users', 'ret_credential_alerts'})
 
 

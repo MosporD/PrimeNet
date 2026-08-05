@@ -9,10 +9,14 @@ from core.cm_extractor.config import huawei_configured, nokia_configured
 from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.mml_parser import normalize_mml_command, parse_mml_report, repair_mml_rows
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
-from core.cm_extractor.nokia_mass_modify import apply_mass_modifications
+from core.cm_extractor.nokia_mass_modify import (
+    apply_mass_modifications,
+    is_empty_plan_error,
+)
 from core.cm_extractor.nokia_operations_client import NokiaOperationsError
 from core.cm_extractor.nokia_semantics import (
     build_mo_path,
+    filter_mo_ids_for_site,
     get_mo_class_catalog,
     query_parameters_individually,
     query_selected_parameters,
@@ -23,6 +27,7 @@ from core.cm_extractor.site_catalog import (
     list_nokia_inventory_sites,
     merge_huawei_ne_names,
     resolve_huawei_ne_names,
+    resolve_nokia_netact_site_id,
 )
 
 HUAWEI_MO = 'RETSUBUNIT'
@@ -936,7 +941,7 @@ NOKIA_MO_CLASS_FALLBACK = NOKIA_MO_CLASS_WRITE_FALLBACK
 
 def config_retu_dist_name(row: dict[str, Any]) -> str:
     """Map a runtime RETU_R row to the config RETU distinguished name for writes."""
-    config_dn = str(row.get('configDN') or '').strip()
+    config_dn = str(row.get('configDN') or row.get('configDn') or '').strip()
     if config_dn:
         if config_dn.startswith('PLMN-'):
             return config_dn
@@ -952,6 +957,66 @@ def config_retu_dist_name(row: dict[str, Any]) -> str:
         .replace('/ALD_R-', '/ALD-')
         .replace('/RETU_R-', '/RETU-')
     )
+
+
+def _retu_write_dist_name_candidates(item: dict[str, Any]) -> list[str]:
+    """Candidate config RETU DNs for Provision_Mass_Modification."""
+    candidates: list[str] = []
+
+    def add(dn: str) -> None:
+        token = str(dn or '').strip()
+        if token and token not in candidates:
+            candidates.append(token)
+
+    add(config_retu_dist_name(item))
+    dist = str(item.get('dist_name') or item.get('DN') or item.get('dn') or '').strip()
+    if '/RETU_R-' in dist:
+        add(config_retu_dist_name({'DN': dist, 'runtime_DN': dist}))
+    elif dist:
+        add(dist)
+
+    site_id = str(item.get('site_id') or '').strip()
+    seed = candidates[0] if candidates else ''
+    if site_id and seed and '/MRBTS-' in seed:
+        for netact_id in _mrbts_query_element_ids(site_id):
+            rewritten = re.sub(r'/MRBTS-[^/]+/', f'/MRBTS-{netact_id}/', seed, count=1)
+            add(rewritten)
+
+    return candidates
+
+
+def _mrbts_query_element_ids(site_id: str) -> list[str]:
+    """Candidate NetAct MRBTS instance ids to scope RETU_R queries."""
+    ids: list[str] = []
+    for candidate in (
+        site_id,
+        resolve_scope_instance_id(site_id, 'MRBTS'),
+        resolve_nokia_netact_site_id(site_id),
+    ):
+        token = str(candidate or '').strip()
+        if token and token not in ids:
+            ids.append(token)
+    return ids
+
+
+def _filter_retu_records_for_site(
+    records: list[dict[str, Any]],
+    site_id: str,
+) -> list[dict[str, Any]]:
+    """Keep only RETU rows whose DN belongs to the selected MRBTS."""
+    if not site_id or not records:
+        return records
+    kept: list[dict[str, Any]] = []
+    for record in records:
+        dn = str(
+            record.get('runtime_DN')
+            or record.get('DN')
+            or record.get('dn')
+            or ''
+        ).strip()
+        if dn and filter_mo_ids_for_site([dn], site_id, scope_level='MRBTS'):
+            kept.append(record)
+    return kept
 
 
 def fetch_nokia_retu_angles(
@@ -976,7 +1041,6 @@ def fetch_nokia_retu_angles(
         raise ValueError(f'Invalid RETU_R MO class id: {read_mo_class}')
     adaptation, abbreviation = read_mo_class.split(':', 1)
     params = list(NOKIA_RETU_PARAMS)
-    path_element_id = resolve_scope_instance_id(site_id, 'MRBTS')
     warnings: list[str] = []
 
     def _query(mo_path: str) -> tuple[list[str], list[list[Any]]]:
@@ -1003,18 +1067,25 @@ def fetch_nokia_retu_angles(
                 include_all_columns=True,
             )
 
-    mo_path = build_mo_path(
-        adaptation,
-        abbreviation,
-        scope_level='MRBTS',
-        element_id=path_element_id,
-    )
-    headers, rows = _query(mo_path)
+    headers: list[str] = []
+    rows: list[list[Any]] = []
+    for element_id in _mrbts_query_element_ids(site_id):
+        mo_path = build_mo_path(
+            adaptation,
+            abbreviation,
+            scope_level='MRBTS',
+            element_id=element_id,
+        )
+        headers, rows = _query(mo_path)
+        if rows:
+            break
+
     if not rows:
         mo_path = build_mo_path(adaptation, abbreviation, scope_level='MRBTS', element_id=None)
         headers, rows = _query(mo_path)
 
     records = _rows_to_records(headers, rows)
+    raw_count = len(records)
     for record in records:
         runtime_dn = str(record.get('DN') or record.get('dn') or '').strip()
         if runtime_dn:
@@ -1022,6 +1093,13 @@ def fetch_nokia_retu_angles(
         write_dn = config_retu_dist_name(record)
         if write_dn:
             record['DN'] = write_dn
+
+    records = _filter_retu_records_for_site(records, site_id)
+    if raw_count and len(records) != raw_count:
+        warnings.append(
+            f'Scoped RETU_R query returned network-wide data; kept {len(records)} '
+            f'row(s) for site {site_id}.'
+        )
 
     if not records:
         warnings.append(
@@ -1047,40 +1125,53 @@ def apply_nokia_angle_changes(
         raise ValueError('No angle updates provided')
 
     class_id = (mo_class or '').strip() or NOKIA_MO_CLASS_WRITE_FALLBACK
-    mass_updates: list[dict[str, Any]] = []
+    all_operations: list[dict[str, Any]] = []
+
     for item in updates:
-        dist_name = str(
-            item.get('dist_name')
-            or item.get('dn')
-            or item.get('DN')
-            or config_retu_dist_name(item)
-            or ''
-        ).strip()
         angle = str(item.get('angle') if item.get('angle') is not None else '').strip()
-        if not dist_name:
-            raise ValueError('Each update requires dist_name (DN)')
         if not angle:
             raise ValueError('Each update requires angle')
-        # Never write to runtime RETU_R — remap if a client still sends it.
-        if '/RETU_R-' in dist_name:
-            dist_name = config_retu_dist_name({'DN': dist_name})
         item_class = str(item.get('mo_class') or item.get('mo_class_id') or class_id).strip()
         if item_class.endswith(':RETU_R') or item_class.upper().endswith('RETU_R'):
             item_class = NOKIA_MO_CLASS_WRITE_FALLBACK
-        mass_updates.append({
-            'dist_name': dist_name,
+
+        dn_candidates = _retu_write_dist_name_candidates(item)
+        if not dn_candidates:
+            raise ValueError('Each update requires dist_name (DN) or configDN')
+
+        # Runtime RETU_R angle often differs from planned RETU — omit old_value for Mass Provision.
+        mass_item = {
             'parameter': 'angle',
             'new_value': angle,
-            'old_value': str(item.get('old_angle') or ''),
             'mo_class': item_class,
-        })
+        }
 
-    return apply_mass_modifications(
-        mass_updates,
-        wait=wait,
-        mo_class=class_id,
-        client=operations_client,
-    )
+        last_error: Exception | None = None
+        applied = False
+        for dist_name in dn_candidates:
+            try:
+                result = apply_mass_modifications(
+                    [{**mass_item, 'dist_name': dist_name}],
+                    wait=wait,
+                    mo_class=class_id,
+                    client=operations_client,
+                )
+                all_operations.extend(result.get('operations') or [])
+                applied = True
+                break
+            except Exception as exc:
+                last_error = exc
+                if is_empty_plan_error(str(exc)) and dist_name != dn_candidates[-1]:
+                    continue
+                raise
+        if not applied and last_error:
+            raise last_error
+
+    return {
+        'operation_name': 'Provision_Mass_Modification',
+        'change_count': len(all_operations),
+        'operations': all_operations,
+    }
 
 
 def vendor_status() -> dict[str, bool]:

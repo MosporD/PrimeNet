@@ -68,6 +68,7 @@ def nokia_defaults() -> dict:
         'max_retries': _env_int('NOKIA_CM_MAX_RETRIES', 8),
         'retry_base_delay_sec': _env_float('NOKIA_CM_RETRY_BASE_DELAY_SEC', 2.0),
         'timeout': _env_int('NOKIA_CM_TIMEOUT', 180),
+        'operation_poll_interval_sec': _env_float('NOKIA_CM_OPS_POLL_INTERVAL_SEC', 1.5),
     }
 
 
@@ -184,6 +185,11 @@ def build_nokia_operations_client(conn: dict[str, Any] | None = None):
         use_https=bool(conn.get('use_https', cfg.get('use_https', True))),
         verify_ssl=bool(conn.get('verify_ssl', cfg.get('verify_ssl', False))),
         timeout=int(conn.get('timeout') or cfg.get('timeout') or 180),
+        poll_interval_sec=float(
+            conn.get('poll_interval_sec')
+            or cfg.get('operation_poll_interval_sec')
+            or 1.5
+        ),
     )
 
 

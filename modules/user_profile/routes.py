@@ -568,24 +568,3 @@ def delete_saved_view(view_id: str):
     conn.close()
     log_activity(user['id'], 'saved_view_delete', f'Deleted saved view {view_id}')
     return jsonify({'success': True})
-
-
-# ── API: recent activity ──────────────────────────────────────────────────────
-
-@user_profile_bp.route('/api/profile/activity')
-@login_required
-def recent_activity():
-    user = get_current_user()
-    role = (user.get('role') or '').strip().lower()
-    if role != 'admin':
-        return jsonify({'error': 'Only Owner can view activity history'}), 403
-    conn = _db()
-    rows = execute_query(conn, '''
-        SELECT a.action, a.details, a.ip_address, a.timestamp, a.user_id, u.username
-        FROM activity_log a
-        LEFT JOIN users u ON u.id = a.user_id
-        ORDER BY timestamp DESC
-        LIMIT 200
-    ''', ()).fetchall()
-    conn.close()
-    return jsonify({'success': True, 'activity': [dict(r) for r in rows]})

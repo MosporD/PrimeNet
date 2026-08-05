@@ -5,9 +5,6 @@ window.addEventListener('DOMContentLoaded', () => {
     loadProfile();
     loadPreferences();
     loadVendorCredentials();
-    if (document.getElementById('activityList')) {
-        loadActivity();
-    }
     document.getElementById('newPassword').addEventListener('input', updateStrength);
 });
 
@@ -218,49 +215,6 @@ async function savePreferences() {
         el.className = 'status-message error';
         el.textContent = data.error || 'Save failed';
     }
-}
-
-// ── Activity ──────────────────────────────────────────────────────────────────
-async function loadActivity() {
-    const res  = await fetch('/api/profile/activity');
-    const data = await res.json();
-    const list = document.getElementById('activityList');
-
-    const activity = data.activity || [];
-    if (!activity.length) {
-        list.innerHTML = '<p style="color:#bbb;text-align:center;padding:20px">No activity recorded yet</p>';
-        return;
-    }
-
-    list.innerHTML = activity.map(a => `
-        <div class="activity-item">
-            <span class="activity-time">${(a.timestamp || '').slice(0, 16)}</span>
-            <div>
-                <div class="activity-action">${formatAction(a.action)}</div>
-                <div class="activity-details"><strong>${a.username || ('User #' + (a.user_id || '?'))}</strong> — ${a.details || ''}</div>
-            </div>
-        </div>
-    `).join('');
-}
-
-function formatAction(action) {
-    const map = {
-        login:              '🔑 Login',
-        logout:             '🚪 Logout',
-        register:           '✅ Registered',
-        config_upload:      '📤 Config Uploaded',
-        config_download:    '📥 Config Downloaded',
-        pci_conflict_check: '🔍 PCI Check',
-        report_generated:   '📊 Report Generated',
-        profile_update:     '✏️ Profile Updated',
-        password_change:    '🔒 Password Changed',
-        performance_view:   '📈 Performance Viewed',
-        vendor_credentials_save:  '🔐 Vendor Credentials Saved',
-        vendor_credentials_clear: '🗑️ Vendor Credentials Cleared',
-        ret_credential_fallback:  '⚠️ RET Credential Fallback',
-        ret_missing_credentials:  '⚠️ RET Missing Credentials',
-    };
-    return map[action] || action;
 }
 
 // ── Vendor credentials (RET management) ─────────────────────────────────────
