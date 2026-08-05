@@ -13,6 +13,8 @@ services:
     image: primenet:latest
     container_name: primenet-web
     restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
     ports:
       - "${PRIMENET_HTTP_PORT:-8000}:8000"
     env_file:
@@ -40,6 +42,8 @@ services:
     image: primenet:latest
     container_name: primenet-scheduler
     restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
     command: ["scheduler"]
     env_file:
       - .env

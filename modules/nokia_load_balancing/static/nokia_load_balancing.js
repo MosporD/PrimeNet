@@ -345,6 +345,17 @@
                 dbInventory.textContent = 'Database empty — sync Nokia and Huawei CSVs for your date range.';
             }
 
+            const smb = data.smb || {};
+            if (smb.enabled) {
+                const smbOk = Boolean(smb.mounted || data.db_has_data);
+                const hostLabel = smb.host ? `${smb.host}/${smb.share || 'share'}` : 'SMB share';
+                setPill(
+                    balanceStatus,
+                    smbOk ? `${hostLabel} mounted` : `SMB not mounted (${hostLabel})`,
+                    smbOk ? 'ok' : 'error'
+                );
+            }
+
             const parts = [];
             if (data.nokia_in_db) parts.push('Nokia');
             if (data.huawei_in_db) parts.push('Huawei');

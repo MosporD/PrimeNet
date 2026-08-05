@@ -3,6 +3,10 @@ set -eu
 
 cd /app
 
+if [ -f /app/deploy/mount_network_balance.sh ]; then
+  /app/deploy/mount_network_balance.sh || echo "WARN: Network Balance SMB mount failed (see logs above)" >&2
+fi
+
 DATA_ROOT="${NCM_DATA_ROOT:-/data}"
 mkdir -p "${DATA_ROOT}/databases" "${DATA_ROOT}/sync_downloads" "${DATA_ROOT}/raw/KPIs"
 if id primenet >/dev/null 2>&1; then

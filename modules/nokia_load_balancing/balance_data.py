@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 
 from . import config
+from .smb_config import mount_point_active, smb_status_public
 from .balance_store import (
     db_has_data,
     get_sectors_from_db,
@@ -25,7 +26,7 @@ def balance_configured() -> bool:
         return True
     root = balance_root()
     try:
-        return root.is_dir()
+        return mount_point_active(str(root))
     except OSError:
         return False
 
@@ -73,10 +74,19 @@ def load_balance_df(
     warnings: list[str] = []
 
     if not folder.is_dir():
-        warnings.append(
-            f"Network Balance folder not accessible: {folder}. "
-            "Set NETWORK_BALANCE_PATH in .env if the share path differs."
-        )
+        smb = smb_status_public()
+        hint = "Set NETWORK_BALANCE_PATH in .env if CSVs live on a local folder."
+        if smb.get("enabled"):
+            hint = (
+                "Check NETWORK_BALANCE_SMB_HOST, USER, PASSWORD, DOMAIN in .env "
+                f"and confirm the share is mounted at {smb.get('mount_point')}."
+            )
+        elif not str(folder).startswith("\\\\"):
+            hint = (
+                "On Linux, set NETWORK_BALANCE_SMB_ENABLED=1 and NETWORK_BALANCE_SMB_* in .env, "
+                "or mount the share and set NETWORK_BALANCE_PATH."
+            )
+        warnings.append(f"Network Balance folder not accessible: {folder}. {hint}")
         return None, None, warnings
 
     start = _as_date(target) or date.today()

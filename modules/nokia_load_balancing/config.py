@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import os
 
+from .smb_config import resolve_balance_path
+
 # Managed object and parameters pulled from NetAct CM.
 AMLE_MO_CLASS = "NOKLTE:AMLEPR"
 AMLE_PARAMS = ["cacHeadroom", "deltaCac", "maxCacThreshold"]
 CM_EXTRA_PARAMS = ["targetCarrierFreq"]
 
 # Network Balance share (daily Nokia/Huawei balancing CSV exports).
-NETWORK_BALANCE_PATH = os.environ.get("NETWORK_BALANCE_PATH", r"\\RNO-WAN\Network Balance")
+# Linux/Docker: set NETWORK_BALANCE_PATH and/or NETWORK_BALANCE_SMB_* in .env.
+NETWORK_BALANCE_PATH = resolve_balance_path()
 NETWORK_BALANCE_VENDOR = os.environ.get("NETWORK_BALANCE_VENDOR", "Nokia")
 SECTOR_COLUMN = "Sector"
 STATUS_COLUMN = "New Balancing Status"

@@ -16,6 +16,7 @@ WORKDIR /app
 # lxml runtime libs; build tools only if a wheel is unavailable
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        cifs-utils \
         libxml2 \
         libxslt1.1 \
         util-linux \
@@ -29,7 +30,9 @@ COPY . .
 RUN useradd --create-home --uid 1000 --shell /usr/sbin/nologin primenet \
     && mkdir -p /data/databases /data/sync_downloads /data/raw/KPIs \
     && chown -R primenet:primenet /app /data \
-    && chmod +x /app/deploy/entrypoint.sh
+    && chmod +x /app/deploy/entrypoint.sh \
+    && chmod +x /app/deploy/mount_network_balance.sh \
+    && chmod +x /app/deploy/mount_network_balance_from_env.sh
 
 EXPOSE 8000
 
