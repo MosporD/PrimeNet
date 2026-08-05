@@ -80,6 +80,8 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)')
     
     # Activity log table
     cursor.execute('''
@@ -539,6 +541,21 @@ def create_session(user_id):
 
 def get_user_by_session(session_token):
     """Get user data by session token"""
+    if not session_token:
+        return None
+    try:
+        from flask import g, has_request_context
+
+        if has_request_context():
+            cache = getattr(g, '_session_user_cache', None)
+            if cache is None:
+                cache = {}
+                g._session_user_cache = cache
+            if session_token in cache:
+                return cache[session_token]
+    except ImportError:
+        pass
+
     conn = get_db()
     cursor = conn.cursor()
     
@@ -555,7 +572,17 @@ def get_user_by_session(session_token):
     user = cursor.fetchone()
     conn.close()
     
-    return dict(user) if user else None
+    result = dict(user) if user else None
+    try:
+        from flask import g, has_request_context
+
+        if has_request_context():
+            if getattr(g, '_session_user_cache', None) is None:
+                g._session_user_cache = {}
+            g._session_user_cache[session_token] = result
+    except ImportError:
+        pass
+    return result
 
 def delete_session(session_token):
     """Delete session (logout)"""

@@ -275,4 +275,10 @@ def refresh_nokia_inventory_cache(
         'fetched_at': _CACHE['fetched_at'],
         'metadata_enrichment': _METADATA_ENRICHMENT_VERSION,
     })
+    try:
+        from core.cm_extractor.site_catalog import invalidate_nokia_site_id_caches
+
+        invalidate_nokia_site_id_caches()
+    except Exception:
+        pass
     return result

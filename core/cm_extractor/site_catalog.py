@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import time
 
 from db.runtime import connect_metadata, execute_query
 
@@ -10,6 +11,10 @@ SCOPE_LEVELS = ('MRBTS', 'RNC', 'BSC')
 _PASTE_SPLIT_RE = re.compile(r'[\s,;]+')
 # NetAct MRBTS instance ids often prefix PrimeNet metadata ids (e.g. 50801 → 801).
 _NOKIA_NETACT_MRBTS_PREFIXES = ('50', '51', '52', '53', '54', '55')
+
+_KNOWN_METADATA_IDS_CACHE: set[str] | None = None
+_METADATA_TO_NETACT_MAP: dict[str, str] | None = None
+_METADATA_TO_NETACT_BUILT_AT: float = 0.0
 
 
 def normalize_scope_level(scope_level: str) -> str:
@@ -24,6 +29,7 @@ def resolve_scope_instance_id(
     scope_level: str,
     *,
     site_name: str = '',
+    known_metadata_ids: set[str] | None = None,
 ) -> str:
     """
     Map a metadata site id to the NetAct MO instance() used in distNames.
@@ -36,7 +42,7 @@ def resolve_scope_instance_id(
     if not token:
         return ''
     if level == 'MRBTS':
-        return resolve_nokia_netact_site_id(token) or token
+        return resolve_nokia_netact_site_id(token, known_metadata_ids=known_metadata_ids) or token
 
     if level == 'RNC':
         name = (site_name or '').strip().upper()
@@ -108,7 +114,10 @@ def scope_dn_needles(
     return (f'/BSC-{token}', f'/BSC-{resolved}') if resolved != token else (f'/BSC-{token}',)
 
 
-def _known_nokia_metadata_site_ids() -> set[str]:
+def _known_nokia_metadata_site_ids(*, force_refresh: bool = False) -> set[str]:
+    global _KNOWN_METADATA_IDS_CACHE
+    if not force_refresh and _KNOWN_METADATA_IDS_CACHE is not None:
+        return _KNOWN_METADATA_IDS_CACHE
     conn = connect_metadata()
     try:
         rows = execute_query(
@@ -116,9 +125,19 @@ def _known_nokia_metadata_site_ids() -> set[str]:
             "SELECT site_id FROM sites WHERE NULLIF(TRIM(site_id), '') IS NOT NULL",
             [],
         ).fetchall()
-        return {str(row['site_id']).strip() for row in rows if str(row['site_id'] or '').strip()}
+        known = {str(row['site_id']).strip() for row in rows if str(row['site_id'] or '').strip()}
     finally:
         conn.close()
+    _KNOWN_METADATA_IDS_CACHE = known
+    return known
+
+
+def invalidate_nokia_site_id_caches() -> None:
+    """Clear in-memory Nokia site-id mapping caches (e.g. after metadata sync)."""
+    global _KNOWN_METADATA_IDS_CACHE, _METADATA_TO_NETACT_MAP, _METADATA_TO_NETACT_BUILT_AT
+    _KNOWN_METADATA_IDS_CACHE = None
+    _METADATA_TO_NETACT_MAP = None
+    _METADATA_TO_NETACT_BUILT_AT = 0.0
 
 
 def resolve_nokia_metadata_site_id(
@@ -174,6 +193,40 @@ def resolve_nokia_metadata_site_id(
     return token
 
 
+def _metadata_to_netact_map(known_metadata_ids: set[str]) -> dict[str, str]:
+    """Build metadata site_id → NetAct MRBTS instance map from discovery cache."""
+    global _METADATA_TO_NETACT_MAP, _METADATA_TO_NETACT_BUILT_AT
+    try:
+        from core.cm_extractor import nokia_discovery
+        from core.cm_extractor.nokia_discovery import get_cached_nokia_inventory, reload_inventory_from_disk
+
+        reload_inventory_from_disk()
+        records = get_cached_nokia_inventory('MRBTS') or []
+        fetched_at = float(nokia_discovery._CACHE.get('fetched_at') or time.time())
+    except Exception:
+        records = []
+        fetched_at = time.time()
+
+    if (
+        _METADATA_TO_NETACT_MAP is not None
+        and _METADATA_TO_NETACT_BUILT_AT >= fetched_at
+    ):
+        return _METADATA_TO_NETACT_MAP
+
+    mapping: dict[str, str] = {}
+    for rec in records:
+        netact = str(rec.get('site_id') or '').strip()
+        if not netact:
+            continue
+        metadata_id = resolve_nokia_metadata_site_id(netact, known_metadata_ids=known_metadata_ids)
+        if metadata_id and metadata_id not in mapping:
+            mapping[metadata_id] = netact
+
+    _METADATA_TO_NETACT_MAP = mapping
+    _METADATA_TO_NETACT_BUILT_AT = fetched_at
+    return mapping
+
+
 def _lookup_netact_site_id_from_cache(
     metadata_site_id: str,
     known_metadata_ids: set[str],
@@ -182,27 +235,7 @@ def _lookup_netact_site_id_from_cache(
     token = str(metadata_site_id or '').strip()
     if not token:
         return ''
-    try:
-        from core.cm_extractor.nokia_discovery import get_cached_nokia_inventory, reload_inventory_from_disk
-
-        reload_inventory_from_disk()
-        records = get_cached_nokia_inventory('MRBTS') or []
-    except Exception:
-        records = []
-    matches: list[str] = []
-    for rec in records:
-        netact = str(rec.get('site_id') or '').strip()
-        if not netact:
-            continue
-        if resolve_nokia_metadata_site_id(netact, known_metadata_ids=known_metadata_ids) == token:
-            matches.append(netact)
-    if not matches:
-        return ''
-    prefixed = [
-        netact for netact in matches
-        if len(netact) == 5 and netact.isdigit() and netact[:2] in _NOKIA_NETACT_MRBTS_PREFIXES
-    ]
-    return prefixed[0] if prefixed else matches[0]
+    return _metadata_to_netact_map(known_metadata_ids).get(token, '')
 
 
 def _netact_candidates_for_metadata(metadata_site_id: str) -> list[str]:
@@ -230,6 +263,10 @@ def resolve_nokia_netact_site_id(
         return ''
     known = known_metadata_ids if known_metadata_ids is not None else _known_nokia_metadata_site_ids()
 
+    # Input may already be a NetAct instance id (e.g. 55635, 50801).
+    if resolve_nokia_metadata_site_id(token, known_metadata_ids=known) != token:
+        return token
+
     for candidate in _netact_candidates_for_metadata(token):
         if resolve_nokia_metadata_site_id(candidate, known_metadata_ids=known) == token:
             return candidate
@@ -237,10 +274,6 @@ def resolve_nokia_netact_site_id(
     cached = _lookup_netact_site_id_from_cache(token, known)
     if cached and cached != token:
         return cached
-
-    # Input may already be a NetAct instance id (e.g. 55635, 50801).
-    if resolve_nokia_metadata_site_id(token, known_metadata_ids=known) != token:
-        return token
 
     return token
 
@@ -723,7 +756,12 @@ def list_nokia_inventory_sites(
         )
         if _meta_id:
             metadata_site_id = _meta_id
-        netact_id = resolve_scope_instance_id(site_id, level, site_name=site_name)
+        netact_id = resolve_scope_instance_id(
+            site_id,
+            level,
+            site_name=site_name,
+            known_metadata_ids=known_metadata_ids,
+        )
         label = f'{site_name} ({site_id})'
         if metadata_site_id and metadata_site_id != site_id:
             label = f'{site_name} ({metadata_site_id} → NetAct {site_id})'
