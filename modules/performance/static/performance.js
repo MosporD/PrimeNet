@@ -3323,7 +3323,7 @@ function _buildAreaChildrenHtml(areaKey) {
             <div class="hw-tree-folder-row">
                 <button type="button" class="hw-tree-twisty" aria-expanded="true">−</button>
                 <span class="hw-tree-ico" aria-hidden="true">📁</span>
-                <span class="hw-tree-folder-name" title="${escAttr(site.site_name)}">${escHtml(site.site_name)}</span>
+                <span class="hw-tree-folder-name" title="${escAttr(_perfSiteFolderLabel(site))}">${escHtml(_perfSiteFolderLabel(site))}</span>
                 <button type="button" class="hw-tree-site-select-all" title="Select all cells at this site" aria-label="Select all cells at this site">All</button>
                 <span class="hw-tree-folder-meta">${site.cells.length}</span>
             </div>
@@ -3415,26 +3415,18 @@ async function _filterCellChipsDebounced(query) {
 
     const loadedLeaves = document.querySelectorAll('#cell-list .hw-tree-leaf');
     if (loadedLeaves.length > 0) {
-        filterCellChipsVisibleOnly(q);
-        return;
+        const visible = filterCellChipsVisibleOnly(q);
+        if (visible > 0) return;
     }
 
-    // No expanded area yet — fall back to server search (deep links, search before expand).
+    // Server search: no cells loaded yet, or keyword not in the currently loaded subtree.
     const listEl = document.getElementById('cell-list');
-    if (listEl) listEl.innerHTML = '<p class="perf-tree-empty">Searching cells…</p>';
-
     try {
-        const params = _buildCellListParams({ search: q });
-        const res = await fetch('/api/performance/cells?' + params.toString());
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Search failed');
-        allCells = Array.isArray(data.cells) ? data.cells : [];
-        if (vendor) allCells = allCells.filter(c => String(c.vendor || '') === vendor);
-        _rebuildGeoFiltersFromCells(allCells);
-        perfAreaTreeData = new Map();
-        perfAreaLoadCache = new Map();
-        showCellPicker(allCells, { fromApply: true, searchMode: true });
-        _updateCellCountBadge(allCells.length, allCells.length);
+        const count = await _runPerfCellServerSearch(q);
+        if (!count && listEl) {
+            listEl.innerHTML = '<p class="perf-tree-empty">No cells match these filters.</p>';
+            _updateCellCountBadge(0, 0);
+        }
     } catch (_) {
         if (listEl) listEl.innerHTML = '<p class="perf-tree-empty">Search failed.</p>';
     }
@@ -3454,6 +3446,14 @@ function _expandPerfTreeAncestors(el) {
         }
         node = node.parentElement;
     }
+}
+
+function _perfSiteFolderLabel(site) {
+    const sid = site.site_id != null ? String(site.site_id).trim() : '';
+    const name = String(site.site_name || '').trim();
+    if (sid && name && !name.startsWith(sid)) return `${sid} · ${name}`;
+    if (sid) return sid;
+    return name || 'Unknown site';
 }
 
 function filterCellChipsVisibleOnly(query) {
@@ -3482,6 +3482,25 @@ function filterCellChipsVisibleOnly(query) {
         el.style.display = any ? '' : 'none';
     });
     _updateCellCountBadge(visible, leaves.length);
+    return visible;
+}
+
+async function _runPerfCellServerSearch(q) {
+    const vendor = document.getElementById('filter-vendor')?.value || '';
+    const listEl = document.getElementById('cell-list');
+    if (listEl) listEl.innerHTML = '<p class="perf-tree-empty">Searching cells…</p>';
+    const params = _buildCellListParams({ search: q });
+    const res = await fetch('/api/performance/cells?' + params.toString());
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Search failed');
+    allCells = Array.isArray(data.cells) ? data.cells : [];
+    if (vendor) allCells = allCells.filter(c => String(c.vendor || '') === vendor);
+    _rebuildGeoFiltersFromCells(allCells);
+    perfAreaTreeData = new Map();
+    perfAreaLoadCache = new Map();
+    showCellPicker(allCells, { fromApply: true, searchMode: true });
+    _updateCellCountBadge(allCells.length, allCells.length);
+    return allCells.length;
 }
 
 function perfTreeClick(e) {

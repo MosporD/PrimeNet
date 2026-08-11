@@ -16,6 +16,15 @@
     const ingestForce = document.getElementById('ingest-force');
     const dbPath = document.getElementById('db-path');
     const dbInventory = document.getElementById('db-inventory');
+    const ingestStatusText = document.getElementById('ingest-status-text');
+    const runDiagnosticsBtn = document.getElementById('run-diagnostics-btn');
+    const diagnosticsStatus = document.getElementById('diagnostics-status');
+    const pipelineSteps = document.getElementById('pipeline-steps');
+    const blockingIssues = document.getElementById('blocking-issues');
+    const diagnosticsWarnings = document.getElementById('diagnostics-warnings');
+    const lastSyncLog = document.getElementById('last-sync-log');
+    const discoveredFilesBody = document.getElementById('discovered-files-body');
+    const coverageTableBody = document.getElementById('coverage-table-body');
     const snapshotTableBody = document.getElementById('snapshot-table-body');
     const trendStart = document.getElementById('trend-start');
     const trendEnd = document.getElementById('trend-end');
@@ -63,6 +72,155 @@
         const token = String(status).toUpperCase();
         const cls = token === 'NOK' ? 'nok' : token === 'OK' ? 'ok' : 'other';
         return `<span class="status-badge ${cls}">${escapeHtml(token)}</span>`;
+    }
+
+    function formatBytes(value) {
+        const num = Number(value);
+        if (!Number.isFinite(num) || num <= 0) return '—';
+        if (num < 1024) return `${num} B`;
+        if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+        return `${(num / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function renderPipelineSteps(steps) {
+        pipelineSteps.innerHTML = '';
+        (steps || []).forEach((step) => {
+            const li = document.createElement('li');
+            li.className = `pipeline-step ${step.status || 'warn'}`;
+            li.innerHTML = `
+                <span class="pipeline-step-label">${escapeHtml(step.label)}</span>
+                <span class="pipeline-step-detail">${escapeHtml(step.detail || '')}</span>
+            `;
+            pipelineSteps.appendChild(li);
+        });
+    }
+
+    function renderDiagnosticsWarnings(warnings) {
+        if (!warnings || !warnings.length) {
+            diagnosticsWarnings.hidden = true;
+            diagnosticsWarnings.innerHTML = '';
+            return;
+        }
+        diagnosticsWarnings.hidden = false;
+        diagnosticsWarnings.innerHTML = `
+            <strong>Warnings</strong>
+            <ul>${warnings.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        `;
+    }
+
+    function renderBlockingIssues(issues) {
+        if (!issues || !issues.length) {
+            blockingIssues.hidden = true;
+            blockingIssues.innerHTML = '';
+            return;
+        }
+        blockingIssues.hidden = false;
+        blockingIssues.innerHTML = `
+            <strong>Blocking issues</strong>
+            <ul>${issues.map((issue) => `<li>${escapeHtml(issue)}</li>`).join('')}</ul>
+        `;
+    }
+
+    function renderLastSyncLog(lastSync) {
+        if (!lastSync) {
+            lastSyncLog.textContent = 'No sync run in this session yet.';
+            return;
+        }
+        const lines = [
+            `Finished: ${lastSync.finished_at || '—'}`,
+            `Range: ${lastSync.start_date} → ${lastSync.end_date}`,
+            `Ingested: ${(lastSync.ingested || []).length} · Skipped: ${(lastSync.skipped || []).length} · Errors: ${(lastSync.errors || []).length}`,
+        ];
+        (lastSync.ingested || []).forEach((item) => {
+            lines.push(`  + ${item.vendor || '?'} ${item.snapshot_date || '?'} (${item.row_count ?? 0} rows) ← ${item.source_file || item.file || 'file'}`);
+        });
+        (lastSync.skipped || []).forEach((item) => {
+            lines.push(`  ~ ${item.vendor || '?'} ${item.date || ''} skipped: ${item.reason || 'unknown'} (${item.file || item.name || ''})`);
+        });
+        (lastSync.errors || []).forEach((item) => {
+            const msg = typeof item === 'string' ? item : `${item.file || 'file'}: ${item.error || item}`;
+            lines.push(`  ! ${msg}`);
+        });
+        lastSyncLog.textContent = lines.join('\n');
+    }
+
+    function renderDiscoveredFiles(files) {
+        discoveredFilesBody.innerHTML = '';
+        if (!files || !files.length) {
+            discoveredFilesBody.innerHTML = '<tr><td colspan="4">No recognized CSV files in the selected date range.</td></tr>';
+            return;
+        }
+        files.forEach((file) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeHtml(file.date)}</td>
+                <td>${escapeHtml(file.vendor)}</td>
+                <td class="source-file-cell" title="${escapeAttr(file.file || '')}">${escapeHtml(file.name || file.file || '')}</td>
+                <td>${escapeHtml(formatBytes(file.size_bytes))}</td>
+            `;
+            discoveredFilesBody.appendChild(tr);
+        });
+    }
+
+    function coverageBadge(status) {
+        const token = String(status || '').toLowerCase();
+        const label = token === 'in_db' ? 'In DB' : token === 'pending' ? 'Pending sync' : 'Missing';
+        return `<span class="coverage-badge ${escapeAttr(token)}">${escapeHtml(label)}</span>`;
+    }
+
+    function renderCoverageTable(rows) {
+        coverageTableBody.innerHTML = '';
+        if (!rows || !rows.length) {
+            coverageTableBody.innerHTML = '<tr><td colspan="6">No coverage data for this range.</td></tr>';
+            return;
+        }
+        rows.forEach((row) => {
+            const tr = document.createElement('tr');
+            const onShare = row.discovered_file || row.canonical_exists ? 'Yes' : 'No';
+            tr.innerHTML = `
+                <td>${escapeHtml(row.date)}</td>
+                <td>${escapeHtml(row.vendor)}</td>
+                <td class="source-file-cell">${escapeHtml(row.expected_file)}</td>
+                <td>${escapeHtml(onShare)}</td>
+                <td>${coverageBadge(row.db_status)}</td>
+                <td>${escapeHtml(row.detail || '')}</td>
+            `;
+            coverageTableBody.appendChild(tr);
+        });
+    }
+
+    async function runDiagnostics() {
+        const start = ingestStart.value || daysAgoIso(13);
+        const end = ingestEnd.value || todayIso();
+        runDiagnosticsBtn.disabled = true;
+        diagnosticsStatus.textContent = 'Running diagnostics…';
+        diagnosticsStatus.classList.remove('error');
+        try {
+            const params = new URLSearchParams({ start_date: start, end_date: end });
+            const resp = await fetch(`/api/nokia-load-balancing/ingest-diagnostics?${params.toString()}`);
+            const data = await resp.json();
+            if (!resp.ok || !data.success) {
+                diagnosticsStatus.textContent = (data.errors || [data.error || 'Diagnostics failed']).join('; ');
+                diagnosticsStatus.classList.add('error');
+                return;
+            }
+            renderPipelineSteps(data.steps || []);
+            renderBlockingIssues(data.blocking_issues || []);
+            renderDiagnosticsWarnings(data.warnings || []);
+            renderDiscoveredFiles(data.discovered_files || []);
+            renderCoverageTable(data.coverage || []);
+            renderLastSyncLog(data.last_sync);
+            const issueCount = (data.blocking_issues || []).length;
+            diagnosticsStatus.textContent = issueCount
+                ? `${issueCount} issue(s) found for ${data.start_date} → ${data.end_date}`
+                : `Pipeline OK for ${data.start_date} → ${data.end_date}`;
+            if (issueCount) diagnosticsStatus.classList.add('error');
+        } catch (err) {
+            diagnosticsStatus.textContent = 'Diagnostics failed: ' + err.message;
+            diagnosticsStatus.classList.add('error');
+        } finally {
+            runDiagnosticsBtn.disabled = false;
+        }
     }
 
     function renderSnapshotTable(snapshots) {
@@ -372,6 +530,7 @@
             document.body.dataset.balanceConfigured = 'true';
             setStatuses();
             renderSnapshotTable(data.recent_snapshots || []);
+            renderLastSyncLog(data.last_sync);
         } catch (_err) {
             setPill(dbStatus, 'Database status unknown', 'muted');
         }
@@ -382,8 +541,8 @@
         const start = ingestStart.value;
         const end = ingestEnd.value;
         const rangeLabel = start && end ? `${start} → ${end}` : 'default lookback';
-        loadStatus.textContent = `Syncing Nokia + Huawei balance files (${rangeLabel})…`;
-        loadStatus.classList.remove('error');
+        ingestStatusText.textContent = `Syncing Nokia + Huawei balance files (${rangeLabel})…`;
+        ingestStatusText.classList.remove('error');
         try {
             const resp = await fetch('/api/nokia-load-balancing/ingest', {
                 method: 'POST',
@@ -398,17 +557,18 @@
             const ingested = (data.ingested || []).length;
             const skipped = (data.skipped || []).length;
             const errors = (data.errors || []).length;
-            loadStatus.textContent = `Sync complete — ${ingested} ingested, ${skipped} skipped, ${errors} errors (${data.start_date} → ${data.end_date})`;
+            ingestStatusText.textContent = `Sync complete — ${ingested} ingested, ${skipped} skipped, ${errors} errors (${data.start_date} → ${data.end_date})`;
             if (errors) {
-                loadStatus.classList.add('error');
-                showWarnings((data.errors || []).map((e) => `${e.file || 'file'}: ${e.error}`));
+                ingestStatusText.classList.add('error');
             }
+            renderLastSyncLog(data);
             await loadDbStatus();
             await loadSnapshots();
+            await runDiagnostics();
             await loadSectors();
         } catch (err) {
-            loadStatus.textContent = 'Sync failed: ' + err.message;
-            loadStatus.classList.add('error');
+            ingestStatusText.textContent = 'Sync failed: ' + err.message;
+            ingestStatusText.classList.add('error');
         } finally {
             syncBalanceBtn.disabled = false;
         }
@@ -635,9 +795,11 @@
 
     sectorFilter.addEventListener('input', applySectorFilter);
     syncBalanceBtn.addEventListener('click', syncBalance);
+    runDiagnosticsBtn.addEventListener('click', runDiagnostics);
     refreshDbBtn.addEventListener('click', () => {
         loadDbStatus();
         loadSnapshots();
+        runDiagnostics();
     });
     loadTrendBtn.addEventListener('click', loadTrend);
     reloadBtn.addEventListener('click', loadSectors);
@@ -662,6 +824,7 @@
     setStatuses();
     loadDbStatus();
     loadSnapshots();
+    runDiagnostics();
     if (document.body.dataset.balanceConfigured === 'true') {
         loadSectors();
     }

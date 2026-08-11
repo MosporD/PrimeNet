@@ -18,7 +18,7 @@ from .balance_store import (
     sector_status_trend,
     snapshot_inventory,
 )
-from .ingest_job import ingest_status, run_balance_ingest
+from .ingest_job import ingest_diagnostics, ingest_status, run_balance_ingest
 from .logic import analyze_sectors, load_preview, preview_backup_xml, preview_xml, save_preview
 from .push import apply_preview_to_oss
 
@@ -91,6 +91,37 @@ def nokia_nok_sectors():
 @admin_required
 def nokia_ingest_status():
     return jsonify({"success": True, **ingest_status()})
+
+
+@nokia_load_balancing_bp.route("/api/nokia-load-balancing/ingest-diagnostics")
+@admin_required
+def nokia_ingest_diagnostics():
+    body = request.get_json(silent=True) or {}
+    lookback = request.args.get("lookback_days") or body.get("lookback_days")
+    try:
+        lookback_days = int(lookback) if lookback is not None else None
+    except (TypeError, ValueError):
+        lookback_days = None
+
+    start_date = _parse_date_only(request.args.get("start_date") or body.get("start_date"))
+    end_date = _parse_date_only(request.args.get("end_date") or body.get("end_date"))
+    if start_date and end_date:
+        span = abs((end_date - start_date).days) + 1
+        if span > config.TREND_MAX_DAYS:
+            return jsonify({
+                "success": False,
+                "errors": [f"Date range cannot exceed {config.TREND_MAX_DAYS} days."],
+            }), 400
+
+    try:
+        payload = ingest_diagnostics(
+            lookback_days=lookback_days,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        return jsonify({"success": True, **payload})
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
 
 
 @nokia_load_balancing_bp.route("/api/nokia-load-balancing/ingest", methods=["POST"])

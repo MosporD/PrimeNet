@@ -2915,7 +2915,9 @@ def get_cells():
                 v.cell_name, v.technology, v.vendor,
                 v.frequency_band, v.azimuth, v.pci,
                 v.activity_status,
-                st.site_id, st.site_name, st.latitude, st.longitude,
+                COALESCE(v.site_id, st.site_id) AS site_id,
+                COALESCE(NULLIF(TRIM(v.site_name), ''), st.site_name) AS site_name,
+                st.latitude, st.longitude,
                 NULL AS kpi_ts
             FROM ({source_sql}) v
             LEFT JOIN sites st ON CAST(v.site_id AS TEXT) = CAST(st.site_id AS TEXT)
@@ -3080,7 +3082,9 @@ def get_cell_trend_by_name():
             v.cell_name AS cell_id,
             v.cell_name, v.technology, v.vendor,
             v.frequency_band, v.azimuth, v.pci,
-            st.site_id, st.site_name, st.latitude, st.longitude
+            COALESCE(v.site_id, st.site_id) AS site_id,
+            COALESCE(NULLIF(TRIM(v.site_name), ''), st.site_name) AS site_name,
+            st.latitude, st.longitude
         FROM ({source_sql}) v
         LEFT JOIN sites st ON CAST(v.site_id AS TEXT) = CAST(st.site_id AS TEXT)
         WHERE {' AND '.join(where)}

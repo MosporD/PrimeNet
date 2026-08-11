@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet — Nokia Load Balancing</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.css') }}?v=4.0">
+    <link rel="stylesheet" href="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.css') }}?v=4.1">
 </head>
 <body class="amle-page"
       data-nokia-configured="{{ 'true' if nokia_configured else 'false' }}"
@@ -54,6 +54,58 @@
                 </div>
                 <p id="db-path" class="meta-line"></p>
                 <p id="db-inventory" class="meta-line"></p>
+                <p id="ingest-status-text" class="status-text" aria-live="polite"></p>
+
+                <details class="process-monitor" id="process-monitor" open>
+                    <summary>Process monitor — CSV → database → balancing sheets</summary>
+                    <p class="field-hint">
+                        Run diagnostics to see why trend tables may be empty: share access, file discovery, ingest gaps, and sync errors.
+                    </p>
+                    <div class="picker-actions process-monitor-actions">
+                        <button type="button" class="btn-secondary" id="run-diagnostics-btn">Run diagnostics</button>
+                        <span id="diagnostics-status" class="status-text" aria-live="polite"></span>
+                    </div>
+
+                    <ol id="pipeline-steps" class="pipeline-steps" aria-label="Pipeline steps"></ol>
+
+                    <div id="blocking-issues" class="blocking-issues" hidden></div>
+                    <div id="diagnostics-warnings" class="diagnostics-warnings" hidden></div>
+
+                    <h4 class="subheading">Last sync</h4>
+                    <pre id="last-sync-log" class="process-log">No sync run in this session yet.</pre>
+
+                    <h4 class="subheading">CSV files in range</h4>
+                    <div class="table-wrap snapshot-table-wrap">
+                        <table id="discovered-files-table" class="data-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Vendor</th>
+                                    <th>File</th>
+                                    <th>Size</th>
+                                </tr>
+                            </thead>
+                            <tbody id="discovered-files-body"></tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="subheading">Database coverage (share vs SQLite)</h4>
+                    <div class="table-wrap snapshot-table-wrap">
+                        <table id="coverage-table" class="data-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Vendor</th>
+                                    <th>Expected file</th>
+                                    <th>On share</th>
+                                    <th>In database</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coverage-table-body"></tbody>
+                        </table>
+                    </div>
+                </details>
 
                 <div class="table-wrap snapshot-table-wrap">
                     <table id="snapshot-table" class="data-table compact-table">
@@ -239,6 +291,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.5"></script>
-    <script src="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.js') }}?v=4.1"></script>
+    <script src="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.js') }}?v=4.2"></script>
 </body>
 </html>
