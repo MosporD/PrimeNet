@@ -13,9 +13,14 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# lxml runtime libs; build tools only if a wheel is unavailable
-RUN apt-get update \
+# lxml runtime libs; cifs-utils for SMB mount at runtime.
+# Use HTTPS apt mirrors — many corporate networks block outbound HTTP (port 80).
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+RUN sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update \
     && apt-get install -y --no-install-recommends \
+        ca-certificates \
         cifs-utils \
         libxml2 \
         libxslt1.1 \
