@@ -286,7 +286,10 @@ function _ensureThemeToggle() {
 }
 
 function _ensureBrandFavicon() {
-    let link = document.querySelector('link[rel="icon"]');
+    // Pages that declare their own favicon (the NexusCore shell: login and
+    // portal pages) keep it; PrimeNet pages get the default brand icon.
+    if (document.querySelector('link[rel~="icon"][data-page-favicon]')) return;
+    let link = document.querySelector('link[rel~="icon"]');
     if (!link) {
         link = document.createElement('link');
         link.setAttribute('rel', 'icon');
