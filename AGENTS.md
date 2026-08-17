@@ -34,6 +34,15 @@ Entry point: `app.py`. Vendors: Nokia, Huawei. RATs: 2G–5G.
 - Dashboard constellation background: `static/js/constellation.js` + `static/css/constellation.css`.
 - Large HTML templates (e.g. `dashboard.html`) — edit targeted sections, avoid full-file rewrites.
 
+## Knowledge graph
+
+Code map lives in `graphify-out/` (AST extract, no API). The CLI is `python -m graphify` on this Windows machine (`graphify` is often not on PATH).
+
+- Before exploring: `python -m graphify query "<question>"`
+- After code edits: `python -m graphify update .`
+- Ignore rules: `.graphifyignore` (plus `.gitignore`)
+- Human view: `/documentation` → Overview → **Graph** / **Code map** / **Call flow**
+
 ## Session handoff
 
 Read `progress.md` for current work and the NEXT pointer. Scope is defined in `checklist.md`.

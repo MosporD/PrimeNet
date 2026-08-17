@@ -9,7 +9,8 @@ the end you'll be able to open any of the ~40 modules and know exactly what
 you're looking at, why it's shaped that way, and how to change it safely.
 
 > If you only read one page for a quick map, read `docs/ARCHITECTURE.md`.
-> This course is the deep version of that map.
+> This course is the deep version of that map. The **live** code map (graphify
+> tree + call flow + community graph) is on `/documentation` under Overview — not a lesson.
 
 ---
 

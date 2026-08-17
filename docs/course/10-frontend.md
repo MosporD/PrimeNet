@@ -152,6 +152,32 @@ JS, but steps 1–2 (shared shell chrome + theme) are identical.
 
 ---
 
+## 10.7 UI zoom (`--ui-zoom`)
+
+PrimeNet is laid out at **67% of CSS pixels** so a 100% Chrome window matches
+~67% browser zoom, but still **fills the viewport**. `static/css/common.css`:
+
+```css
+:root {
+    --ui-zoom: 0.67;
+    --ui-vw: calc(100vw / var(--ui-zoom));
+    --ui-vh: calc(100vh / var(--ui-zoom));
+}
+body {
+    zoom: var(--ui-zoom);
+    width: var(--ui-vw);
+    min-height: var(--ui-vh);
+}
+```
+
+Full-page layouts must use `var(--ui-vh)` / `var(--ui-vw)`, **not** `100vh` /
+`100vw`. Plain `100vh` under `zoom` leaves a gap or overflows — that was the
+Developer Documentation bug. Pointer math for canvases/charts goes through
+helpers in `common.js` / `constellation.js` (`viewportCssSize`,
+`patchChartJsForUiZoom`).
+
+---
+
 ## Recap
 
 - `templates/` holds shared shells; modules add their own only for bespoke UIs.
@@ -160,6 +186,7 @@ JS, but steps 1–2 (shared shell chrome + theme) are identical.
   filter shell; charts are vendored locally (CSP-friendly).
 - Theme = `body.dark-mode` + `localStorage` + one global toggle in `common.js`.
   Never roll your own toggle; key CSS off `body.dark-mode`.
+- Global scale is `--ui-zoom: 0.67`; full-height pages use `--ui-vh`, not `100vh`.
 - The dashboard deck reads the same role-filtered nav as access control.
 - Current scope is UI unification — see `checklist.md`.
 

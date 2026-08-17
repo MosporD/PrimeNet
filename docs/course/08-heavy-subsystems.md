@@ -41,6 +41,11 @@ actually talks to the customer's live network management systems.**
 | `http_util.py`, `config.py` | Shared HTTP + config. |
 | `test_*.py` | **Read these to learn the module** — they show real inputs/outputs. |
 
+Nokia Load Balancing (`modules/nokia_load_balancing/`) is a **consumer** of this
+stack, not a fifth heavy module: it calls the same Nokia client for `AMLEPR`,
+then `push.py` uses CM Operations `actualImport` (same confirmation phrase as
+Excel reimport). Read it after this section if you are working AMLE.
+
 ### The endpoint flow (read `routes.py` in this order)
 
 The 32 endpoints group into a clear workflow. Trace it top-down:

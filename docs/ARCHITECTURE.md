@@ -5,8 +5,9 @@ through it, how the data model works, and the conventions to follow when adding
 code. Read this once and every module reads the same way.
 
 > Companion docs: `AGENTS.md` (short conventions), `progress.md` (current work +
-> `NEXT` pointer), `checklist.md` (active scope). Vendor references live under
-> `docs/*_CM_OPEN_API_*.md` and `docs/FRONTEND_THEME.md`.
+> `NEXT` pointer), `checklist.md` (active scope). The live code map is on
+> `/documentation` (Overview → Code map / Call flow). Vendor references live
+> under `docs/*_CM_OPEN_API_*.md` and `docs/FRONTEND_THEME.md`.
 >
 > **Want the deep version?** `docs/course/` is a full code-level course (12
 > lessons) that teaches every layer and module in order, with `file:line`
@@ -115,12 +116,19 @@ no-op. That's the first env var you'll want.
   what**. `NAV_SECTIONS` is a declarative list of every dashboard link with a
   `visibility` of `all` / `admin` / `admin_or_noc`. It both renders the nav menu
   (filtered by role) *and* enforces access (`enforce_module_access`,
-  `href_allowed_for_role`). Roles: `admin` (owner), `noc_sys`, regular users.
+  `href_allowed_for_role`). Roles: `admin` (owner), `noc_sys`, `ran_config_user`,
+  `user`.
+- **`core/feature_access.py`** — admin-panel overlay on those defaults. Owner
+  can grant/revoke `noc_sys` / `ran_config_user` / `user` per href; `admin` is
+  always allowed; `/dashboard`, `/profile`, `/admin-panel` are locked. Until an
+  admin edits a row, behaviour is identical to `NAV_SECTIONS`.
 - **`core/radio/web.py`** — the decorators feature modules actually use:
   `@login_required`, `@admin_required`, plus `get_current_user`, `format_user`,
   and `query_filters()` (parses the standard
   `area/vendor/technology/severity/q/limit` filter set every radio module
-  shares).
+  shares). Some modules still use `@admin_required` in addition to the
+  `module_access_before_request` hook — those stay owner-only even if feature
+  access is opened in the admin panel.
 
 > **User shape gotcha:** a user is sometimes a `dict` and sometimes a positional
 > tuple where `user[6]` is the role. Legacy DB rows are tuples. Helpers in
@@ -208,6 +216,9 @@ no template of their own — the shell + shared `radio_modules.css` do the work.
   `config_history`, `xml_parser`, `excel_generator`, `ne_comparison`,
   `ret_management` (remote electrical tilt), `network_management`. These talk to
   live network elements or parse vendor XML/MML.
+- **Load balancing / AMLE** — `nokia_load_balancing` (Network Balance ingest →
+  AMLE proposals → RAML XML/Excel → optional NetAct OSS push).
+  `huawei_load_balancing` is a stub. Legacy `/amle-optimizer` redirects to Nokia.
 - **Dictionaries / reference** — `parameter_dictionary` (its
   `huawei_params/` is ~19k scraped HTML files, **do-not-edit**, served
   read-only), `performance_dictionary`, `ran_features`.
@@ -215,9 +226,11 @@ no template of their own — the shell + shared `radio_modules.css` do the work.
   `drive_test_viewer`, `elevation` (uses `core/elevation.py`).
 - **Reporting / monitoring** — `reports`, `radio_morning_report`,
   `fault_management`, `femto_pm` (femtocells), `performance` /
-  `performance_analytics` (KPI explorer; own `kpi_catalog.py` + `kpi_mapping.py`).
-- **Admin / ops** — `admin_panel`, `user_profile`, `sync` (drives the pipeline
-  from the UI), `task_scheduler`.
+  `performance_analytics` (KPI explorer; own `kpi_catalog.py` + `kpi_mapping.py`),
+  `power_bi` (link-out gallery to Power BI Service; embed tokens need Fabric).
+- **Admin / ops** — `admin_panel` (users + feature access), `user_profile`
+  (includes per-user vendor credentials), `sync` (drives the pipeline from the
+  UI), `task_scheduler`, `documentation` (this course + the graphify maps).
 
 ---
 
@@ -328,11 +341,39 @@ JSON {success, issues, summary}  →  after_request security headers  →  Brows
 | I want to… | Start in |
 |---|---|
 | Add a new analysis module | copy a radio module (`sleeping_cells`), register in `app.py`, add a `NAV_SECTIONS` entry |
-| Change who can see a page | `core/module_access.py` (`NAV_SECTIONS`) |
+| Change who can see a page | defaults: `core/module_access.py`; runtime: Admin Panel → feature access (`core/feature_access.py`) |
 | Query PM data | `db/runtime.performance_meta_pm_conn()` + `core/radio/pm.py` recipes |
 | Add a DB / path | `sync_config.py` constants |
 | Touch login / sessions | `routes/auth_routes.py` + `database_enhanced.py` |
 | Change the activation/license flow | `core/activation_gate.py` + `core/license_client.py` |
 | Extract live config from a network element | `core/cm_extractor/` (nokia_client / huawei_client) |
 | Change ingestion | `pipeline/orchestrators/` |
-| Restyle the UI | `static/css/*.css`, `templates/radio_module.html`, `dashboard.html` |
+| Restyle the UI | `static/css/*.css`, `templates/radio_module.html`, `dashboard.html` (respect `--ui-zoom` / `--ui-vh`) |
+| Trace how two modules connect | `/documentation` → **Code map** / **Call flow**, or `python -m graphify query "…"` |
+
+---
+
+## 15. Deploy, Docker, Network Balance
+
+Production is Docker (`Dockerfile`, `docker-compose.yml`; live-reload via
+`docker-compose.dev.yml`). Network policy (what the server may reach) is
+`docs/SERVER_NETWORK_POLICY.md`.
+
+Nokia Load Balancing reads the Network Balance share (`\\RNO-WAN\Network Balance`
+on Windows; SMB auto-mount on Linux Docker via `deploy/mount_network_balance.sh`).
+Daily Nokia/Huawei CSVs land in SQLite under `databases/network_balance/`.
+
+Per-user NetAct/U2020 credentials live in `core/user_vendor_credentials.py` and
+are edited from **User Profile** — not only from `.env`.
+
+---
+
+## 16. Code map (graphify)
+
+`graphify-out/` is an AST map of this repo (local, no API). Minified vendor JS
+(`*.min.js`, Chart.js) is excluded so the **Graph** view is PrimeNet logic, not
+`an()`/`ns()` internals. **Code map** and **Call flow** keep module and function
+names. Rebuild after code changes with `python -m graphify update .` (Windows:
+`python -m graphify`). `.graphifyignore` also excludes `huawei_params/`, uploads,
+and runtime dumps.
+

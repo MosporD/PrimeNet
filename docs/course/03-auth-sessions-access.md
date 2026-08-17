@@ -4,7 +4,7 @@
 decides which of the ~40 tools each role can reach.
 
 Files: `database_enhanced.py`, `routes/auth_routes.py`, `core/module_access.py`,
-`core/radio/web.py`.
+`core/feature_access.py`, `core/user_vendor_credentials.py`, `core/radio/web.py`.
 
 ---
 
@@ -43,8 +43,8 @@ def _role(user) -> str:
 ```
 
 When you touch user objects, **mirror this dual handling** or you'll crash on
-one of the two paths. Roles in the system: `admin` (the owner), `noc_sys`
-(user-administration helper), and regular users (`user`).
+one of the two paths. Roles in the system: `admin` (owner), `noc_sys` (NOC SYS),
+`ran_config_user` (RNC User), and `user`.
 
 ---
 
@@ -169,15 +169,32 @@ This one list does **two** jobs:
 `module_access_before_request(href)` (line 110) is a ready-made blueprint hook:
 give it the module's href and it does the whole "get the session user, then
 enforce" dance. Some modules wire it as a `before_request`; the radio modules
-instead lean on `@admin_required`. Both end up enforcing the same rule.
+instead lean on `@admin_required`. Both end up enforcing the same *default* rule.
 
-> **Where to change access:** if you want to hide/show a tool or change which
-> role can use it, you edit `NAV_SECTIONS` — **nowhere else**. The menu and the
-> gate both read from it, so they can never disagree.
+> **Defaults vs overlay:** `NAV_SECTIONS` is still the place you add a *new*
+> tool. Day-to-day "who can open this?" is edited in the **Admin Panel**
+> (`core/feature_access.py`). Owner (`admin`) is always allowed and cannot be
+> revoked. `/dashboard`, `/profile`, `/admin-panel` are locked. Until someone
+> saves an override, behaviour matches `NAV_SECTIONS` exactly.
+>
+> **Gotcha:** several modules still wrap the page in `@admin_required` *and* the
+> feature-access hook (Nokia Load Balancing is one). Opening that href for
+> `ran_config_user` in the admin panel will show the dashboard card, but the
+> decorator still 403s non-owners. If you mean to open a tool, drop
+> `@admin_required` and keep the `before_request` hook.
 
 ---
 
-## 3.5 Putting it together
+## 3.6 Per-user vendor credentials
+
+NetAct / U2020 passwords are no longer only in `.env`.
+`core/user_vendor_credentials.py` stores per-user secrets (used by CM Extractor,
+RET, Load Balancing). Users edit them on `/profile`. The Flask `SECRET_KEY` must
+be set (app config is enough — see the 2026-07-22 fix) or save fails.
+
+---
+
+## 3.7 Putting it together
 
 A protected page request, e.g. `GET /sleeping-cells`:
 
@@ -187,9 +204,10 @@ A protected page request, e.g. `GET /sleeping-cells`:
    `_role(user) == "admin"`. Non-admin → 403 / redirect. Admin → continue.
 4. The view runs and renders the page.
 
-For "does this link even appear in the menu," it's the same role compared
-against `NAV_SECTIONS`. **Menu visibility and route enforcement are two reads of
-the same table** — that's the design worth remembering.
+For "does this link even appear in the menu," `navigation_sections_for_role`
+reads `NAV_SECTIONS` **plus** `feature_access` overrides. Menu and route
+enforcement agree *when the module uses `module_access_before_request`*. They
+disagree if the view still has `@admin_required` (see the gotcha above).
 
 ---
 
@@ -201,8 +219,9 @@ the same table** — that's the design worth remembering.
   both.
 - `core/radio/web.py` gives modules `@login_required` / `@admin_required`,
   `query_filters()`, and `json_error()`.
-- `core/module_access.py`'s `NAV_SECTIONS` is the one place that decides both
-  what's in the menu and who can reach each URL.
+- `core/module_access.py`'s `NAV_SECTIONS` is the *default* menu + gate. Runtime
+  grants live in `core/feature_access.py` (Admin Panel). Some routes still use
+  `@admin_required` on top of that.
 
 **Next:** [Lesson 04 — The data model](04-data-model.md) — the databases every
 one of these routes reads from.

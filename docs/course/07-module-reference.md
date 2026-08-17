@@ -1,4 +1,4 @@
-# Lesson 07 — Module reference (all 40)
+# Lesson 07 — Module reference (all 41)
 
 **Goal:** a code-level catalog of every module in `modules/`, grouped by family,
 so you can jump straight to the right file. For each: its route prefix, its extra
@@ -64,6 +64,8 @@ The tools that read/compare/push device configuration rather than performance.
 | `ret_management` | `/ret-management` | `logic.py`, `test_logic.py` | Remote Electrical Tilt: read/adjust antenna tilt. Has unit tests — read `test_logic.py` to learn the module. `all`. |
 | `network_management` | `/network-management` | — | General NE management actions. `all`. |
 | `ran_features` | `/ran-features` | `hdx.py`, `navi.py` | RAN Feature Library — which features are licensed/active per NE. `all`. |
+| `nokia_load_balancing` | `/nokia-load-balancing` | `logic.py`, `rules.py`, `ingest_job.py`, `balance_store.py`, `balance_data.py`, `export.py`, `push.py`, `file_discovery.py`, `smb_config.py` | **AMLE optimizer.** Ingests Network Balance CSVs → SQLite, live CM extract (`NOKLTE:AMLEPR`), proposes RAML XML/Excel, optional NetAct OSS `actualImport`. Admin. Legacy `/amle-optimizer` redirects here. |
+| `huawei_load_balancing` | `/huawei-load-balancing` | — | **Stub.** Placeholder page only; no ingest/rules/push yet. Admin. |
 
 ---
 
@@ -93,7 +95,8 @@ The tools that read/compare/push device configuration rather than performance.
 | Module | Route | Extra files | Notes |
 |---|---|---|---|
 | `reports` | `/reports` | `metadata_helpers.py`, `sector_coverage_data.py` | Performance report builder (649 lines). `all`. |
-| `performance` | `/performance` | `kpi_catalog.py`, `kpi_mapping.py` | **Heavy — Lesson 08.** The main KPI Explorer (2981 lines, the biggest module): cell/trend charts, CSV export, caching. `all`. |
+| `performance` | `/performance` | `kpi_catalog.py`, `kpi_mapping.py` | **Heavy — Lesson 08.** The main KPI Explorer (the biggest module): cell/trend charts, CSV export, caching. `all`. |
+| `power_bi` | `/power-bi` | `logic.py` | Catalog-driven **link-out** gallery to Power BI Service. No embed tokens until the workspace has Premium/Fabric. `all`. |
 
 ---
 
@@ -101,10 +104,11 @@ The tools that read/compare/push device configuration rather than performance.
 
 | Module | Route | Endpoints | Notes |
 |---|---|---|---|
-| `admin_panel` | `/admin-panel` | 9 | User administration (create/disable/role/reset). `admin_or_noc`. Calls `database_enhanced.py` user functions (Lesson 03). |
-| `user_profile` | `/profile` | 14 | Self-service profile + **change password** (the escape hatch for the password-rotation hook). `all`. |
+| `admin_panel` | `/admin-panel` | 9 | User administration (create/disable/role/reset) **and feature-access grants** (`core/feature_access.py`). `admin_or_noc`. |
+| `user_profile` | `/profile` | 14 | Self-service profile + **change password** + **per-user vendor credentials**. `all`. |
 | `sync` | `/sync` (+ APIs) | 18 | **Heavy — Lesson 08.** Drives the ETL pipeline from the UI: SFTP pulls, processors, scheduler. Own `sftp_client.py`, `pm_processor.py`, `metadata_processor.py`, `group_processor.py`, `scheduler.py`, `db_migration.py`. |
 | `task_scheduler` | `/config-task-scheduler` | 8 | Schedule config tasks; ties into the task tables in `database_enhanced.py`. `all`. |
+| `documentation` | `/documentation` | 3 | Admin-only course + architecture + **embedded graphify maps** (`graph.html`, `GRAPH_TREE.html`, `Project-callflow.html`). Catalog is `_catalog()` in `routes.py` — no arbitrary file reads. |
 
 ---
 
@@ -138,11 +142,12 @@ minutes. The exceptions are the four heavy modules — next lesson.
 
 ## Recap
 
-- ~40 modules fall into 8 families; the biggest family (radio optimization) is
+- ~41 modules fall into these families; the biggest family (radio optimization) is
   all the same Lesson-06 shape.
 - The non-obvious ones: `network_health` (precompute store), `son_analytics`
   (owns `pm_helpers.py`), `parameter_dictionary` (huge do-not-edit reference),
-  `sync` (drives the pipeline), and the four heavy modules.
+  `sync` (drives the pipeline), `nokia_load_balancing` (AMLE + OSS push), and the
+  four heavy modules.
 - To learn any module fast: grep routes → read page route → follow the API route
   into logic.
 

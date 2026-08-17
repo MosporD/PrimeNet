@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet — Developer Documentation</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('documentation.static', filename='documentation.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('documentation.static', filename='documentation.css') }}?v=1.1">
 </head>
 <body class="doc-page">
     <header class="doc-header">
@@ -13,7 +13,7 @@
             <a href="/dashboard" class="doc-home-link" title="Dashboard">&#8962;</a>
             <div class="doc-title-block">
                 <h1 class="doc-app-title">Developer Documentation</h1>
-                <p class="doc-app-subtitle">Code-level course &amp; architecture for PrimeNet · admin only</p>
+                <p class="doc-app-subtitle">Architecture, code map, and course · admin only</p>
             </div>
         </div>
         <div class="doc-header-right">
@@ -23,14 +23,14 @@
 
     <div class="doc-layout">
         <aside class="doc-sidebar" id="doc-sidebar">
-            <input type="search" id="doc-search" class="doc-search" placeholder="Filter lessons…" autocomplete="off">
+            <input type="search" id="doc-search" class="doc-search" placeholder="Filter…" autocomplete="off">
             <nav class="doc-nav" id="doc-nav">
                 {% set groups = nav | groupby('group') %}
                 {% for group_name, items in groups %}
                 <div class="doc-nav-group">
                     <div class="doc-nav-group-title">{{ group_name }}</div>
                     {% for item in items %}
-                    <a href="#{{ item.id }}" class="doc-nav-link" data-id="{{ item.id }}">{{ item.title }}</a>
+                    <a href="#{{ item.id }}" class="doc-nav-link" data-id="{{ item.id }}" data-kind="{{ item.kind|default('md') }}">{{ item.title }}</a>
                     {% endfor %}
                 </div>
                 {% endfor %}
@@ -58,6 +58,16 @@
             });
         }
 
+        function kindOf(id) {
+            var found = "md";
+            nav.querySelectorAll(".doc-nav-link").forEach(function (a) {
+                if (a.getAttribute("data-id") === id) {
+                    found = a.getAttribute("data-kind") || "md";
+                }
+            });
+            return found;
+        }
+
         function idFromHref(href) {
             // Internal course links look like "04-data-model.md" or "docs/ARCHITECTURE.md".
             var m = href.match(/([^\/]+)\.md(#.*)?$/i);
@@ -67,11 +77,20 @@
             return base;
         }
 
+        function renderMap(id) {
+            content.classList.add("is-map");
+            content.innerHTML =
+                '<iframe class="doc-map-frame" src="/documentation/map/' +
+                encodeURIComponent(id) +
+                '" title="PrimeNet code map"></iframe>';
+            if (window.scrollTo) window.scrollTo(0, 0);
+        }
+
         function render(doc) {
+            content.classList.remove("is-map");
             content.innerHTML = '<article class="doc-article">' + doc.html + "</article>";
             content.scrollTop = 0;
             window.scrollTo(0, 0);
-            // Rewrite in-doc links to other lessons so they load in-place.
             content.querySelectorAll("a[href]").forEach(function (a) {
                 var id = idFromHref(a.getAttribute("href"));
                 if (id) {
@@ -86,7 +105,13 @@
         function load(id, push) {
             if (!id) return;
             setActive(id);
+            if (kindOf(id) === "map") {
+                renderMap(id);
+                if (push) history.replaceState(null, "", "#" + id);
+                return;
+            }
             if (cache[id]) { render(cache[id]); if (push) history.replaceState(null, "", "#" + id); return; }
+            content.classList.remove("is-map");
             content.innerHTML = '<div class="doc-loading">Loading…</div>';
             fetch("/api/documentation/page/" + encodeURIComponent(id), { credentials: "same-origin" })
                 .then(function (r) { return r.json(); })
