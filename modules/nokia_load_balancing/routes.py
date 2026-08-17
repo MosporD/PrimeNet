@@ -21,6 +21,7 @@ from .balance_store import (
 from .ingest_job import ingest_diagnostics, ingest_status, run_balance_ingest
 from .logic import analyze_sectors, load_preview, preview_backup_xml, preview_xml, save_preview
 from .push import apply_preview_to_oss
+from .verify import verify_pipeline
 
 nokia_load_balancing_bp = Blueprint(
     "nokia_load_balancing",
@@ -76,6 +77,15 @@ def nokia_load_balancing_page():
         balance_path=str(balance_root()),
         apply_confirmation=CONFIRMATION_PHRASE,
     )
+
+
+@nokia_load_balancing_bp.route("/api/nokia-load-balancing/verify")
+@admin_required
+def nokia_verify_pipeline():
+    """Prove analyze → XML without performing a live OSS import."""
+    payload = verify_pipeline()
+    status = 200 if payload.get("success") else 503
+    return jsonify(payload), status
 
 
 @nokia_load_balancing_bp.route("/api/nokia-load-balancing/nok-sectors")
@@ -383,12 +393,13 @@ def nokia_apply_to_oss():
     confirmation = (body.get("confirmation") or "").strip()
     if not token:
         return jsonify({"success": False, "error": "Missing preview token. Run Analyze first."}), 400
+    dry_run = str(body.get("dry_run") or "").strip().lower() in ("1", "true", "yes", "on")
     if confirmation != CONFIRMATION_PHRASE:
         return jsonify({
             "success": False,
             "error": f"Type {CONFIRMATION_PHRASE!r} to apply these changes to the network.",
         }), 400
-    if not nokia_export_ssh_settings().get("configured"):
+    if not dry_run and not nokia_export_ssh_settings().get("configured"):
         return jsonify({
             "success": False,
             "error": "OSS push is not configured. Set NOKIA_CM_SSH_* (or NOKIA_PM_*) and reimport path in .env.",
@@ -396,7 +407,7 @@ def nokia_apply_to_oss():
 
     wait = str(body.get("wait") or "").strip().lower() in ("1", "true", "yes", "on")
     try:
-        result = apply_preview_to_oss(user["username"], token, wait=wait)
+        result = apply_preview_to_oss(user["username"], token, wait=wait, dry_run=dry_run)
     except FileNotFoundError:
         return jsonify({"success": False, "error": "Preview not found or expired."}), 404
     except ValueError as exc:

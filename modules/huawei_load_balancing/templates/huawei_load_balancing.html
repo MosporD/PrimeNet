@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet — Huawei Load Balancing</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('huawei_load_balancing.static', filename='huawei_load_balancing.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('nokia_load_balancing.static', filename='nokia_load_balancing.css') }}?v=4.1">
+    <link rel="stylesheet" href="{{ url_for('huawei_load_balancing.static', filename='huawei_load_balancing.css') }}?v=1.1">
 </head>
-<body class="lb-page">
+<body class="amle-page"
+      data-huawei-configured="{{ 'true' if huawei_configured else 'false' }}"
+      data-balance-configured="{{ 'true' if balance_configured else 'false' }}">
     <div class="container">
-        <header class="lb-topbar">
+        <header class="amle-topbar">
             <div class="header-content">
                 <a href="/dashboard" class="back-link">Dashboard</a>
                 <div class="header-left">
                     <h1>Huawei Load Balancing</h1>
-                    <p>Huawei load-balancing workflow — duplicated from Nokia module, implementation pending.</p>
+                    <p>Select NOK Huawei sectors from Network Balance, propose CellMLB changes, download Excel or MML. OSS push stays off until Nokia AMLE apply is trusted.</p>
                 </div>
                 <div class="header-right">
                     <span class="user-name">{{ user.username }}</span>
@@ -22,17 +25,109 @@
                 </div>
             </div>
         </header>
-        <main class="main-content">
-            <section class="panel placeholder-panel">
-                <h2>Coming soon</h2>
-                <p>
-                    This module will mirror
+
+        <main class="main-content amle-main">
+            <section class="panel">
+                <div class="connection-bar">
+                    <span id="cm-status" class="connection-pill">Checking U2020…</span>
+                    <span id="balance-status" class="connection-pill">Checking Network Balance…</span>
+                </div>
+                <p class="field-hint">
+                    Throughput is the same Network Balance SQLite used by
                     <a href="/nokia-load-balancing">Nokia Load Balancing</a>
-                    for Huawei sectors and CM parameters.
+                    (vendor = Huawei). CellMLB proposals do not require a live U2020 extract.
+                    Share path: <code class="path-inline">{{ balance_path }}</code>
                 </p>
+
+                <div class="workflow-step">
+                    <h2>1. Select sectors</h2>
+                    <div class="form-inline-row">
+                        <div class="inline-field">
+                            <label for="balance-date">Balance date</label>
+                            <input type="date" id="balance-date" class="search-input">
+                        </div>
+                        <div class="inline-field inline-field-grow">
+                            <span class="inline-label">Actions</span>
+                            <div class="picker-actions">
+                                <button type="button" class="btn-secondary" id="sync-balance-btn">Sync Huawei CSV</button>
+                                <button type="button" class="btn-secondary" id="reload-sectors-btn">Load NOK sectors</button>
+                                <button type="button" class="btn-secondary" id="select-visible-btn" disabled>Select visible</button>
+                                <button type="button" class="btn-secondary" id="clear-all-btn" disabled>Clear selection</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="load-status" class="status-text" aria-live="polite"></p>
+                    <p id="source-file" class="meta-line"></p>
+                    <div id="sector-list" class="sector-table-section" hidden>
+                        <div class="table-toolbar">
+                            <label class="table-filter">
+                                <input type="search" id="sector-filter" class="search-input" placeholder="Filter sectors…" autocomplete="off">
+                            </label>
+                            <span id="sector-count" class="table-meta"></span>
+                        </div>
+                        <div class="table-wrap sector-table-wrap">
+                            <table id="sector-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-check"><input type="checkbox" id="sector-check-all"></th>
+                                        <th>Sector</th>
+                                        <th>Highest</th>
+                                        <th>Lowest</th>
+                                        <th>L18</th>
+                                        <th>L21</th>
+                                        <th>L9</th>
+                                        <th>L18+</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sector-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <details class="manual-sectors-block">
+                        <summary>Enter sector IDs manually</summary>
+                        <textarea id="manual-sectors" class="manual-textarea" rows="4" placeholder="1201_A"></textarea>
+                    </details>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>2. Analyze &amp; export</h2>
+                    <div class="picker-actions">
+                        <button type="button" class="btn-primary btn-large" id="analyze-btn" disabled>Propose CellMLB</button>
+                        <span id="analyze-status" class="status-text"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" id="results-panel" hidden>
+                <div class="results-head">
+                    <h2>Proposed CellMLB changes</h2>
+                    <div class="results-actions">
+                        <button type="button" class="btn-secondary" id="download-excel-btn" disabled>Download Excel</button>
+                        <button type="button" class="btn-secondary" id="download-mml-btn" disabled>Download MML</button>
+                    </div>
+                </div>
+                <div id="warnings-box" class="warnings-box" hidden></div>
+                <div class="table-wrap">
+                    <table id="results-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sector</th>
+                                <th>Source</th>
+                                <th>Target</th>
+                                <th>Action</th>
+                                <th>Parameter</th>
+                                <th>Current</th>
+                                <th>Proposed</th>
+                                <th>Delta</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </section>
         </main>
     </div>
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.5"></script>
+    <script src="{{ url_for('huawei_load_balancing.static', filename='huawei_load_balancing.js') }}?v=1.1"></script>
 </body>
 </html>

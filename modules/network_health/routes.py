@@ -367,3 +367,22 @@ def network_health_refresh():
         })
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
+
+
+@network_health_bp.route("/api/network-health/groups")
+@login_required
+def network_health_groups():
+    """Controller/BSC/RNC congestion from groups PM DBs (same data as Group Health)."""
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    vendor = request.args.get("vendor", "all")
+    technology = request.args.get("rat") or request.args.get("technology") or "all"
+    top_n = min(100, max(5, int(request.args.get("top_n", 20))))
+    try:
+        from core.radio.groups import group_health
+
+        payload = group_health(vendor=vendor, technology=technology, limit=top_n)
+        return jsonify({"success": True, "stage": "development", **payload})
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500

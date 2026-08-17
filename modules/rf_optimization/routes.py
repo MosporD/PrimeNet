@@ -4,9 +4,10 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import rf_optimization
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
+from core.radio.web import admin_required, attach_feature_guard, format_user, get_current_user, json_error, query_filters
 
 rf_optimization_bp = Blueprint("rf_optimization", __name__)
+attach_feature_guard(rf_optimization_bp, "/rf-optimization")
 
 
 @rf_optimization_bp.route("/rf-optimization")

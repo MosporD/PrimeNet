@@ -3,7 +3,7 @@ from __future__ import annotations
 from flask import Blueprint, jsonify, render_template, request
 
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
+from core.radio.web import admin_required, attach_feature_guard, format_user, get_current_user, json_error, query_filters
 
 from .logic import (
     DEFAULT_BASELINE_DAYS,
@@ -13,6 +13,7 @@ from .logic import (
 )
 
 sleeping_cells_bp = Blueprint("sleeping_cells", __name__)
+attach_feature_guard(sleeping_cells_bp, "/sleeping-cells")
 
 
 @sleeping_cells_bp.route("/sleeping-cells")

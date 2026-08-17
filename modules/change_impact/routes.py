@@ -4,9 +4,10 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import change_impact
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
+from core.radio.web import admin_required, attach_feature_guard, format_user, get_current_user, json_error, query_filters
 
 change_impact_bp = Blueprint("change_impact", __name__)
+attach_feature_guard(change_impact_bp, "/change-impact")
 
 
 @change_impact_bp.route("/change-impact")

@@ -126,7 +126,13 @@ def overshooting_candidates(*, vendor: str = "all", technology: str = "all", are
 def neighbor_quality(*, vendor: str = "all", technology: str = "all", area: str = "", limit: int = 200) -> dict:
     rows = neighbor.build_quality_issues(vendor, technology, limit=limit)
     rows = filter_rows(rows, area=area)
-    return {"generated_at": utc_now_iso(), "summary": summarize(rows), "issues": _limit(rows, limit)}
+    return {
+        "generated_at": utc_now_iso(),
+        "summary": summarize(rows),
+        "issues": _limit(rows, limit),
+        "freshness": neighbor.neighbor_freshness(),
+        "note": "HO SR, attempts, distance, azimuth, and reciprocal gaps. TA/MR samples are not in the neighbor DBs.",
+    }
 
 
 def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: int = 500) -> dict:
@@ -180,7 +186,14 @@ def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: i
 
 def change_impact(*, vendor: str = "all", technology: str = "all", limit: int = 200) -> dict:
     changes = cm_store.detect_changes(limit=limit * 2)
-    degraded = {str(r.get("cell_name") or "").lower(): r for r in pm.degraded_cells(vendor="all", technology="4G", limit=500)}
+    techs = ["2G", "3G", "4G", "5G"] if technology in ("", "all", None) else [str(technology).split("-")[0]]
+    degraded: dict = {}
+    for tech in techs:
+        family = "4G" if str(tech).upper().startswith("4G") else str(tech)
+        for row in pm.degraded_cells(vendor="all", technology=family, limit=300):
+            key = str(row.get("cell_name") or "").lower()
+            if key and key not in degraded:
+                degraded[key] = row
     issues: list[dict] = []
     for ch in changes:
         if vendor and vendor.lower() != "all" and str(ch.get("vendor") or "").lower() != vendor.lower():
@@ -228,28 +241,46 @@ def rf_optimization(*, area: str = "", vendor: str = "all", technology: str = "a
 
 
 def radio_morning_report(*, area: str = "", vendor: str = "all", technology: str = "all", limit: int = 100) -> dict:
+    from core.radio.alarm_impact import alarm_impact
+    from core.radio.groups import group_health
+    from core.radio.mobility import irat_border, mobility_explorer
+    from modules.sleeping_cells.logic import detect_sleeping_cells
+
     capacity = capacity_hotspots(vendor=vendor, technology=technology, area=area, limit=limit)
     neighbors = neighbor_quality(vendor=vendor, technology=technology, area=area, limit=limit)
     layers = layer_coverage_gaps(area=area, limit=limit)
     overshoot = overshooting_candidates(vendor=vendor, technology=technology, area=area, limit=limit)
     cm_audit = cm_parameter_audit(vendor=vendor, technology=technology, limit=limit)
     impact = change_impact(vendor=vendor, technology=technology, limit=limit)
+    sleeping = detect_sleeping_cells(vendor=vendor, technology=technology, limit=limit)
+    mobility = mobility_explorer(vendor=vendor, technology=technology, area=area, limit=limit)
+    groups = group_health(vendor=vendor, technology=technology, limit=limit)
+    alarms = alarm_impact(vendor=vendor, technology=technology, area=area, limit=limit)
+    irat = irat_border(vendor=vendor, technology=technology, area=area, limit=limit)
     all_rows = []
-    for section in (capacity, neighbors, layers, overshoot, cm_audit, impact):
-        all_rows.extend(section.get("issues") or [])
+    sections = {
+        "capacity_hotspots": capacity.get("issues", [])[:limit],
+        "neighbor_quality": neighbors.get("issues", [])[:limit],
+        "layer_coverage": layers.get("issues", [])[:limit],
+        "overshooting": overshoot.get("issues", [])[:limit],
+        "cm_audit": cm_audit.get("issues", [])[:limit],
+        "change_impact": impact.get("issues", [])[:limit],
+        "sleeping_cells": sleeping.get("issues", [])[:limit],
+        "mobility": mobility.get("issues", [])[:limit],
+        "group_health": groups.get("issues", [])[:limit],
+        "alarm_impact": alarms.get("issues", [])[:limit],
+        "irat_border": irat.get("issues", [])[:limit],
+    }
+    for rows in sections.values():
+        all_rows.extend(rows)
     all_rows = filter_rows(all_rows, area=area, vendor=vendor, technology=technology)
     return {
         "generated_at": utc_now_iso(),
         "summary": summarize(all_rows),
-        "sections": {
-            "capacity_hotspots": capacity.get("issues", [])[:limit],
-            "neighbor_quality": neighbors.get("issues", [])[:limit],
-            "layer_coverage": layers.get("issues", [])[:limit],
-            "overshooting": overshoot.get("issues", [])[:limit],
-            "cm_audit": cm_audit.get("issues", [])[:limit],
-            "change_impact": impact.get("issues", [])[:limit],
-        },
+        "sections": sections,
         "issues": all_rows[:limit],
         "cm_store": cm_store.store_stats(),
+        "neighbor_freshness": neighbors.get("freshness"),
+        "group_inventory": groups.get("inventory"),
     }
 

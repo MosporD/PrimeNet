@@ -132,9 +132,12 @@ def _sector_index(df: pd.DataFrame) -> dict[str, pd.Series]:
     return out
 
 
-def list_nok_sectors(target: datetime | date | None = None) -> dict[str, Any]:
+def list_nok_sectors(
+    target: datetime | date | None = None,
+    vendor: str | None = None,
+) -> dict[str, Any]:
     """Return NOK sectors with throughput summary (SQLite first)."""
-    vendor = config.NETWORK_BALANCE_VENDOR
+    vendor = (vendor or config.NETWORK_BALANCE_VENDOR or "Nokia").strip() or "Nokia"
     day = _as_date(target)
 
     if config.BALANCE_PREFER_SQLITE and db_has_data(vendor.lower()):
@@ -195,6 +198,7 @@ def list_nok_sectors(target: datetime | date | None = None) -> dict[str, Any]:
 def sectors_from_balance(
     sector_ids: list[str],
     target: datetime | date | None = None,
+    vendor: str | None = None,
 ) -> tuple[list[dict[str, Any]], list[str], str | None]:
     """
     Look up requested sectors in Network Balance data.
@@ -215,7 +219,8 @@ def sectors_from_balance(
     if not requested:
         return [], ["Provide at least one sector id (e.g. 1201_A)."], None
 
-    vendor = config.NETWORK_BALANCE_VENDOR.lower()
+    vendor_label = (vendor or config.NETWORK_BALANCE_VENDOR or "Nokia").strip() or "Nokia"
+    vendor = vendor_label.lower()
     day = _as_date(target)
 
     if config.BALANCE_PREFER_SQLITE and db_has_data(vendor):
@@ -226,7 +231,7 @@ def sectors_from_balance(
         if warnings and not any("No Network Balance snapshot" in w for w in warnings):
             return sectors, warnings, meta.get("source_file") if meta else None
 
-    df, path, warnings = load_balance_df(target, vendor=config.NETWORK_BALANCE_VENDOR)
+    df, path, warnings = load_balance_df(target, vendor=vendor_label)
     if df is None:
         return [], warnings or ["Network Balance data unavailable."], None
 

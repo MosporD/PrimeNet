@@ -12,7 +12,13 @@ from .export import build_changes_xml
 from .logic import load_preview, preview_xml, write_preview_xml
 
 
-def apply_preview_to_oss(username: str, token: str, *, wait: bool = False) -> dict[str, Any]:
+def apply_preview_to_oss(
+    username: str,
+    token: str,
+    *,
+    wait: bool = False,
+    dry_run: bool = False,
+) -> dict[str, Any]:
     preview = load_preview(username, token)
     changes = preview.get("changes") or []
     if not changes:
@@ -20,6 +26,14 @@ def apply_preview_to_oss(username: str, token: str, *, wait: bool = False) -> di
 
     xml_text = preview_xml(username, token)
     xml_path = write_preview_xml(username, token, xml_text)
+    if dry_run:
+        return {
+            "dry_run": True,
+            "xml_path": xml_path,
+            "xml_bytes": len(xml_text.encode("utf-8")),
+            "change_count": len(changes),
+            "uploaded": False,
+        }
     remote_name = f"primenet_nokia_lb_{token[:12]}.xml"
     remote_path = _upload_to_omc(xml_path, remote_name)
 

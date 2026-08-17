@@ -7,6 +7,9 @@
     const cmStatus = document.getElementById('cm-status');
     const balanceStatus = document.getElementById('balance-status');
     const dbStatus = document.getElementById('db-status');
+    const pipelineStatus = document.getElementById('pipeline-status');
+    const pipelineVerifyDetail = document.getElementById('pipeline-verify-detail');
+    const verifyPipelineBtn = document.getElementById('verify-pipeline-btn');
     const balanceDate = document.getElementById('balance-date');
     const reloadBtn = document.getElementById('reload-sectors-btn');
     const syncBalanceBtn = document.getElementById('sync-balance-btn');
@@ -318,6 +321,33 @@
         );
 
         updateAnalyzeButton();
+    }
+
+    async function verifyPipeline() {
+        if (!pipelineStatus) return;
+        setPill(pipelineStatus, 'Verifying pipeline…', 'muted');
+        if (pipelineVerifyDetail) pipelineVerifyDetail.textContent = '';
+        try {
+            const resp = await fetch('/api/nokia-load-balancing/verify');
+            const data = await resp.json();
+            const readyOss = !!data.ready_for_oss_push;
+            const readyXml = !!data.ready_for_xml;
+            const label = readyOss
+                ? 'Pipeline ready (XML + OSS config)'
+                : readyXml
+                    ? 'XML path ready (OSS push not configured)'
+                    : 'Pipeline not ready';
+            setPill(pipelineStatus, label, readyXml ? 'ok' : 'error');
+            const failed = (data.checks || []).filter((c) => !c.ok).map((c) => c.name + ': ' + (c.detail || ''));
+            if (pipelineVerifyDetail) {
+                pipelineVerifyDetail.textContent = failed.length
+                    ? failed.join(' · ')
+                    : (data.note || 'Analyze → RAML XML verified. Live OSS import is confirmation-gated.');
+            }
+        } catch (err) {
+            setPill(pipelineStatus, 'Pipeline check failed', 'error');
+            if (pipelineVerifyDetail) pipelineVerifyDetail.textContent = err.message || String(err);
+        }
     }
 
     function visibleSectorRows() {
@@ -815,6 +845,7 @@
         downloadFile('/api/nokia-load-balancing/download-excel', `nokia_lb_${previewToken.slice(0, 8)}.xlsx`)
     );
     if (applyOssBtn) applyOssBtn.addEventListener('click', applyToOss);
+    if (verifyPipelineBtn) verifyPipelineBtn.addEventListener('click', verifyPipeline);
 
     balanceDate.value = todayIso();
     ingestEnd.value = todayIso();
@@ -822,6 +853,7 @@
     trendEnd.value = todayIso();
     trendStart.value = daysAgoIso(13);
     setStatuses();
+    verifyPipeline();
     loadDbStatus();
     loadSnapshots();
     runDiagnostics();

@@ -84,6 +84,10 @@ from modules.power_bi.routes import power_bi_bp
 from modules.documentation import documentation_bp
 from modules.nokia_load_balancing import nokia_load_balancing_bp
 from modules.huawei_load_balancing import huawei_load_balancing_bp
+from modules.mobility_explorer import mobility_explorer_bp
+from modules.alarm_impact import alarm_impact_bp
+from modules.group_health import group_health_bp
+from modules.irat_border import irat_border_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(activation_bp)
@@ -128,6 +132,10 @@ app.register_blueprint(power_bi_bp)
 app.register_blueprint(documentation_bp)
 app.register_blueprint(nokia_load_balancing_bp)
 app.register_blueprint(huawei_load_balancing_bp)
+app.register_blueprint(mobility_explorer_bp)
+app.register_blueprint(alarm_impact_bp)
+app.register_blueprint(group_health_bp)
+app.register_blueprint(irat_border_bp)
 
 
 @app.route("/amle-optimizer")

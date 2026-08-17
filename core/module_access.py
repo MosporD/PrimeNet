@@ -44,6 +44,10 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Radio Morning Report", "href": "/radio-morning-report", "visibility": "admin"},
             {"label": "Nokia Load Balancing", "href": "/nokia-load-balancing", "visibility": "admin"},
             {"label": "Huawei Load Balancing", "href": "/huawei-load-balancing", "visibility": "admin"},
+            {"label": "Mobility / HO Explorer", "href": "/mobility-explorer", "visibility": "admin"},
+            {"label": "Alarm–PM Correlator", "href": "/alarm-impact", "visibility": "admin"},
+            {"label": "Group / Cluster Health", "href": "/group-health", "visibility": "admin"},
+            {"label": "IRAT / Vendor Border", "href": "/irat-border", "visibility": "admin"},
         ],
     },
     {

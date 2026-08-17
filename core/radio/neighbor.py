@@ -16,7 +16,7 @@ from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 from .scoring import bounded_score, issue
 
 
-TECHNOLOGIES = ["2G-2G", "3G-3G", "4G-4G"]
+TECHNOLOGIES = ["2G-2G", "3G-3G", "4G-4G", "5G-5G"]
 
 
 def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
@@ -134,11 +134,40 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
                 "success_rate": sr,
                 "failures": failures,
                 "distance_km": distance,
+                "source_azimuth": row.get("source_azimuth"),
+                "target_azimuth": row.get("target_azimuth"),
                 "missing_reciprocal": missing_recip,
                 "target_vendor": row.get("target_vendor"),
+                "ta_mr_available": False,
             },
             recommendation="Check neighbor definition, reciprocity, distance, and handover thresholds.",
             source_url="/neighbor-quality",
         ))
     return sorted(issues, key=lambda r: -float(r.get("score") or 0))[:limit]
+
+
+def neighbor_freshness() -> dict:
+    """Nokia vs Huawei neighbor DB freshness for UI, not scheduler logs."""
+    from core.neighbor_health import get_neighbor_health_cached
+
+    payload = get_neighbor_health_cached()
+    dbs = payload.get("neighbor_databases") or []
+    return {
+        "checked_at_utc": payload.get("checked_at_utc"),
+        "cached": payload.get("cached"),
+        "databases": [
+            {
+                "label": item.get("label"),
+                "overall": item.get("overall"),
+                "exists": (item.get("file") or {}).get("exists"),
+                "size_mb": (item.get("file") or {}).get("size_mb"),
+                "modified_utc": (item.get("file") or {}).get("modified_utc"),
+                "latest_data_overall": item.get("latest_data_overall"),
+                "total_rows": item.get("total_rows"),
+                "empty_tables": item.get("empty_tables") or [],
+            }
+            for item in dbs
+        ],
+        "note": "TA/MR samples are not in these neighbor DBs — distance uses metadata lat/long only.",
+    }
 

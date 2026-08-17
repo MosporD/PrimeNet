@@ -2,9 +2,18 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Nokia Load Balancing (AMLE) + Network Balance ingest. UI unification in `checklist.md` is still open.
+**Current track:** Data-to-modules roadmap shipped (Huawei LB, joins, Mobility/Alarm/Group/IRAT, platform). UI unification in `checklist.md` is still backlog.
 
-**NEXT:** Browser-verify `/nokia-load-balancing` (sector pick → analyze → XML / OSS push) with NetAct CM credentials.
+**NEXT:** Browser-verify `/nokia-load-balancing` Apply on a reviewed sector (confirmation-gated live NetAct import), then walk `/huawei-load-balancing` and the new radio modules on a weekday sample.
+
+## 2026-08-17 (roadmap)
+
+- Done: Nokia LB pipeline verify (rules + RAML XML dry-run + `/api/nokia-load-balancing/verify`). Live OSS import stays confirmation-gated; this host does not auto-push.
+- Done: Huawei Load Balancing on Network Balance SQLite (CellMLB propose → Excel/MML). No U2020 push.
+- Done: Neighbor 5G-5G + azimuth/freshness; sleeping-cell vs live FM; groups API on Network Health; Change Impact PM across RATs
+- Done: Mobility Explorer, Alarm–PM Correlator, Group Health, IRAT/Vendor Border
+- Done: KPI aliases for 2G/3G/5G; feature-access guards on radio insight modules; morning report composes the new outputs
+- Modified: `app.py`, `core/radio/`, `core/module_access.py`, `core/module_versions.py`, `modules/nokia_load_balancing/`, `modules/huawei_load_balancing/`, new radio modules, `templates/dashboard.html`
 
 ## 2026-08-17
 

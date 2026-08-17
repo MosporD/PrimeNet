@@ -145,6 +145,41 @@ def detect_sleeping_cells(
 
     issues.sort(key=lambda r: -float(r.get("score") or 0))
     issues = issues[: max(1, int(limit))]
+
+    alarm_notes: list[str] = []
+    try:
+        from core.radio.alarm_join import fetch_recent_alarms, match_alarms_for_cells
+
+        fm = fetch_recent_alarms(limit=200)
+        alarm_notes = list(fm.get("notes") or [])
+        hits = match_alarms_for_cells(
+            [c for row in issues for c in (row.get("cells") or [])],
+            [str(row.get("site_id") or "") for row in issues],
+        )
+        for row in issues:
+            keys = [str(c).lower() for c in (row.get("cells") or [])]
+            if row.get("site_id"):
+                keys.append(str(row["site_id"]).lower())
+            matched = []
+            for key in keys:
+                matched.extend(hits.get(key) or [])
+            names = sorted({str(a.get("alarm_name") or "").strip() for a in matched if a})
+            names = [n for n in names if n][:3]
+            evidence = dict(row.get("evidence") or {})
+            evidence["alarm_count"] = len(matched)
+            evidence["alarm_names"] = names
+            evidence["alarm_status"] = "alarmed" if matched else ("no_match" if fm.get("alarms") else "fm_unavailable")
+            evidence["fm_notes"] = alarm_notes
+            row["evidence"] = evidence
+            if matched:
+                row["summary"] = f"{row.get('summary')} Live FM: {', '.join(names) or 'alarm present'}."
+                row["recommendation"] = (
+                    "This CM-active quiet cell also has a live alarm — treat as an alarmed outage, "
+                    "not only a sleeping-cell reset."
+                )
+    except Exception as exc:
+        alarm_notes = [str(exc)]
+
     return {
         "generated_at": utc_now_iso(),
         "summary": summarize(issues),
@@ -154,5 +189,7 @@ def detect_sleeping_cells(
             "baseline_days": baseline_days,
             "min_baseline": min_baseline,
             "scanned_active_cells": scanned_cells,
+            "alarm_join": alarm_notes,
         },
+        "note": "CM-active + traffic collapse. Alarm names are joined from live FM when configured; otherwise the detector cannot tell sleeping vs alarmed.",
     }

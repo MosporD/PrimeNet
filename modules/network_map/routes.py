@@ -252,6 +252,7 @@ def _normalize_ui_map_tech_token(tech: str) -> str:
         "4g-4g intra": "4G-4G",
         "4g-4g inter": "4G-4G",
         "4g-4g": "4G-4G",
+        "5g-5g": "5G-5G",
         "2g": "2G",
         "3g": "3G",
         "4g-fdd": "4G-FDD",
@@ -509,6 +510,8 @@ def _neighbor_raw_table_name_for_technology(technology: str, prefix: str) -> str
         return f"{prefix}_2g"
     if tok == "3G-3G" or t.startswith("3G"):
         return f"{prefix}_3g"
+    if tok == "5G-5G" or t.startswith("5G") or "NR" in t:
+        return f"{prefix}_5g"
     if "4G" in t or "LTE" in t:
         return f"{prefix}_4g"
     return None
@@ -528,6 +531,9 @@ def _resolve_raw_neighbor_tables_for_vendor(
     if not preferred:
         return []
     t = (technology or "").strip().upper()
+    if "5G" in t or "NR" in t:
+        preferred_5g = f"{prefix}_5g"
+        return [preferred_5g] if _neighbor_table_non_empty(conn, preferred_5g) else []
     if "4G" not in t and "LTE" not in t:
         return [preferred] if _neighbor_table_non_empty(conn, preferred) else []
 
@@ -556,6 +562,8 @@ def _resolve_huawei_neighbor_export_table(_conn: sqlite3.Connection, technology:
         return "huawei_neighbor_export_2g"
     if tok == "3G-3G" or t.startswith("3G"):
         return "huawei_neighbor_export_3g"
+    if tok == "5G-5G" or t.startswith("5G") or "NR" in t:
+        return "huawei_neighbor_export_5g"
     if "4G" in t or "LTE" in t:
         return "huawei_neighbor_export_4g"
     return None

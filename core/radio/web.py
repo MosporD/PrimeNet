@@ -98,3 +98,14 @@ def query_filters(default_limit: int = 200) -> dict:
 def json_error(exc: Exception, status: int = 500):
     return jsonify({"success": False, "error": str(exc)}), status
 
+
+def attach_feature_guard(bp, href: str) -> None:
+    """Honor Admin Panel feature-access grants on a blueprint (login + href ACL)."""
+
+    @bp.before_request
+    def _feature_guard():
+        from core.module_access import module_access_before_request
+        return module_access_before_request(href)
+
+    _feature_guard.__name__ = f"_guard_{href.strip('/').replace('-', '_')}"
+

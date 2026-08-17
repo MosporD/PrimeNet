@@ -4,9 +4,10 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import layer_coverage_gaps
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
+from core.radio.web import admin_required, attach_feature_guard, format_user, get_current_user, json_error, query_filters
 
 layer_coverage_bp = Blueprint("layer_coverage", __name__)
+attach_feature_guard(layer_coverage_bp, "/layer-coverage")
 
 
 @layer_coverage_bp.route("/layer-coverage")
