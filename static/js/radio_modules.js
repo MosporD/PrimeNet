@@ -2,7 +2,18 @@
     const body = document.body;
     const apiUrl = body.dataset.apiUrl;
     const defaultTechnology = body.dataset.defaultTechnology || 'all';
+    const FETCH_TIMEOUT_MS = 120000;
     let currentRows = [];
+    let activeModule = null;
+
+    function moduleKey(row) {
+        return row.module || row.category || 'Unclassified';
+    }
+
+    function visibleRows() {
+        if (!activeModule) return currentRows;
+        return currentRows.filter((row) => moduleKey(row) === activeModule);
+    }
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -25,10 +36,12 @@
         const container = document.getElementById('radio-module-summary');
         const counts = new Map();
         (rows || []).forEach((row) => {
-            const key = row.module || row.category || 'Unclassified';
-            counts.set(key, (counts.get(key) || 0) + 1);
+            counts.set(moduleKey(row), (counts.get(moduleKey(row)) || 0) + 1);
         });
-        if (!counts.size) {
+        if (activeModule && !counts.has(activeModule)) {
+            activeModule = null;
+        }
+        if (counts.size < 2 && !activeModule) {
             container.innerHTML = '';
             container.hidden = true;
             return;
@@ -37,11 +50,19 @@
         container.innerHTML = Array.from(counts.entries())
             .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
             .map(([label, count]) => `
-                <div class="radio-module-chip">
+                <button type="button" class="radio-module-chip${label === activeModule ? ' active' : ''}" data-module="${escapeHtml(label)}" title="Show only ${escapeHtml(label)} issues">
                     <span>${escapeHtml(label)}</span>
                     <strong>${escapeHtml(count)}</strong>
-                </div>
+                </button>
             `).join('');
+        container.querySelectorAll('.radio-module-chip').forEach((chip) => {
+            chip.addEventListener('click', () => {
+                const label = chip.dataset.module;
+                activeModule = activeModule === label ? null : label;
+                setModuleSummary(currentRows);
+                renderRows(visibleRows());
+            });
+        });
     }
 
     function formatEvidence(evidence) {
@@ -113,7 +134,7 @@
             const selectRow = () => {
                 tbody.querySelectorAll('tr.selected').forEach((item) => item.classList.remove('selected'));
                 tr.classList.add('selected');
-                renderDetail(currentRows[Number(tr.dataset.rowIndex)]);
+                renderDetail(rows[Number(tr.dataset.rowIndex)]);
             };
             tr.addEventListener('click', selectRow);
             tr.addEventListener('keydown', (event) => {
@@ -156,8 +177,10 @@
             q: document.getElementById('radio-search').value,
             limit: '250',
         });
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
         try {
-            const response = await fetch(`${apiUrl}?${params.toString()}`);
+            const response = await fetch(`${apiUrl}?${params.toString()}`, { signal: controller.signal });
             const data = await response.json();
             if (!data.success) {
                 throw new Error(data.error || 'Request failed');
@@ -165,7 +188,7 @@
             currentRows = data.issues || [];
             setSummary(data.summary || {});
             setModuleSummary(currentRows);
-            renderRows(currentRows);
+            renderRows(visibleRows());
             const note = document.getElementById('radio-note');
             if (data.note) {
                 note.hidden = false;
@@ -174,7 +197,12 @@
                 note.hidden = true;
             }
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="8">Failed to load data: ${escapeHtml(error.message)}</td></tr>`;
+            const message = error.name === 'AbortError'
+                ? 'Request timed out. Heavy sections may still be computing on the server — click Apply to retry.'
+                : error.message;
+            tbody.innerHTML = `<tr><td colspan="8">Failed to load data: ${escapeHtml(message)}</td></tr>`;
+        } finally {
+            clearTimeout(timer);
         }
     }
 
