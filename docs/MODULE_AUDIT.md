@@ -28,7 +28,11 @@ KPI-header databases do not exist at all. So this audit proves **wiring** — ro
 register, queries execute, templates render, JSON contracts hold, empty states
 don't crash — but it does **not** validate detector accuracy, KPI maths, or
 threshold tuning against real network data. Those need a run against a populated
-deployment; §5 lists what to check there.
+deployment; §6 lists what to check there.
+
+Two lenses are used throughout: **§3–§4 and §7 are the engineering view** (does the
+code work, is it maintainable) and **§5 is the RF/operational view** (would a radio
+engineer trust and use it).
 
 ---
 
@@ -69,6 +73,8 @@ is absent rather than fail.
 ## 3. Module inventory
 
 Grouped as the navigation groups them. "Status" reflects the wiring test above.
+The "Gaps" column here is the **engineering view** (structure, coupling, coverage);
+for the **RF/operational view** of the same modules see §5.
 
 ### Overview & Performance
 
@@ -183,7 +189,168 @@ and the only non-nav pages are intentional (`/login`, `/portals`, `/activation`,
 
 ---
 
-## 5. What to verify on a populated deployment
+## 5. The RF engineer's view
+
+§3 and §4 judge the code. This section judges the **tool**: would an RF/RNO
+engineer trust it, and what would they immediately ask for. Every claim below was
+checked against the source.
+
+### 5.1 Workflow coverage
+
+How an RF engineer's actual working week maps onto PrimeNet:
+
+| RF workflow | Covered by | Verdict |
+|---|---|---|
+| Morning KPI check / worst cells | Radio Morning Report, Network Health, Performance Explorer | **Strong** |
+| Trouble-ticket investigation (one cell/site) | Performance Explorer, Network Map, Fault Management | **Strong** |
+| Neighbor / mobility optimization | Neighbor Quality, Mobility Explorer, IRAT Border | **Partial** — existing relations only (see 5.2 #2) |
+| Capacity management | Capacity Hotspots, Load Balancing | **Partial** — no busy hour (see 5.2 #1) |
+| Coverage optimization (tilt / azimuth / power) | Overshooting Detector, Layer Coverage, RET Management | **Partial** — detects, but does not propose values or close the loop |
+| PCI / PSC planning and audit | Conflict Map, Network Management | **Partial** — reuse only, no confusion/mod3 (see 5.2 #3) |
+| Interference / UL noise analysis | Network Health (RTWP KPI only) | **Missing as a detector** (see 5.2 #5) |
+| Parameter audit / golden config | CM Parameter Audit, NE Comparison, Config History | **Strong** |
+| Change validation (before/after) | Change Impact Tracker | **Partial** — correlation, not a validation cycle (see 5.2 #9) |
+| Site acceptance / new-site validation | — | **Missing** |
+| Drive test analysis | Drive Test Viewer | **Weak** — route display only, no KPI overlay or PM correlation |
+| Capacity planning / expansion business case | — | **Missing** |
+| VoLTE / voice quality | — | **Missing** |
+
+### 5.2 Gaps that matter to an RF engineer, ranked by operational impact
+
+**1. Everything runs on daily averages — there is no busy hour.**
+`modules/son_analytics/pm_helpers.py:19` sets `PM_DATA_SCOPE = "daily"`, and every
+detector inherits it. Capacity Hotspots compares a daily figure against a prior-week
+daily average. RF capacity work is busy-hour work: a cell at 45% daily PRB can sit
+at 95% in the evening peak, and a cell with flat all-day load can look worse than
+it is. As built, the capacity ranking will **systematically under-flag genuinely
+congested cells and over-flag flat-profile cells**. This is the single biggest
+credibility gap for an RF audience — hourly stores already exist for group PM, so
+the ingestion pattern is proven; the detectors need to consume a BH scope.
+
+**2. Missing neighbors are invisible by construction.**
+Neighbor Quality (`core/radio/neighbor.py`) scores relations that already exist —
+low HO success, failures, distance, missing reciprocity. But the most common real
+mobility fault is a neighbor that was **never defined**, causing drops at a border
+with no HO attempts to score. Nothing in the codebase detects missing/undefined
+neighbors (no ANR or X2 candidate handling anywhere). A cell can have a perfect
+Neighbor Quality score and still be dropping calls into an undefined neighbor.
+
+**3. PCI analysis covers reuse but not confusion or modulo collisions.**
+Conflict Map does co-band PCI/PSC reuse by distance and azimuth-vs-bearing — good,
+but it is one of three standard checks. Missing:
+- **PCI confusion** — two neighbors *of the same cell* sharing a PCI, which breaks
+  handover target resolution outright;
+- **mod3 collision** — PSS/SSS and DMRS interference between strong neighbors;
+- **mod30 collision** — PUCCH/SRS interference.
+Any operator PCI audit expects all four. Confusion in particular is a hard fault,
+not a risk score.
+
+**4. Nothing is weighted by traffic or customer impact.**
+`core/radio/scoring.py` scores pure symptom severity. An RF engineer prioritizes by
+impact: 92% HO success on a cell carrying 400 GB/day outranks 85% on a cell carrying
+2 GB. Without a traffic/Erlang/user weighting term, the "prioritized action queue"
+is not prioritized the way an RF team prioritizes, and the Workbench's top rows may
+be statistically noisy low-traffic cells. **Adding a traffic-weight multiplier to
+`bounded_score()` is probably the highest value-per-line change in the suite.**
+
+**5. There is no UL interference detector.**
+RTWP / UL interference exists as a Network Health KPI category
+(`modules/network_health/config.py:112`, threshold −95 dBm) but no detector in the
+optimization suite hunts rising RTWP, external interference, or PIM signatures.
+UL interference is a top-three real-world RF fault class and is well suited to the
+existing detector pattern (baseline vs. recent, per cell).
+
+**6. Recommendations name a topic, not an action.**
+Every detector's recommendation is generic — *"Review antenna tilt/azimuth, power,
+neighbor design"*, *"Check neighbor definition, reciprocity, distance"*. An RF tool
+earns trust when it proposes a **value and an expected gain**: "E-tilt 3° → 5°,
+expected overshoot reduction ~2 km, 6 affected relations". Notably, Nokia Load
+Balancing already works this way (concrete AMLE parameter proposals, export, verify)
+— that bar exists in the codebase and the optimization suite doesn't meet it.
+
+**7. Overshooting without TA/MR is a weak proxy.**
+The detector flags neighbor relations beyond 8 km with HO evidence, and is honest
+about being a heuristic. But real overshooting is diagnosed from the **timing-advance
+distribution tail** (or MR path-loss). Distance-based inference produces false
+positives on legitimately planned long-range rural cells and **misses overshooters
+that have no far neighbor defined at all** — which is the same blind spot as #2.
+The 8 km threshold is also fixed, so it cannot distinguish dense urban from desert
+highway morphology.
+
+**8. Detect → act → verify is four disconnected modules.**
+The natural RF loop — detect overshoot, propose a tilt, push it via RET, verify the
+KPI moved — exists as Overshooting Detector, RET Management, and Change Impact
+Tracker with **no links between them** (no reference to RET anywhere in
+`core/radio/`). Today the engineer copies a cell name between three screens.
+
+**9. Change Impact correlates, it does not validate.**
+It flags a CM change on a cell that also degraded, scoring 65 when both appear and
+35 for a change alone. That is a candidate list, not validation: no control group
+(did untouched sibling cells degrade too?), no confidence measure, no explicit
+before/after window comparison per KPI, and no disambiguation when several changes
+land on one cell. RNO practice needs "I applied X on day D, here is the KPI delta
+over D+7 against a comparable control set".
+
+**10. The tool is issue-centric; RF work is campaign-centric.**
+There is no cluster or campaign object — no way to say "I own Cluster 7 this
+sprint, show me everything, track my progress, report what improved". Issues cannot
+be assigned, acknowledged, snoozed, or closed; the same issue reappears every run
+with no memory that an engineer already dispositioned it. **No issue lifecycle is
+the biggest workflow gap after busy hour.**
+
+**11. No coverage-limited vs capacity-limited classification.**
+The standard first triage question — is this cell short of coverage or short of
+capacity? — is unanswered, yet it decides whether the action is tilt/power or
+carrier/sector split.
+
+**12. 5G support is thin.** Only two NSA aliases appear in the KPI recipes
+(`NSA Avg nr user`, `IntergNB HO SR NSA`). There is no SA handling, no beam/SSB
+analysis, no NSA leg-retention or EN-DC setup-failure view. For a network deploying
+5G, this is a growing blind spot.
+
+**13. No VoLTE or voice-quality dimension** — no VoLTE accessibility/retainability
+category, no MOS or codec view. For most operators voice KPIs are contractual.
+
+**14. No planned-vs-actual comparison.** Nothing imports planning-tool output
+(Atoll / Asset / Planet), so the tool cannot flag where the live network diverges
+from the design — a routine optimization input.
+
+### 5.3 What an RF engineer would say about specific modules
+
+| Module | RF verdict |
+|---|---|
+| **Performance Explorer** | The module they'd live in. Wants busy-hour scope and per-KPI target lines on trends. |
+| **RF Optimization Workbench** | Right idea; ranking is not impact-weighted (5.2 #4) and it covers 5 of 11 detectors. Add traffic weighting and per-cell grouping and it becomes the daily worklist. |
+| **Radio Morning Report** | Content is right, delivery is wrong — a morning report should arrive by email at 07:00, not wait to be opened. |
+| **Neighbor Quality** | Solid on defined relations; blind to missing ones (5.2 #2). |
+| **Capacity Hotspots** | Cannot be trusted for capacity decisions until it's busy-hour based (5.2 #1). |
+| **Overshooting Detector** | Useful screening list, not a diagnosis (5.2 #7). |
+| **Sleeping Cell Detector** | Genuinely valuable — catches the fault type that silently costs traffic. Should correlate to VSWR/RET/hardware alarms to separate "sleeping" from "faulty". |
+| **CM Parameter Audit** | Exactly what a golden-config audit should be. Wants rule versioning and an approval trail for MOP discipline. |
+| **Nokia Load Balancing** | The most RF-credible module in the app: concrete proposals, export, verify, push. This is the template the rest should follow. |
+| **Huawei Load Balancing** | Same promise, far less delivered — no verify, no push. |
+| **Conflict Map / Network Management** | Two half-PCI-audits; merge them and add confusion + mod3/mod30 (5.2 #3). |
+| **Drive Test Viewer** | Shows the route but not the radio — no RSRP/SINR overlay, no correlation to serving-cell PM. Currently a map, not an analysis tool. |
+| **Fault Management** | Read-only alarm list. RF wants alarm-to-KPI-impact ranking (which alarms are actually costing traffic). |
+| **RET Management** | Trusted for what it does; needs a dry-run/preview and a link from the detectors that recommend tilt changes (5.2 #8). |
+
+### 5.4 RF priority list
+
+If the next quarter of PrimeNet work were scoped by an RF manager rather than a
+developer, this is the order:
+
+1. **Busy-hour scope for all PM detectors** — without it, capacity output isn't decision-grade.
+2. **Traffic/impact weighting in issue scoring** — makes the priority queue genuinely prioritized.
+3. **Issue lifecycle** (assign / acknowledge / snooze / close, with history) — turns detectors into a workflow.
+4. **Missing-neighbor detection** — closes the biggest mobility blind spot.
+5. **PCI confusion + mod3/mod30 checks** — completes the PCI audit.
+6. **UL interference / RTWP detector** — adds a missing top-three fault class.
+7. **Quantified recommendations** with proposed values, following the Nokia LB pattern.
+8. **Detect → RET → verify loop** — connect the three modules that already exist.
+
+---
+
+## 6. What to verify on a populated deployment
 
 This audit could not test data correctness. On a real dataset, check in this order:
 
@@ -200,7 +367,10 @@ This audit could not test data correctness. On a real dataset, check in this ord
 
 ---
 
-## 6. Priority recommendations
+## 7. Priority recommendations (engineering / codebase)
+
+The RF-facing priority list is §5.4. This one is about the code itself; the two
+are complementary, and items 2–4 here are what make §5.4 affordable to build.
 
 1. **Fix or remove the XML Parser profile buttons** — a visible feature that 404s.
 2. **Unit-test `core/radio/`** — highest coverage value per line in the codebase.
