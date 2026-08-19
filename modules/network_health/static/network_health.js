@@ -712,7 +712,7 @@
                         labels: {
                             color: theme.legend,
                             boxWidth: 12,
-                            font: { size: 11, weight: '600' },
+                            font: { size: 14, weight: '600' },
                             padding: 10,
                         },
                     },
@@ -733,12 +733,12 @@
                             maxTicksLimit: isHourly ? 8 : 10,
                             maxRotation: 0,
                             autoSkip: true,
-                            font: { size: 10 },
+                            font: { size: 13 },
                         },
                         grid: { color: theme.grid },
                     },
                     y: {
-                        ticks: { color: theme.tick, font: { size: 10 } },
+                        ticks: { color: theme.tick, font: { size: 13 } },
                         grid: { color: theme.grid },
                     },
                 },
