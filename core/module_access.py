@@ -48,6 +48,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Alarm–PM Correlator", "href": "/alarm-impact", "visibility": "admin"},
             {"label": "Group / Cluster Health", "href": "/group-health", "visibility": "admin"},
             {"label": "IRAT / Vendor Border", "href": "/irat-border", "visibility": "admin"},
+            {"label": "PCI Audit", "href": "/pci-audit", "visibility": "admin"},
         ],
     },
     {

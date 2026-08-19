@@ -117,7 +117,7 @@ would ask for. Gaps that belong to no single module are in §5.
 #### Conflict Map — OK
 - **Scope:** Co-band PCI/PSC reuse conflicts by distance and azimuth-vs-bearing, KML export.
 - **Dev:** Overlaps Network Management's PCI conflict API; distance/bearing thresholds hardcoded.
-- **RF:** **One of four standard PCI checks.** Missing **PCI confusion** (two neighbors of the same cell sharing a PCI — a hard HO fault, not a risk score), **mod3 collision** (PSS/SSS and DMRS interference), and **mod30** (PUCCH/SRS). Also no RSI/PRACH root-sequence conflict check.
+- **RF:** Covers geographic co-band reuse only. Confusion, mod3 and mod30 are now handled by the new **PCI Audit** module (they need the neighbor graph, which this module never reads); **RSI/PRACH root-sequence** conflicts remain uncovered. The two are complementary rather than duplicative, but one canonical PCI view would still beat two entry points.
 
 #### Femto PM — OK
 - **Scope:** Femtocell PM — device catalog, KPI columns, trends, user-defined KPIs.
@@ -185,6 +185,11 @@ All detectors share one engine (`core/radio/`) and emit a normalized issue recor
 - **Scope:** Thin blueprints over the shared engine — handover behaviour, inter-RAT and vendor-border issues, alarm-to-PM correlation.
 - **Dev:** ~19 LOC each over `core/radio/`; the alarm correlator's 5-minute cache and correlation window are not tunable.
 - **RF:** Mobility lacks a HO-parameter view alongside the failure counts. IRAT lacks a coverage-driven vs. parameter-driven distinction. The alarm correlator does not rank by traffic lost, so it tells you an alarm coincided with degradation but not whether it mattered.
+
+#### PCI Audit — OK *(new)*
+- **Scope:** Neighbor-relation PCI faults: **collision** (a cell and its own neighbor share a PCI), **confusion** (two neighbors of one cell share a PCI), and **mod3/mod30** interference risk gated on handover volume so only busy pairs are reported. LTE/NR only for the modulo checks; same-band required throughout.
+- **Dev:** Pure classifier (`core/radio/pci_audit.py`) with 21 unit tests — the first coverage in `core/radio/`. Reads `metadata.cell_index()` for PCI/band and the neighbor graph for relations; no new ingestion.
+- **RF:** Covers the checks Conflict Map cannot see, because they need the relation graph rather than geography. Still missing **RSI / PRACH root-sequence** conflicts — cell metadata carries no root-sequence index. Same-band stands in for co-frequency since metadata has no EARFCN, so two carriers within one band are treated as co-frequency.
 
 #### Group / Cluster Health — Fixed (was 500)
 - **Scope:** Controller/BSC/RNC congestion from group PM databases.
@@ -265,7 +270,7 @@ All detectors share one engine (`core/radio/`) and emit a normalized issue recor
 #### Network Management — OK
 - **Scope:** PCI/PSC/BCCH conflict detection (grouped by PCI and area) and a site cell browser.
 - **Dev:** Overlaps Conflict Map — two half-implementations of the same audit.
-- **RF:** Same PCI gaps as Conflict Map (no confusion, mod3, mod30, RSI). Conflicts are grouped by area rather than by actual neighbor relations or measured co-coverage, so distant same-PCI cells that never interfere are flagged alongside real collisions.
+- **RF:** Confusion/mod3/mod30 now live in **PCI Audit**; RSI remains uncovered here too. Conflicts are grouped by area rather than by actual neighbor relations or measured co-coverage, so distant same-PCI cells that never interfere are flagged alongside real collisions.
 
 #### RAN Feature Library — OK
 - **Scope:** Serves compiled Huawei HDX feature documentation.
@@ -341,10 +346,10 @@ a workflow, and it is the largest RF-workflow gap after busy hour.
 behind one operator-editable store would make every detector speak in the operator's
 own targets.
 
-**The `core/radio/` engine has no unit tests.** 75 tests exist but cluster in four
-modules; the scoring, filtering, and fusion logic that all 16 optimization modules
-depend on has none. It is pure functions over dicts — the cheapest high-value
-coverage available.
+**The `core/radio/` engine is still mostly untested.** The PCI Audit classifier now
+has 21 unit tests — the first in `core/radio/` — but the scoring, filtering and
+fusion logic that every optimization module depends on still has none. It is pure
+functions over dicts: the cheapest high-value coverage available.
 
 **Duplicated concepts.** Conflict Map vs. Network Management PCI; Sector Health vs.
 Layer Coverage; Nokia LB (3,556 LOC, full pipeline) vs. Huawei LB (610 LOC,
@@ -375,7 +380,7 @@ The two lenses produce different orders. Items 1–3 on the RF list depend on it
 2. **Traffic/impact weighting** in issue scoring — makes the priority queue genuinely prioritized.
 3. **Issue lifecycle** (assign / acknowledge / snooze / close, with history) — turns detectors into a workflow.
 4. **Missing-neighbor detection** — closes the biggest mobility blind spot.
-5. **PCI confusion + mod3/mod30 + RSI checks** — completes the PCI audit.
+5. ~~PCI confusion + mod3/mod30~~ — **shipped as the PCI Audit module**; RSI/PRACH root-sequence checks still need root-sequence data ingested.
 6. **UL interference / RTWP detector** — adds a missing top-three fault class.
 7. **Quantified recommendations** with proposed values and expected gain, following the Nokia LB pattern.
 8. **Detect → RET → verify loop** — connect three modules that already exist.
