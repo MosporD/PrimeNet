@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable
 
 from flask import Blueprint, jsonify, render_template
@@ -27,6 +28,12 @@ def make_radio_module(
     bp = Blueprint(name, __name__)
     attach_feature_guard(bp, href)
 
+    # Not every detector has an area dimension: group/controller PM rows are
+    # BSC/RNC aggregates that span areas. Pass (and filter on) area only when
+    # the builder models it, so those modules neither crash nor return nothing.
+    builder_params = inspect.signature(builder).parameters
+    supports_area = "area" in builder_params
+
     @bp.route(href)
     @admin_required
     def page():
@@ -45,15 +52,17 @@ def make_radio_module(
     def issues():
         f = query_filters(default_limit=default_limit)
         try:
-            payload = builder(
-                vendor=f["vendor"],
-                technology=f["technology"],
-                area=f["area"],
-                limit=f["limit"],
-            )
+            kwargs = {
+                "vendor": f["vendor"],
+                "technology": f["technology"],
+                "limit": f["limit"],
+            }
+            if supports_area:
+                kwargs["area"] = f["area"]
+            payload = builder(**kwargs)
             rows = filter_rows(
                 payload.get("issues") or [],
-                area=f["area"],
+                area=f["area"] if supports_area else "",
                 vendor=f["vendor"],
                 technology=f["technology"],
                 severity=f["severity"],
