@@ -21,8 +21,8 @@
 
 .nh-page {
     margin: 0;
-    min-height: 100vh;
-    height: 100vh;
+    min-height: var(--ui-vh, 100vh);
+    height: var(--ui-vh, 100vh);
     display: flex;
     flex-direction: column;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -75,8 +75,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    min-height: var(--nh-kpi-footer-h);
-    max-height: 40vh;
+    height: var(--nh-kpi-footer-h);
+    display: flex;
+    flex-direction: column;
     flex-shrink: 0;
     background: linear-gradient(0deg, #7fa6c2 0%, #8fb1ca 100%);
     border-top: 2px solid rgba(255, 255, 255, 0.5);
@@ -97,8 +98,10 @@ body.nh-page .nh-kpi-footer {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.45rem;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    margin-bottom: 0.4rem;
+    overflow: hidden;
 }
 
 .nh-kpi-footer-label {
@@ -135,7 +138,7 @@ body.nh-page .nh-kpi-footer {
 
 .nh-kpi-search {
     width: 200px;
-    max-width: 32vw;
+    max-width: calc(var(--ui-vw, 100vw) * 0.32);
     border: 1.5px solid rgba(255, 255, 255, 0.55);
     border-radius: 7px;
     padding: 0.38rem 0.55rem;
@@ -253,12 +256,14 @@ body.nh-page .nh-kpi-footer {
 .nh-tabs {
     display: flex;
     gap: 0.35rem;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     scrollbar-width: thin;
     padding-bottom: 4px;
-    min-height: 36px;
-    flex-wrap: nowrap;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-wrap: wrap;
+    align-content: flex-start;
     align-items: center;
 }
 
@@ -360,11 +365,11 @@ body.nh-page .nh-kpi-footer {
 
 .nh-workspace {
     display: grid;
-    grid-template-columns: 190px minmax(420px, 1fr) 360px;
+    grid-template-columns: 200px minmax(420px, 1fr) 440px;
     gap: 0;
     flex: 1;
     min-height: 0;
-    height: calc(100vh - var(--nh-header-h) - var(--nh-kpi-footer-h));
+    height: calc(var(--ui-vh, 100vh) - var(--nh-header-h) - var(--nh-kpi-footer-h));
     overflow: hidden;
     background: var(--pn-bg);
 }
@@ -437,8 +442,13 @@ body.nh-page .nh-kpi-footer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.3rem;
-    max-height: 220px;
     overflow-y: auto;
+}
+
+.nh-cluster-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .nh-cluster-btn {
@@ -566,8 +576,8 @@ body.nh-page .nh-kpi-footer {
 }
 
 .nh-table-title {
-    padding: 0.35rem 0.5rem 0.2rem;
-    font-size: 0.78rem;
+    padding: 0.4rem 0.55rem 0.25rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--pn-primary-dark);
     white-space: nowrap;
@@ -583,14 +593,15 @@ body.nh-page .nh-kpi-footer {
 
 .nh-table {
     width: 100%;
+    max-width: 1150px;
     border-collapse: collapse;
-    font-size: 0.76rem;
+    font-size: 0.82rem;
     table-layout: auto;
 }
 
 .nh-table th,
 .nh-table td {
-    padding: 0.28rem 0.35rem;
+    padding: 0.32rem 0.45rem;
     border-bottom: 1px solid var(--pn-border-soft);
     text-align: left;
     color: var(--pn-text);
@@ -601,7 +612,8 @@ body.nh-page .nh-kpi-footer {
 .nh-table td.num {
     text-align: right;
     font-variant-numeric: tabular-nums;
-    width: 4.5rem;
+    width: 6rem;
+    white-space: nowrap;
 }
 
 .nh-sort-th {
@@ -647,10 +659,15 @@ body.nh-page .nh-kpi-footer {
     top: 0;
     background: var(--pn-surface-soft);
     font-weight: 700;
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     text-transform: none;
     color: var(--pn-primary);
     z-index: 1;
+}
+
+/* Zebra striping so a row can be tracked across to its numbers. */
+.nh-table tbody tr:nth-child(even) {
+    background: rgba(127, 166, 194, 0.055);
 }
 
 .nh-table tbody tr {
@@ -673,7 +690,7 @@ body.nh-page .nh-kpi-footer {
 
 .nh-table .cell-name,
 .nh-table .dn {
-    font-size: 0.74rem;
+    font-size: 0.8rem;
     word-break: break-word;
 }
 
@@ -725,6 +742,7 @@ body.nh-page .nh-kpi-footer {
 }
 
 .nh-kpi-chart-card {
+    flex: 1 1 0;
     background: var(--pn-surface);
     border: 1px solid var(--pn-border);
     border-radius: 10px;
@@ -750,8 +768,8 @@ body.nh-page .nh-kpi-footer {
 .nh-chart-canvas-wrap {
     position: relative;
     width: 100%;
-    height: 200px;
-    flex: 0 0 200px;
+    flex: 1 1 auto;
+    min-height: 170px;
 }
 
 .nh-chart-canvas-wrap canvas {
@@ -760,12 +778,16 @@ body.nh-page .nh-kpi-footer {
     height: 100% !important;
 }
 
+.nh-chart-empty[hidden] {
+    display: none;
+}
+
 .nh-chart-empty {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 200px;
-    flex: 0 0 200px;
+    flex: 1 1 auto;
+    min-height: 170px;
     color: var(--pn-muted, #6d95b3);
     font-size: 0.85rem;
     font-style: italic;
@@ -799,7 +821,7 @@ body.nh-page .nh-kpi-footer {
 @media (max-width: 760px) {
     .nh-page {
         height: auto;
-        min-height: 100vh;
+        min-height: var(--ui-vh, 100vh);
         overflow-y: auto;
         padding-bottom: var(--nh-kpi-footer-h);
     }
@@ -811,7 +833,7 @@ body.nh-page .nh-kpi-footer {
     .nh-workspace {
         grid-template-columns: 1fr;
         height: auto;
-        min-height: calc(100vh - var(--nh-header-h) - var(--nh-kpi-footer-h));
+        min-height: calc(var(--ui-vh, 100vh) - var(--nh-header-h) - var(--nh-kpi-footer-h));
     }
 
     .nh-charts-stack {
@@ -995,6 +1017,14 @@ body.dark-mode .nh-context-menu-item {
 body.dark-mode .nh-context-menu-item:hover {
     background: var(--dm-panel-3, #223246);
     color: #9fd0ff;
+}
+
+/* The panel gradient hard-codes #ffffff as its first stop; dark mode only
+   remapped --pn-surface-soft, leaving a white band behind the light-coloured
+   chart title. Repaint the whole gradient in dark mode. */
+body.dark-mode .nh-charts {
+    background: linear-gradient(165deg, var(--dm-surface, #16212e) 0%, var(--dm-bg, #0f1720) 100%);
+    border-left-color: var(--dm-border, #304258);
 }
 
 body.dark-mode .nh-kpi-chart-card {
