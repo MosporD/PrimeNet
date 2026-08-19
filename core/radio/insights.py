@@ -224,63 +224,74 @@ def change_impact(*, vendor: str = "all", technology: str = "all", limit: int = 
     return {"generated_at": utc_now_iso(), "store": cm_store.store_stats(), "summary": summarize(rows), "issues": rows}
 
 
+def _partial_note(skipped: list[str]) -> str:
+    return (
+        "Partial results — "
+        + "; ".join(skipped)
+        + ". Slow sections keep building in the background; press Apply again in a minute."
+    )
+
+
 def rf_optimization(*, area: str = "", vendor: str = "all", technology: str = "all", limit: int = 250) -> dict:
-    sections = [
-        neighbor_quality(vendor=vendor, technology=technology, area=area, limit=80),
-        capacity_hotspots(vendor=vendor, technology=technology, area=area, limit=80),
-        overshooting_candidates(vendor=vendor, technology=technology, area=area, limit=80),
-        cm_parameter_audit(vendor=vendor, technology=technology, limit=80),
-        change_impact(vendor=vendor, technology=technology, limit=80),
-    ]
+    from .section_runner import run_sections
+
+    key = f"{vendor}|{technology}|{area}"
+    builders = {
+        "Neighbor Quality": (f"neighbor_quality|{key}", lambda: neighbor_quality(vendor=vendor, technology=technology, area=area, limit=80)),
+        "Capacity Hotspots": (f"capacity_hotspots|{key}", lambda: capacity_hotspots(vendor=vendor, technology=technology, area=area, limit=80)),
+        "Overshooting Detector": (f"overshooting|{key}", lambda: overshooting_candidates(vendor=vendor, technology=technology, area=area, limit=80)),
+        "CM Parameter Audit": (f"cm_audit|{vendor}|{technology}", lambda: cm_parameter_audit(vendor=vendor, technology=technology, limit=80)),
+        "Change Impact": (f"change_impact|{vendor}|{technology}", lambda: change_impact(vendor=vendor, technology=technology, limit=80)),
+    }
+    payloads, skipped = run_sections(builders)
     rows: list[dict] = []
-    for section in sections:
+    for section in payloads.values():
         rows.extend(section.get("issues") or [])
     rows = filter_rows(rows, area=area, vendor=vendor, technology=technology)
     rows = _limit(rows, limit)
-    return {"generated_at": utc_now_iso(), "summary": summarize(rows), "issues": rows}
+    out = {"generated_at": utc_now_iso(), "summary": summarize(rows), "issues": rows}
+    if skipped:
+        out["note"] = _partial_note(skipped)
+    return out
 
 
 def radio_morning_report(*, area: str = "", vendor: str = "all", technology: str = "all", limit: int = 100) -> dict:
     from core.radio.alarm_impact import alarm_impact
     from core.radio.groups import group_health
     from core.radio.mobility import irat_border, mobility_explorer
+    from core.radio.section_runner import run_sections
     from modules.sleeping_cells.logic import detect_sleeping_cells
 
-    capacity = capacity_hotspots(vendor=vendor, technology=technology, area=area, limit=limit)
-    neighbors = neighbor_quality(vendor=vendor, technology=technology, area=area, limit=limit)
-    layers = layer_coverage_gaps(area=area, limit=limit)
-    overshoot = overshooting_candidates(vendor=vendor, technology=technology, area=area, limit=limit)
-    cm_audit = cm_parameter_audit(vendor=vendor, technology=technology, limit=limit)
-    impact = change_impact(vendor=vendor, technology=technology, limit=limit)
-    sleeping = detect_sleeping_cells(vendor=vendor, technology=technology, limit=limit)
-    mobility = mobility_explorer(vendor=vendor, technology=technology, area=area, limit=limit)
-    groups = group_health(vendor=vendor, technology=technology, limit=limit)
-    alarms = alarm_impact(vendor=vendor, technology=technology, area=area, limit=limit)
-    irat = irat_border(vendor=vendor, technology=technology, area=area, limit=limit)
-    all_rows = []
-    sections = {
-        "capacity_hotspots": capacity.get("issues", [])[:limit],
-        "neighbor_quality": neighbors.get("issues", [])[:limit],
-        "layer_coverage": layers.get("issues", [])[:limit],
-        "overshooting": overshoot.get("issues", [])[:limit],
-        "cm_audit": cm_audit.get("issues", [])[:limit],
-        "change_impact": impact.get("issues", [])[:limit],
-        "sleeping_cells": sleeping.get("issues", [])[:limit],
-        "mobility": mobility.get("issues", [])[:limit],
-        "group_health": groups.get("issues", [])[:limit],
-        "alarm_impact": alarms.get("issues", [])[:limit],
-        "irat_border": irat.get("issues", [])[:limit],
+    key = f"{vendor}|{technology}|{area}|{limit}"
+    builders = {
+        "capacity_hotspots": (f"capacity_hotspots|{key}", lambda: capacity_hotspots(vendor=vendor, technology=technology, area=area, limit=limit)),
+        "neighbor_quality": (f"neighbor_quality|{key}", lambda: neighbor_quality(vendor=vendor, technology=technology, area=area, limit=limit)),
+        "layer_coverage": (f"layer_coverage|{area}|{limit}", lambda: layer_coverage_gaps(area=area, limit=limit)),
+        "overshooting": (f"overshooting|{key}", lambda: overshooting_candidates(vendor=vendor, technology=technology, area=area, limit=limit)),
+        "cm_audit": (f"cm_audit|{vendor}|{technology}|{limit}", lambda: cm_parameter_audit(vendor=vendor, technology=technology, limit=limit)),
+        "change_impact": (f"change_impact|{vendor}|{technology}|{limit}", lambda: change_impact(vendor=vendor, technology=technology, limit=limit)),
+        "sleeping_cells": (f"sleeping_cells|{vendor}|{technology}|{limit}", lambda: detect_sleeping_cells(vendor=vendor, technology=technology, limit=limit)),
+        "mobility": (f"mobility|{key}", lambda: mobility_explorer(vendor=vendor, technology=technology, area=area, limit=limit)),
+        "group_health": (f"group_health|{vendor}|{technology}|{limit}", lambda: group_health(vendor=vendor, technology=technology, limit=limit)),
+        "alarm_impact": (f"alarm_impact|{key}", lambda: alarm_impact(vendor=vendor, technology=technology, area=area, limit=limit)),
+        "irat_border": (f"irat_border|{key}", lambda: irat_border(vendor=vendor, technology=technology, area=area, limit=limit)),
     }
+    payloads, skipped = run_sections(builders)
+    all_rows: list[dict] = []
+    sections = {name: (payloads.get(name) or {}).get("issues", [])[:limit] for name in builders}
     for rows in sections.values():
         all_rows.extend(rows)
     all_rows = filter_rows(all_rows, area=area, vendor=vendor, technology=technology)
-    return {
+    out = {
         "generated_at": utc_now_iso(),
         "summary": summarize(all_rows),
         "sections": sections,
         "issues": all_rows[:limit],
         "cm_store": cm_store.store_stats(),
-        "neighbor_freshness": neighbors.get("freshness"),
-        "group_inventory": groups.get("inventory"),
+        "neighbor_freshness": (payloads.get("neighbor_quality") or {}).get("freshness"),
+        "group_inventory": (payloads.get("group_health") or {}).get("inventory"),
     }
+    if skipped:
+        out["note"] = _partial_note(skipped)
+    return out
 
