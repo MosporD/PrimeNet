@@ -223,6 +223,7 @@ function initializeMap() {
         _showEmptyState();
         _wireInitialFilterListeners();
         updateNeighborMetricHint();
+        applyDeepLinkFromUrl();
     });
 }
 
@@ -2987,6 +2988,24 @@ function _groupCellsIntoWedges(site, cells) {
 }
 
 // ─── Empty state + filter wiring ──────────────────────────────────────────────
+
+function _siteIdFromUrl() {
+    try {
+        const q = new URLSearchParams(window.location.search || '');
+        return String(q.get('site_id') || q.get('site') || '').trim();
+    } catch (_) {
+        return '';
+    }
+}
+
+function applyDeepLinkFromUrl() {
+    if (NEIGHBOR_ONLY_MODE) return;
+    const siteId = _siteIdFromUrl();
+    if (!siteId) return;
+    const search = document.getElementById('site-search');
+    if (search) search.value = siteId;
+    loadNetworkSites();
+}
 
 function _hasActiveFilters() {
     if (NEIGHBOR_ONLY_MODE && !_neighborDirectionSelected()) return false;

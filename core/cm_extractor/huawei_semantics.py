@@ -99,6 +99,68 @@ HUAWEI_MO_CATALOG: list[dict[str, Any]] = [
             {'id': 'MNC', 'name': 'MNC'},
         ],
     },
+    {
+        'id': 'UCELL',
+        'label': 'UMTS Cell',
+        'technology': '3G',
+        'command': 'LST UCELL',
+        'group': '3G',
+        'recommended': True,
+        'products': ['BSC6900 UMTS', 'BSC6910 UMTS'],
+        'parameters': [
+            {'id': 'Cell Name', 'name': 'Cell Name'},
+            {'id': 'Cell ID', 'name': 'Cell ID'},
+            {'id': 'NodeB Name', 'name': 'NodeB Name'},
+            {'id': 'Local Cell ID', 'name': 'Local Cell ID'},
+            {'id': 'LAC', 'name': 'LAC'},
+            {'id': 'SAC', 'name': 'SAC'},
+            {'id': 'PSC', 'name': 'PSC'},
+            {'id': 'UARFCN Downlink', 'name': 'UARFCN Downlink'},
+        ],
+    },
+    {
+        'id': 'NODEBFUNCTION',
+        'label': 'NodeB Function',
+        'technology': '3G',
+        'command': 'LST NODEBFUNCTION',
+        'group': '3G',
+        'recommended': True,
+        'products': ['BSC6900 UMTS', 'BSC6910 UMTS'],
+        'parameters': [
+            {'id': 'NodeB Name', 'name': 'NodeB Name'},
+            {'id': 'NodeB ID', 'name': 'NodeB ID'},
+        ],
+    },
+    {
+        'id': 'GCELL',
+        'label': 'GSM Cell',
+        'technology': '2G',
+        'command': 'LST GCELL',
+        'group': '2G',
+        'recommended': True,
+        'products': ['BSC6900 GSM', 'BSC6910 GSM'],
+        'parameters': [
+            {'id': 'Cell Name', 'name': 'Cell Name'},
+            {'id': 'Cell ID', 'name': 'Cell ID'},
+            {'id': 'BTS Name', 'name': 'BTS Name'},
+            {'id': 'LAC', 'name': 'LAC'},
+            {'id': 'CI', 'name': 'CI'},
+            {'id': 'BCCH', 'name': 'BCCH'},
+        ],
+    },
+    {
+        'id': 'BTSFUNCTION',
+        'label': 'BTS Function',
+        'technology': '2G',
+        'command': 'LST BTSFUNCTION',
+        'group': '2G',
+        'recommended': True,
+        'products': ['BSC6900 GSM', 'BSC6910 GSM'],
+        'parameters': [
+            {'id': 'BTS Name', 'name': 'BTS Name'},
+            {'id': 'BTS ID', 'name': 'BTS ID'},
+        ],
+    },
 ]
 
 _MO_ID_ALIASES = {
@@ -111,8 +173,17 @@ _MO_BY_ID = {item['id']: item for item in HUAWEI_MO_CATALOG}
 PREVIEW_ROW_LIMIT = 25
 MML_SINGLE_NE_LIMIT = 100
 
-# CM extractor currently targets Huawei 4G eNodeB only (no 3G/5G scope).
 HUAWEI_CM_TECHNOLOGIES = frozenset({'4G', 'Common'})
+HUAWEI_SCOPE_TECHNOLOGIES = {
+    'ENODEB': frozenset({'4G', 'Common', 'Multi'}),
+    'RNC': frozenset({'3G', 'UMTS', 'WCDMA', 'Multi'}),
+    'BSC': frozenset({'2G', 'GSM', 'Multi'}),
+}
+_HUAWEI_SCOPE_RECOMMENDED = {
+    'ENODEB': frozenset({'CELL', 'ENODEBFUNCTION'}),
+    'RNC': frozenset({'UCELL', 'NODEBFUNCTION'}),
+    'BSC': frozenset({'GCELL', 'BTSFUNCTION'}),
+}
 
 
 def _discovered_mo_catalog() -> list[dict[str, Any]] | None:
@@ -138,7 +209,31 @@ def _param_dict_catalog() -> list[dict[str, Any]] | None:
         return None
 
 
-def get_mo_object_catalog() -> list[dict[str, Any]]:
+def mo_matches_huawei_scope(item: dict[str, Any], scope_level: str = 'ENODEB') -> bool:
+    """Return whether an MO catalog entry belongs on the Huawei extraction scope."""
+    try:
+        from core.cm_extractor.site_catalog import normalize_huawei_scope_level
+
+        level = normalize_huawei_scope_level(scope_level)
+    except Exception:
+        level = 'ENODEB'
+    allowed = HUAWEI_SCOPE_TECHNOLOGIES.get(level, HUAWEI_SCOPE_TECHNOLOGIES['ENODEB'])
+    tech = str(item.get('technology') or '').strip()
+    if tech in allowed and tech != 'Multi':
+        return True
+    if tech != 'Multi':
+        return False
+    products = ' '.join(str(p) for p in (item.get('products') or [])).upper()
+    if not products:
+        return level == 'ENODEB'
+    if level == 'RNC':
+        return any(token in products for token in ('UMTS', 'WCDMA'))
+    if level == 'BSC':
+        return 'GSM' in products
+    return any(token in products for token in ('LTE', 'BTS3900', 'BTS5900', 'ENODEB'))
+
+
+def get_mo_object_catalog(scope_level: str = 'ENODEB') -> list[dict[str, Any]]:
     discovered = _discovered_mo_catalog()
     baseline = _param_dict_catalog()
 
@@ -150,6 +245,14 @@ def get_mo_object_catalog() -> list[dict[str, Any]]:
         source, source_name = HUAWEI_MO_CATALOG, 'builtin'
 
     discovered_ids = {str(item.get('id', '')).upper() for item in (discovered or [])}
+
+    try:
+        from core.cm_extractor.site_catalog import normalize_huawei_scope_level
+
+        level = normalize_huawei_scope_level(scope_level)
+    except Exception:
+        level = 'ENODEB'
+    recommended = _HUAWEI_SCOPE_RECOMMENDED.get(level, _HUAWEI_SCOPE_RECOMMENDED['ENODEB'])
 
     items: list[dict[str, Any]] = []
     for item in source:
@@ -163,7 +266,7 @@ def get_mo_object_catalog() -> list[dict[str, Any]]:
             'technology': item['technology'],
             'command': normalize_mml_command(str(item.get('command') or f"LST {mo_id}")),
             'group': item.get('group') or item['technology'],
-            'recommended': bool(item.get('recommended')),
+            'recommended': str(mo_id).upper() in recommended or bool(item.get('recommended')),
             'products': list(item.get('products') or []),
             'parameter_count': param_count,
             'source': source_name,
@@ -171,7 +274,28 @@ def get_mo_object_catalog() -> list[dict[str, Any]]:
             'permission_denied': bool(item.get('permission_denied')),
         }
         items.append(entry)
-    return [item for item in items if item.get('technology') in HUAWEI_CM_TECHNOLOGIES]
+    filtered = [item for item in items if mo_matches_huawei_scope(item, level)]
+    have = {str(item['id']).upper() for item in filtered}
+    for builtin in HUAWEI_MO_CATALOG:
+        mo_id = str(builtin['id']).upper()
+        if mo_id in have or mo_id not in recommended:
+            continue
+        if not mo_matches_huawei_scope(builtin, level):
+            continue
+        filtered.append({
+            'id': builtin['id'],
+            'label': builtin['label'],
+            'technology': builtin['technology'],
+            'command': normalize_mml_command(str(builtin.get('command') or f'LST {mo_id}')),
+            'group': builtin.get('group') or builtin['technology'],
+            'recommended': True,
+            'products': list(builtin.get('products') or []),
+            'parameter_count': len(builtin.get('parameters') or []),
+            'source': 'builtin',
+            'discovered': mo_id in discovered_ids,
+            'permission_denied': False,
+        })
+    return filtered
 
 
 def get_parameters_for_object(mo_id: str) -> list[dict[str, str]]:

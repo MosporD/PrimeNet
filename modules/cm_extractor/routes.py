@@ -122,8 +122,12 @@ def _extract_is_long_running(data: dict) -> bool:
                 return True
             if len(sel.get('parameters') or []) >= 50:
                 return True
-    elif vendor == 'huawei' and n_sites >= 25:
-        return True
+    elif vendor == 'huawei':
+        scope_level = (data.get('scope_level') or 'ENODEB').strip().upper()
+        if scope_level in ('RNC', 'BSC'):
+            return True
+        if n_sites >= 25:
+            return True
     return False
 
 
@@ -502,6 +506,12 @@ def _huawei_selection_payload(data: dict) -> tuple[list[str], list[dict], list[d
     if unresolved:
         preview = ', '.join(unresolved[:8])
         suffix = '…' if len(unresolved) > 8 else ''
+        if scope_level in ('RNC', 'BSC'):
+            raise ValueError(
+                f'Could not map {scope_level} id(s) to U2020 controller name: {preview}{suffix}. '
+                'Expected OSS names like RNC01 or BSC_HQ_01. Run Sync NEs from U2020, '
+                'or pick controllers from the list after it loads.',
+            )
         raise ValueError(
             f'Could not map site id(s) to U2020 NE name: {preview}{suffix}. '
             'Ensure metadata site_name is the OSS meName (e.g. 2222-UL_Site_Name_IBS_M), '
@@ -863,7 +873,8 @@ def huawei_mo_objects():
 
     load_discovery_from_disk()
     cache = get_cached_discovery(max_age_sec=10**9) or {}
-    items = get_mo_object_catalog()
+    scope_level = (request.args.get('scope') or 'ENODEB').strip().upper()
+    items = get_mo_object_catalog(scope_level)
     catalog_source = items[0].get('source') if items else 'builtin'
     return jsonify({
         'success': True,
@@ -871,6 +882,7 @@ def huawei_mo_objects():
         'count': len(items),
         'discovered': bool(cache.get('mo_catalog')),
         'catalog_source': catalog_source,
+        'scope_level': scope_level,
         'product_samples': cache.get('product_samples') or {},
     })
 
@@ -940,7 +952,7 @@ def huawei_preview():
             preview = ', '.join(row['NE name'] for row in skipped[:8])
             suffix = '…' if len(skipped) > 8 else ''
             result['warnings'].append(
-                f'Skipped {len(skipped)} NE(s) without Huawei 4G inventory: {preview}{suffix}',
+                f'Skipped {len(skipped)} NE(s): {preview}{suffix}',
             )
         return jsonify({'success': True, **result})
     except HuaweiCmError as exc:

@@ -194,6 +194,28 @@
 
                     <div class="picker-section">
                         <div class="picker-head">
+                            <h3>Extraction scope</h3>
+                        </div>
+                        <p class="field-hint admin-only" id="huawei-scope-hint">
+                            4G runs MML on site eNodeBs (BTS3900). 3G RNC and 2G BSC run on the
+                            controller NE in U2020 (e.g. <code>RNC01</code>, <code>BSC_HQ_01</code>),
+                            not the site BTS.
+                        </p>
+                        <div class="scope-level-row" role="radiogroup" aria-label="Huawei CM scope">
+                            <label class="scope-level-option">
+                                <input type="radio" name="huawei-scope-level" value="ENODEB" checked>
+                                <span>eNodeB <span class="field-hint admin-only">(4G)</span></span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="huawei-scope-level" value="RNC">
+                                <span>RNC <span class="field-hint admin-only">(3G)</span></span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="huawei-scope-level" value="BSC">
+                                <span>BSC <span class="field-hint admin-only">(2G)</span></span>
+                            </label>
+                        </div>
+                        <div class="picker-head">
                             <h3 id="huawei-ne-picker-title">Sites (4G eNodeB)</h3>
                             <input type="search" id="huawei-ne-search" class="search-input" placeholder="Search NE name or id…" autocomplete="off">
                             <button type="button" class="link-btn" id="huawei-ne-select-all">Select all</button>
@@ -201,7 +223,7 @@
                             <button type="button" class="link-btn" id="huawei-ne-clear">Clear</button>
                             <button type="button" class="btn-secondary admin-only" id="huawei-sync-u2020-btn">Sync NEs from U2020</button>
                         </div>
-                        <div class="area-select-row">
+                        <div class="area-select-row" id="huawei-area-row">
                             <label for="huawei-area-select">Area / cluster</label>
                             <select id="huawei-area-select" class="search-input">
                                 <option value="">All areas</option>
@@ -212,9 +234,9 @@
                                 <span>Filter list to area</span>
                             </label>
                         </div>
-                        <p class="field-hint admin-only" id="huawei-u2020-sync-status">U2020 MML needs the OSS <code>meName</code> exactly as stored in PrimeNet metadata (e.g. <code>2222-Mecca_Mall_Old_Ext_PF_Fiber_IBS_Manage</code>) or from <strong>Sync NEs from U2020</strong> (FM alarm catalog). Only Huawei 4G eNodeB sites with LTE cell inventory are listed; sites without LTE are skipped to <code>Skipped_NEs</code>. MO object selection is separate and does not affect NE mapping.</p>
+                        <p class="field-hint admin-only" id="huawei-u2020-sync-status">U2020 MML needs the OSS <code>meName</code>. 4G maps site ids to eNodeB names; RNC/BSC map controller ids to names like <code>RNC01</code> / <code>BSC_HQ_01</code> (from Sync NEs). MO object selection follows the chosen scope.</p>
                         <div class="site-paste-row">
-                            <label for="huawei-ne-paste">Paste site IDs</label>
+                            <label for="huawei-ne-paste">Paste IDs</label>
                             <textarea id="huawei-ne-paste" class="site-paste-input" rows="3" placeholder="Paste 4G eNodeB site IDs separated by comma, space, or new line&#10;e.g. 1001, 1002, 1211"></textarea>
                             <button type="button" class="btn-secondary" id="huawei-ne-apply-paste">Apply pasted IDs</button>
                             <p id="huawei-ne-paste-status" class="field-hint" hidden></p>
@@ -371,6 +393,24 @@
                         </div>
                     </div>
 
+                    <div id="sched-huawei-scope" class="modal-section" hidden>
+                        <h3>Scope</h3>
+                        <div class="scope-level-row" role="radiogroup">
+                            <label class="scope-level-option">
+                                <input type="radio" name="sched-huawei-scope" value="ENODEB" checked>
+                                <span>eNodeB</span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="sched-huawei-scope" value="RNC">
+                                <span>RNC</span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="sched-huawei-scope" value="BSC">
+                                <span>BSC</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="modal-section">
                         <div class="picker-head modal-picker-head">
                             <h3>Objects</h3>
@@ -456,6 +496,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
-    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.45"></script>
+    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.46"></script>
 </body>
 </html>

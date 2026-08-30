@@ -94,6 +94,12 @@ def _resolve_huawei_targets(payload: dict[str, Any]) -> tuple[list[str], list[di
     if unresolved:
         preview = ', '.join(unresolved[:8])
         suffix = '…' if len(unresolved) > 8 else ''
+        if scope_level in ('RNC', 'BSC'):
+            raise ValueError(
+                f'Could not map {scope_level} id(s) to U2020 controller name: {preview}{suffix}. '
+                'Expected OSS names like RNC01 or BSC_HQ_01. Run Sync NEs from U2020, '
+                'or pick controllers from the list after it loads.',
+            )
         raise ValueError(
             f'Could not map site id(s) to U2020 NE name: {preview}{suffix}. '
             'Ensure metadata site_name is the OSS meName (e.g. 2222-UL_Site_Name_IBS_M), '

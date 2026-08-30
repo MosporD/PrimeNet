@@ -37,7 +37,11 @@ NOKIA_DEFAULT_MO_CLASSES = {
     'BSC': ['NOKBSC:BSC', 'NOKBSC:BCF', 'NOKBSC:BTS', 'NOKBSC:TRX'],
 }
 
-HUAWEI_DEFAULT_MO_CLASSES = ['ENODEBFUNCTION', 'CELL', 'CNOPERATOR']
+HUAWEI_DEFAULT_MO_CLASSES = {
+    'ENODEB': ['ENODEBFUNCTION', 'CELL', 'CNOPERATOR'],
+    'RNC': ['UCELL', 'NODEBFUNCTION'],
+    'BSC': ['GCELL', 'BTSFUNCTION'],
+}
 MAX_COMPARE_DIFFS = 2500
 MAX_AUDIT_VALUE_SAMPLES = 8
 AUDIT_IDENTITY_COLUMNS = {
@@ -94,7 +98,7 @@ def _normalize_vendor(value: str) -> str:
 
 def _normalize_scope(vendor: str, value: str) -> str:
     scope = (value or ('MRBTS' if vendor == 'nokia' else 'ENODEB')).strip().upper()
-    allowed = ('MRBTS', 'RNC', 'BSC') if vendor == 'nokia' else ('ENODEB',)
+    allowed = ('MRBTS', 'RNC', 'BSC') if vendor == 'nokia' else ('ENODEB', 'RNC', 'BSC')
     if scope not in allowed:
         raise ValueError(f'Scope must be one of: {", ".join(allowed)}')
     return scope
@@ -112,8 +116,8 @@ def _nokia_default_classes(scope_level: str) -> list[str]:
     return list(NOKIA_DEFAULT_MO_CLASSES.get(scope_level, NOKIA_DEFAULT_MO_CLASSES['MRBTS']))
 
 
-def _huawei_default_classes() -> list[str]:
-    return list(HUAWEI_DEFAULT_MO_CLASSES)
+def _huawei_default_classes(scope_level: str = 'ENODEB') -> list[str]:
+    return list(HUAWEI_DEFAULT_MO_CLASSES.get(scope_level, HUAWEI_DEFAULT_MO_CLASSES['ENODEB']))
 
 
 def _nokia_selections_from_mo_classes(
@@ -138,10 +142,13 @@ def _nokia_selections_from_mo_classes(
     return selections
 
 
-def _huawei_selections_from_mo_classes(mo_classes: list[str]) -> list[dict[str, Any]]:
+def _huawei_selections_from_mo_classes(
+    mo_classes: list[str],
+    scope_level: str = 'ENODEB',
+) -> list[dict[str, Any]]:
     return [
         {'mo_id': mo_id, 'export_all': True, 'parameters': []}
-        for mo_id in (mo_classes or _huawei_default_classes())
+        for mo_id in (mo_classes or _huawei_default_classes(scope_level))
     ]
 
 
@@ -177,7 +184,10 @@ def _normalize_nokia_selections(
     )
 
 
-def _normalize_huawei_selections(data: dict[str, Any]) -> list[dict[str, Any]]:
+def _normalize_huawei_selections(
+    data: dict[str, Any],
+    scope_level: str = 'ENODEB',
+) -> list[dict[str, Any]]:
     raw = data.get('selections')
     if isinstance(raw, list) and raw:
         selections: list[dict[str, Any]] = []
@@ -196,7 +206,7 @@ def _normalize_huawei_selections(data: dict[str, Any]) -> list[dict[str, Any]]:
             })
         if selections:
             return selections
-    return _huawei_selections_from_mo_classes(_as_list(data.get('mo_classes')))
+    return _huawei_selections_from_mo_classes(_as_list(data.get('mo_classes')), scope_level)
 
 
 def _fetch_nokia_selection_sheet(
@@ -703,8 +713,8 @@ def cm_mo_class_options():
                 'default_mo_classes': list(defaults),
             })
 
-        defaults = set(_huawei_default_classes())
-        items = get_mo_object_catalog()
+        defaults = set(_huawei_default_classes(scope_level))
+        items = get_mo_object_catalog(scope_level)
         for item in items:
             item['recommended'] = item.get('id') in defaults
         return jsonify({
@@ -752,7 +762,7 @@ def compare_cm_nes():
             ne2_name = str(ne2.get('u2020_ne_name') or ne2.get('ne_name') or '').strip()
             if not ne1_name or not ne2_name:
                 return jsonify({'error': 'Select two resolved Huawei NEs from the same level'}), 400
-            selections = _normalize_huawei_selections(data)
+            selections = _normalize_huawei_selections(data, scope_level)
             if not selections:
                 return jsonify({'error': 'Select at least one MO object and parameters to compare'}), 400
             result = _compare_huawei_cm(ne1_name=ne1_name, ne2_name=ne2_name, selections=selections)
@@ -806,7 +816,7 @@ def audit_cm_network():
                 conf_id=conf_id,
             )
         else:
-            selections = _normalize_huawei_selections(data)
+            selections = _normalize_huawei_selections(data, scope_level)
             if not selections:
                 return jsonify({'error': 'Select at least one MO object and parameters to audit'}), 400
             result = _audit_huawei_cm(nes=nes, selections=selections)

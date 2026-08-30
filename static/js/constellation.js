@@ -1067,6 +1067,7 @@
         var ctx = canvas.getContext('2d');
         var wrap = canvas.parentElement;
         var tooltipEl = opts.tooltipEl || null;
+        var onSelect = typeof opts.onSelect === 'function' ? opts.onSelect : null;
         var vw = 0, vh = 0;
         var sites = [];        /* {id, name, area, lat, lon, x, y, tw, glow} */
         var sweep = -Math.PI / 2;
@@ -1227,7 +1228,8 @@
                 hoverSite.id + name + '</div>' +
                 (hoverSite.area ? '<div class="radar-tip-row"><span>Area</span><strong>' + hoverSite.area + '</strong></div>' : '') +
                 '<div class="radar-tip-row"><span>Lat / Lon</span><strong>' +
-                Number(hoverSite.lat).toFixed(3) + ', ' + Number(hoverSite.lon).toFixed(3) + '</strong></div>';
+                Number(hoverSite.lat).toFixed(3) + ', ' + Number(hoverSite.lon).toFixed(3) + '</strong></div>' +
+                (onSelect ? '<div class="radar-tip-row"><span>Click</span><strong>Open on Network Map</strong></div>' : '');
             tooltipEl.hidden = false;
             var pad2 = 12;
             var x = hoverSite.x + pad2, y = hoverSite.y + pad2;
@@ -1246,6 +1248,9 @@
         canvas.addEventListener('mouseleave', function () {
             mouse.x = -1e4; mouse.y = -1e4;
             if (tooltipEl) tooltipEl.hidden = true;
+        });
+        canvas.addEventListener('click', function () {
+            if (hoverSite && onSelect) onSelect(hoverSite);
         });
         window.addEventListener('resize', resize);
 

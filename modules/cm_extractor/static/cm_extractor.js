@@ -157,6 +157,9 @@ if (huaweiEnabled) {
     document.getElementById('huawei-ne-select-visible').addEventListener('click', selectVisibleHuaweiNes);
     document.getElementById('huawei-ne-clear').addEventListener('click', clearHuaweiNeSelection);
     document.getElementById('huawei-ne-apply-paste').addEventListener('click', applyPastedHuaweiNeIds);
+    document.querySelectorAll('input[name="huawei-scope-level"]').forEach((radio) => {
+        radio.addEventListener('change', onHuaweiScopeLevelChanged);
+    });
     const huaweiSyncBtn = document.getElementById('huawei-sync-u2020-btn');
     if (huaweiSyncBtn) huaweiSyncBtn.addEventListener('click', syncHuaweiFromU2020);
     document.getElementById('huawei-area-add-btn').addEventListener('click', addHuaweiAreaSites);
@@ -584,8 +587,52 @@ function clearSiteSelection() {
     updateActionState();
 }
 
+const HUAWEI_SCOPE_PASTE_PLACEHOLDER = {
+    ENODEB: 'Paste 4G eNodeB site IDs (comma, space, or new line)\ne.g. 1001, 1002, 1211',
+    RNC: 'Paste RNC ids (comma, space, or new line)\ne.g. 1, 2 or RNC01',
+    BSC: 'Paste BSC ids (comma, space, or new line)\ne.g. HQ_01, BSC_HQ_01',
+};
+
+const HUAWEI_SCOPE_TITLES = {
+    ENODEB: 'Sites (4G eNodeB)',
+    RNC: 'RNCs (3G)',
+    BSC: 'BSCs (2G)',
+};
+
 function getHuaweiScopeLevel() {
-    return 'ENODEB';
+    return document.querySelector('input[name="huawei-scope-level"]:checked')?.value || 'ENODEB';
+}
+
+function isHuaweiControllerScope(level = getHuaweiScopeLevel()) {
+    return level === 'RNC' || level === 'BSC';
+}
+
+function onHuaweiScopeLevelChanged() {
+    const level = getHuaweiScopeLevel();
+    const title = document.getElementById('huawei-ne-picker-title');
+    if (title) title.textContent = HUAWEI_SCOPE_TITLES[level] || HUAWEI_SCOPE_TITLES.ENODEB;
+    const paste = document.getElementById('huawei-ne-paste');
+    if (paste) paste.placeholder = HUAWEI_SCOPE_PASTE_PLACEHOLDER[level] || HUAWEI_SCOPE_PASTE_PLACEHOLDER.ENODEB;
+    const areaRow = document.getElementById('huawei-area-row');
+    if (areaRow) areaRow.hidden = isHuaweiControllerScope(level);
+    selectedHuaweiSiteIds.clear();
+    selectedHuaweiMoObjects.clear();
+    selectedHuaweiParamsByMo.clear();
+    huaweiParametersByMo.clear();
+    fullMoByHuaweiObject.clear();
+    document.getElementById('huawei-param-section').hidden = true;
+    if (paste) paste.value = '';
+    const pasteStatus = document.getElementById('huawei-ne-paste-status');
+    if (pasteStatus) {
+        pasteStatus.hidden = true;
+        pasteStatus.textContent = '';
+    }
+    const areaFilter = document.getElementById('huawei-area-filter-list');
+    if (areaFilter) areaFilter.checked = false;
+    loadHuaweiNeCatalog();
+    loadHuaweiAreas();
+    loadHuaweiMoObjects();
+    updateHuaweiActionState();
 }
 
 function setVendor(vendor) {
@@ -620,7 +667,7 @@ async function loadHuaweiNeCatalog({ refreshU2020 = false } = {}) {
     loading.hidden = false;
     loading.textContent = refreshU2020
         ? 'Discovering NE names from U2020 (FM alarms)…'
-        : 'Loading 4G eNodeB sites from database…';
+        : `Loading ${HUAWEI_SCOPE_TITLES[getHuaweiScopeLevel()] || 'Huawei NEs'} from database…`;
     listEl.hidden = true;
 
     try {
@@ -635,7 +682,7 @@ async function loadHuaweiNeCatalog({ refreshU2020 = false } = {}) {
         }
         huaweiNeCatalog = data.sites || [];
         if (!huaweiNeCatalog.length) {
-            throw new Error('No 4G eNodeB sites found in the database. Run metadata sync first.');
+            throw new Error(`No ${getHuaweiScopeLevel()} entries found in the database. Run metadata sync first.`);
         }
         if (syncStatus) {
             const catalogSize = data.u2020_catalog_size || 0;
@@ -846,7 +893,8 @@ async function loadHuaweiMoObjects() {
     listEl.hidden = true;
 
     try {
-        const response = await fetch('/api/cm-extractor/huawei/mo-objects', { credentials: 'same-origin' });
+        const scope = encodeURIComponent(getHuaweiScopeLevel());
+        const response = await fetch(`/api/cm-extractor/huawei/mo-objects?scope=${scope}`, { credentials: 'same-origin' });
         const data = await response.json();
         if (!response.ok || !data.success) {
             throw new Error(data.error || 'Failed to load MML object catalog');
@@ -1097,10 +1145,12 @@ function updateHuaweiActionState() {
         return;
     }
     const parts = selections.map(huaweiSelectionSummary);
+    const scopeLabel = { ENODEB: '4G eNodeB', RNC: '3G RNC', BSC: '2G BSC' }[getHuaweiScopeLevel()]
+        || getHuaweiScopeLevel();
     const batchNote = selectedHuaweiSiteIds.size > 100
         ? ' Runs MML in chunks of 100 NEs per request.'
         : '';
-    desc.textContent = `4G eNodeB — ${selectedHuaweiSiteIds.size} site(s), ${selections.length} object type(s) — ${parts.join('; ')}.${batchNote}`;
+    desc.textContent = `${scopeLabel} — ${selectedHuaweiSiteIds.size} ${isHuaweiControllerScope() ? 'controller(s)' : 'site(s)'}, ${selections.length} object type(s) — ${parts.join('; ')}.${batchNote}`;
     info.hidden = false;
 }
 
@@ -2066,6 +2116,7 @@ const schedState = {
     selectedHuaweiParamsByMo: new Map(),
     fullMoByHuaweiObject: new Set(),
     paramsCache: new Map(),
+    huaweiMoCatalog: [],
 };
 
 function getSchedNokiaScope() {
@@ -2073,7 +2124,7 @@ function getSchedNokiaScope() {
 }
 
 function getSchedHuaweiScope() {
-    return 'ENODEB';
+    return document.querySelector('input[name="sched-huawei-scope"]:checked')?.value || 'ENODEB';
 }
 
 function setupScheduler() {
@@ -2099,6 +2150,19 @@ function setupScheduler() {
         radio.addEventListener('change', () => {
             schedState.selectedSiteIds.clear();
             schedLoadSites();
+        });
+    });
+    document.querySelectorAll('input[name="sched-huawei-scope"]').forEach((radio) => {
+        radio.addEventListener('change', async () => {
+            schedState.selectedSiteIds.clear();
+            schedState.selectedHuaweiMoObjects.clear();
+            schedState.selectedHuaweiParamsByMo.clear();
+            schedState.fullMoByHuaweiObject.clear();
+            schedState.paramsCache.clear();
+            await schedLoadSites();
+            await schedEnsureMoCatalog();
+            schedRenderMoList();
+            await schedRefreshParamPanels();
         });
     });
 
@@ -2220,6 +2284,9 @@ function seedSchedStateFromMain() {
             schedState.selectedHuaweiParamsByMo.set(id, new Set(set));
         });
         fullMoByHuaweiObject.forEach((id) => schedState.fullMoByHuaweiObject.add(id));
+        const scope = getHuaweiScopeLevel();
+        const radio = document.querySelector(`input[name="sched-huawei-scope"][value="${scope}"]`);
+        if (radio) radio.checked = true;
     } else {
         selectedSiteIds.forEach((id) => schedState.selectedSiteIds.add(id));
         selectedMoClasses.forEach((mo, id) => schedState.selectedMoClasses.set(id, { ...mo }));
@@ -2249,6 +2316,8 @@ async function openScheduleModal() {
     document.getElementById('sched-storage-subpath').value = '';
     updateSchedStoragePreview();
     document.getElementById('sched-nokia-scope').hidden = isHuawei;
+    const huaweiScopeEl = document.getElementById('sched-huawei-scope');
+    if (huaweiScopeEl) huaweiScopeEl.hidden = !isHuawei;
     document.getElementById('sched-form-hint').hidden = true;
     document.getElementById('sched-form-hint').textContent = '';
     document.getElementById('sched-site-paste').value = '';
@@ -2390,7 +2459,9 @@ function schedClearSites() {
 
 function schedFilteredMoClasses() {
     const query = (document.getElementById('sched-mo-search')?.value || '').trim().toLowerCase();
-    const catalog = schedState.vendor === 'huawei' ? huaweiMoCatalog : moClassCatalog;
+    const catalog = schedState.vendor === 'huawei'
+        ? (schedState.huaweiMoCatalog.length ? schedState.huaweiMoCatalog : huaweiMoCatalog)
+        : moClassCatalog;
     return catalog.filter((mo) => {
         if (!query) return true;
         const hay = schedState.vendor === 'huawei'
@@ -2421,7 +2492,9 @@ async function schedAddMoSelections(mos) {
 }
 
 async function schedSelectAllMo() {
-    const catalog = schedState.vendor === 'huawei' ? huaweiMoCatalog : moClassCatalog;
+    const catalog = schedState.vendor === 'huawei'
+        ? (schedState.huaweiMoCatalog.length ? schedState.huaweiMoCatalog : huaweiMoCatalog)
+        : moClassCatalog;
     await schedAddMoSelections(catalog);
 }
 
@@ -2449,10 +2522,11 @@ async function schedEnsureMoCatalog() {
     loading.hidden = false;
     try {
         if (schedState.vendor === 'huawei') {
-            if (!huaweiMoCatalog.length) {
-                const response = await fetch('/api/cm-extractor/huawei/mo-objects', { credentials: 'same-origin' });
-                const data = await response.json();
-                if (response.ok && data.success) huaweiMoCatalog = data.mo_objects || [];
+            const scope = encodeURIComponent(getSchedHuaweiScope());
+            const response = await fetch(`/api/cm-extractor/huawei/mo-objects?scope=${scope}`, { credentials: 'same-origin' });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                schedState.huaweiMoCatalog = data.mo_objects || [];
             }
         } else if (!moClassCatalog.length) {
             await loadMoClasses();
@@ -2485,7 +2559,8 @@ function schedRenderMoList() {
             input.addEventListener('change', async () => {
                 const moId = input.dataset.schedMoId;
                 if (input.checked) {
-                    const mo = huaweiMoCatalog.find((item) => item.id === moId);
+                    const mo = (schedState.huaweiMoCatalog.find((item) => item.id === moId)
+                        || huaweiMoCatalog.find((item) => item.id === moId));
                     if (mo) schedState.selectedHuaweiMoObjects.set(moId, mo);
                 } else {
                     schedState.selectedHuaweiMoObjects.delete(moId);

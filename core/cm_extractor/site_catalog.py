@@ -855,7 +855,14 @@ def list_nokia_inventory_areas(scope_level: str = 'MRBTS') -> list[dict[str, str
     return areas_from_site_items(items)
 
 
-HUAWEI_SCOPE_LEVELS = ('ENODEB',)
+HUAWEI_SCOPE_LEVELS = ('ENODEB', 'RNC', 'BSC')
+
+HUAWEI_RNC_PRODUCTS = frozenset({
+    'BSC6900 UMTS', 'BSC6910 UMTS', 'BSC6900 GU', 'BSC6910 GU', 'RNC',
+})
+HUAWEI_BSC_PRODUCTS = frozenset({
+    'BSC6900 GSM', 'BSC6910 GSM', 'BSC6900 GU', 'BSC6910 GU', 'BSC',
+})
 
 
 def normalize_huawei_scope_level(scope_level: str) -> str:
@@ -863,6 +870,76 @@ def normalize_huawei_scope_level(scope_level: str) -> str:
     if level not in HUAWEI_SCOPE_LEVELS:
         raise ValueError(f'Huawei scope must be one of: {", ".join(HUAWEI_SCOPE_LEVELS)}')
     return level
+
+
+def _controller_numeric_token(value: str) -> str:
+    digits = re.sub(r'\D+', '', value or '')
+    return digits.lstrip('0')
+
+
+def match_huawei_controller_ne_name(
+    controller_id: str,
+    controller_name: str = '',
+    catalog: list[dict] | None = None,
+    *,
+    scope_level: str = 'RNC',
+) -> str:
+    """Map a PrimeNet RNC/BSC id to a U2020 controller meName (e.g. RNC01, BSC_HQ_01)."""
+    level = normalize_huawei_scope_level(scope_level)
+    if level not in ('RNC', 'BSC'):
+        return ''
+
+    wanted = [
+        str(token).strip()
+        for token in (controller_name, controller_id)
+        if str(token or '').strip()
+    ]
+    if not wanted:
+        return ''
+
+    products = HUAWEI_RNC_PRODUCTS if level == 'RNC' else HUAWEI_BSC_PRODUCTS
+    product_ok = {item.upper() for item in products}
+    prefix = 'RNC' if level == 'RNC' else 'BSC'
+    nes = []
+    for row in catalog or []:
+        name = str(row.get('ne_name') or '').strip()
+        if not name:
+            continue
+        product = str(row.get('product_name') or '').strip().upper()
+        if product in product_ok or (not product and name.upper().startswith(prefix)):
+            nes.append(name)
+    by_upper = {name.upper(): name for name in nes}
+
+    for token in wanted:
+        hit = by_upper.get(token.upper())
+        if hit:
+            return hit
+
+    if level == 'RNC':
+        for token in wanted:
+            digits = _controller_numeric_token(token)
+            if not digits:
+                continue
+            for name in nes:
+                upper = name.upper().replace(' ', '')
+                if upper.startswith('RNC') and _controller_numeric_token(upper[3:]) == digits:
+                    return name
+
+    if level == 'BSC':
+        for token in wanted:
+            needle = token.upper().replace(' ', '_')
+            if len(needle) < 3 or needle.isdigit():
+                continue
+            for name in nes:
+                hay = name.upper().replace(' ', '_')
+                if needle in hay or hay.endswith(needle):
+                    return name
+
+    for token in wanted:
+        upper = token.upper().replace(' ', '_')
+        if upper.startswith('RNC') or upper.startswith('BSC'):
+            return token.strip()
+    return ''
 
 
 def resolve_huawei_ne_name(site_id: str, site_name: str = '') -> str:
@@ -1046,6 +1123,72 @@ def _lookup_huawei_site_names(site_ids: list[str], *, scope_level: str = 'ENODEB
     }
 
 
+def _lookup_huawei_controller_names(ids: list[str], scope_level: str) -> dict[str, str]:
+    """Map RNC/BSC ids from the cell tables to their metadata display names."""
+    wanted = [str(item).strip() for item in ids if str(item).strip()]
+    if not wanted:
+        return {}
+    level = normalize_huawei_scope_level(scope_level)
+    if level == 'RNC':
+        table, id_col, name_col = 'cells_3g', 'rnc', 'rnc_name'
+    elif level == 'BSC':
+        table, id_col, name_col = 'cells_2g', 'bsc', 'bsc_name'
+    else:
+        return {}
+
+    out: dict[str, str] = {}
+    conn = connect_metadata()
+    try:
+        chunk = 900
+        for start in range(0, len(wanted), chunk):
+            part = wanted[start:start + chunk]
+            placeholders = ','.join('?' for _ in part)
+            rows = execute_query(
+                conn,
+                f'''
+                SELECT CAST({id_col} AS TEXT) AS cid,
+                       MAX(COALESCE(NULLIF(TRIM({name_col}), ''), {id_col})) AS cname
+                FROM {table}
+                WHERE LOWER(COALESCE(vendor, '')) LIKE '%huawei%'
+                  AND CAST({id_col} AS TEXT) IN ({placeholders})
+                GROUP BY {id_col}
+                ''',
+                part,
+            ).fetchall()
+            for row in rows:
+                cid = str(row['cid'] or '').strip()
+                if cid:
+                    out[cid] = str(row['cname'] or cid).strip() or cid
+        return out
+    finally:
+        conn.close()
+
+
+def _resolve_huawei_controller_names(
+    ids: list[str],
+    scope_level: str,
+) -> tuple[list[str], list[str], dict[str, list[str]], list[dict[str, str]]]:
+    from core.cm_extractor.huawei_discovery import get_cached_discovery, load_discovery_from_disk
+
+    load_discovery_from_disk()
+    catalog = (get_cached_discovery(max_age_sec=10**9) or {}).get('nes') or []
+    names = _lookup_huawei_controller_names(ids, scope_level)
+    resolved: list[str] = []
+    unresolved: list[str] = []
+    for controller_id in ids:
+        ne_name = match_huawei_controller_ne_name(
+            controller_id,
+            names.get(controller_id, ''),
+            catalog,
+            scope_level=scope_level,
+        )
+        if ne_name:
+            resolved.append(ne_name)
+        else:
+            unresolved.append(controller_id)
+    return list(dict.fromkeys(resolved)), unresolved, {}, []
+
+
 def resolve_huawei_ne_names(
     site_ids: list[str],
     *,
@@ -1062,6 +1205,9 @@ def resolve_huawei_ne_names(
         return [], [], {}, []
 
     level = normalize_huawei_scope_level(scope_level)
+    if level in ('RNC', 'BSC'):
+        return _resolve_huawei_controller_names(ids, level)
+
     min_score = _HUAWEI_SCOPE_MIN_METADATA_SCORE.get(level, 0)
     lte_site_ids = huawei_site_ids_with_lte(ids) if level == 'ENODEB' else set()
 
@@ -1247,6 +1393,8 @@ def huawei_area_map(scope_level: str = 'ENODEB') -> dict[str, dict[str, str]]:
 def list_huawei_areas(scope_level: str = 'ENODEB') -> list[dict[str, str | int]]:
     """Return distinct areas with site counts matching the Huawei picker list."""
     level = normalize_huawei_scope_level(scope_level)
+    if level in ('RNC', 'BSC'):
+        return []
     rows = _huawei_picker_rows('', scope_level=level, limit=5000)
     area_map = huawei_area_map(level)
     index = _site_area_index()
@@ -1339,14 +1487,116 @@ def list_nokia_areas(scope_level: str = 'MRBTS') -> list[dict[str, str | int]]:
     return list_nokia_inventory_areas(scope_level)
 
 
+def _huawei_controller_picker_rows(
+    query: str = '',
+    *,
+    scope_level: str,
+    limit: int = 2000,
+) -> list:
+    """Distinct Huawei RNC or BSC controllers from 3G/2G cell inventory."""
+    level = normalize_huawei_scope_level(scope_level)
+    conn = connect_metadata()
+    try:
+        params: list[object] = []
+        term = (query or '').strip()
+        limit = max(1, min(int(limit), 5000))
+        if level == 'RNC':
+            where = [
+                "LOWER(COALESCE(vendor, '')) LIKE '%huawei%'",
+                "NULLIF(TRIM(rnc), '') IS NOT NULL",
+            ]
+            if term:
+                where.append('(rnc LIKE ? OR rnc_name LIKE ?)')
+                like = f'%{term}%'
+                params.extend([like, like])
+            sql = f'''
+                SELECT
+                    CAST(rnc AS TEXT) AS site_id,
+                    MAX(COALESCE(NULLIF(TRIM(rnc_name), ''), rnc)) AS site_name,
+                    MAX(CAST(lat AS REAL)) AS latitude,
+                    MAX(CAST("long" AS REAL)) AS longitude,
+                    COUNT(DISTINCT cell_name) AS cell_count
+                FROM cells_3g
+                WHERE {' AND '.join(where)}
+                GROUP BY rnc
+                ORDER BY site_name COLLATE NOCASE
+                LIMIT ?
+            '''
+        else:
+            where = [
+                "LOWER(COALESCE(vendor, '')) LIKE '%huawei%'",
+                "NULLIF(TRIM(bsc), '') IS NOT NULL",
+            ]
+            if term:
+                where.append('(bsc LIKE ? OR bsc_name LIKE ?)')
+                like = f'%{term}%'
+                params.extend([like, like])
+            sql = f'''
+                SELECT
+                    CAST(bsc AS TEXT) AS site_id,
+                    MAX(COALESCE(NULLIF(TRIM(bsc_name), ''), bsc)) AS site_name,
+                    MAX(CAST(lat AS REAL)) AS latitude,
+                    MAX(CAST("long" AS REAL)) AS longitude,
+                    COUNT(DISTINCT cell_name) AS cell_count
+                FROM cells_2g
+                WHERE {' AND '.join(where)}
+                GROUP BY bsc
+                ORDER BY site_name COLLATE NOCASE
+                LIMIT ?
+            '''
+        params.append(limit)
+        return execute_query(conn, sql, params).fetchall()
+    finally:
+        conn.close()
+
+
+def _huawei_controller_site_items(rows: list, scope_level: str) -> list[dict[str, str | int | float | None]]:
+    from core.cm_extractor.huawei_discovery import get_cached_discovery, load_discovery_from_disk
+
+    load_discovery_from_disk()
+    catalog = (get_cached_discovery(max_age_sec=10**9) or {}).get('nes') or []
+    items: list[dict[str, str | int | float | None]] = []
+    for row in rows:
+        site_id = str(row['site_id'])
+        site_name = row['site_name'] or site_id
+        ne_name = match_huawei_controller_ne_name(
+            site_id,
+            site_name,
+            catalog,
+            scope_level=scope_level,
+        )
+        label = f'{site_name} ({site_id})'
+        if ne_name and ne_name != site_name:
+            label = f'{site_name} ({site_id} → {ne_name})'
+        items.append({
+            'site_id': site_id,
+            'metadata_site_id': site_id,
+            'site_name': site_name,
+            'ne_name': ne_name or site_name,
+            'u2020_ne_name': ne_name or '',
+            'u2020_resolved': bool(ne_name),
+            'u2020_source': 'fm' if ne_name else None,
+            'area': '',
+            'cluster': '',
+            'latitude': row['latitude'],
+            'longitude': row['longitude'],
+            'cell_count': row['cell_count'] or 0,
+            'scope_level': scope_level,
+            'label': label,
+        })
+    return items
+
+
 def _huawei_picker_rows(
     query: str = '',
     *,
     scope_level: str = 'ENODEB',
     limit: int = 2000,
 ) -> list:
-    """Active Huawei LTE eNodeB rows used by the CM picker (no U2020 lookup)."""
+    """Active Huawei rows used by the CM picker (no U2020 lookup)."""
     level = normalize_huawei_scope_level(scope_level)
+    if level in ('RNC', 'BSC'):
+        return _huawei_controller_picker_rows(query, scope_level=level, limit=limit)
     conn = connect_metadata()
     try:
         params: list[object] = []
@@ -1405,12 +1655,16 @@ def list_huawei_db_sites(
     limit: int = 2000,
 ) -> list[dict[str, str | int | float | None]]:
     """
-    Return Huawei 4G eNodeB sites for CM MML extraction.
+    Return Huawei NEs for CM MML extraction.
 
-    Only sites with Huawei LTE (FDD/TDD) cell inventory are included.
+    - ENODEB: sites with Huawei LTE (FDD/TDD) cell inventory
+    - RNC: Huawei 3G controllers from cells_3g.rnc
+    - BSC: Huawei 2G controllers from cells_2g.bsc
     """
     level = normalize_huawei_scope_level(scope_level)
     rows = _huawei_picker_rows(query, scope_level=level, limit=limit)
+    if level in ('RNC', 'BSC'):
+        return _huawei_controller_site_items(rows, level)
     area_map = huawei_area_map(level)
     site_area_index = _site_area_index()
     metadata_by_id, _metadata_alts = lookup_huawei_metadata_ne_candidates(
