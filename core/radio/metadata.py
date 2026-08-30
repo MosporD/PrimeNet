@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from functools import lru_cache
-
 from db.runtime import connect_metadata, execute_query, quote_ident
 from modules.reports.metadata_helpers import _metadata_table_columns, _pick_col
 from modules.sync.metadata_active_sql import PER_TABLE_ACTIVE_WHERE
@@ -87,8 +85,7 @@ def _inventory_union_sql(conn) -> str:
     return "\nUNION ALL\n".join(parts)
 
 
-@lru_cache(maxsize=1)
-def list_cells() -> list[dict]:
+def _list_cells_uncached() -> list[dict]:
     conn = connect_metadata()
     try:
         sql = _inventory_union_sql(conn)
@@ -112,8 +109,71 @@ def list_cells() -> list[dict]:
     return out
 
 
+def list_cells() -> list[dict]:
+    from .section_runner import cached_build
+
+    return cached_build("metadata.list_cells", _list_cells_uncached, ttl=600)
+
+
+def list_map_sites(
+    *,
+    lat_min: float,
+    lat_max: float,
+    lon_min: float,
+    lon_max: float,
+) -> list[dict]:
+    """Unique sites with coordinates, aggregated in SQL (not a full cell dump)."""
+    conn = connect_metadata()
+    try:
+        union = _inventory_union_sql(conn)
+        rows = execute_query(
+            conn,
+            f"""
+            SELECT CAST(site_id AS TEXT) AS id,
+                   MAX(COALESCE(site_name, '')) AS name,
+                   MAX(COALESCE(area, '')) AS area,
+                   AVG(latitude) AS lat,
+                   AVG(longitude) AS lon
+            FROM ({union}) v
+            WHERE site_id IS NOT NULL
+              AND TRIM(CAST(site_id AS TEXT)) != ''
+              AND latitude IS NOT NULL
+              AND longitude IS NOT NULL
+              AND latitude BETWEEN ? AND ?
+              AND longitude BETWEEN ? AND ?
+            GROUP BY CAST(site_id AS TEXT)
+            """,
+            (lat_min, lat_max, lon_min, lon_max),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    sites: list[dict] = []
+    for row in rows:
+        item = dict(row)
+        lat = to_float(item.get("lat"))
+        lon = to_float(item.get("lon"))
+        sid = str(item.get("id") or "").strip()
+        if not sid or lat is None or lon is None:
+            continue
+        sites.append({
+            "id": sid,
+            "name": str(item.get("name") or "").strip(),
+            "area": str(item.get("area") or "").strip(),
+            "lat": round(float(lat), 5),
+            "lon": round(float(lon), 5),
+        })
+    return sites
+
+
 def cell_index() -> dict[str, dict]:
-    return {str(row.get("cell_name") or "").strip().lower(): row for row in list_cells()}
+    from .section_runner import cached_build
+
+    return cached_build(
+        "metadata.cell_index",
+        lambda: {str(row.get("cell_name") or "").strip().lower(): row for row in list_cells()},
+        ttl=600,
+    )
 
 
 def enrich_cell(cell_name: str) -> dict:

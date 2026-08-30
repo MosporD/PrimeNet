@@ -13,6 +13,9 @@ let perfActiveRows = [];
 let perfSidebarTimer = null;
 let perfTableTimer = null;
 let perfFetchToken = 0;
+let perfVendor = 'nokia';
+let hwTechs = [];
+let hwRows = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.entity-tab').forEach((btn) => {
@@ -39,10 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (techFilter) techFilter.addEventListener('change', () => {
         renderSidebarList();
-        if (perfActiveEntity === 'kpis') fetchAndRenderTable();
+        if (perfVendor === 'huawei' || perfActiveEntity === 'kpis') fetchAndRenderTable();
     });
     if (detailClose) detailClose.addEventListener('click', closeDetailModal);
     if (detailBackdrop) detailBackdrop.addEventListener('click', closeDetailModal);
+
+    document.querySelectorAll('.vendor-tab').forEach((btn) => {
+        btn.addEventListener('click', () => setPerfVendor(btn.dataset.vendor));
+    });
 
     loadPerfData();
 });
@@ -68,6 +75,7 @@ async function loadPerfData() {
         if (perfMeasurementIndex.length) {
             selectSidebarItem(perfMeasurementIndex[0].id);
         }
+        applyPerfDeepLink();
     } catch (err) {
         if (countEl) countEl.textContent = `Error: ${err.message}`;
     }
@@ -154,6 +162,10 @@ function getSidebarItems() {
 }
 
 function renderSidebarList() {
+    if (perfVendor === 'huawei') {
+        renderHuaweiSidebar();
+        return;
+    }
     const listEl = document.getElementById('perf-sidebar-list');
     const countEl = document.getElementById('perf-sidebar-count');
     if (!listEl) return;
@@ -197,6 +209,10 @@ function selectSidebarItem(id) {
 }
 
 async function fetchAndRenderTable() {
+    if (perfVendor === 'huawei') {
+        await fetchHuaweiTable();
+        return;
+    }
     const token = ++perfFetchToken;
     const host = document.getElementById('perf-table-host');
     if (host) host.innerHTML = '<div class="perf-loading">Loading…</div>';
@@ -425,3 +441,122 @@ function escapeHtml(text) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 }
+
+async function setPerfVendor(vendor) {
+    perfVendor = vendor === 'huawei' ? 'huawei' : 'nokia';
+    document.querySelectorAll('.vendor-tab').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.vendor === perfVendor);
+    });
+    const entityTabs = document.getElementById('nokia-entity-tabs');
+    if (entityTabs) entityTabs.style.display = perfVendor === 'nokia' ? '' : 'none';
+    if (perfVendor === 'huawei') {
+        await loadHuaweiCatalog();
+        return;
+    }
+    populateTechFilter();
+    updateStats();
+    updateSourceLabel();
+    renderSidebarList();
+    if (perfMeasurementIndex.length) selectSidebarItem(perfMeasurementIndex[0].id);
+}
+
+async function applyPerfDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    const vendor = (params.get('vendor') || '').toLowerCase();
+    const entity = (params.get('entity') || '').toLowerCase();
+    const q = (params.get('q') || '').trim();
+    if (vendor === 'huawei') {
+        const tableSearch = document.getElementById('perf-table-search');
+        if (q && tableSearch) tableSearch.value = q;
+        await setPerfVendor('huawei');
+        return;
+    }
+    if (entity === 'kpis' || entity === 'counters' || entity === 'measurements') {
+        switchEntity(entity);
+    }
+    if (q) {
+        const tableSearch = document.getElementById('perf-table-search');
+        if (tableSearch) tableSearch.value = q;
+        await fetchAndRenderTable();
+    }
+}
+
+async function loadHuaweiCatalog() {
+    const countEl = document.getElementById('perf-sidebar-count');
+    if (countEl) countEl.textContent = 'Loading Huawei counters…';
+    try {
+        const resp = await fetch('/api/performance-dictionary/huawei/catalog');
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.error || 'Failed to load Huawei catalog');
+        hwTechs = Array.isArray(data.technologies) ? data.technologies : [];
+        const select = document.getElementById('perf-tech-filter');
+        if (select) {
+            select.innerHTML = '';
+            hwTechs.forEach((tech) => {
+                const opt = document.createElement('option');
+                opt.value = tech.technology;
+                opt.textContent = `${tech.technology} (${tech.total_counters || 0})`;
+                select.appendChild(opt);
+            });
+            if (!select.value && hwTechs[0]) select.value = hwTechs[0].technology;
+        }
+        const configured = hwTechs.filter((t) => t.configured && t.total_counters);
+        setText('stat-measurements', configured.length);
+        setText('stat-counters', configured.reduce((sum, t) => sum + (t.total_counters || 0), 0));
+        setText('stat-kpis', 0);
+        setText('perf-source-label', configured.length
+            ? 'Source: Huawei MAE counter catalog'
+            : 'Huawei CSVs not installed under data/huawei_pm_counters');
+        perfActiveId = '';
+        await fetchHuaweiTable();
+    } catch (err) {
+        if (countEl) countEl.textContent = `Error: ${err.message}`;
+    }
+}
+
+function renderHuaweiSidebar() {
+    const listEl = document.getElementById('perf-sidebar-list');
+    const countEl = document.getElementById('perf-sidebar-count');
+    if (!listEl) return;
+    const tech = document.getElementById('perf-tech-filter')?.value || '';
+    const selected = hwTechs.find((t) => t.technology === tech);
+    if (countEl) countEl.textContent = selected ? `${selected.total_counters || 0} counters` : 'Select a RAT';
+    listEl.innerHTML = `<div class="perf-sidebar-hint">Huawei MAE system counters for ${escapeHtml(tech || 'the selected RAT')}. Search the table to filter by name or ID.</div>`;
+}
+
+async function fetchHuaweiTable() {
+    const host = document.getElementById('perf-table-host');
+    const tech = document.getElementById('perf-tech-filter')?.value || '';
+    const q = (document.getElementById('perf-table-search')?.value || '').trim();
+    if (!tech) {
+        clearMainPanel('Select a Huawei RAT.');
+        return;
+    }
+    if (host) host.innerHTML = '<div class="perf-loading">Loading…</div>';
+    try {
+        const qs = new URLSearchParams({ technology: tech, q, limit: '300' });
+        const resp = await fetch(`/api/performance-dictionary/huawei/catalog?${qs.toString()}`);
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+        hwRows = data.counters || [];
+        setText('perf-selected-title', `${tech} counters`);
+        setText('perf-selected-meta', `${data.total || 0} matching · ${data.ne_type || ''} · ${data.configured ? 'catalog loaded' : 'CSV missing'}`);
+        renderHuaweiSidebar();
+        if (!hwRows.length) {
+            if (host) host.innerHTML = `<div class="perf-empty">${data.configured ? 'No counters match.' : 'Place MAE counter CSVs in data/huawei_pm_counters (2GBSC.csv, 3GRNC.csv, 4GBTS.csv).'}</div>`;
+            return;
+        }
+        const cols = ['id', 'name', 'unit', 'function_subset_name', 'time_aggregation', 'object_aggregation'];
+        const header = cols.map((c) => `<th>${escapeHtml(c)}</th>`).join('');
+        const body = hwRows.map((row) => {
+            const cells = cols.map((c) => `<td>${escapeHtml(row[c] || '')}</td>`).join('');
+            return `<tr>${cells}</tr>`;
+        }).join('');
+        if (host) {
+            host.innerHTML = `<div class="param-table-wrap"><table class="param-table"><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table></div>`;
+        }
+    } catch (err) {
+        if (host) host.innerHTML = `<div class="perf-empty">${escapeHtml(err.message)}</div>`;
+    }
+}
+

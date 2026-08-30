@@ -41,6 +41,10 @@ _CACHE_TTL_SEC = 600
 _cache_lock = threading.Lock()
 _cache: dict[str, Any] = {"expires_at": 0.0, "payload": None}
 
+# Append-only PM tables — sample the oldest/newest rowid windows instead of
+# scanning every distinct timestamp in the table.
+_TS_SAMPLE_ROWS = 50_000
+
 PM_CELL_DBS = [
     ("Nokia PM hourly", NOKIA_PM_DB),
     ("Huawei PM hourly", HUAWEI_PM_DB),
@@ -228,35 +232,63 @@ def _parse_time_part(value: str) -> tuple[int, int, int]:
     return hour, minute, second
 
 
+def _table_rowid_range(conn: sqlite3.Connection, table: str) -> tuple[int, int] | None:
+    try:
+        row = conn.execute(f'SELECT MIN(rowid), MAX(rowid) FROM "{table}"').fetchone()
+    except Exception:
+        return None
+    if not row or row[0] is None or row[1] is None:
+        return None
+    return int(row[0]), int(row[1])
+
+
+def _timestamp_windows(rowids: tuple[int, int] | None) -> list[tuple[str, tuple]]:
+    if not rowids:
+        return [("", ())]
+    min_rid, max_rid = rowids
+    if max_rid - min_rid + 1 <= _TS_SAMPLE_ROWS * 2:
+        return [("", ())]
+    earliest_cut = min(max_rid, min_rid + _TS_SAMPLE_ROWS - 1)
+    latest_cut = max(min_rid, max_rid - _TS_SAMPLE_ROWS + 1)
+    return [
+        ("AND rowid <= ?", (earliest_cut,)),
+        ("AND rowid >= ?", (latest_cut,)),
+    ]
+
+
 def _timestamp_bounds(
     conn: sqlite3.Connection, table: str, columns: list[str], label: str
 ) -> dict[str, Any] | None:
     best: dict[str, Any] | None = None
+    windows = _timestamp_windows(_table_rowid_range(conn, table))
     for col in _timestamp_candidates(columns):
         parsed_count = 0
         earliest_dt: datetime | None = None
         earliest_raw: Any = None
         latest_dt: datetime | None = None
         latest_raw: Any = None
-        try:
-            values = conn.execute(
-                f'SELECT DISTINCT "{col}" FROM "{table}" '
-                f'WHERE "{col}" IS NOT NULL AND TRIM(CAST("{col}" AS TEXT)) != ""'
-            )
-        except Exception:
-            continue
-
-        for (raw_value,) in values:
-            parsed = _parse_pm_timestamp(raw_value, label, col)
-            if parsed is None:
+        for extra_sql, params in windows:
+            try:
+                values = conn.execute(
+                    f'SELECT DISTINCT "{col}" FROM "{table}" '
+                    f'WHERE "{col}" IS NOT NULL AND TRIM(CAST("{col}" AS TEXT)) != "" '
+                    f'{extra_sql}',
+                    params,
+                )
+            except Exception:
                 continue
-            parsed_count += 1
-            if earliest_dt is None or parsed < earliest_dt:
-                earliest_dt = parsed
-                earliest_raw = raw_value
-            if latest_dt is None or parsed > latest_dt:
-                latest_dt = parsed
-                latest_raw = raw_value
+
+            for (raw_value,) in values:
+                parsed = _parse_pm_timestamp(raw_value, label, col)
+                if parsed is None:
+                    continue
+                parsed_count += 1
+                if earliest_dt is None or parsed < earliest_dt:
+                    earliest_dt = parsed
+                    earliest_raw = raw_value
+                if latest_dt is None or parsed > latest_dt:
+                    latest_dt = parsed
+                    latest_raw = raw_value
 
         if parsed_count == 0 or earliest_dt is None or latest_dt is None:
             continue
@@ -489,6 +521,14 @@ def run_pm_health_check(
         payload["distinct_cells_all_pm_cell_dbs_union"] = pm_union_distinct_cells(
             [p for _, p in PM_CELL_DBS]
         )
+        payload["distinct_cells_scope"] = "union"
+    else:
+        largest = max(
+            (int(report.get("distinct_cells_db") or 0) for report in cell_reports),
+            default=0,
+        )
+        payload["distinct_cells_all_pm_cell_dbs_union"] = largest or None
+        payload["distinct_cells_scope"] = "largest_db"
     return payload
 
 

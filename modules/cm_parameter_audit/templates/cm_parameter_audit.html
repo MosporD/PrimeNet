@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - CM Parameter Audit</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.2">
 </head>
 <body class="cm-audit-page"
       data-nokia-configured="{{ 'true' if nokia_configured else 'false' }}"
@@ -87,6 +87,64 @@
                 </div>
             </section>
 
+            <section class="cm-audit-panel cm-rules-panel">
+                <details id="golden-rules">
+                    <summary>Golden configuration rules</summary>
+                    <p class="section-description">Per-band / per-area equals, range, and not-empty checks. Editing a rule clears approval until an engineer signs it against a baseline.</p>
+                    <div id="rules-list" class="rules-list"></div>
+                    <form id="rule-form" class="rule-form">
+                        <div class="form-row">
+                            <label>ID <input type="text" id="rule-id" placeholder="lte-pci-urban"></label>
+                            <label>Parameter <input type="text" id="rule-parameter" required placeholder="pci"></label>
+                            <label>MO class <input type="text" id="rule-mo" placeholder="LNCEL"></label>
+                        </div>
+                        <div class="form-row">
+                            <label>Technology
+                                <select id="rule-tech">
+                                    <option value="">Any</option>
+                                    <option value="2G">2G</option>
+                                    <option value="3G">3G</option>
+                                    <option value="4G">4G</option>
+                                    <option value="5G">5G</option>
+                                </select>
+                            </label>
+                            <label>Band <input type="text" id="rule-band" placeholder="L18 / L21 / N78"></label>
+                            <label>Area
+                                <select id="rule-area">
+                                    <option value="">All areas</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <label>Type
+                                <select id="rule-type">
+                                    <option value="equals">equals</option>
+                                    <option value="range">range</option>
+                                    <option value="not_empty">not empty</option>
+                                </select>
+                            </label>
+                            <label>Expected <input type="text" id="rule-expected"></label>
+                            <label>Min <input type="number" id="rule-min" step="any"></label>
+                            <label>Max <input type="number" id="rule-max" step="any"></label>
+                        </div>
+                        <div class="form-row">
+                            <label>Severity
+                                <select id="rule-severity">
+                                    <option>High</option>
+                                    <option selected>Medium</option>
+                                    <option>Low</option>
+                                </select>
+                            </label>
+                            <label>Baseline <input type="text" id="rule-baseline" placeholder="NetAct snapshot date / MOP id"></label>
+                            <label class="rule-desc">Description <input type="text" id="rule-description" placeholder="Why this is the golden value"></label>
+                        </div>
+                        <div class="form-row">
+                            <button type="submit" class="btn-primary">Save rule</button>
+                        </div>
+                    </form>
+                </details>
+            </section>
+
             <section class="cm-audit-status" id="audit-status" hidden aria-live="polite"></section>
 
             <section class="cm-audit-summary" id="audit-summary" hidden>
@@ -156,6 +214,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
-    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=1.9"></script>
+    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=2.0"></script>
 </body>
 </html>

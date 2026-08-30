@@ -1,4 +1,4 @@
-"""KPI presets for Network Health Scorecard (development stage)."""
+"""KPI presets for Network Health Scorecard — operator category targets."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ PRECALC_CRON_MINUTE = _env_int("NH_PRECALC_MINUTE", 30)
 # Optional explicit KPI names/aliases to prioritize in shortlist builds (partial match).
 PRECOMPUTE_KPI_NAMES: list[str] = []
 
-# Legacy category presets (SON Analytics compatibility)
+# Operator KPI targets. Radio detectors score against these (not a separate 0–100 heuristic).
 CATEGORY_PRESETS: dict[str, dict] = {
     "Retainability": {
         "direction": "higher_worse",
@@ -80,6 +80,7 @@ CATEGORY_PRESETS: dict[str, dict] = {
             "UE rel R abnorm rel",
         ],
         "threshold_bad": 2.0,
+        "threshold_span": 8.0,
     },
     "Accessibility": {
         "direction": "lower_worse",
@@ -94,6 +95,7 @@ CATEGORY_PRESETS: dict[str, dict] = {
             "Act RACH stp SR",
         ],
         "threshold_bad": 98.0,
+        "threshold_span": 10.0,
     },
     "Mobility": {
         "direction": "lower_worse",
@@ -108,6 +110,7 @@ CATEGORY_PRESETS: dict[str, dict] = {
             "IntergNB HO SR NSA",
         ],
         "threshold_bad": 95.0,
+        "threshold_span": 10.0,
     },
     "Interference": {
         "direction": "higher_worse",
@@ -120,6 +123,7 @@ CATEGORY_PRESETS: dict[str, dict] = {
             "Avg UE rel RSSI PUSCH",
         ],
         "threshold_bad": -95.0,
+        "threshold_span": 15.0,
     },
     "Utilization": {
         "direction": "higher_worse",
@@ -132,6 +136,7 @@ CATEGORY_PRESETS: dict[str, dict] = {
             "PRB util PUSCH",
         ],
         "threshold_bad": 80.0,
+        "threshold_span": 20.0,
     },
 }
 
@@ -158,3 +163,34 @@ def metadata_technology_for_rat(rat_key: str) -> str | None:
     if not cfg:
         return None
     return cfg.get("metadata_technology") or cfg["key"]
+
+
+def _norm_kpi(text: str) -> str:
+    return "".join(ch for ch in str(text or "").lower() if ch.isalnum())
+
+
+def match_category(kpi_name: str) -> str | None:
+    """Map a PM column name onto a scorecard category, or None."""
+    needle = _norm_kpi(kpi_name)
+    if not needle:
+        return None
+    for cat, preset in CATEGORY_PRESETS.items():
+        for alias in preset.get("aliases") or []:
+            token = _norm_kpi(alias)
+            if token and (token == needle or token in needle or needle in token):
+                return cat
+    return None
+
+
+def public_category_presets() -> dict:
+    """JSON-safe category targets for the UI and radio detectors."""
+    out: dict[str, dict] = {}
+    for name, preset in CATEGORY_PRESETS.items():
+        out[name] = {
+            "direction": preset["direction"],
+            "tab_label": preset.get("tab_label") or name,
+            "threshold_bad": preset.get("threshold_bad"),
+            "threshold_span": preset.get("threshold_span"),
+            "aliases": list(preset.get("aliases") or []),
+        }
+    return out

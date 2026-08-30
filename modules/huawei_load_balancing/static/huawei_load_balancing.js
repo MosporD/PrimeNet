@@ -171,6 +171,8 @@
                     <td>${escapeHtml(row.current)}</td>
                     <td>${escapeHtml(row.proposed)}</td>
                     <td>${escapeHtml(row.delta)}</td>
+                    <td title="${escapeHtml((row.ml_treatment && row.ml_treatment.note) || '')}">${escapeHtml(row.ml_treatment && row.ml_treatment.predicted_util_delta != null ? row.ml_treatment.predicted_util_delta : '—')}</td>
+                    <td>${escapeHtml(row.ml_treatment && row.ml_treatment.predicted_mobility_delta != null ? row.ml_treatment.predicted_mobility_delta : '—')}</td>
                 </tr>
             `).join('');
             const warnings = data.warnings || [];

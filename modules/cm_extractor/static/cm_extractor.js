@@ -413,7 +413,7 @@ async function loadNokiaSites() {
     errorEl.hidden = true;
     errorEl.textContent = '';
     loading.hidden = false;
-    loading.textContent = `Loading ${getScopeLevel()} ids from database…`;
+    loading.textContent = `Loading ${getScopeLevel()} ids from NetAct inventory…`;
     listEl.hidden = true;
 
     try {
@@ -1507,11 +1507,19 @@ function updateActionState() {
     }
     const level = getScopeLevel();
     const viaOps = isControllerScope(level);
+    const heavyNeighbor = selections.some((s) => {
+        const abbr = String(s.mo_class_id || '').split(':').pop().toUpperCase();
+        return abbr.startsWith('LNREL') || abbr.startsWith('LNADJ') || abbr.startsWith('LNHOIF');
+    });
     const methodNote = viaOps
         ? (bulkExportSshConfigured
             ? 'via CM Operations Import_Export'
             : 'via CM Open API (SFTP not configured — partial RNC/BSC data)')
-        : 'via CM Open API';
+        : (heavyNeighbor && bulkExportSshConfigured
+            ? 'via CM Operations Import_Export (neighbor MOs — scoped to selected sites)'
+            : (heavyNeighbor
+                ? 'via scoped CM Open API (LNREL/LNADJ never dump the whole network)'
+                : 'via CM Open API'));
     desc.textContent = `${level} scope — ${selectedSiteIds.size} id(s), ${selections.length} MO class(es) — ${parts.join('; ')}. ${methodNote}. One Excel sheet per MO class.`;
     info.hidden = false;
 }

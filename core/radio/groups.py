@@ -14,7 +14,8 @@ from sync_config import (
     pm_table_name,
 )
 
-from .scoring import bounded_score, issue, summarize, to_float, utc_now_iso
+from .scoring import issue, score_vs_preset, summarize, to_float, utc_now_iso
+from .section_runner import cached_insight
 
 GROUP_NAME_ALIASES = (
     "group name",
@@ -131,28 +132,41 @@ def _scan_table(conn: sqlite3.Connection, table: str, vendor: str, technology: s
             continue
         if grp not in best or val > best[grp]:
             best[grp] = val
+    from modules.network_health.config import CATEGORY_PRESETS
+
+    util_preset = CATEGORY_PRESETS["Utilization"]
     issues = []
     for grp, val in sorted(best.items(), key=lambda kv: -kv[1])[:limit]:
-        score = bounded_score(min(90.0, val))
+        score = score_vs_preset(val, util_preset)
         if score < 20:
             continue
         issues.append(issue(
             module="Group Health",
             category="Controller / Cluster",
             title=f"{vendor} {technology} group pressure: {grp}",
-            summary=f"{kpi_col} latest={round(val, 2)} on group/controller '{grp}'.",
+            summary=(
+                f"{kpi_col} latest={round(val, 2)} on group/controller '{grp}' "
+                f"(operator target {util_preset.get('threshold_bad')}%)."
+            ),
             score=score,
             cells=[],
             site_id=grp,
             vendor=vendor,
             technology=technology,
-            evidence={"group": grp, "kpi": kpi_col, "value": round(val, 3), "table": table},
+            evidence={
+                "group": grp,
+                "kpi": kpi_col,
+                "value": round(val, 3),
+                "table": table,
+                "threshold_bad": util_preset.get("threshold_bad"),
+            },
             recommendation="Open Performance Explorer in group mode and drill into the worst cells inside this controller.",
             source_url="/group-health",
         ))
     return issues
 
 
+@cached_insight("group_health")
 def group_health(*, vendor: str = "all", technology: str = "all", limit: int = 200) -> dict:
     techs = ["2G", "3G", "4G", "5G"] if technology in ("", "all", None) else [str(technology).split("-")[0].upper()]
     issues: list[dict] = []

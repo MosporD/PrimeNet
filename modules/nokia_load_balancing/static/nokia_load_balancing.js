@@ -505,6 +505,8 @@
                     <td>${escapeHtml(vals.current)}</td>
                     <td>${escapeHtml(vals.proposed)}</td>
                     <td>${escapeHtml(vals.delta)}</td>
+                    <td title="${escapeAttr((row.ml_treatment && row.ml_treatment.note) || '')}">${escapeHtml(row.ml_treatment && row.ml_treatment.predicted_util_delta != null ? row.ml_treatment.predicted_util_delta : '—')}</td>
+                    <td>${escapeHtml(row.ml_treatment && row.ml_treatment.predicted_mobility_delta != null ? row.ml_treatment.predicted_mobility_delta : '—')}</td>
                 `;
                 resultsBody.appendChild(tr);
             });

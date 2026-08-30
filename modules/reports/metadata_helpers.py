@@ -84,6 +84,11 @@ def _metadata_inventory_union_sql(conn) -> str:
         et_col = _pick_col(['electrical_tilt', 'electrical tilt', 'e_tilt'], low_to_real)
         mt_col = _pick_col(['mechanical_tilt', 'mechanical tilt', 'm_tilt'], low_to_real)
         status_col = _pick_col(['status', 'activity_status'], low_to_real)
+        cluster_col = _pick_col(['cluster'], low_to_real)
+        lat_col = _pick_col(['lat', 'latitude'], low_to_real)
+        lng_col = _pick_col(['long', 'longitude', 'lng', 'lon'], low_to_real)
+        rnc_col = _pick_col(['rnc_name', 'rnc'], low_to_real)
+        bsc_col = _pick_col(['bsc_name', 'bsc'], low_to_real)
 
         site_expr = f'CAST({_sql_ident(site_col)} AS TEXT)' if site_col else 'NULL'
         cell_expr = _sql_ident(cell_col) if cell_col else 'NULL'
@@ -95,6 +100,12 @@ def _metadata_inventory_union_sql(conn) -> str:
         et_expr = _sql_ident(et_col) if et_col else 'NULL'
         mt_expr = _sql_ident(mt_col) if mt_col else 'NULL'
         status_expr = _sql_ident(status_col) if status_col else "''"
+        cluster_expr = _sql_ident(cluster_col) if cluster_col else 'NULL'
+        lat_expr = _sql_ident(lat_col) if lat_col else 'NULL'
+        lng_expr = _sql_ident(lng_col) if lng_col else 'NULL'
+        rnc_expr = _sql_ident(rnc_col) if rnc_col else 'NULL'
+        bsc_expr = _sql_ident(bsc_col) if bsc_col else 'NULL'
+        controller_expr = f'COALESCE({rnc_expr}, {bsc_expr})'
 
         parts.append(
             f"""
@@ -109,7 +120,11 @@ def _metadata_inventory_union_sql(conn) -> str:
                 {area_expr} AS area,
                 {et_expr} AS electrical_tilt,
                 {mt_expr} AS mechanical_tilt,
-                {status_expr} AS status
+                {status_expr} AS status,
+                {cluster_expr} AS cluster,
+                {lat_expr} AS latitude,
+                {lng_expr} AS longitude,
+                {controller_expr} AS controller
             FROM {_sql_ident(table)}
             """
         )
@@ -118,6 +133,7 @@ def _metadata_inventory_union_sql(conn) -> str:
         return (
             "SELECT NULL AS site_id, NULL AS cell_name, NULL AS technology, NULL AS vendor, "
             "NULL AS frequency_band, NULL AS azimuth, NULL AS pci, NULL AS area, NULL AS electrical_tilt, "
-            "NULL AS mechanical_tilt, NULL AS status WHERE 1=0"
+            "NULL AS mechanical_tilt, NULL AS status, NULL AS cluster, NULL AS latitude, "
+            "NULL AS longitude, NULL AS controller WHERE 1=0"
         )
     return "\nUNION ALL\n".join(parts)

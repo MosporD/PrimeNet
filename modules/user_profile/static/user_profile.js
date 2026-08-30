@@ -182,6 +182,11 @@ async function loadPreferences() {
     if (prefs.default_tab)    document.getElementById('prefDefaultTab').value    = prefs.default_tab;
     if (prefs.default_tech)   document.getElementById('prefDefaultTech').value   = prefs.default_tech;
     if (prefs.default_vendor) document.getElementById('prefDefaultVendor').value = prefs.default_vendor;
+    const layout = (prefs.dashboard_layout && typeof prefs.dashboard_layout === 'object')
+        ? prefs.dashboard_layout
+        : {};
+    const showMap = document.getElementById('prefShowConstellation');
+    if (showMap) showMap.checked = layout.show_constellation !== false;
     const pmView = String(prefs.pm_view_mode || '').toLowerCase();
     if (pmView === 'table' || pmView === 'charts') {
         document.getElementById('prefCompact').checked = pmView === 'table';
@@ -199,6 +204,11 @@ async function savePreferences() {
         pm_view_mode:   document.getElementById('prefCompact').checked ? 'table' : 'charts',
         // Keep old key so existing integrations don't break.
         compact_tables: document.getElementById('prefCompact').checked,
+        dashboard_layout: {
+            show_constellation: document.getElementById('prefShowConstellation')
+                ? document.getElementById('prefShowConstellation').checked
+                : true,
+        },
     };
     const res  = await fetch('/api/profile/preferences', {
         method: 'POST',

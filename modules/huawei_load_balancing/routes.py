@@ -140,6 +140,14 @@ def huawei_analyze():
         }), 400
 
     result = analyze_sectors(sectors)
+    if result.get("success"):
+        try:
+            from modules.son_analytics.ml.infer import score_load_balancing_rows
+
+            score_load_balancing_rows(result.get("rows") or [], site_key_fields=("site_id",))
+            score_load_balancing_rows(result.get("review_rows") or [], site_key_fields=("site_id",))
+        except Exception:
+            pass
     all_errors = lookup_errors + (result.get("errors") or [])
     if not result.get("success"):
         return jsonify({

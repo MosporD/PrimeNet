@@ -470,12 +470,58 @@ function openNokiaDetail(row) {
         `;
     }).filter(Boolean).join('');
 
+    const liveHost = document.createElement('div');
+    liveHost.className = 'nokia-live-panel';
+    liveHost.innerHTML = '<p class="nokia-live-status">Loading network values…</p>';
+    body.appendChild(liveHost);
+    loadNetworkValues(row, liveHost);
+
     modal.hidden = false;
 }
 
 function closeNokiaDetail() {
     const modal = document.getElementById('nokia-detail-modal');
     if (modal) modal.hidden = true;
+}
+
+async function loadNetworkValues(row, host) {
+    const param = row['Abbreviated Name'] || '';
+    const mo = row._mo || row['MO Class'] || nokiaActiveMO || '';
+    const defVal = row['Default Value'] || '';
+    if (!param) {
+        host.innerHTML = '';
+        return;
+    }
+    try {
+        const qs = new URLSearchParams({ param, mo, default: defVal });
+        const resp = await fetch(`/api/parameter-dictionary/network-values?${qs.toString()}`);
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.error || 'Failed');
+        const dist = (data.distribution || []).slice(0, 8).map((item) =>
+            `<li><code>${escapeHtml(item.value || '(empty)')}</code> — ${item.count} objects</li>`
+        ).join('');
+        const deviations = data.deviation_count || 0;
+        const samples = (data.deviations || []).slice(0, 8).map((item) =>
+            `<li>${escapeHtml(item.cell_name || item.dn || 'object')}: <code>${escapeHtml(item.value)}</code></li>`
+        ).join('');
+        if (!data.total) {
+            host.innerHTML = `
+                <h4>Network values</h4>
+                <p>No CM snapshot for this parameter yet. Default from dictionary: <code>${escapeHtml(defVal || 'n/a')}</code>.</p>
+                <p><a class="nokia-live-link" href="${escapeHtml(data.audit_url || '/cm-parameter-audit')}">Scan live network in CM Parameter Audit</a></p>
+            `;
+            return;
+        }
+        host.innerHTML = `
+            <h4>Network values vs dictionary default</h4>
+            <p>Default: <code>${escapeHtml(data.default_value || defVal || 'n/a')}</code> · ${data.total} objects · ${deviations} deviate from default</p>
+            <ul class="nokia-live-dist">${dist || '<li>No values</li>'}</ul>
+            ${samples ? `<p>Deviating cells</p><ul class="nokia-live-dev">${samples}</ul>` : ''}
+            <p><a class="nokia-live-link" href="${escapeHtml(data.audit_url || '/cm-parameter-audit')}">Open live scan in CM Parameter Audit</a></p>
+        `;
+    } catch (err) {
+        host.innerHTML = `<p class="nokia-live-status">Could not load network values: ${escapeHtml(err.message)}</p>`;
+    }
 }
 
 function updateNokiaStats(moCount, paramCount) {

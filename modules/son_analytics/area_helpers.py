@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import re
 import time
 
 from db.runtime import connect_metadata, execute_query
 from modules.reports.metadata_helpers import _metadata_inventory_union_sql
+
+_CELL_SITE_PREFIX_RE = re.compile(r"^(\d{3,6})")
 
 _CLUSTER_AREA = {
     3: "East Amman", 13: "East Amman", 17: "East Amman", 21: "East Amman",
@@ -43,9 +46,35 @@ def clusters_for_area(area: str | None = None) -> list[int]:
 
 def cluster_from_site_id(site_id) -> int | None:
     try:
-        return int(site_id) // 100
+        return int(float(str(site_id).strip())) // 100
     except (TypeError, ValueError):
         return None
+
+
+def as_cluster_int(value) -> int | None:
+    """Coerce metadata cluster values like 12, 12.0, '12.0' to int."""
+    if value is None or value == "":
+        return None
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def cluster_from_cell_name(cell_name: str) -> int | None:
+    m = _CELL_SITE_PREFIX_RE.match(str(cell_name or "").strip())
+    if not m:
+        return None
+    return int(m.group(1)) // 100
+
+
+def resolve_cell_cluster(cell_name: str, loc: dict | None = None) -> int | None:
+    info = loc or {}
+    return (
+        as_cluster_int(info.get("cluster"))
+        or cluster_from_site_id(info.get("site_id"))
+        or cluster_from_cell_name(cell_name)
+    )
 
 
 def normalize_area(value: str | None) -> str:
@@ -109,7 +138,7 @@ def get_cell_area_map(*, force_refresh: bool = False) -> dict[str, str]:
 def get_cell_location_map(*, force_refresh: bool = False) -> dict[str, dict]:
     """Return cell_name -> {latitude, longitude, area, site_id}."""
     now = time.time()
-    cache_key = "_loc"
+    cache_key = "_loc_v3"
     if (
         not force_refresh
         and _CELL_AREA_CACHE.get(cache_key)
@@ -125,7 +154,7 @@ def get_cell_location_map(*, force_refresh: bool = False) -> dict[str, dict]:
         rows = execute_query(
             conn,
             f"""
-            SELECT DISTINCT cell_name, site_id, latitude, longitude
+            SELECT DISTINCT cell_name, site_id, latitude, longitude, cluster, controller
             FROM ({union_sql}) v
             WHERE cell_name IS NOT NULL AND TRIM(cell_name) != ''
             """,
@@ -141,11 +170,28 @@ def get_cell_location_map(*, force_refresh: bool = False) -> dict[str, dict]:
                 lng_f = float(lng) if lng is not None else None
             except (TypeError, ValueError):
                 lat_f = lng_f = None
+            site_id = row["site_id"]
+            cluster = resolve_cell_cluster(cell, {"cluster": row["cluster"], "site_id": site_id})
+            controller = str(row["controller"] or "").strip()
+            existing = out.get(cell)
+            if existing:
+                if existing.get("cluster") is None and cluster is not None:
+                    existing["cluster"] = cluster
+                if not existing.get("controller") and controller:
+                    existing["controller"] = controller
+                if existing.get("site_id") in (None, "") and site_id not in (None, ""):
+                    existing["site_id"] = site_id
+                if existing.get("latitude") is None and lat_f is not None:
+                    existing["latitude"] = lat_f
+                    existing["longitude"] = lng_f
+                continue
             out[cell] = {
                 "latitude": lat_f,
                 "longitude": lng_f,
                 "area": area_map.get(cell, ""),
-                "site_id": row["site_id"],
+                "site_id": site_id,
+                "cluster": cluster,
+                "controller": controller,
             }
     except Exception:
         pass
@@ -177,8 +223,10 @@ def cell_in_cluster(cell_name: str, cluster: int | None, loc_map: dict[str, dict
         return True
     key = str(cell_name or "").strip()
     info = loc_map.get(key) or {}
-    site_id = info.get("site_id")
-    return cluster_from_site_id(site_id) == int(cluster)
+    got = resolve_cell_cluster(key, info)
+    if got is None:
+        return False
+    return got == int(cluster)
 
 
 def get_cell_technology_map(*, force_refresh: bool = False) -> dict[str, str]:

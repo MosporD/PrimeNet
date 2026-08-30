@@ -66,6 +66,78 @@ def bounded_score(*values: float | None) -> float:
     return round(min(100.0, total), 2)
 
 
+def _default_threshold_span(direction: str, threshold_bad: float) -> float:
+    """Headroom past the operator target that maps to score=100."""
+    thr = abs(float(threshold_bad))
+    if str(direction or "").strip().lower() == "lower_worse":
+        room = 100.0 - thr if 0 <= thr <= 100 else 10.0
+        return max(5.0, min(20.0, room if room > 0 else 10.0))
+    if thr >= 50:
+        return 20.0
+    if thr <= 5:
+        return 8.0
+    return 15.0
+
+
+def score_vs_threshold(
+    value: float | None,
+    *,
+    direction: str = "higher_worse",
+    threshold_bad: float | None = None,
+    span: float | None = None,
+) -> float:
+    """Map a KPI versus the operator target to 0–100 (0 = at/better than target)."""
+    if value is None or threshold_bad is None:
+        return 0.0
+    try:
+        val = float(value)
+        thr = float(threshold_bad)
+    except (TypeError, ValueError):
+        return 0.0
+    direction_n = str(direction or "higher_worse").strip().lower()
+    try:
+        width = float(span) if span not in (None, "") else _default_threshold_span(direction_n, thr)
+    except (TypeError, ValueError):
+        width = _default_threshold_span(direction_n, thr)
+    if width <= 0:
+        width = 10.0
+    excess = (thr - val) if direction_n == "lower_worse" else (val - thr)
+    if excess <= 0:
+        return 0.0
+    return round(min(100.0, 100.0 * excess / width), 2)
+
+
+def breached_threshold(
+    value: float | None,
+    *,
+    direction: str = "higher_worse",
+    threshold_bad: float | None = None,
+) -> bool:
+    """True when the value is worse than the operator target."""
+    if value is None or threshold_bad is None:
+        return False
+    try:
+        val = float(value)
+        thr = float(threshold_bad)
+    except (TypeError, ValueError):
+        return False
+    if str(direction or "").strip().lower() == "lower_worse":
+        return val < thr
+    return val > thr
+
+
+def score_vs_preset(value: float | None, preset: dict | None) -> float:
+    """Score a KPI using a Network Health category preset (`threshold_bad`)."""
+    if not preset:
+        return 0.0
+    return score_vs_threshold(
+        value,
+        direction=str(preset.get("direction") or "higher_worse"),
+        threshold_bad=preset.get("threshold_bad"),
+        span=preset.get("threshold_span"),
+    )
+
+
 def issue(
     *,
     module: str,

@@ -133,6 +133,7 @@ async function generateXML() {
                 `Successfully converted Excel to XML: ${data.output_file}`;
 
             window.downloadFilename = data.output_file;
+            renderValidation(data.validation);
 
             showNotification('Conversion complete!', 'success');
         } else {
@@ -175,3 +176,31 @@ async function downloadFile() {
         showNotification('Download error: ' + error.message, 'error');
     }
 }
+
+function renderValidation(payload) {
+    const host = document.getElementById('validation-section');
+    const summaryEl = document.getElementById('validation-summary');
+    const listEl = document.getElementById('validation-list');
+    if (!host || !summaryEl || !listEl) return;
+    if (!payload) {
+        host.hidden = true;
+        return;
+    }
+    const summary = payload.summary || {};
+    const findings = Array.isArray(payload.findings) ? payload.findings : [];
+    host.hidden = false;
+    summaryEl.textContent = `${payload.mo_count || 0} MOs · ${summary.errors || 0} errors · ${summary.warnings || 0} warnings · ${summary.diffs || 0} diffs vs current network snapshot`;
+    if (!payload.snapshot_available) {
+        summaryEl.textContent += ' (no snapshot loaded — generate after a CM extract for a dry-run diff)';
+    }
+    if (!findings.length) {
+        listEl.innerHTML = '<p class="validation-ok">Plan passed dictionary / golden-rule checks.</p>';
+        return;
+    }
+    listEl.innerHTML = findings.slice(0, 80).map((item) => {
+        const cls = item.severity === 'error' ? 'is-error' : (item.severity === 'warning' ? 'is-warning' : 'is-info');
+        const text = String(item.message || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        return `<div class="validation-item ${cls}"><strong>${item.severity || ''}</strong> ${text}</div>`;
+    }).join('');
+}
+

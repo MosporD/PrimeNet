@@ -15,6 +15,8 @@ _CACHE_TTL_SEC = 600
 _cache_lock = threading.Lock()
 _cache: dict[str, Any] = {"expires_at": 0.0, "payload": None}
 
+_TS_SAMPLE_ROWS = 50_000
+
 NEIGHBOR_DBS = [
     ("Nokia neighbor hourly", NEIGHBOR_KPI_DB),
     ("Huawei neighbor hourly", HUAWEI_NEIGHBOR_RAW_DB),
@@ -99,15 +101,29 @@ def _parse_timestamp(value: Any) -> datetime | None:
 
 
 def _latest_timestamp(conn: sqlite3.Connection, table: str, ts_col: str) -> str | None:
-    best: datetime | None = None
-    for (raw,) in conn.execute(
-        f"""
+    try:
+        max_rowid = conn.execute(
+            f"SELECT MAX(rowid) FROM {_sqlite_ident(table)}"
+        ).fetchone()[0]
+    except sqlite3.Error:
+        max_rowid = None
+    cutoff = max(1, int(max_rowid) - _TS_SAMPLE_ROWS) if max_rowid else None
+    sql = f"""
         SELECT DISTINCT {_sqlite_ident(ts_col)}
         FROM {_sqlite_ident(table)}
         WHERE {_sqlite_ident(ts_col)} IS NOT NULL
           AND TRIM(CAST({_sqlite_ident(ts_col)} AS TEXT)) <> ''
-        """
-    ):
+    """
+    params: tuple = ()
+    if cutoff is not None:
+        sql += " AND rowid >= ?"
+        params = (cutoff,)
+    best: datetime | None = None
+    try:
+        rows = conn.execute(sql, params)
+    except sqlite3.Error:
+        return None
+    for (raw,) in rows:
         parsed = _parse_timestamp(raw)
         if parsed is not None and (best is None or parsed > best):
             best = parsed

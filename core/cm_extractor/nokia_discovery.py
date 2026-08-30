@@ -18,6 +18,8 @@ from typing import Any
 
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.cm_extractor.site_catalog import (
+    _known_nokia_metadata_site_ids,
+    _site_area_index,
     canonical_controller_site_id,
     cluster_area_map,
     list_netact_plmn_controllers,
@@ -25,14 +27,13 @@ from core.cm_extractor.site_catalog import (
     nokia_mrbts_area_for_site,
     normalize_scope_level,
     site_cluster_map,
-    _known_nokia_metadata_site_ids,
 )
 
 _CATALOG_PATH = Path(__file__).resolve().parents[2] / 'data' / 'nokia_netact_inventory.json'
 _CACHE_TTL_SEC = 6 * 3600
 # Bump when metadata enrichment rules change (e.g. NetAct 50801 -> metadata 801,
-# or longest-suffix mapping 53308 -> 3308 instead of 308).
-_METADATA_ENRICHMENT_VERSION = 3
+# or longest-suffix mapping 53308 -> 3308 instead of 308, or canonical area names).
+_METADATA_ENRICHMENT_VERSION = 4
 
 # MO paths that enumerate site-level NEs per scope (all PLMNs).
 _MRBTS_MO_PATH = '/NetActCommon:PLMN/MRBTS as $m'
@@ -95,13 +96,14 @@ def discover_controllers(client: NokiaCmClient, scope_level: str) -> list[dict[s
 
 
 def _enrich_with_area(records: list[dict[str, str]], scope_level: str) -> None:
-    """Attach cluster + area to MRBTS records via metadata cluster->area mapping."""
+    """Attach cluster + canonical area to MRBTS records."""
     if scope_level != 'MRBTS' or not records:
         return
     known_metadata_ids = _known_nokia_metadata_site_ids()
     clusters = site_cluster_map('nokia', 'MRBTS')
     cluster_to_area = cluster_area_map()
     area_map = nokia_area_map('MRBTS')
+    site_area_index = _site_area_index()
     for rec in records:
         _meta_id, area, cluster = nokia_mrbts_area_for_site(
             str(rec.get('site_id') or ''),
@@ -109,6 +111,7 @@ def _enrich_with_area(records: list[dict[str, str]], scope_level: str) -> None:
             clusters=clusters,
             cluster_to_area=cluster_to_area,
             area_map=area_map,
+            site_area_index=site_area_index,
         )
         rec['cluster'] = cluster
         rec['area'] = area

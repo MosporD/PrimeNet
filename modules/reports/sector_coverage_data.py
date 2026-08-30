@@ -175,6 +175,36 @@ def load_sector_coverage_rows(conn=None, *, active_only: bool = True) -> tuple[l
     When active_only is True (default), only on-air cells per PER_TABLE_ACTIVE_WHERE are included.
     When False, every configured cell row is included regardless of activity status.
     """
+    if conn is None:
+        from core.radio.section_runner import cached_build
+
+        return cached_build(
+            f"sector.rows|{int(bool(active_only))}",
+            lambda: _load_sector_coverage_rows_uncached(active_only=active_only),
+            copy=_clone_sector_bundle,
+        )
+    return _load_sector_coverage_rows_uncached(conn, active_only=active_only)
+
+
+def _clone_sector_bundle(payload: tuple[list[dict], list[str]]) -> tuple[list[dict], list[str]]:
+    sectors, bands = payload
+    out: list[dict] = []
+    for sector in sectors:
+        item = dict(sector)
+        item["vendors"] = set(sector.get("vendors") or [])
+        item["tech_bands"] = set(sector.get("tech_bands") or [])
+        out.append(item)
+    return out, list(bands)
+
+
+def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) -> tuple[list[dict], list[str]]:
+    """
+    Returns (sector_list, sorted_tech_bands).
+    Each sector dict: site_id, site_name, vendors (set), area, sector, tech_bands (set).
+
+    When active_only is True (default), only on-air cells per PER_TABLE_ACTIVE_WHERE are included.
+    When False, every configured cell row is included regardless of activity status.
+    """
     close_conn = False
     if conn is None:
         conn = _meta_conn()
@@ -327,50 +357,70 @@ def _filter_sectors(sectors: list[dict], *, area: str = '', rat: str = '', searc
 
 def build_sector_health_bundle(*, active_only: bool = True) -> tuple[list[str], list[dict]]:
     """Load sectors once: (lte_bands_for_health, lightweight rows for filtering)."""
-    sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
-    lte_bands = _lte_bands_for_health(sorted_tb)
-    rows = [_sector_to_payload(sec, lte_bands) for sec in sector_list]
-    return lte_bands, rows
+    from core.radio.section_runner import cached_build
+
+    def _run():
+        sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
+        lte_bands = _lte_bands_for_health(sorted_tb)
+        rows = [_sector_to_payload(sec, lte_bands) for sec in sector_list]
+        return lte_bands, rows
+
+    def _copy(payload):
+        bands, rows = payload
+        return list(bands), [dict(row) for row in rows]
+
+    return cached_build(f"sector.health_bundle|{int(bool(active_only))}", _run, copy=_copy)
 
 
 def build_sector_coverage_payload(*, active_only: bool = True) -> dict:
     """Full payload (Excel report tooling) — includes all sectors."""
-    sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
-    lte_bands = _lte_bands_from(sorted_tb)
-    sectors_out = [_sector_to_payload(sec, lte_bands, include_full_coverage=True) for sec in sector_list]
+    from core.radio.section_runner import cached_build
 
-    tb_summary = []
-    total = len(sectors_out)
-    lte_bands_health = _lte_bands_for_health(sorted_tb)
-    lte_total = sum(
-        1 for sec in sector_list
-        if any(tb in sec['tech_bands'] for tb in lte_bands_health)
-    )
-    for tb in sorted_tb:
-        sector_count = sum(1 for s in sector_list if tb in s['tech_bands'])
-        site_ids = {s['site_id'] for s in sector_list if tb in s['tech_bands']}
-        entry = {
-            'tech_band': tb,
-            'sector_count': sector_count,
-            'site_count': len(site_ids),
+    def _run():
+        sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
+        lte_bands = _lte_bands_from(sorted_tb)
+        sectors_out = [_sector_to_payload(sec, lte_bands, include_full_coverage=True) for sec in sector_list]
+
+        tb_summary = []
+        total = len(sectors_out)
+        lte_bands_health = _lte_bands_for_health(sorted_tb)
+        lte_total = sum(
+            1 for sec in sector_list
+            if any(tb in sec['tech_bands'] for tb in lte_bands_health)
+        )
+        for tb in sorted_tb:
+            sector_count = sum(1 for s in sector_list if tb in s['tech_bands'])
+            site_ids = {s['site_id'] for s in sector_list if tb in s['tech_bands']}
+            entry = {
+                'tech_band': tb,
+                'sector_count': sector_count,
+                'site_count': len(site_ids),
+            }
+            if tb in lte_bands_health:
+                entry['layer_pct'] = _pct(sector_count, lte_total)
+            tb_summary.append(entry)
+
+        areas = sorted({s['area'] for s in sector_list if s.get('area')})
+
+        return {
+            'generated_at': datetime.now(timezone.utc).isoformat(),
+            'tech_bands': sorted_tb,
+            'lte_tech_bands': lte_bands,
+            'rat_techs': list(RAT_COUNT_TECHS),
+            'sectors': sectors_out,
+            'sector_count': total,
+            'tech_band_summary': tb_summary,
+            'areas': areas,
+            'health_summary': compute_health_summary(sectors_out, lte_bands_health),
         }
-        if tb in lte_bands_health:
-            entry['layer_pct'] = _pct(sector_count, lte_total)
-        tb_summary.append(entry)
 
-    areas = sorted({s['area'] for s in sector_list if s.get('area')})
+    def _copy(payload):
+        out = dict(payload)
+        if isinstance(out.get('sectors'), list):
+            out['sectors'] = [dict(row) for row in out['sectors']]
+        return out
 
-    return {
-        'generated_at': datetime.now(timezone.utc).isoformat(),
-        'tech_bands': sorted_tb,
-        'lte_tech_bands': lte_bands,
-        'rat_techs': list(RAT_COUNT_TECHS),
-        'sectors': sectors_out,
-        'sector_count': total,
-        'tech_band_summary': tb_summary,
-        'areas': areas,
-        'health_summary': compute_health_summary(sectors_out, lte_bands_health),
-    }
+    return cached_build(f"sector.coverage_payload|{int(bool(active_only))}", _run, copy=_copy)
 
 
 def build_sector_health_api_response(

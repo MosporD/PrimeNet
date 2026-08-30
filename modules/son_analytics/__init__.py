@@ -1,1 +1,1 @@
-"""SON Analytics — read-only recommendation engine (development stage)."""
+"""SON Analytics — read-only recommendation engine with offline ML scores."""

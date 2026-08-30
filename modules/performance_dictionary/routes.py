@@ -172,6 +172,33 @@ def nokia_kpi():
         return jsonify({"error": str(exc)}), 500
 
 
+@performance_dictionary_bp.route("/api/performance-dictionary/huawei/catalog", methods=["GET"])
+def huawei_catalog():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        from core.huawei_pm.counter_catalog import list_technologies, filter_counters
+
+        tech = (request.args.get("technology") or request.args.get("tech") or "").strip().upper()
+        if not tech:
+            return jsonify({
+                "success": True,
+                "vendor": "huawei",
+                "technologies": list_technologies(),
+            })
+        payload = filter_counters(
+            tech,
+            q=(request.args.get("q") or "").strip(),
+            subset_id=int(request.args["subset_id"]) if request.args.get("subset_id") else None,
+            limit=min(500, max(1, int(request.args.get("limit", 300)))),
+            offset=max(0, int(request.args.get("offset", 0))),
+        )
+        return jsonify({"success": True, "vendor": "huawei", **payload})
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
+
 @performance_dictionary_bp.route("/api/performance-dictionary/nokia/search", methods=["GET"])
 def nokia_search():
     user = get_current_user()

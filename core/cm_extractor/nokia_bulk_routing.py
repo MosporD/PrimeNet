@@ -7,7 +7,11 @@ from typing import Any
 
 from core.cm_extractor.config import nokia_export_ssh_settings
 
-# MO abbreviations that are typically high-volume (many instances per cell/site).
+# Neighbor / HO-interface MOs: tens to hundreds of instances per cell.
+# Matching is by prefix so SPARE / IRAT variants (LNRELW, LNADJG, …) are included.
+_HIGH_CARDINALITY_MO_PREFIXES = ('LNREL', 'LNADJ', 'LNHOIF')
+
+# Explicit names kept for tests / env overrides that replace the default set.
 _DEFAULT_BULK_MO_ABBREVIATIONS = frozenset({
     'LNHOIF',
     'LNHOIFSPARE',
@@ -22,19 +26,35 @@ _DEFAULT_BULK_MO_ABBREVIATIONS = frozenset({
     'LNRELGSPARE',
     'LNRELWSPARE',
     'LNRELXSPARE',
+    'LNADJ',
+    'LNADJG',
+    'LNADJGNB',
+    'LNADJL',
+    'LNADJN',
+    'LNADJNL',
+    'LNADJT',
+    'LNADJW',
+    'LNADJX',
+    'LNADJSPARE',
+    'LNADJGSPARE',
+    'LNADJGNBSPARE',
+    'LNADJLSPARE',
+    'LNADJWSPARE',
+    'LNADJXSPARE',
 })
 
 
 def bulk_mo_abbreviations() -> frozenset[str]:
-    raw = (os.environ.get('CM_BULK_MO_CLASSES') or '').strip()
-    if not raw:
-        return _DEFAULT_BULK_MO_ABBREVIATIONS
-    return frozenset(
-        token.strip().upper()
-        for part in raw.split(',')
-        for token in [part.strip()]
-        if token
-    )
+    extra = (os.environ.get('CM_BULK_MO_CLASSES') or '').strip()
+    names = set(_DEFAULT_BULK_MO_ABBREVIATIONS)
+    if extra:
+        names.update(
+            token.strip().upper()
+            for part in extra.split(',')
+            for token in [part.strip()]
+            if token
+        )
+    return frozenset(names)
 
 
 def _mo_abbreviation(mo_class_id: str) -> str:
@@ -44,20 +64,30 @@ def _mo_abbreviation(mo_class_id: str) -> str:
     return token.upper()
 
 
-def selection_prefers_bulk(sel: dict[str, Any], *, site_count: int = 1) -> bool:
-    mo_class_id = (sel.get('mo_class_id') or sel.get('id') or '').strip()
+def is_high_cardinality_mo(mo_class_id: str) -> bool:
+    """True for neighbor / HO-interface classes whose instance count dominates query cost."""
     abbr = _mo_abbreviation(mo_class_id)
-    if abbr not in bulk_mo_abbreviations():
-        return False
-    export_mode = (sel.get('export_mode') or '').strip().lower()
-    if export_mode == 'full':
+    return any(abbr == prefix or abbr.startswith(prefix) for prefix in _HIGH_CARDINALITY_MO_PREFIXES)
+
+
+def is_bulk_mo_abbreviation(mo_class_id: str) -> bool:
+    abbr = _mo_abbreviation(mo_class_id)
+    if is_high_cardinality_mo(abbr):
         return True
-    params = [p for p in (sel.get('parameters') or []) if p]
-    if site_count >= 10 and params:
-        return True
-    if len(params) >= 20:
-        return True
-    return len(params) >= 40
+    return abbr in bulk_mo_abbreviations()
+
+
+def selection_prefers_bulk(sel: dict[str, Any], *, site_count: int = 1) -> bool:
+    """
+    Prefer CM Operations Import_Export for high-cardinality neighbor MOs.
+
+    Instance count (not parameter count or site count) dominates runtime. A
+    two-site LNREL/LNADJ Open API dump that falls back to all-PLMN can take
+    minutes; Import_Export is scoped to the selected MRBTS DNs.
+    """
+    del site_count  # cardinality of the MO class matters, not how many sites
+    mo_class_id = (sel.get('mo_class_id') or sel.get('id') or '').strip()
+    return is_bulk_mo_abbreviation(mo_class_id)
 
 
 def should_use_bulk_export(

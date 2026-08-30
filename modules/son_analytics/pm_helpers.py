@@ -443,6 +443,7 @@ def _single_cell_daily_kpi_series(
     kpi_column: str,
     *,
     lookback_days: int = 21,
+    fuzzy: bool = True,
 ) -> list[tuple[str, float]]:
     """Daily KPI points for one cell, newest first."""
     if not pm_db_path or not os.path.isfile(pm_db_path) or not cell_name:
@@ -452,7 +453,7 @@ def _single_cell_daily_kpi_series(
     if not resolved_kpi:
         return []
 
-    cache_key = f"cell|{pm_db_path}|{table_name}|{cell_name}|{resolved_kpi}|{lookback_days}"
+    cache_key = f"cell|{pm_db_path}|{table_name}|{cell_name}|{resolved_kpi}|{lookback_days}|{int(fuzzy)}"
     cached = _cache_get(_SERIES_CACHE, cache_key, pm_db_path)
     if cached is not None:
         return cached
@@ -490,7 +491,7 @@ def _single_cell_daily_kpi_series(
             conn.close()
 
     series = _query(exact=True)
-    if not series:
+    if not series and fuzzy:
         series = _query(exact=False)
     _cache_set(_SERIES_CACHE, cache_key, pm_db_path, series)
     return series
@@ -608,7 +609,9 @@ def collect_degraded_cells(
     degradation_pct: float = 5.0,
     min_absolute_delta: float = 0.5,
 ) -> list[dict]:
-    """Find cells whose latest daily KPI is worse than the prior-week average."""
+    """Cells worse than last week, or currently past the operator `threshold_bad` target."""
+    from core.radio.scoring import bounded_score, breached_threshold, score_vs_preset
+
     degraded: list[dict] = []
     for cat_name, preset in category_presets.items():
         direction = preset["direction"]
@@ -621,7 +624,7 @@ def collect_degraded_cells(
                 db_path, table, col, lookback_days=lookback_days,
             )
             for cell, series in series_map.items():
-                bench = benchmark_cell_vs_week(
+                bench = benchmark_cell_change(
                     series,
                     direction=direction,
                     min_history_days=min_history_days,
@@ -630,6 +633,21 @@ def collect_degraded_cells(
                 )
                 if not bench:
                     continue
+                value = bench.get("today_value")
+                breached = breached_threshold(
+                    value,
+                    direction=direction,
+                    threshold_bad=preset.get("threshold_bad"),
+                )
+                if not bench.get("degraded") and not breached:
+                    continue
+                bench.pop("daily_series", None)
+                target_score = score_vs_preset(value, preset)
+                wow_score = (
+                    min(30.0, abs(float(bench.get("change_pct") or 0)) * 0.4)
+                    if bench.get("degraded")
+                    else 0.0
+                )
                 degraded.append({
                     "cell_name": cell,
                     "vendor": vlabel,
@@ -638,7 +656,10 @@ def collect_degraded_cells(
                     "kpi_column": col,
                     "pm_data_scope": _normalize_scope(scope),
                     "direction": direction,
+                    "threshold_bad": preset.get("threshold_bad"),
+                    "breached": breached,
                     **bench,
+                    "score": bounded_score(target_score, wow_score),
                 })
     return degraded
 
@@ -886,6 +907,7 @@ def _cell_kpi_hourly_series(
     kpi_column: str,
     *,
     max_points: int = 336,
+    fuzzy: bool = True,
 ) -> list[tuple[str, float]]:
     """Hourly KPI points for one cell, oldest first."""
     if not pm_db_path or not os.path.isfile(pm_db_path):
@@ -894,6 +916,25 @@ def _cell_kpi_hourly_series(
     if not resolved_kpi:
         return []
 
+    def _cell_where(cols: list[str], exact: bool) -> tuple[str, list[str]] | tuple[None, None]:
+        names = []
+        for cand in _CELL_COL_CANDIDATES + ["cell_name", "Cell Name", "DN", "dn"]:
+            found = _find_col(cols, [cand])
+            if found and found not in names:
+                names.append(found)
+        if not names:
+            return None, None
+        if exact:
+            clause = " OR ".join(
+                f'LOWER(TRIM(CAST("{c}" AS TEXT))) = LOWER(TRIM(?))' for c in names
+            )
+        else:
+            clause = " OR ".join(
+                f'LOWER(TRIM(CAST("{c}" AS TEXT))) LIKE LOWER(TRIM(?))' for c in names
+            )
+        params = [cell_name if exact else f"%{cell_name}%"] * len(names)
+        return f"({clause})", params
+
     def _query(exact: bool) -> list[tuple[str, float]]:
         out: list[tuple[str, float]] = []
         conn = sqlite3.connect(pm_db_path, timeout=30)
@@ -901,16 +942,10 @@ def _cell_kpi_hourly_series(
         conn.execute("PRAGMA busy_timeout=30000")
         try:
             cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()]
-            cell_col = _find_col(cols, _CELL_COL_CANDIDATES + ["DN", "dn"])
-            ts_col = _find_col(cols, _TS_COL_CANDIDATES + ["Date", "date", "Time", "time"])
-            if not cell_col or not ts_col:
+            ts_col = _find_col(cols, _TS_COL_CANDIDATES + ["Date", "date", "Time", "time", "report_time", "report_date"])
+            where, where_params = _cell_where(cols, exact)
+            if not ts_col or not where:
                 return out
-            if exact:
-                where = f'LOWER(TRIM(CAST("{cell_col}" AS TEXT))) = LOWER(TRIM(?))'
-                param = cell_name
-            else:
-                where = f'LOWER(TRIM(CAST("{cell_col}" AS TEXT))) LIKE LOWER(TRIM(?))'
-                param = f"%{cell_name}%"
             sql = f"""
                 SELECT "{ts_col}" AS ts_raw, "{resolved_kpi}" AS kpi_value
                 FROM "{table_name}"
@@ -919,7 +954,7 @@ def _cell_kpi_hourly_series(
                 ORDER BY "{ts_col}" DESC
                 LIMIT ?
             """
-            for row in conn.execute(sql, (param, max(1, max_points))):
+            for row in conn.execute(sql, tuple(where_params) + (max(1, max_points),)):
                 val = _to_float(row["kpi_value"])
                 ts_raw = str(row["ts_raw"] or "").strip()
                 if val is None or not ts_raw:
@@ -933,6 +968,6 @@ def _cell_kpi_hourly_series(
         return out
 
     pts = _query(exact=True)
-    if not pts:
+    if not pts and fuzzy:
         pts = _query(exact=False)
     return pts

@@ -5,6 +5,7 @@ Nokia CM extraction semantics: MO catalog, parameter metadata, query building, e
 from __future__ import annotations
 
 import json
+import logging
 import time
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ from core.cm_extractor.excel_writer import (
     query_rows_to_ncm_sheet,
     write_nokia_multi_sheet_excel,
 )
+from core.cm_extractor.nokia_bulk_routing import is_high_cardinality_mo
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.cm_extractor.site_catalog import (
     normalize_controller_mo_ids,
@@ -24,6 +26,7 @@ from core.cm_extractor.site_catalog import (
     scope_dn_needles,
 )
 
+_LOGGER = logging.getLogger(__name__)
 _MO_CLASS_CACHE: dict[str, Any] = {'ts': 0.0, 'items': [], 'by_scope': {}, 'version': 0}
 _CACHE_TTL_SEC = 3600
 
@@ -324,6 +327,165 @@ def build_query_variables(plmn: str) -> dict[str, str] | None:
 
 def adaptation_supports_path_scope(adaptation: str, scope_level: str) -> bool:
     return adaptation in _allowed_adaptations_for_scope(scope_level)
+
+
+def scope_path_instance_candidates(
+    site_id: str,
+    scope_level: str,
+    *,
+    site_name: str = '',
+) -> list[str]:
+    """NetAct MRBTS instance() plus the original metadata id (AMLE pattern)."""
+    token = str(site_id or '').strip()
+    if not token:
+        return []
+    resolved = resolve_scope_instance_id(token, scope_level, site_name=site_name)
+    candidates: list[str] = []
+    for candidate in (resolved, token):
+        if candidate and candidate not in candidates:
+            candidates.append(candidate)
+    return candidates
+
+
+def _mo_ids_from_lites(lites: list[Any]) -> list[str]:
+    return [
+        lite['moId']
+        for lite in lites
+        if isinstance(lite, dict) and lite.get('moId')
+    ]
+
+
+def _mo_ids_from_dn_rows(rows: list[list[Any]]) -> list[str]:
+    return [str(row[0]) for row in rows if row and str(row[0]).strip()]
+
+
+def _filter_site_mo_ids(
+    mo_ids: list[str],
+    site_id: str | None,
+    *,
+    scope_level: str,
+    site_name: str = '',
+) -> list[str]:
+    if not site_id or not mo_ids:
+        return mo_ids
+    return filter_mo_ids_for_site(
+        mo_ids,
+        site_id,
+        scope_level=scope_level,
+        site_name=site_name,
+    )
+
+
+def list_site_mo_ids(
+    client: NokiaCmClient,
+    adaptation: str,
+    abbreviation: str,
+    *,
+    site_id: str | None,
+    scope_level: str = 'MRBTS',
+    site_name: str = '',
+    conf_id: int = 1,
+) -> list[str]:
+    """
+    List MO distNames for one site without scanning the whole PLMN.
+
+    queryMOLites on ``MRBTS[instance()=…]`` often returns no rows on this NetAct.
+    The query API with the same scoped path does respect the filter (AMLEPR).
+    High-cardinality classes (LNREL/LNADJ/LNHOIF) never fall back to all-PLMN —
+    that path dumps every neighbor in the network, once per selected site.
+    """
+    level = normalize_scope_level(scope_level)
+    high_cardinality = is_high_cardinality_mo(abbreviation)
+    use_path_scope = bool(site_id) and adaptation_supports_path_scope(adaptation, level)
+    path_ids = (
+        scope_path_instance_candidates(site_id, level, site_name=site_name)
+        if use_path_scope and site_id
+        else [None]
+    )
+
+    for path_id in path_ids:
+        mo_path = build_mo_path(
+            adaptation,
+            abbreviation,
+            scope_level=level,
+            element_id=path_id,
+        )
+        bare = mo_path.split(' as ', 1)[0]
+        mo_ids = _filter_site_mo_ids(
+            _mo_ids_from_lites(client.query_mo_lites(bare, conf_id=conf_id)),
+            site_id,
+            scope_level=level,
+            site_name=site_name,
+        )
+        if mo_ids:
+            return mo_ids
+        try:
+            mo_ids = _filter_site_mo_ids(
+                _mo_ids_from_dn_rows(client.query(mo_path, ['dn()'], conf_id=conf_id)),
+                site_id,
+                scope_level=level,
+                site_name=site_name,
+            )
+        except NokiaCmError as exc:
+            _LOGGER.info(
+                'Scoped dn() listing failed for %s:%s path_id=%s: %s',
+                adaptation,
+                abbreviation,
+                path_id,
+                exc,
+            )
+            mo_ids = []
+        if mo_ids:
+            _LOGGER.info(
+                'Listed %s %s:%s instance(s) via scoped query() path_id=%s',
+                len(mo_ids),
+                adaptation,
+                abbreviation,
+                path_id,
+            )
+            return mo_ids
+
+    if site_id and not high_cardinality:
+        fallback_path = build_mo_path(
+            adaptation,
+            abbreviation,
+            scope_level=level,
+            element_id=None,
+        )
+        bare = fallback_path.split(' as ', 1)[0]
+        _LOGGER.warning(
+            'Falling back to all-PLMN listing for %s:%s site=%s',
+            adaptation,
+            abbreviation,
+            site_id,
+        )
+        mo_ids = _filter_site_mo_ids(
+            _mo_ids_from_lites(client.query_mo_lites(bare, conf_id=conf_id)),
+            site_id,
+            scope_level=level,
+            site_name=site_name,
+        )
+        if mo_ids:
+            return mo_ids
+        try:
+            mo_ids = _filter_site_mo_ids(
+                _mo_ids_from_dn_rows(client.query(fallback_path, ['dn()'], conf_id=conf_id)),
+                site_id,
+                scope_level=level,
+                site_name=site_name,
+            )
+        except NokiaCmError:
+            mo_ids = []
+        return mo_ids
+
+    if site_id and high_cardinality:
+        _LOGGER.warning(
+            'Skipping all-PLMN fallback for high-cardinality %s:%s site=%s',
+            adaptation,
+            abbreviation,
+            site_id,
+        )
+    return []
 
 
 def _is_controller_root_mo(adaptation: str, abbreviation: str) -> bool:
@@ -1026,18 +1188,6 @@ def extract_full_mo_class(
 ) -> dict[str, Any]:
     """Export every MO instance and all parameters for one MO class (optionally one site)."""
     level = normalize_scope_level(scope_level)
-    use_path_scope = site_id and adaptation_supports_path_scope(adaptation, level)
-    path_element_id = None
-    if use_path_scope and site_id:
-        path_element_id = resolve_scope_instance_id(site_id, level, site_name=site_name)
-    mo_path = build_mo_path(
-        adaptation,
-        abbreviation,
-        scope_level=level,
-        element_id=path_element_id,
-    )
-
-    mo_path_bare = mo_path.split(' as ', 1)[0]
 
     if adaptation in _CONTROLLER_DN_FILTER_ADAPTATIONS and level in ('RNC', 'BSC'):
         if site_id:
@@ -1053,6 +1203,12 @@ def extract_full_mo_class(
         mo_class_id = f'{adaptation}:{abbreviation}'
         param_ids = [p['id'] for p in (meta_parameters or []) if p.get('id')]
         queryable, _ = filter_queryable_parameters(param_ids, meta_parameters)
+        mo_path = build_mo_path(
+            adaptation,
+            abbreviation,
+            scope_level=level,
+            element_id=None,
+        )
         return extract_full_mo_via_query(
             client,
             mo_path,
@@ -1064,32 +1220,15 @@ def extract_full_mo_class(
             site_name=site_name,
         )
 
-    lites = client.query_mo_lites(mo_path_bare, conf_id=conf_id)
-    mo_ids = [lite['moId'] for lite in lites if isinstance(lite, dict) and lite.get('moId')]
-    if site_id and use_path_scope and not mo_ids:
-        # Some NetAct builds return no queryMOLites rows for instance-scoped
-        # MRBTS/LNBTS/NRBTS paths. Fall back to all-PLMN and filter by DN.
-        fallback_path = build_mo_path(
-            adaptation,
-            abbreviation,
-            scope_level=level,
-            element_id=None,
-        ).split(' as ', 1)[0]
-        lites = client.query_mo_lites(fallback_path, conf_id=conf_id)
-        mo_ids = [lite['moId'] for lite in lites if isinstance(lite, dict) and lite.get('moId')]
-        mo_ids = filter_mo_ids_for_site(
-            mo_ids,
-            site_id,
-            scope_level=level,
-            site_name=site_name,
-        )
-    elif site_id and not use_path_scope:
-        mo_ids = filter_mo_ids_for_site(
-            mo_ids,
-            site_id,
-            scope_level=level,
-            site_name=site_name,
-        )
+    mo_ids = list_site_mo_ids(
+        client,
+        adaptation,
+        abbreviation,
+        site_id=site_id,
+        scope_level=level,
+        site_name=site_name,
+        conf_id=conf_id,
+    )
     if not mo_ids:
         return {'headers': ['moId'], 'rows': [], 'mo_count': 0}
 
@@ -1330,31 +1469,48 @@ def extract_nokia_selection(
                     scope_level=level,
                     meta_parameters=meta_parameters,
                 )
-                mo_count += int(part.pop('mo_count', len(part.get('rows') or [])))
+                part_rows = len(part.get('rows') or [])
+                if part_rows == 0 and is_high_cardinality_mo(abbreviation):
+                    warnings.append(
+                        f'{abbreviation}: scoped listing returned 0 instances for site {site_id} '
+                        '(all-PLMN fallback skipped). Prefer CM Operations bulk export for neighbor MOs.'
+                    )
+                mo_count += int(part.pop('mo_count', part_rows))
                 sheet_parts.append(part)
             else:
                 use_path_scope = adaptation_supports_path_scope(adaptation, level)
-                path_element_id = None
-                if use_path_scope and site_id:
-                    path_element_id = resolve_scope_instance_id(site_id, level)
-                mo_path = build_mo_path(
-                    adaptation,
-                    abbreviation,
-                    scope_level=level,
-                    element_id=path_element_id,
+                path_ids = (
+                    scope_path_instance_candidates(site_id, level)
+                    if use_path_scope and site_id
+                    else [None]
                 )
-                used_unscoped_fallback = False
-                headers, rows = query_selected_parameters(
-                    client,
-                    mo_path,
-                    queryable,
-                    adaptation=adaptation,
-                    abbreviation=abbreviation,
-                    conf_id=conf_id,
-                    site_id=site_id,
-                    scope_level=level,
-                )
-                if use_path_scope and site_id and not rows:
+                headers: list[str] = []
+                rows: list[list[Any]] = []
+                for path_id in path_ids:
+                    mo_path = build_mo_path(
+                        adaptation,
+                        abbreviation,
+                        scope_level=level,
+                        element_id=path_id,
+                    )
+                    headers, rows = query_selected_parameters(
+                        client,
+                        mo_path,
+                        queryable,
+                        adaptation=adaptation,
+                        abbreviation=abbreviation,
+                        conf_id=conf_id,
+                        site_id=site_id,
+                        scope_level=level,
+                    )
+                    if rows:
+                        break
+                if (
+                    use_path_scope
+                    and site_id
+                    and not rows
+                    and not is_high_cardinality_mo(abbreviation)
+                ):
                     fallback_mo_path = build_mo_path(
                         adaptation,
                         abbreviation,
@@ -1371,8 +1527,13 @@ def extract_nokia_selection(
                         site_id=site_id,
                         scope_level=level,
                     )
-                    used_unscoped_fallback = True
-                if site_id and rows and (not use_path_scope or used_unscoped_fallback):
+                elif use_path_scope and site_id and not rows and is_high_cardinality_mo(abbreviation):
+                    warnings.append(
+                        f'{abbreviation}: scoped Open API returned 0 rows for site {site_id} '
+                        '(all-PLMN fallback skipped — that dump would scan every neighbor in the network). '
+                        'If this site should have data, use CM Operations bulk export (SFTP) or check the NetAct id.'
+                    )
+                if site_id and rows:
                     dn_index = headers.index('DN') if 'DN' in headers else 0
                     filtered = filter_mo_ids_for_site(
                         [str(row[dn_index]) for row in rows],

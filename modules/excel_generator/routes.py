@@ -12,6 +12,7 @@ from functools import wraps
 
 from ncm_core import ExcelToXMLConverter
 from database_enhanced import get_user_by_session, log_activity
+from core.cm_plan_validate import validate_raml_plan
 
 excel_generator_bp = Blueprint(
     'excel_generator', __name__,
@@ -142,10 +143,17 @@ def convert_excel():
         if not success:
             return jsonify({'error': message}), 500
 
+        validation = {"summary": {"errors": 0, "warnings": 0, "diffs": 0}, "findings": []}
+        try:
+            validation = validate_raml_plan(output_path)
+        except Exception as exc:
+            validation = {"success": False, "error": str(exc), "summary": {"errors": 0, "warnings": 0, "diffs": 0}, "findings": []}
+
         TEMP_FILES[f"output_{file_id}"] = {
             'path': output_path,
             'filename': output_filename,
-            'user_id': (user.get('id') if isinstance(user, dict) else user[0])
+            'user_id': (user.get('id') if isinstance(user, dict) else user[0]),
+            'validation': validation,
         }
 
         log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'excel_convert', f'Converted {filename} to XML')
@@ -153,7 +161,8 @@ def convert_excel():
         return jsonify({
             'success': True,
             'output_file': output_filename,
-            'file_id': f"output_{file_id}"
+            'file_id': f"output_{file_id}",
+            'validation': validation,
         })
 
     except Exception as e:

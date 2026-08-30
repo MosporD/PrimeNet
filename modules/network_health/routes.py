@@ -1,4 +1,4 @@
-"""Network Health Scorecard routes (development stage)."""
+"""Network Health Scorecard routes."""
 
 from __future__ import annotations
 
@@ -11,12 +11,12 @@ from modules.son_analytics.area_helpers import list_areas, normalize_area
 
 from . import config as cfg
 from .logic import (
+    get_category_scorecard,
     get_cell_trend_payload,
     get_clusters,
     get_health_payload,
     get_kpi_cells,
     get_precomputed_table,
-    get_worst_cells,
     list_kpi_columns,
     resolve_precompute_kpis,
 )
@@ -76,6 +76,31 @@ def _normalize_rat(value: str) -> str:
     return r if r in _VALID_RATS else cfg.DEFAULT_RAT
 
 
+def _int_arg(name: str, default: int, lo: int, hi: int) -> int:
+    raw = request.args.get(name, default)
+    try:
+        return min(hi, max(lo, int(raw)))
+    except (TypeError, ValueError):
+        return default
+
+
+def _default_kpi(vendor: str, rat: str) -> str:
+    columns = list_kpi_columns(vendor, rat)
+    if not columns:
+        return ""
+    from .precalc_store import get_build_meta
+
+    build = get_build_meta(vendor, rat)
+    precomputed = list(build.get("precomputed_kpis") or []) if build else []
+    for name in precomputed:
+        if name in columns:
+            return name
+    shortlist = resolve_precompute_kpis(columns)
+    if shortlist:
+        return shortlist[0]
+    return columns[0]
+
+
 @network_health_bp.route("/network-health")
 @login_required
 def network_health_select():
@@ -107,6 +132,8 @@ def network_health_view():
         rat_label=rat_cfg.get("label", rat),
         vendors=cfg.VENDOR_OPTIONS,
         rats=cfg.RAT_OPTIONS,
+        show_controller=rat in ("2G", "3G"),
+        controller_label="BSC" if rat == "2G" else "RNC",
     )
 
 
@@ -140,6 +167,8 @@ def network_health_kpis():
             "count": len(columns),
             "precomputed_kpis": precomputed,
             "precompute_max": cfg.PRECOMPUTE_KPI_MAX,
+            "categories": cfg.public_category_presets(),
+            "kpi_categories": {col: cfg.match_category(col) for col in columns if cfg.match_category(col)},
         })
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
@@ -208,16 +237,21 @@ def network_health_cells():
     rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
     kpi = request.args.get("kpi", "").strip()
     if not kpi:
-        return jsonify({"success": False, "error": "kpi is required"}), 400
+        kpi = _default_kpi(vendor, rat)
+    if not kpi:
+        return jsonify({"success": False, "error": "No KPI columns available for this vendor/RAT"}), 400
     area = normalize_area(request.args.get("area"))
     cluster_raw = request.args.get("cluster", "").strip()
-    cluster = int(cluster_raw) if cluster_raw.isdigit() else None
+    try:
+        cluster = int(cluster_raw) if cluster_raw else None
+    except (TypeError, ValueError):
+        cluster = None
     sort_mode = request.args.get("sort", "").strip()
     all_cells = request.args.get("all", "").strip().lower() in ("1", "true", "yes")
     if all_cells:
-        top_n = 500_000
+        top_n = 50_000
     else:
-        top_n = min(500_000, max(10, int(request.args.get("top_n", 50_000))))
+        top_n = _int_arg("top_n", 50_000, 10, 50_000)
     try:
         rows = get_kpi_cells(
             kpi,
@@ -228,14 +262,18 @@ def network_health_cells():
             sort_mode=sort_mode or None,
             top_n=top_n,
         )
+        cat = cfg.match_category(kpi)
+        preset = cfg.CATEGORY_PRESETS.get(cat or "", {})
         return jsonify({
             "success": True,
-            "stage": "development",
             "pm_data_scope": "daily",
             "benchmark": "daily_vs_7day_avg",
             "benchmark_days": cfg.WOW_LOOKBACK_DAYS,
             "kpi": kpi,
             "kpi_label": kpi,
+            "category": cat,
+            "direction": preset.get("direction"),
+            "threshold_bad": preset.get("threshold_bad"),
             "vendor": vendor,
             "rat": rat,
             "area": area or "all",
@@ -256,6 +294,8 @@ def network_health_cell_trend():
     kpi = request.args.get("kpi", "").strip()
     vendor = _normalize_vendor(request.args.get("vendor"))
     rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
+    if not kpi:
+        kpi = _default_kpi(vendor, rat)
     if not cell_name or not kpi:
         return jsonify({"success": False, "error": "cell_name and kpi required"}), 400
     try:
@@ -273,27 +313,20 @@ def network_health_summary():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    vendor = request.args.get("vendor", cfg.DEFAULT_VENDOR)
-    technology = cfg.pm_technology_for_rat(
-        request.args.get("rat") or request.args.get("technology", cfg.DEFAULT_RAT)
-    )
-    area = request.args.get("area", "all")
-    top_n = min(50, max(5, int(request.args.get("top_n", 20))))
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
+    area = normalize_area(request.args.get("area"))
+    cluster_raw = request.args.get("cluster", "").strip()
     try:
-        payload = get_health_payload(
-            vendor=vendor, technology=technology, top_n=top_n, area=area,
+        cluster = int(cluster_raw) if cluster_raw else None
+    except (TypeError, ValueError):
+        cluster = None
+    top_n = _int_arg("top_n", 8, 3, 50)
+    try:
+        payload = get_category_scorecard(
+            vendor, rat, area=area, cluster=cluster, top_n=top_n,
         )
-        return jsonify({
-            "success": True,
-            "stage": "development",
-            "pm_data_scope": payload.get("pm_data_scope"),
-            "benchmark": payload.get("benchmark"),
-            "benchmark_days": payload.get("benchmark_days"),
-            "generated_at": payload.get("generated_at"),
-            "summary": payload.get("summary"),
-            "technology": payload.get("technology"),
-            "area": payload.get("area_filter"),
-        })
+        return jsonify({"success": True, **payload})
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
 
@@ -304,26 +337,30 @@ def network_health_worst():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    vendor = request.args.get("vendor", cfg.DEFAULT_VENDOR)
-    technology = cfg.pm_technology_for_rat(
-        request.args.get("rat") or request.args.get("technology", cfg.DEFAULT_RAT)
-    )
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
     category = request.args.get("category")
-    area = request.args.get("area", "all")
-    top_n = min(50, max(5, int(request.args.get("top_n", 20))))
+    area = normalize_area(request.args.get("area"))
+    top_n = _int_arg("top_n", 20, 5, 50)
     try:
-        payload = get_health_payload(
-            vendor=vendor, technology=technology, top_n=top_n, area=area,
-        )
-        rows = get_worst_cells(payload, category=category, top_n=top_n)
+        payload = get_category_scorecard(vendor, rat, area=area, top_n=top_n)
+        rows = []
+        for entry in payload.get("categories") or []:
+            if category and str(entry.get("category") or "") != category:
+                continue
+            rows.extend(entry.get("cells") or [])
+        rows.sort(key=lambda x: -float(x.get("score") or 0))
         return jsonify({
             "success": True,
-            "stage": "development",
             "pm_data_scope": payload.get("pm_data_scope"),
             "generated_at": payload.get("generated_at"),
             "category": category or "all",
-            "area": payload.get("area_filter"),
-            "cells": rows,
+            "area": payload.get("area"),
+            "threshold_bad": (
+                cfg.CATEGORY_PRESETS.get(category or "", {}).get("threshold_bad")
+                if category else None
+            ),
+            "cells": rows[:top_n],
         })
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
@@ -350,7 +387,7 @@ def network_health_refresh():
             results = build_all(force=force)
             return jsonify({"success": True, "precalc": results})
         area = normalize_area(request.args.get("area"))
-        top_n = min(50, max(5, int(request.args.get("top_n", 20))))
+        top_n = _int_arg("top_n", 20, 5, 50)
         technology = cfg.pm_technology_for_rat(rat)
         payload = get_health_payload(
             vendor=vendor,
@@ -361,7 +398,6 @@ def network_health_refresh():
         )
         return jsonify({
             "success": True,
-            "stage": "development",
             "generated_at": payload.get("generated_at"),
             "summary": payload.get("summary"),
         })
@@ -376,13 +412,15 @@ def network_health_groups():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    vendor = request.args.get("vendor", "all")
-    technology = request.args.get("rat") or request.args.get("technology") or "all"
-    top_n = min(100, max(5, int(request.args.get("top_n", 20))))
+    vendor_raw = str(request.args.get("vendor") or "all").strip().lower()
+    vendor = vendor_raw if vendor_raw in (_VALID_VENDORS | {"all"}) else "all"
+    rat_raw = str(request.args.get("rat") or request.args.get("technology") or "all").strip()
+    technology = rat_raw if rat_raw in (_VALID_RATS | {"all"}) else "all"
+    top_n = _int_arg("top_n", 20, 5, 100)
     try:
         from core.radio.groups import group_health
 
         payload = group_health(vendor=vendor, technology=technology, limit=top_n)
-        return jsonify({"success": True, "stage": "development", **payload})
+        return jsonify({"success": True, **payload})
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500

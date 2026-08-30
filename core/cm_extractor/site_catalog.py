@@ -278,6 +278,43 @@ def resolve_nokia_netact_site_id(
     return token
 
 
+def _site_area_index() -> dict[str, str]:
+    from core.site_area import build_site_area_index
+
+    return build_site_area_index()
+
+
+def canonical_cm_area(
+    site_id: str,
+    fallback: str = '',
+    *,
+    index: dict[str, str] | None = None,
+) -> str:
+    """Canonical CM area label for a site (North Jordan, not North / Zarqa)."""
+    from core.site_area import canonicalize_area, resolve_site_area
+
+    token = str(site_id or '').strip()
+    if token:
+        resolved = resolve_site_area(token, index=index)
+        if resolved:
+            return resolved
+    return canonicalize_area(fallback) or ''
+
+
+def areas_from_site_items(items: list[dict[str, Any]]) -> list[dict[str, str | int]]:
+    """Distinct areas with site counts from a picker list (canonical names)."""
+    counts: dict[str, int] = {}
+    for item in items:
+        area = str(item.get('area') or '').strip()
+        if not area:
+            continue
+        counts[area] = counts.get(area, 0) + 1
+    return [
+        {'area': area, 'site_count': counts[area]}
+        for area in sorted(counts, key=lambda a: (-counts[a], a.lower()))
+    ]
+
+
 def nokia_mrbts_area_for_site(
     netact_site_id: str,
     *,
@@ -285,8 +322,9 @@ def nokia_mrbts_area_for_site(
     clusters: dict[str, str] | None = None,
     cluster_to_area: dict[str, str] | None = None,
     area_map: dict[str, dict[str, str]] | None = None,
+    site_area_index: dict[str, str] | None = None,
 ) -> tuple[str, str, str]:
-    """Return ``(metadata_site_id, area, cluster)`` for a NetAct MRBTS id."""
+    """Return ``(metadata_site_id, canonical area, cluster)`` for a NetAct MRBTS id."""
     metadata_site_id = resolve_nokia_metadata_site_id(
         netact_site_id,
         known_metadata_ids=known_metadata_ids,
@@ -305,15 +343,20 @@ def nokia_mrbts_area_for_site(
             cluster = clusters[lookup_id]
             break
 
-    area = ''
+    raw_area = ''
     for lookup_id in lookup_ids:
         if lookup_id and lookup_id in area_map:
-            area = str(area_map[lookup_id].get('area') or '').strip()
-            if area:
+            raw_area = str(area_map[lookup_id].get('area') or '').strip()
+            if raw_area:
                 break
-    if not area and cluster:
-        area = str(cluster_to_area.get(cluster) or '').strip()
+    if not raw_area and cluster:
+        raw_area = str(cluster_to_area.get(cluster) or '').strip()
 
+    area = canonical_cm_area(
+        metadata_site_id or str(netact_site_id or '').strip(),
+        fallback=raw_area,
+        index=site_area_index,
+    )
     return metadata_site_id, area, cluster
 
 
@@ -591,6 +634,7 @@ def list_nokia_db_sites(
         params.append(limit)
         rows = execute_query(conn, sql, params).fetchall()
         area_map = nokia_area_map(level) if level == 'MRBTS' else {}
+        site_area_index = _site_area_index() if level == 'MRBTS' else {}
         items = []
         for row in rows:
             site_id = str(row['site_id'])
@@ -600,12 +644,19 @@ def list_nokia_db_sites(
             label = f'{site_name} ({site_id})'
             if level == 'RNC' and netact_id != site_id:
                 label = f'{site_name} ({site_id} → NetAct {netact_id})'
+            area = ''
+            if level == 'MRBTS':
+                area = canonical_cm_area(
+                    site_id,
+                    fallback=str(area_info.get('area') or ''),
+                    index=site_area_index,
+                )
             items.append({
                 'site_id': site_id,
                 'metadata_site_id': site_id,
                 'site_name': site_name,
                 'netact_instance_id': netact_id,
-                'area': area_info.get('area', ''),
+                'area': area,
                 'cluster': area_info.get('cluster', ''),
                 'latitude': row['latitude'],
                 'longitude': row['longitude'],
@@ -737,6 +788,7 @@ def list_nokia_inventory_sites(
     clusters = site_cluster_map('nokia', 'MRBTS')
     cluster_to_area = cluster_area_map()
     area_map = nokia_area_map('MRBTS')
+    site_area_index = _site_area_index()
     term = (query or '').strip().lower()
     cap = max(1, min(int(limit), 5000))
 
@@ -753,6 +805,7 @@ def list_nokia_inventory_sites(
             clusters=clusters,
             cluster_to_area=cluster_to_area,
             area_map=area_map,
+            site_area_index=site_area_index,
         )
         if _meta_id:
             metadata_site_id = _meta_id
@@ -794,38 +847,12 @@ def list_nokia_inventory_sites(
 
 
 def list_nokia_inventory_areas(scope_level: str = 'MRBTS') -> list[dict[str, str | int]]:
-    """Area list (with counts) derived from the API-discovered inventory."""
+    """Area list (with counts) from the same Nokia picker population as sites."""
     level = normalize_scope_level(scope_level)
     if level != 'MRBTS':
         return []
-    try:
-        from core.cm_extractor.nokia_discovery import ensure_nokia_inventory_enriched, get_cached_nokia_inventory
-
-        ensure_nokia_inventory_enriched(persist=True)
-        records = get_cached_nokia_inventory(level)
-    except Exception:
-        records = None
-    if not records:
-        return list_nokia_areas(level)
-    known_metadata_ids = _known_nokia_metadata_site_ids()
-    clusters = site_cluster_map('nokia', 'MRBTS')
-    cluster_to_area = cluster_area_map()
-    area_map = nokia_area_map('MRBTS')
-    counts: dict[str, int] = {}
-    for rec in records:
-        _meta_id, area, _cluster = nokia_mrbts_area_for_site(
-            str(rec.get('site_id') or ''),
-            known_metadata_ids=known_metadata_ids,
-            clusters=clusters,
-            cluster_to_area=cluster_to_area,
-            area_map=area_map,
-        )
-        if area:
-            counts[area] = counts.get(area, 0) + 1
-    return [
-        {'area': area, 'site_count': counts[area]}
-        for area in sorted(counts, key=lambda a: (-counts[a], a.lower()))
-    ]
+    items, _source = list_nokia_inventory_sites('', scope_level=level, limit=5000)
+    return areas_from_site_items(items)
 
 
 HUAWEI_SCOPE_LEVELS = ('ENODEB',)
@@ -1218,8 +1245,23 @@ def huawei_area_map(scope_level: str = 'ENODEB') -> dict[str, dict[str, str]]:
 
 
 def list_huawei_areas(scope_level: str = 'ENODEB') -> list[dict[str, str | int]]:
-    """Return distinct areas with site counts for area-level NE selection."""
-    return _areas_from_map(huawei_area_map(scope_level))
+    """Return distinct areas with site counts matching the Huawei picker list."""
+    level = normalize_huawei_scope_level(scope_level)
+    rows = _huawei_picker_rows('', scope_level=level, limit=5000)
+    area_map = huawei_area_map(level)
+    index = _site_area_index()
+    items = []
+    for row in rows:
+        site_id = str(row['site_id'])
+        area_info = area_map.get(site_id) or {}
+        items.append({
+            'area': canonical_cm_area(
+                site_id,
+                fallback=str(area_info.get('area') or ''),
+                index=index,
+            ),
+        })
+    return areas_from_site_items(items)
 
 
 _ALL_CELL_AREA_SOURCES: tuple[tuple[str, str], ...] = (
@@ -1293,28 +1335,23 @@ def site_cluster_map(vendor: str, scope_level: str) -> dict[str, str]:
 
 
 def list_nokia_areas(scope_level: str = 'MRBTS') -> list[dict[str, str | int]]:
-    """Return distinct areas with site counts (MRBTS site-level scope only)."""
-    return _areas_from_map(nokia_area_map(scope_level))
+    """Return distinct areas with site counts (same population as the Nokia picker)."""
+    return list_nokia_inventory_areas(scope_level)
 
 
-def list_huawei_db_sites(
+def _huawei_picker_rows(
     query: str = '',
     *,
     scope_level: str = 'ENODEB',
     limit: int = 2000,
-) -> list[dict[str, str | int | float | None]]:
-    """
-    Return Huawei 4G eNodeB sites for CM MML extraction.
-
-    Only sites with Huawei LTE (FDD/TDD) cell inventory are included.
-    """
+) -> list:
+    """Active Huawei LTE eNodeB rows used by the CM picker (no U2020 lookup)."""
     level = normalize_huawei_scope_level(scope_level)
     conn = connect_metadata()
     try:
         params: list[object] = []
         term = (query or '').strip()
         limit = max(1, min(int(limit), 5000))
-
         where = [
             "LOWER(COALESCE(s.vendor, '')) LIKE '%huawei%'",
             "COALESCE(s.status, 'Active') = 'Active'",
@@ -1324,7 +1361,6 @@ def list_huawei_db_sites(
             where.append('(s.site_id LIKE ? OR s.site_name LIKE ?)')
             like = f'%{term}%'
             params.extend([like, like])
-        # JOIN-based filter (faster than per-row EXISTS + correlated cell count).
         sql = f'''
             WITH huawei_lte_sites AS (
                 SELECT CAST(enb_id_actual AS TEXT) AS site_id
@@ -1356,73 +1392,92 @@ def list_huawei_db_sites(
             ORDER BY s.site_name COLLATE NOCASE
             LIMIT ?
         '''
-
         params.append(limit)
-        rows = execute_query(conn, sql, params).fetchall()
-        area_map = huawei_area_map(level)
-        metadata_by_id, _metadata_alts = lookup_huawei_metadata_ne_candidates(
-            [str(row['site_id']) for row in rows],
-            min_source_score=_HUAWEI_SCOPE_MIN_METADATA_SCORE.get(level, 0),
-        )
-
-        from core.cm_extractor.huawei_discovery import (
-            get_cached_discovery,
-            load_discovery_from_disk,
-            resolve_u2020_ne_name,
-        )
-
-        load_discovery_from_disk()
-        discovery_cache = get_cached_discovery(max_age_sec=10**9) or {}
-        catalog = discovery_cache.get('nes') or []
-        by_site_id = discovery_cache.get('nes_by_site_id') or {}
-
-        items = []
-        for row in rows:
-            site_id = str(row['site_id'])
-            site_name = row['site_name'] or site_id
-            meta_candidates = metadata_by_id.get(site_id) or []
-            hint = meta_candidates[0] if meta_candidates else site_name
-            ne_name = hint
-            area_info = area_map.get(site_id) or {}
-            u2020_ne_name = ''
-            u2020_resolved = None
-            u2020_source = ''
-            try:
-                u2020_ne_name, u2020_source = resolve_u2020_ne_name(
-                    site_id,
-                    hint,
-                    catalog if catalog else None,
-                    by_site_id=by_site_id if catalog else None,
-                    allow_metadata_fallback=True,
-                    metadata_candidates=meta_candidates,
-                )
-                u2020_ne_name = u2020_ne_name or ''
-                u2020_resolved = bool(u2020_ne_name)
-            except Exception:
-                u2020_ne_name = ''
-                u2020_source = ''
-
-            if u2020_ne_name:
-                ne_name = u2020_ne_name
-            label = f'{site_name} ({site_id})'
-            if u2020_ne_name and u2020_ne_name != site_name:
-                label = f'{site_name} ({site_id} → {u2020_ne_name})'
-            items.append({
-                'site_id': site_id,
-                'metadata_site_id': site_id,
-                'site_name': site_name,
-                'ne_name': ne_name,
-                'u2020_ne_name': u2020_ne_name or ne_name,
-                'u2020_resolved': u2020_resolved,
-                'u2020_source': u2020_source or None,
-                'area': area_info.get('area', ''),
-                'cluster': area_info.get('cluster', ''),
-                'latitude': row['latitude'],
-                'longitude': row['longitude'],
-                'cell_count': row['cell_count'] or 0,
-                'scope_level': level,
-                'label': label,
-            })
-        return items
+        return execute_query(conn, sql, params).fetchall()
     finally:
         conn.close()
+
+
+def list_huawei_db_sites(
+    query: str = '',
+    *,
+    scope_level: str = 'ENODEB',
+    limit: int = 2000,
+) -> list[dict[str, str | int | float | None]]:
+    """
+    Return Huawei 4G eNodeB sites for CM MML extraction.
+
+    Only sites with Huawei LTE (FDD/TDD) cell inventory are included.
+    """
+    level = normalize_huawei_scope_level(scope_level)
+    rows = _huawei_picker_rows(query, scope_level=level, limit=limit)
+    area_map = huawei_area_map(level)
+    site_area_index = _site_area_index()
+    metadata_by_id, _metadata_alts = lookup_huawei_metadata_ne_candidates(
+        [str(row['site_id']) for row in rows],
+        min_source_score=_HUAWEI_SCOPE_MIN_METADATA_SCORE.get(level, 0),
+    )
+
+    from core.cm_extractor.huawei_discovery import (
+        get_cached_discovery,
+        load_discovery_from_disk,
+        resolve_u2020_ne_name,
+    )
+
+    load_discovery_from_disk()
+    discovery_cache = get_cached_discovery(max_age_sec=10**9) or {}
+    catalog = discovery_cache.get('nes') or []
+    by_site_id = discovery_cache.get('nes_by_site_id') or {}
+
+    items = []
+    for row in rows:
+        site_id = str(row['site_id'])
+        site_name = row['site_name'] or site_id
+        meta_candidates = metadata_by_id.get(site_id) or []
+        hint = meta_candidates[0] if meta_candidates else site_name
+        ne_name = hint
+        area_info = area_map.get(site_id) or {}
+        u2020_ne_name = ''
+        u2020_resolved = None
+        u2020_source = ''
+        try:
+            u2020_ne_name, u2020_source = resolve_u2020_ne_name(
+                site_id,
+                hint,
+                catalog if catalog else None,
+                by_site_id=by_site_id if catalog else None,
+                allow_metadata_fallback=True,
+                metadata_candidates=meta_candidates,
+            )
+            u2020_ne_name = u2020_ne_name or ''
+            u2020_resolved = bool(u2020_ne_name)
+        except Exception:
+            u2020_ne_name = ''
+            u2020_source = ''
+
+        if u2020_ne_name:
+            ne_name = u2020_ne_name
+        label = f'{site_name} ({site_id})'
+        if u2020_ne_name and u2020_ne_name != site_name:
+            label = f'{site_name} ({site_id} → {u2020_ne_name})'
+        items.append({
+            'site_id': site_id,
+            'metadata_site_id': site_id,
+            'site_name': site_name,
+            'ne_name': ne_name,
+            'u2020_ne_name': u2020_ne_name or ne_name,
+            'u2020_resolved': u2020_resolved,
+            'u2020_source': u2020_source or None,
+            'area': canonical_cm_area(
+                site_id,
+                fallback=str(area_info.get('area') or ''),
+                index=site_area_index,
+            ),
+            'cluster': area_info.get('cluster', ''),
+            'latitude': row['latitude'],
+            'longitude': row['longitude'],
+            'cell_count': row['cell_count'] or 0,
+            'scope_level': level,
+            'label': label,
+        })
+    return items

@@ -46,7 +46,7 @@ function _isPortalPage() {
 }
 
 const CONSTELLATION_CSS_VERSION = '1.9';
-const CONSTELLATION_JS_VERSION = '1.9';
+const CONSTELLATION_JS_VERSION = '2.1';
 
 function _constellationBgExcluded(path) {
     return /^\/(login|register|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);

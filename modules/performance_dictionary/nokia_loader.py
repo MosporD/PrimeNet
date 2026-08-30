@@ -74,6 +74,7 @@ DISPLAY_COLUMNS = {
 }
 
 _cache: dict[str, Any] | None = None
+_index_cache: dict[str, Any] | None = None
 
 
 def _clean(value: Any) -> str:
@@ -619,13 +620,37 @@ def load_nokia_data(force_refresh: bool = False) -> dict[str, Any]:
 
 
 def get_index_payload() -> dict[str, Any]:
+    global _index_cache
+    excel_mtime = _excel_mtime()
+    try:
+        index_mtime = os.path.getmtime(NOKIA_CACHE_INDEX)
+    except OSError:
+        index_mtime = 0.0
+    stale = bool(excel_mtime) and index_mtime < excel_mtime
+
+    if _index_cache is not None and not stale:
+        return _index_cache
+
+    if os.path.isfile(NOKIA_CACHE_INDEX) and not stale:
+        index = _read_json(NOKIA_CACHE_INDEX)
+        payload = {
+            "columns": index.get("columns") or {},
+            "measurement_index": index.get("measurement_index") or [],
+            "kpi_index": index.get("kpi_index") or [],
+            "meta": index.get("meta") or {},
+        }
+        _index_cache = payload
+        return payload
+
     data = load_nokia_data()
-    return {
+    payload = {
         "columns": data.get("columns") or {},
         "measurement_index": data.get("measurement_index") or [],
         "kpi_index": data.get("kpi_index") or [],
         "meta": data.get("meta") or {},
     }
+    _index_cache = payload
+    return payload
 
 
 def _lookup_row(store: dict[str, dict[str, str]], key: str, id_col: str) -> tuple[str, dict[str, str] | None]:

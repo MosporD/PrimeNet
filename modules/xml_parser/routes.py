@@ -6,14 +6,18 @@ Handles XML to Excel conversion functionality
 from flask import Blueprint, request, jsonify, send_file, render_template, redirect, url_for
 from werkzeug.utils import secure_filename
 import os
+import json
+import sqlite3
 import tempfile
 import uuid
 from functools import wraps
 
 # Import core processing logic
 from ncm_core import XMLToExcelConverter
-from database_enhanced import get_user_by_session, log_activity
+from database_enhanced import get_user_by_session, log_activity, get_db
+from db.runtime import execute_query
 from utils.xml_safety import parse_xml_file
+from core.cm_plan_validate import validate_raml_plan
 
 xml_parser_bp = Blueprint(
     'xml_parser', __name__,
@@ -112,12 +116,24 @@ def upload_xml():
 
         parameters = sorted(list(parameters))
 
+        validation = {"summary": {"errors": 0, "warnings": 0, "diffs": 0}, "findings": [], "mo_count": 0}
+        try:
+            validation = validate_raml_plan(temp_path)
+        except Exception as exc:
+            validation = {
+                "success": False,
+                "error": str(exc),
+                "summary": {"errors": 0, "warnings": 0, "diffs": 0},
+                "findings": [],
+            }
+
         # Store file info
         TEMP_FILES[file_id] = {
             'path': temp_path,
             'filename': filename,
             'parameters': parameters,
-            'user_id': (user.get('id') if isinstance(user, dict) else user[0])
+            'user_id': (user.get('id') if isinstance(user, dict) else user[0]),
+            'validation': validation,
         }
 
         log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'xml_upload', f'Uploaded {filename}')
@@ -126,7 +142,8 @@ def upload_xml():
             'success': True,
             'file_id': file_id,
             'filename': filename,
-            'parameters': parameters
+            'parameters': parameters,
+            'validation': validation,
         })
 
     except Exception as e:
@@ -232,3 +249,120 @@ def download_file(filename):
 
     except Exception:
         return jsonify({'error': 'Download failed'}), 500
+
+
+def _uid(user):
+    return user.get('id') if isinstance(user, dict) else user[0]
+
+
+def _ensure_saved_views(conn):
+    if not isinstance(conn, sqlite3.Connection):
+        return
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS saved_views (
+            id TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            module TEXT NOT NULL,
+            name TEXT NOT NULL,
+            state TEXT NOT NULL,
+            is_public INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+
+def _list_xml_profiles(user_id) -> list[dict]:
+    conn = get_db()
+    if isinstance(conn, sqlite3.Connection):
+        conn.row_factory = sqlite3.Row
+    _ensure_saved_views(conn)
+    rows = execute_query(conn, '''
+        SELECT name, state FROM saved_views
+        WHERE user_id = ? AND module = ?
+        ORDER BY updated_at DESC
+    ''', (user_id, 'xml-parser')).fetchall()
+    conn.close()
+    profiles = []
+    for row in rows:
+        try:
+            state = json.loads(row['state'] or '{}')
+        except Exception:
+            state = {}
+        profiles.append({
+            'name': row['name'],
+            'parameters': state.get('parameters') or state.get('selected_params') or [],
+        })
+    return profiles
+
+
+@xml_parser_bp.route('/api/xml-parser/validate', methods=['POST'])
+def validate_xml_plan():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    data = request.get_json(silent=True) or {}
+    file_id = data.get('file_id')
+    if not file_id or file_id not in TEMP_FILES:
+        return jsonify({'error': 'Invalid or expired file'}), 400
+    info = TEMP_FILES[file_id]
+    if info.get('user_id') != _uid(user):
+        return jsonify({'error': 'Unauthorized file access'}), 403
+    try:
+        payload = validate_raml_plan(info['path'])
+        info['validation'] = payload
+        return jsonify({'success': True, **payload})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@xml_parser_bp.route('/api/xml-parser/profiles', methods=['GET'])
+@xml_parser_bp.route('/api/profiles/list', methods=['GET'])
+def list_xml_profiles():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        profiles = _list_xml_profiles(_uid(user))
+        return jsonify({'success': True, 'profiles': profiles})
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
+
+
+@xml_parser_bp.route('/api/xml-parser/profiles', methods=['POST'])
+@xml_parser_bp.route('/api/profiles/save', methods=['POST'])
+def save_xml_profile():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    data = request.get_json(silent=True) or {}
+    name = str(data.get('profile_name') or data.get('name') or '').strip()
+    params = data.get('selected_params') or data.get('parameters') or []
+    if not name:
+        return jsonify({'error': 'profile_name is required'}), 400
+    if not isinstance(params, list):
+        return jsonify({'error': 'selected_params must be a list'}), 400
+    try:
+        state = json.dumps({'parameters': [str(p) for p in params]})
+        conn = get_db()
+        if isinstance(conn, sqlite3.Connection):
+            conn.row_factory = sqlite3.Row
+        _ensure_saved_views(conn)
+        existing = execute_query(conn, '''
+            SELECT id FROM saved_views WHERE user_id = ? AND module = ? AND name = ?
+        ''', (_uid(user), 'xml-parser', name)).fetchone()
+        if existing:
+            execute_query(conn, '''
+                UPDATE saved_views SET state = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+            ''', (state, existing['id']))
+        else:
+            execute_query(conn, '''
+                INSERT INTO saved_views (id, user_id, module, name, state, is_public)
+                VALUES (?, ?, ?, ?, ?, 0)
+            ''', (uuid.uuid4().hex[:10], _uid(user), 'xml-parser', name, state))
+        conn.commit()
+        conn.close()
+        log_activity(_uid(user), 'xml_profile_save', f'Saved XML parser profile {name}')
+        return jsonify({'success': True, 'profile_name': name})
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500

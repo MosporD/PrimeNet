@@ -2,9 +2,31 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Data-to-modules roadmap shipped (Huawei LB, joins, Mobility/Alarm/Group/IRAT, platform). UI unification in `checklist.md` is still backlog.
+**Current track:** Module gap-fix pass. Config dictionaries/XML/CM-audit shipped locally; SON ML pipeline also shipped.
 
-**NEXT:** Browser-verify `/nokia-load-balancing` Apply on a reviewed sector (confirmation-gated live NetAct import), then walk `/huawei-load-balancing` and the new radio modules on a weekday sample.
+**NEXT:** Browser-verify `/xml-parser`, `/excel-generator`, `/parameter-dictionary`, `/performance-dictionary`, `/cm-parameter-audit`. Then `/son-analytics` after `python scripts/pipeline/run_son_ml_job.py --force`.
+
+## 2026-08-19 (SON ML)
+
+- Done: Offline SON ML pipeline — cell-day feature store, PCA+IsolationForest (optional torch AE), weak-label cause mix, neighbor-graph scores, spatial DBSCAN clusters, read-only AMLE/CellMLB treatment scores
+- Done: Isolated nightly job `scripts/pipeline/run_son_ml_job.py` after Network Health precalc (`SON_DISABLE_ML=1` kill switch). Flask never imports torch
+- Done: SON UI — Anomaly/Topology categories, ML store age, thumbs feedback API; WoW clusters remain if ML store empty
+- Modified: `modules/son_analytics/`, `modules/sync/scheduler.py`, `requirements.txt`, `requirements-ml.txt`, load-balancing preview tables
+
+## 2026-08-19
+
+- Done: Network Health scorecard uses operator `threshold_bad` (Retainability 2%, Accessibility 98%, Mobility 95%, Interference −95 dBm, Utilization 80%)
+- Done: Radio detectors (capacity, neighbor quality, mobility, IRAT, overshooting HO SR, group health) score against those targets instead of hardcoded 70/95/96/97 cutoffs
+- Done: NH APIs no longer 400 on missing KPI (defaults to first precomputed); vendor/rat/top_n hardened; "development stage" label removed
+- Done: UI — category scorecard, groups panel, vs-target column, direction-aware delta colors, threshold line on charts, select-page default fix
+- Done: TTL cache for expensive radio scans (inventory, neighbors, PM recipes, sleeping detector, sector health, insight builders). `?refresh=1` busts the cache. TTL default 900s (`NCM_RADIO_SECTION_TTL`).
+- Done: Sector Health / Excel matrix no longer overlay Sleeping Cells (PM). Coverage is metadata.db only (active vs all configured).
+- Done: XML Parser Save/Load Profile endpoints (were 404) + MO/golden-rule validation on upload
+- Done: XML Generator pre-flight validation against dictionary, golden rules, and CM snapshot diff
+- Done: Parameter Dictionary list index cache (cold ~4 ms) + network values vs default in the parameter detail
+- Done: Performance Dictionary index-only list (was 1.76 s); Huawei MAE counter tab; KPI "ref" link from Performance Explorer; data-dependent unit test skips when cache missing
+- Done: CM Parameter Audit golden rules: band/area scope, version, approval/baseline; detector honors the same scope
+- **NEXT:** Browser-verify `/xml-parser`, `/excel-generator`, `/parameter-dictionary`, `/performance-dictionary`, `/cm-parameter-audit`
 
 ## 2026-08-17 (roadmap)
 

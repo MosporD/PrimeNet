@@ -7,6 +7,8 @@ from core.cm_extractor.huawei_client import HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.site_catalog import list_huawei_areas, list_nokia_inventory_areas
 from core.radio.cm_live import query_live_parameter_status
+from core.radio import cm_store
+from core.site_area import list_canonical_areas
 from core.radio.web import format_user, get_current_user, json_error, login_required
 from modules.cm_parameter_audit.version import MODULE_VERSION_LABEL
 from modules.cm_parameter_audit.cache import get_export_payload, store_export_payload
@@ -146,5 +148,52 @@ def cm_parameter_audit_export(export_id: str | None = None):
             download_name=filename,
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+    except Exception as exc:
+        return json_error(exc)
+
+
+@cm_parameter_audit_bp.route("/api/cm-parameter-audit/rules", methods=["GET"])
+@login_required
+def cm_parameter_audit_rules():
+    try:
+        return jsonify({
+            "success": True,
+            "rules": cm_store.list_rules(include_disabled=True),
+            "areas": list_canonical_areas(),
+        })
+    except Exception as exc:
+        return json_error(exc)
+
+
+@cm_parameter_audit_bp.route("/api/cm-parameter-audit/rules", methods=["POST"])
+@login_required
+def cm_parameter_audit_upsert_rule():
+    data = _json_body()
+    user = get_current_user()
+    actor = ""
+    if isinstance(user, dict):
+        actor = str(user.get("username") or user.get("id") or "")
+    if not str(data.get("parameter") or "").strip():
+        return jsonify({"success": False, "error": "parameter is required"}), 400
+    try:
+        rule = cm_store.upsert_rule(data, actor=actor)
+        return jsonify({"success": True, "rule": rule})
+    except Exception as exc:
+        return json_error(exc)
+
+
+@cm_parameter_audit_bp.route("/api/cm-parameter-audit/rules/<rule_id>/approve", methods=["POST"])
+@login_required
+def cm_parameter_audit_approve_rule(rule_id: str):
+    data = _json_body()
+    user = get_current_user()
+    actor = ""
+    if isinstance(user, dict):
+        actor = str(user.get("username") or user.get("id") or "")
+    try:
+        rule = cm_store.approve_rule(rule_id, actor=actor, baseline=str(data.get("baseline") or ""))
+        if not rule:
+            return jsonify({"success": False, "error": "Rule not found"}), 404
+        return jsonify({"success": True, "rule": rule})
     except Exception as exc:
         return json_error(exc)

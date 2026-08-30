@@ -1,4 +1,4 @@
-"""Network Health Scorecard logic (development stage)."""
+"""Network Health Scorecard logic — precomputed KPI tables plus category targets."""
 
 from __future__ import annotations
 
@@ -6,16 +6,18 @@ import re
 import time
 from datetime import datetime, timedelta, timezone
 
+from core.radio.scoring import bounded_score, breached_threshold, score_vs_preset
 from modules.son_analytics.area_helpers import (
+    as_cluster_int,
     cell_in_area,
     cell_in_cluster,
     cell_in_rat,
-    cluster_from_site_id,
     clusters_for_area,
     get_cell_area_map,
     get_cell_location_map,
     get_cell_technology_map,
     normalize_area,
+    resolve_cell_cluster,
 )
 from modules.son_analytics.pm_helpers import (
     PM_DATA_SCOPE,
@@ -81,18 +83,46 @@ def _enrich_benchmark_rows(
         loc = loc_map.get(cell) or {}
         item = dict(row)
         item["area"] = cell_map.get(cell, loc.get("area") or "")
-        item["cluster"] = cluster_from_site_id(loc.get("site_id"))
+        item["cluster"] = resolve_cell_cluster(cell, loc)
         item["site_id"] = loc.get("site_id")
-        item["rnc"] = _infer_rnc(cell, str(loc.get("site_name") or ""))
+        item["rnc"] = str(loc.get("controller") or "").strip() or _infer_rnc(
+            cell, str(loc.get("site_name") or "")
+        )
         item["pm_data_scope"] = PM_DATA_SCOPE
-        item["score"] = round(abs(float(row.get("delta") or 0)), 3)
         item["value"] = row.get("today_value")
         item["benchmark"] = "daily_vs_7day_avg"
         item["pre"] = row.get("week_avg")
         item["post"] = row.get("today_value")
+        cat_name = str(row.get("category") or "")
+        preset = cfg.CATEGORY_PRESETS.get(cat_name) or {}
+        if not preset:
+            matched = cfg.match_category(str(row.get("kpi_column") or row.get("kpi") or ""))
+            preset = cfg.CATEGORY_PRESETS.get(matched or "", {})
+        prior_score = item.get("score")
+        item.update(_threshold_fields(item.get("post"), preset))
+        if prior_score is not None:
+            item["score"] = prior_score
+        elif item.get("score") is None:
+            item["score"] = item.get("target_score") or round(abs(float(row.get("delta") or 0)), 3)
         enriched.append(item)
 
     return enriched
+
+
+def _backfill_row_meta(rows: list[dict]) -> list[dict]:
+    """Fill cluster / RNC-BSC on precalc rows (store currently writes those as NULL)."""
+    if not rows:
+        return rows
+    loc_map = get_cell_location_map()
+    for row in rows:
+        cell = str(row.get("cell_name") or "").strip()
+        loc = loc_map.get(cell) or {}
+        row["cluster"] = as_cluster_int(row.get("cluster")) or resolve_cell_cluster(cell, loc)
+        if not str(row.get("rnc") or "").strip():
+            row["rnc"] = str(loc.get("controller") or "").strip()
+        if not str(row.get("area") or "").strip():
+            row["area"] = str(loc.get("area") or "")
+    return rows
 
 
 def _slim_table_row(row: dict) -> dict:
@@ -105,7 +135,62 @@ def _slim_table_row(row: dict) -> dict:
         "cluster": row.get("cluster"),
         "rnc": row.get("rnc"),
         "vendor": row.get("vendor"),
+        "breached": row.get("breached"),
+        "vs_threshold": row.get("vs_threshold"),
+        "threshold_bad": row.get("threshold_bad"),
+        "direction": row.get("direction"),
+        "score": row.get("score"),
+        "category": row.get("category"),
     }
+
+
+def _threshold_fields(value: object, preset: dict | None) -> dict:
+    if not preset:
+        return {}
+    target_score = score_vs_preset(value, preset)
+    return {
+        "direction": preset.get("direction"),
+        "threshold_bad": preset.get("threshold_bad"),
+        "breached": breached_threshold(
+            value,
+            direction=str(preset.get("direction") or "higher_worse"),
+            threshold_bad=preset.get("threshold_bad"),
+        ),
+        "vs_threshold": _vs_threshold_delta(value, preset),
+        "target_score": target_score,
+        "score": target_score,
+    }
+
+
+def _vs_threshold_delta(value: object, preset: dict) -> float | None:
+    try:
+        val = float(value)
+        thr = float(preset.get("threshold_bad"))
+    except (TypeError, ValueError):
+        return None
+    if str(preset.get("direction") or "").strip().lower() == "lower_worse":
+        return round(val - thr, 3)
+    return round(val - thr, 3)
+
+
+def _annotate_threshold_rows(rows: list[dict], kpi: str) -> list[dict]:
+    cat = cfg.match_category(kpi)
+    preset = cfg.CATEGORY_PRESETS.get(cat or "", {})
+    if not preset:
+        return rows
+    out: list[dict] = []
+    for row in rows:
+        item = dict(row)
+        post = item.get("post") if item.get("post") is not None else item.get("today_value")
+        fields = _threshold_fields(post, preset)
+        fields["category"] = cat
+        wow = 0.0
+        if item.get("degraded"):
+            wow = min(30.0, abs(float(item.get("change_pct") or item.get("delta") or 0)) * 0.4)
+        fields["score"] = bounded_score(fields.get("target_score") or 0, wow)
+        item.update(fields)
+        out.append(item)
+    return out
 
 
 def _match_kpi_name(available: list[str], hint: str) -> str | None:
@@ -287,7 +372,7 @@ def _compute_precomputed_table_runtime(
 
 def list_kpi_columns(vendor: str, rat: str) -> list[str]:
     """KPI column names with PM data for the selected vendor + RAT (daily scope)."""
-    cache_key = f"{vendor}|{rat}|nh_kpi_v2"
+    cache_key = f"{vendor}|{rat}|nh_kpi_v3"
     now = time.time()
     cached = _KPI_CACHE.get("data") or {}
     if (
@@ -319,9 +404,16 @@ def list_kpi_columns(vendor: str, rat: str) -> list[str]:
             merged.append(name)
 
     out = _drop_duplicate_kpis(sorted(merged, key=lambda s: s.lower()))
-    from .kpi_filter import filter_network_health_kpis
+    from .kpi_filter import filter_network_health_kpis, is_metadata_kpi
 
     out = filter_network_health_kpis(out, exclude_percentage=cfg.EXCLUDE_PERCENTAGE_KPIS)
+    if cfg.EXCLUDE_PERCENTAGE_KPIS:
+        restored = [
+            col for col in merged
+            if cfg.match_category(col) and not is_metadata_kpi(col)
+        ]
+        if restored:
+            out = _drop_duplicate_kpis(sorted(set(out) | set(restored), key=lambda s: s.lower()))
     data = dict(cached)
     data[cache_key] = out
     _KPI_CACHE["data"] = data
@@ -401,8 +493,8 @@ def get_kpi_cells(
                 rat,
                 kpi_column,
                 area=area,
-                cluster=cluster,
-                limit=sql_limit,
+                cluster=None,
+                limit=sql_limit if cluster is None else None,
             )
         ]
     elif cfg.PRECOMPUTE_ALLOW_RUNTIME_BUILD:
@@ -426,15 +518,18 @@ def get_kpi_cells(
             )
             rows = _enrich_benchmark_rows(raw.get(kpi_column, []), rat=rat)
 
+    _backfill_row_meta(rows)
     if area:
         rows = [r for r in rows if str(r.get("area") or "") == area]
     if cluster is not None:
-        rows = [r for r in rows if r.get("cluster") == cluster]
+        want = int(cluster)
+        rows = [r for r in rows if as_cluster_int(r.get("cluster")) == want]
+    rows = _annotate_threshold_rows(rows, kpi_column)
     if (sort_mode or "").strip():
         rows = _sort_kpi_cell_rows(rows, sort_mode)
     else:
         rows.sort(key=lambda x: str(x.get("cell_name") or ""))
-    return rows[: max(1, min(5000, top_n))]
+    return rows[: max(1, min(50_000, int(top_n or 200)))]
 
 
 def get_clusters(area: str = "") -> list[int]:
@@ -507,37 +602,68 @@ def get_cell_trend_payload(
     daily_series: list[dict] = []
     hourly_series: list[dict] = []
     resolved_vendor = vendor
+    daily_by_day: dict[str, float] = {}
+    hourly_by_ts: dict[str, float] = {}
 
     for vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, PM_DATA_SCOPE):
         if kpi_column not in _table_columns(db_path, table):
             if not resolve_kpi_column(db_path, table, [kpi_column]):
                 continue
         series = _single_cell_daily_kpi_series(
-            db_path, table, cell_name, kpi_column, lookback_days=21,
+            db_path, table, cell_name, kpi_column, lookback_days=21, fuzzy=False,
         )
-        if series:
-            ordered = list(reversed(series))
-            daily_values = [val for _, val in ordered]
-            linear = _linear_trend(daily_values)
-            daily_series = [
-                {
-                    "day": day,
-                    "value": round(val, 2),
-                    "linear": linear[i] if i < len(linear) else round(val, 2),
-                }
-                for i, (day, val) in enumerate(ordered)
-            ]
-            resolved_vendor = vlabel
-            break
+        if not series:
+            continue
+        resolved_vendor = vlabel
+        for day, val in series:
+            daily_by_day[day] = val
 
-    hourly_pts: list[tuple[str, float]] = []
-    for vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, "hourly"):
-        hourly_pts = _cell_kpi_hourly_series(
-            db_path, table, cell_name, kpi_column, max_points=336,
-        )
-        if hourly_pts:
+    if not daily_by_day:
+        for vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, PM_DATA_SCOPE):
+            series = _single_cell_daily_kpi_series(
+                db_path, table, cell_name, kpi_column, lookback_days=21, fuzzy=True,
+            )
+            if not series:
+                continue
             resolved_vendor = vlabel
-            break
+            for day, val in series:
+                daily_by_day[day] = val
+
+    if daily_by_day:
+        ordered = sorted(daily_by_day.items())[-21:]
+        daily_values = [val for _, val in ordered]
+        linear = _linear_trend(daily_values)
+        daily_series = [
+            {
+                "day": day,
+                "value": round(val, 2),
+                "linear": linear[i] if i < len(linear) else round(val, 2),
+            }
+            for i, (day, val) in enumerate(ordered)
+        ]
+
+    for vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, "hourly"):
+        pts = _cell_kpi_hourly_series(
+            db_path, table, cell_name, kpi_column, max_points=336, fuzzy=False,
+        )
+        if not pts:
+            continue
+        resolved_vendor = vlabel
+        for ts, val in pts:
+            hourly_by_ts[ts] = val
+
+    if not hourly_by_ts:
+        for vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, "hourly"):
+            pts = _cell_kpi_hourly_series(
+                db_path, table, cell_name, kpi_column, max_points=336, fuzzy=True,
+            )
+            if not pts:
+                continue
+            resolved_vendor = vlabel
+            for ts, val in pts:
+                hourly_by_ts[ts] = val
+
+    hourly_pts: list[tuple[str, float]] = sorted(hourly_by_ts.items())
 
     if hourly_pts:
         if not daily_series:
@@ -583,7 +709,68 @@ def get_cell_trend_payload(
     return payload
 
 
-# Legacy summary endpoints (category presets)
+# Category scorecard (operator threshold_bad per KPI family)
+def get_category_scorecard(
+    vendor: str,
+    rat: str,
+    *,
+    area: str = "",
+    cluster: int | None = None,
+    top_n: int = 8,
+) -> dict:
+    """Worst cells vs operator targets, read from the precalc store when available."""
+    columns = list_kpi_columns(vendor, rat)
+    categories: list[dict] = []
+    summary: dict[str, int] = {}
+    by_name: dict[str, list[dict]] = {}
+    for cat_name, preset in cfg.CATEGORY_PRESETS.items():
+        kpi = None
+        for alias in preset.get("aliases") or []:
+            kpi = _match_kpi_name(columns, alias)
+            if kpi:
+                break
+        entry: dict = {
+            "category": cat_name,
+            "tab_label": preset.get("tab_label") or cat_name,
+            "direction": preset["direction"],
+            "threshold_bad": preset.get("threshold_bad"),
+            "kpi": kpi,
+            "count": 0,
+            "cells": [],
+        }
+        if kpi:
+            rows = get_kpi_cells(
+                kpi,
+                vendor=vendor,
+                rat=rat,
+                area=area,
+                cluster=cluster,
+                top_n=50_000,
+            )
+            breached = [r for r in rows if r.get("breached")]
+            breached.sort(key=lambda r: -float(r.get("score") or 0))
+            entry["count"] = len(breached)
+            entry["cells"] = [_slim_table_row(r) for r in breached[: max(1, int(top_n or 8))]]
+            by_name[cat_name] = entry["cells"]
+        else:
+            by_name[cat_name] = []
+        summary[cat_name] = entry["count"]
+        categories.append(entry)
+    return {
+        "generated_at": _utc_now_iso(),
+        "vendor": vendor,
+        "rat": rat,
+        "pm_data_scope": PM_DATA_SCOPE,
+        "benchmark": "vs_operator_threshold",
+        "area": area or "all",
+        "cluster": cluster,
+        "summary": summary,
+        "categories": categories,
+        "category_cells": by_name,
+        "presets": cfg.public_category_presets(),
+    }
+
+
 def _build_category_rankings(
     vendor: str = "all",
     technology: str = "4G",
@@ -613,15 +800,15 @@ def _build_category_rankings(
 
     return {
         "generated_at": _utc_now_iso(),
-        "stage": "development",
         "pm_data_scope": PM_DATA_SCOPE,
-        "benchmark": "daily_vs_7day_avg",
+        "benchmark": "vs_operator_threshold",
         "benchmark_days": cfg.WOW_LOOKBACK_DAYS,
         "technology": technology,
         "vendor_filter": vendor,
         "area_filter": area or "all",
         "summary": summary,
         "categories": results,
+        "presets": cfg.public_category_presets(),
     }
 
 

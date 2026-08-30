@@ -979,6 +979,54 @@ def run_network_health_precalc(force: bool = False):
         _trim_scheduler_memory('network_health_precalc')
 
 
+def run_son_ml_job(force: bool = False):
+    """Build SON ML feature store + scores (daily, after Network Health precalc)."""
+    if os.environ.get('SON_DISABLE_ML', '').strip().lower() in ('1', 'true', 'yes'):
+        logger.info('SON ML job skipped (SON_DISABLE_ML=1)')
+        return
+    if _defer_pipeline_if_low_memory('son_ml'):
+        return
+
+    script = os.path.join(_PROJECT_ROOT, 'scripts', 'pipeline', 'run_son_ml_job.py')
+    if not os.path.isfile(script):
+        _log_sync('son_ml', 'all', 'error', 0, f'missing script: {script}')
+        logger.error('SON ML script not found: %s', script)
+        return
+
+    cmd = [sys.executable, script]
+    if force:
+        cmd.append('--force')
+
+    try:
+        proc = _run_child_script(cmd)
+        if proc.returncode == 0:
+            _log_sync('son_ml', 'all', 'ok', 0, 'SON ML job completed')
+            logger.info('SON ML subprocess completed.')
+        else:
+            details = _subprocess_failure_detail(proc)
+            msg = f'SON ML job failed (code={proc.returncode})'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('son_ml', 'all', 'error', 0, msg)
+            logger.error(msg)
+    except Exception as e:
+        _log_sync('son_ml', 'all', 'error', 0, str(e))
+        logger.exception('SON ML job failed: %s', e)
+    finally:
+        _trim_scheduler_memory('son_ml')
+
+
+def _son_ml_cron_hour_minute() -> tuple[int, int]:
+    from modules.network_health import config as nh_cfg
+
+    hour = _network_health_precalc_cron_hour()
+    minute = int(nh_cfg.PRECALC_CRON_MINUTE) + 30
+    if minute >= 60:
+        hour = (int(hour) + 1) % 24
+        minute -= 60
+    return hour, minute
+
+
 def refresh_nokia_cm_inventory():
     """Discover the Nokia NetAct NE inventory (CM Open API) and cache to disk."""
     try:
@@ -1223,6 +1271,19 @@ def start_scheduler():
             ),
             id='network_health_precalc_daily',
             name='Network Health precalc (daily KPI tables)',
+            replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+        )
+
+    son_ml_disabled = os.environ.get('SON_DISABLE_ML', '').strip().lower() in ('1', 'true', 'yes')
+    if not son_ml_disabled:
+        son_hour, son_minute = _son_ml_cron_hour_minute()
+        _scheduler.add_job(
+            run_son_ml_job,
+            trigger=CronTrigger(hour=son_hour, minute=son_minute),
+            id='son_ml_daily',
+            name='SON ML feature store + scores (daily, after NH precalc)',
             replace_existing=True,
             coalesce=True,
             max_instances=1,

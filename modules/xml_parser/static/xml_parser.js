@@ -47,6 +47,7 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
             // Show filter section
             document.getElementById('filter-section').style.display = 'block';
             loadParameters();
+            renderValidation(data.validation);
 
             showNotification('File uploaded successfully!', 'success');
         } else {
@@ -327,3 +328,43 @@ async function loadFilterProfile() {
         showNotification('Failed to load profiles', 'error');
     }
 }
+
+function renderValidation(payload) {
+    const host = document.getElementById('validation-section');
+    const summaryEl = document.getElementById('validation-summary');
+    const listEl = document.getElementById('validation-list');
+    if (!host || !summaryEl || !listEl) return;
+    if (!payload) {
+        host.style.display = 'none';
+        return;
+    }
+    const summary = payload.summary || {};
+    const findings = Array.isArray(payload.findings) ? payload.findings : [];
+    const errors = summary.errors || 0;
+    const warnings = summary.warnings || 0;
+    const diffs = summary.diffs || 0;
+    host.style.display = 'block';
+    summaryEl.textContent = `${payload.mo_count || 0} MOs · ${errors} errors · ${warnings} warnings · ${diffs} diffs vs network snapshot`;
+    if (!payload.dictionary_available) {
+        summaryEl.textContent += ' · dictionary not loaded';
+    }
+    if (!payload.snapshot_available) {
+        summaryEl.textContent += ' · no CM snapshot for dry-run diff';
+    }
+    if (!findings.length) {
+        listEl.innerHTML = '<p class="validation-ok">No MO / golden-rule issues found.</p>';
+        return;
+    }
+    listEl.innerHTML = findings.slice(0, 80).map((item) => {
+        const cls = item.severity === 'error' ? 'is-error' : (item.severity === 'warning' ? 'is-warning' : 'is-info');
+        return `<div class="validation-item ${cls}"><strong>${escapeXml(item.severity || '')}</strong> ${escapeXml(item.message || '')}</div>`;
+    }).join('');
+}
+
+function escapeXml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+

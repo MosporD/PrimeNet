@@ -5,14 +5,19 @@ from __future__ import annotations
 from modules.reports.sector_coverage_data import build_sector_coverage_payload
 
 from . import cm_store, metadata, neighbor, pm
-from .scoring import bounded_score, filter_rows, issue, summarize, to_float, utc_now_iso
+from .scoring import bounded_score, filter_rows, issue, score_vs_preset, summarize, to_float, utc_now_iso
+from .section_runner import cached_insight
 
 
 def _limit(rows: list[dict], limit: int) -> list[dict]:
     return rows[: max(1, min(1000, int(limit or 200)))]
 
 
+@cached_insight("capacity_hotspots")
 def capacity_hotspots(*, vendor: str = "all", technology: str = "all", area: str = "", limit: int = 200) -> dict:
+    from modules.network_health.config import CATEGORY_PRESETS
+
+    util_preset = CATEGORY_PRESETS["Utilization"]
     util_rows = pm.top_kpi_rows(recipe="utilization", vendor=vendor, rat=technology, top_n=limit, sort_mode="increased")
     cell_meta = metadata.cell_index()
     issues: list[dict] = []
@@ -23,21 +28,32 @@ def capacity_hotspots(*, vendor: str = "all", technology: str = "all", area: str
             continue
         delta = abs(float(row.get("delta") or 0))
         post = to_float(row.get("post"))
-        score = bounded_score(min(45, delta * 2), max(0, (post or 0) - 70) * 1.2)
+        target_score = score_vs_preset(post, util_preset)
+        score = bounded_score(target_score, min(30.0, delta * 1.5))
         if score < 20:
             continue
         issues.append(issue(
             module="Capacity Hotspots",
             category="Capacity",
             title=f"Capacity pressure on {cell}",
-            summary=f"{row.get('kpi')} latest={row.get('post')} vs baseline={row.get('pre')} (delta {row.get('delta')}).",
+            summary=(
+                f"{row.get('kpi')} latest={row.get('post')} vs baseline={row.get('pre')} "
+                f"(delta {row.get('delta')}; operator target {util_preset.get('threshold_bad')}%)."
+            ),
             score=score,
             cells=[cell],
             site_id=str(meta.get("site_id") or row.get("site_id") or ""),
             area=str(meta.get("area") or row.get("area") or ""),
             vendor=str(row.get("vendor") or meta.get("vendor") or ""),
             technology=str(row.get("technology") or meta.get("technology") or ""),
-            evidence={"kpi": row.get("kpi"), "pre": row.get("pre"), "post": row.get("post"), "delta": row.get("delta")},
+            evidence={
+                "kpi": row.get("kpi"),
+                "pre": row.get("pre"),
+                "post": row.get("post"),
+                "delta": row.get("delta"),
+                "threshold_bad": util_preset.get("threshold_bad"),
+                "direction": util_preset.get("direction"),
+            },
             recommendation="Review busy-hour PRB/utilization, traffic growth, users, and sector split or carrier expansion options.",
             source_url="/capacity-hotspots",
         ))
@@ -45,6 +61,7 @@ def capacity_hotspots(*, vendor: str = "all", technology: str = "all", area: str
     return {"generated_at": utc_now_iso(), "summary": summarize(rows), "issues": rows}
 
 
+@cached_insight("layer_coverage_gaps")
 def layer_coverage_gaps(*, area: str = "", search: str = "", limit: int = 500) -> dict:
     payload = build_sector_coverage_payload()
     sectors = payload.get("sectors") or []
@@ -86,7 +103,11 @@ def layer_coverage_gaps(*, area: str = "", search: str = "", limit: int = 500) -
     return {"generated_at": payload.get("generated_at") or utc_now_iso(), "summary": summarize(rows), "issues": rows}
 
 
+@cached_insight("overshooting_candidates")
 def overshooting_candidates(*, vendor: str = "all", technology: str = "all", area: str = "", limit: int = 200) -> dict:
+    from modules.network_health.config import CATEGORY_PRESETS
+
+    mobility_preset = CATEGORY_PRESETS["Mobility"]
     lines = neighbor.load_neighbor_lines(vendor, technology, min_attempts=5, max_lines=max(800, limit * 5))
     cell_meta = metadata.cell_index()
     issues: list[dict] = []
@@ -101,7 +122,12 @@ def overshooting_candidates(*, vendor: str = "all", technology: str = "all", are
         failures = to_float(row.get("ho_failures")) or 0
         attempts = to_float(row.get("ho_attempts")) or 0
         sr = to_float(row.get("ho_success_rate"))
-        score = bounded_score(min(45, (distance - 8) * 4), min(25, failures / max(1, attempts) * 100), max(0, 95 - sr) if sr is not None else 8)
+        sr_pen = score_vs_preset(sr, mobility_preset) * 0.35 if sr is not None else 8.0
+        score = bounded_score(
+            min(45, (distance - 8) * 4),
+            min(25, failures / max(1, attempts) * 100),
+            sr_pen,
+        )
         if score < 30:
             continue
         issues.append(issue(
@@ -115,7 +141,14 @@ def overshooting_candidates(*, vendor: str = "all", technology: str = "all", are
             area=str(meta.get("area") or ""),
             vendor=str(row.get("vendor") or meta.get("vendor") or ""),
             technology=str(row.get("technology") or meta.get("technology") or ""),
-            evidence={"distance_km": distance, "attempts": attempts, "failures": failures, "success_rate": sr, "source_azimuth": row.get("source_azimuth")},
+            evidence={
+                "distance_km": distance,
+                "attempts": attempts,
+                "failures": failures,
+                "success_rate": sr,
+                "source_azimuth": row.get("source_azimuth"),
+                "threshold_bad": mobility_preset.get("threshold_bad"),
+            },
             recommendation="Review antenna tilt/azimuth, power, neighbor design, and TA/MR evidence if available.",
             source_url="/overshooting-detector",
         ))
@@ -123,6 +156,7 @@ def overshooting_candidates(*, vendor: str = "all", technology: str = "all", are
     return {"generated_at": utc_now_iso(), "summary": summarize(rows), "issues": rows, "note": "Heuristic: no TA/MR/RSRP source is required for this first pass."}
 
 
+@cached_insight("neighbor_quality")
 def neighbor_quality(*, vendor: str = "all", technology: str = "all", area: str = "", limit: int = 200) -> dict:
     rows = neighbor.build_quality_issues(vendor, technology, limit=limit)
     rows = filter_rows(rows, area=area)
@@ -135,6 +169,7 @@ def neighbor_quality(*, vendor: str = "all", technology: str = "all", area: str 
     }
 
 
+@cached_insight("cm_parameter_audit")
 def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: int = 500) -> dict:
     rows = cm_store.latest_snapshot_rows(limit=10000)
     rules = cm_store.list_rules()
@@ -145,6 +180,13 @@ def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: i
         if technology and technology.lower() != "all" and technology.lower() not in str(snap.get("technology") or "").lower():
             continue
         param = str(snap.get("parameter") or "").lower()
+        snap_band = cm_store.infer_band(str(snap.get("cell_name") or ""), str(snap.get("technology") or ""))
+        snap_area = ""
+        try:
+            from core.site_area import resolve_cell_area
+            snap_area = resolve_cell_area(snap.get("cell_name"), site_id=snap.get("site_id"))
+        except Exception:
+            snap_area = ""
         for rule in rules:
             if rule.get("vendor") and str(rule.get("vendor")).lower() != str(snap.get("vendor") or "").lower():
                 continue
@@ -154,6 +196,20 @@ def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: i
                 continue
             if str(rule.get("parameter") or "").lower() != param:
                 continue
+            rule_band = str(rule.get("band") or "").strip()
+            if rule_band and rule_band.lower() not in ("all", "") and rule_band.lower() != snap_band.lower():
+                continue
+            rule_area = str(rule.get("area") or "").strip()
+            if rule_area and rule_area.lower() not in ("all", ""):
+                try:
+                    from core.site_area import canonicalize_area
+                    want = (canonicalize_area(rule_area) or rule_area).lower()
+                    have = (canonicalize_area(snap_area) or snap_area or "").lower()
+                except Exception:
+                    want = rule_area.lower()
+                    have = str(snap_area or "").lower()
+                if want != have:
+                    continue
             value = snap.get("value")
             failed = False
             if rule.get("rule_type") == "not_empty":
@@ -176,7 +232,17 @@ def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: i
                 site_id=str(snap.get("site_id") or ""),
                 vendor=str(snap.get("vendor") or ""),
                 technology=str(snap.get("technology") or ""),
-                evidence={"dn": snap.get("dn"), "mo_class": snap.get("mo_class"), "value": value, "rule": rule},
+                evidence={
+                    "dn": snap.get("dn"),
+                    "mo_class": snap.get("mo_class"),
+                    "value": value,
+                    "rule": rule,
+                    "band": snap_band,
+                    "area": snap_area,
+                    "approved_by": rule.get("approved_by"),
+                    "baseline": rule.get("baseline"),
+                    "rule_version": rule.get("version"),
+                },
                 recommendation="Review the parameter against the approved golden configuration before making any change.",
                 source_url="/cm-parameter-audit",
             ))
@@ -184,6 +250,7 @@ def cm_parameter_audit(*, vendor: str = "all", technology: str = "all", limit: i
     return {"generated_at": utc_now_iso(), "store": cm_store.store_stats(), "summary": summarize(rows_out), "issues": rows_out}
 
 
+@cached_insight("change_impact")
 def change_impact(*, vendor: str = "all", technology: str = "all", limit: int = 200) -> dict:
     changes = cm_store.detect_changes(limit=limit * 2)
     techs = ["2G", "3G", "4G", "5G"] if technology in ("", "all", None) else [str(technology).split("-")[0]]

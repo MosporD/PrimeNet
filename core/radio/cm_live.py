@@ -34,6 +34,13 @@ IDENTITY_COLUMNS = {
 }
 
 
+def _area_key(value: str) -> str:
+    from core.site_area import canonicalize_area
+
+    raw = str(value or '').strip()
+    return (canonicalize_area(raw) or raw).strip().lower()
+
+
 def _ne_display_name(ne: dict[str, Any]) -> str:
     return str(
         ne.get('label')
@@ -157,9 +164,10 @@ def _resolve_nes(
         items = [item for item in items if str(item.get('site_id') or '').strip() in wanted]
 
     if area_filter:
+        want = _area_key(area_filter)
         items = [
             item for item in items
-            if str(item.get('area') or '').strip().lower() == area_filter.lower()
+            if _area_key(str(item.get('area') or '')) == want
         ]
 
     total_available = len(items)

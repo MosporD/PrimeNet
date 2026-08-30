@@ -5,13 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet — Network Health</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=4.5">
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=6.4">
 </head>
-<body class="nh-page nh-select-page">
-    <header class="nh-select-header">
-        <a href="/dashboard" class="nh-home-link" title="Dashboard">&#8962;</a>
-        <h1 class="nh-select-title">Network Health</h1>
-        <span class="nh-user nh-select-user">{{ user.username }}</span>
+<body class="nh-page nh-select-page"
+      data-default-vendor="{{ default_vendor }}"
+      data-default-rat="{{ default_rat }}">
+    <header>
+        <div class="header-content">
+            <a href="/dashboard" class="back-link">Dashboard</a>
+            <div class="header-left">
+                <h1>Network Health</h1>
+                <p>Select vendor and radio access technology</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button type="button" class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
     </header>
 
     <main class="nh-select-main">
@@ -51,6 +61,12 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
-    <script src="{{ url_for('network_health.static', filename='network_health_select.js') }}?v=1.1"></script>
+    <script src="{{ url_for('network_health.static', filename='network_health_select.js') }}?v=1.2"></script>
+    <script>
+    async function logout() {
+        try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}
+        window.location.href = '/login';
+    }
+    </script>
 </body>
 </html>

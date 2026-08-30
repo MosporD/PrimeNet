@@ -21,6 +21,21 @@ class NokiaBulkRoutingTests(unittest.TestCase):
         sel = {'mo_class_id': 'NOKLTE:LNCEL', 'export_mode': 'full', 'parameters': []}
         self.assertFalse(selection_prefers_bulk(sel))
 
+    def test_lnadj_prefers_bulk(self) -> None:
+        sel = {'mo_class_id': 'NOKLTE:LNADJ', 'export_mode': 'selected', 'parameters': ['adjEnbId']}
+        self.assertTrue(selection_prefers_bulk(sel, site_count=2))
+        self.assertTrue(selection_prefers_bulk(
+            {'mo_class_id': 'NOKLTE:LNREL', 'export_mode': 'selected', 'parameters': ['targetCellDn']},
+            site_count=2,
+        ))
+
+    def test_lnadj_variant_is_bulk(self) -> None:
+        from core.cm_extractor.nokia_bulk_routing import is_high_cardinality_mo, is_bulk_mo_abbreviation
+
+        self.assertTrue(is_high_cardinality_mo('NOKLTE:LNADJG'))
+        self.assertTrue(is_bulk_mo_abbreviation('LNRELW'))
+        self.assertFalse(is_high_cardinality_mo('NOKLTE:LNCEL'))
+
     def test_should_use_bulk_for_mrbts_lnhoif(self) -> None:
         selections = [{'mo_class_id': 'NOKLTE:LNHOIF', 'export_mode': 'full', 'parameters': []}]
         # SFTP may be configured in dev .env; when not configured this returns False.

@@ -167,6 +167,30 @@
         }
     }
 
+    function applyQueryFilters() {
+        const params = new URLSearchParams(window.location.search);
+        const area = (params.get('area') || '').trim();
+        const vendor = (params.get('vendor') || '').trim();
+        const technology = (params.get('technology') || params.get('rat') || '').trim();
+        const q = (params.get('q') || params.get('search') || '').trim();
+        const areaSel = document.getElementById('radio-area');
+        const vendorSel = document.getElementById('radio-vendor');
+        const techSel = document.getElementById('radio-technology');
+        const searchEl = document.getElementById('radio-search');
+        if (areaSel && area && area.toLowerCase() !== 'all') {
+            if (![...areaSel.options].some((opt) => opt.value === area)) {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area;
+                areaSel.appendChild(option);
+            }
+            areaSel.value = area;
+        }
+        if (vendorSel && vendor) vendorSel.value = vendor;
+        if (techSel && technology) techSel.value = technology;
+        if (searchEl && q) searchEl.value = q;
+    }
+
     async function loadData() {
         const tbody = document.getElementById('radio-rows');
         tbody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
@@ -214,7 +238,10 @@
                 loadData();
             }
         });
-        loadAreas().finally(loadData);
+        loadAreas().finally(() => {
+            applyQueryFilters();
+            loadData();
+        });
     });
 }());
 

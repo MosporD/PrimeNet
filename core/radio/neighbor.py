@@ -13,7 +13,7 @@ from modules.network_map.routes import (
 )
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
-from .scoring import bounded_score, issue
+from .scoring import bounded_score, issue, score_vs_preset
 
 
 TECHNOLOGIES = ["2G-2G", "3G-3G", "4G-4G", "5G-5G"]
@@ -65,6 +65,13 @@ def _load_vendor_lines(vendor: str, technology: str, *, min_attempts: float, max
 
 
 def load_neighbor_lines(vendor: str = "all", technology: str = "all", *, min_attempts: float = 10, max_lines: int = 1200) -> list[dict]:
+    from .section_runner import cached_build
+
+    key = f"neighbor.lines|{vendor}|{technology}|{min_attempts}|{max_lines}"
+    return cached_build(key, lambda: _load_neighbor_lines_uncached(vendor, technology, min_attempts, max_lines))
+
+
+def _load_neighbor_lines_uncached(vendor: str, technology: str, min_attempts: float, max_lines: int) -> list[dict]:
     vendors = ["nokia", "huawei"] if vendor in ("", "all", None) else [vendor.lower()]
     techs = TECHNOLOGIES if technology in ("", "all", None) else [technology]
     out: list[dict] = []
@@ -86,6 +93,10 @@ def load_neighbor_lines(vendor: str = "all", technology: str = "all", *, min_att
 
 
 def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_attempts: float = 10, limit: int = 200) -> list[dict]:
+    from modules.network_health.config import CATEGORY_PRESETS
+
+    mobility_preset = CATEGORY_PRESETS["Mobility"]
+    ho_floor = float(mobility_preset.get("threshold_bad") or 95.0)
     lines = load_neighbor_lines(vendor, technology, min_attempts=min_attempts, max_lines=max(limit * 4, 400))
     pair_set = {
         (str(r.get("source_cell") or "").lower(), str(r.get("target_cell") or "").lower())
@@ -101,7 +112,7 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
             str(row.get("target_cell") or "").lower(),
             str(row.get("source_cell") or "").lower(),
         ) not in pair_set
-        sr_penalty = max(0.0, 95.0 - float(sr)) * 1.4 if sr is not None else 10.0
+        sr_penalty = score_vs_preset(sr, mobility_preset) * 0.45 if sr is not None else 10.0
         failure_penalty = min(35.0, float(failures or 0) / max(1.0, attempts) * 100.0) if failures is not None else 0.0
         distance_penalty = 20.0 if distance is not None and float(distance) >= 12 else 0.0
         recip_penalty = 15.0 if missing_recip else 0.0
@@ -110,8 +121,8 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
         if score < 25:
             continue
         labels = []
-        if sr is not None and float(sr) < 95:
-            labels.append(f"HO SR {float(sr):.1f}%")
+        if sr is not None and float(sr) < ho_floor:
+            labels.append(f"HO SR {float(sr):.1f}% (target {ho_floor:g}%)")
         if failures is not None:
             labels.append(f"{float(failures):.0f} failed HOs")
         if missing_recip:
@@ -139,6 +150,7 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
                 "missing_reciprocal": missing_recip,
                 "target_vendor": row.get("target_vendor"),
                 "ta_mr_available": False,
+                "threshold_bad": ho_floor,
             },
             recommendation="Check neighbor definition, reciprocity, distance, and handover thresholds.",
             source_url="/neighbor-quality",

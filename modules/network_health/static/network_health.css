@@ -29,9 +29,23 @@
     background: var(--pn-bg);
     color: var(--pn-text);
     overflow: hidden;
-    --nh-header-h: 52px;
+    --nh-header-h: 96px;
     --nh-kpi-footer-h: 128px;
     padding-bottom: var(--nh-kpi-footer-h);
+}
+
+body.nh-page > header {
+    flex-shrink: 0;
+}
+
+body.nh-page .header-left .nh-context-switcher {
+    display: flex;
+    justify-content: center;
+}
+
+body.nh-page .header-left .nh-context-menu {
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Legacy overview panel (removed from templates; hide if cached HTML still has it) */
@@ -365,11 +379,11 @@ body.nh-page .nh-kpi-footer {
 
 .nh-workspace {
     display: grid;
-    grid-template-columns: 200px minmax(460px, 880px) minmax(520px, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: 0;
     flex: 1;
     min-height: 0;
-    height: calc(var(--ui-vh, 100vh) - var(--nh-header-h) - var(--nh-kpi-footer-h));
     overflow: hidden;
     background: var(--pn-bg);
 }
@@ -382,6 +396,7 @@ body.nh-page .nh-kpi-footer {
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
+    min-height: 0;
 }
 
 .nh-section-label {
@@ -478,6 +493,8 @@ body.nh-page .nh-kpi-footer {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
+    overflow: hidden;
     background: var(--pn-surface);
     border-right: 1px solid var(--pn-border-soft);
 }
@@ -694,14 +711,156 @@ body.nh-page .nh-kpi-footer {
     word-break: break-word;
 }
 
-.nh-table .delta-up {
+.nh-table .delta-up,
+.nh-table .delta-worse {
     color: var(--pn-danger);
     font-weight: 600;
 }
 
-.nh-table .delta-down {
+.nh-table .delta-down,
+.nh-table .delta-better {
     color: var(--pn-success);
     font-weight: 600;
+}
+
+.nh-table tbody tr.nh-breached td.cell-name {
+    font-weight: 700;
+}
+
+.nh-scorecard {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.4rem;
+    padding: 0.45rem 0.5rem 0.35rem;
+    background: var(--pn-surface-soft);
+    border-bottom: 1px solid var(--pn-border-soft);
+}
+
+.nh-scorecard-empty {
+    grid-column: 1 / -1;
+    font-size: 0.75rem;
+    color: var(--pn-text-muted);
+    padding: 0.25rem 0.15rem;
+}
+
+.nh-score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    border: 1px solid var(--pn-border);
+    background: var(--pn-surface);
+    color: var(--pn-text);
+    border-radius: 8px;
+    padding: 0.38rem 0.45rem 0.4rem;
+    cursor: pointer;
+    text-align: left;
+    min-width: 0;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.nh-score-card:hover {
+    border-color: var(--pn-primary);
+}
+
+.nh-score-card.active {
+    border-color: var(--pn-primary-dark);
+    box-shadow: inset 0 0 0 1px var(--pn-primary);
+}
+
+.nh-score-card.bad {
+    border-color: #f0b4ad;
+}
+
+.nh-score-card.ok {
+    border-color: #b7ddc6;
+}
+
+.nh-score-card.missing {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.nh-score-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pn-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.nh-score-count {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.nh-score-card.bad .nh-score-count {
+    color: var(--pn-danger);
+}
+
+.nh-score-card.ok .nh-score-count {
+    color: var(--pn-success);
+}
+
+.nh-score-target {
+    font-size: 0.62rem;
+    color: var(--pn-text-muted);
+}
+
+.nh-groups-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nh-groups-empty {
+    font-size: 0.72rem;
+    color: var(--pn-text-muted);
+}
+
+.nh-group-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    background: var(--pn-surface);
+    border: 1px solid var(--pn-border-soft);
+    border-radius: 6px;
+    padding: 0.28rem 0.4rem;
+}
+
+.nh-group-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nh-group-val {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--pn-danger);
+    flex-shrink: 0;
+}
+
+.nh-header-right .btn-logout {
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    border-radius: 7px;
+    padding: 0.28rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.nh-header-right .btn-logout:hover {
+    background: rgba(255, 255, 255, 0.32);
 }
 
 .nh-empty {
@@ -713,8 +872,8 @@ body.nh-page .nh-kpi-footer {
 .nh-charts {
     display: flex;
     flex-direction: column;
-    padding: 0.75rem;
-    gap: 0.5rem;
+    padding: 0.55rem 0.75rem 0.8rem;
+    gap: 0.45rem;
     overflow: hidden;
     min-height: 0;
     min-width: 0;
@@ -723,10 +882,10 @@ body.nh-page .nh-kpi-footer {
 }
 
 .nh-chart-head {
-    font-size: 0.95rem;
-    line-height: 1.35;
+    font-size: 0.88rem;
+    line-height: 1.3;
     word-break: break-all;
-    min-height: 2rem;
+    min-height: 1.4rem;
     flex-shrink: 0;
     color: var(--pn-text);
     font-weight: 600;
@@ -738,26 +897,27 @@ body.nh-page .nh-kpi-footer {
     gap: 0.65rem;
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .nh-kpi-chart-card {
     flex: 1 1 0;
+    min-height: 0;
+    height: auto;
     background: var(--pn-surface);
     border: 1px solid var(--pn-border);
     border-radius: 10px;
-    padding: 12px 14px 10px;
+    padding: 10px 12px 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
-    min-height: 0;
 }
 
 .nh-kpi-chart-name {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--pn-text);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     flex-shrink: 0;
 }
 
@@ -769,7 +929,7 @@ body.nh-page .nh-kpi-footer {
     position: relative;
     width: 100%;
     flex: 1 1 auto;
-    min-height: 170px;
+    min-height: 0;
 }
 
 .nh-chart-canvas-wrap canvas {
@@ -787,7 +947,7 @@ body.nh-page .nh-kpi-footer {
     align-items: center;
     justify-content: center;
     flex: 1 1 auto;
-    min-height: 170px;
+    min-height: 0;
     color: var(--pn-muted, #6d95b3);
     font-size: 0.85rem;
     font-style: italic;
@@ -799,6 +959,10 @@ body.nh-page .nh-kpi-footer {
         grid-template-rows: 1fr auto;
     }
 
+    .nh-scorecard {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .nh-charts {
         grid-column: 1 / -1;
         min-height: 0;
@@ -808,13 +972,7 @@ body.nh-page .nh-kpi-footer {
     }
 
     .nh-charts-stack {
-        flex-direction: row;
-    }
-
-    .nh-chart-canvas-wrap,
-    .nh-chart-empty {
-        height: 200px;
-        flex-basis: 200px;
+        flex-direction: column;
     }
 }
 
@@ -834,6 +992,10 @@ body.nh-page .nh-kpi-footer {
         grid-template-columns: 1fr;
         height: auto;
         min-height: calc(var(--ui-vh, 100vh) - var(--nh-header-h) - var(--nh-kpi-footer-h));
+    }
+
+    .nh-scorecard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .nh-charts-stack {
@@ -987,6 +1149,47 @@ body.dark-mode.nh-page {
     --pn-text-muted: #a9b7c9;
     --pn-border: #304258;
     --pn-border-soft: #2a3a4d;
+}
+
+body.dark-mode .nh-sidebar,
+body.dark-mode .nh-center,
+body.dark-mode .nh-charts,
+body.dark-mode .nh-center-toolbar,
+body.dark-mode .nh-scorecard {
+    background: var(--pn-surface-soft);
+}
+
+body.dark-mode .nh-table th {
+    background: var(--pn-surface-soft);
+}
+
+body.dark-mode .nh-table tbody tr:hover {
+    background: #223246;
+}
+
+body.dark-mode .nh-table tbody tr.selected {
+    background: #1f3a55;
+}
+
+body.dark-mode .nh-area-btn,
+body.dark-mode .nh-cluster-btn,
+body.dark-mode .nh-rnc-box,
+body.dark-mode .nh-cell-search,
+body.dark-mode .nh-change-btn,
+body.dark-mode .nh-score-card,
+body.dark-mode .nh-group-row,
+body.dark-mode .nh-vendor-card {
+    background: var(--pn-surface);
+    border-color: var(--pn-border);
+    color: var(--pn-text);
+}
+
+body.dark-mode .nh-score-card.bad {
+    border-color: #8a3d45;
+}
+
+body.dark-mode .nh-score-card.ok {
+    border-color: #2f6a48;
 }
 
 body.dark-mode .nh-rat-card {

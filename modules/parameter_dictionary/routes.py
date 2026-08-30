@@ -11,7 +11,13 @@ from functools import wraps
 from database_enhanced import get_user_by_session, log_activity
 from .knowledge import parse_huawei_toc
 from .ai_service import answer_question
-from .nokia_loader import get_nokia_index_payload, get_nokia_mo_parameters, load_nokia_data, search_nokia_parameters
+from .nokia_loader import (
+    get_nokia_index_payload,
+    get_nokia_mo_parameters,
+    load_nokia_data,
+    lookup_parameter_row,
+    search_nokia_parameters,
+)
 from .mrbts_tree_loader import get_mrbts_tree_payload
 
 parameter_dictionary_bp = Blueprint(
@@ -265,3 +271,43 @@ def ai_ask():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@parameter_dictionary_bp.route('/api/parameter-dictionary/network-values', methods=['GET'])
+def network_values():
+    """Latest CM snapshot values for a dictionary parameter (definition vs live)."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    mo_name = (request.args.get('mo') or '').strip()
+    param = (request.args.get('param') or '').strip()
+    if not param:
+        return jsonify({'error': 'Missing param query parameter'}), 400
+
+    default_value = (request.args.get('default') or '').strip()
+    leaf = mo_name.split('/')[-1].strip() if mo_name else ''
+    if not default_value:
+        row = lookup_parameter_row(mo_name, param) if mo_name else None
+        if row:
+            default_value = str(row.get('Default Value') or '').strip()
+
+    try:
+        from core.radio.cm_store import parameter_network_values
+
+        payload = parameter_network_values(
+            param,
+            mo_class=leaf,
+            vendor=(request.args.get('vendor') or ''),
+            default_value=default_value,
+        )
+        audit_qs = f'vendor=nokia&mo={leaf or mo_name}&param={param}'
+        return jsonify({
+            'success': True,
+            'default_value': default_value,
+            'audit_url': f'/cm-parameter-audit?{audit_qs}',
+            **payload,
+        })
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
+

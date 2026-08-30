@@ -120,17 +120,54 @@ def get_current_user():
 
 def get_operational_site_stats():
     """
-    Distinct site counts per RAT from metadata, counting only cells whose
-    vendor-specific rules mark them as on-air (activity_status = 'Active').
-    4G-FDD and 4G-TDD are reported as separate columns.
+    Distinct on-air site counts per RAT, plus Huawei/Nokia cell counts for
+    vendor-balance dials. 4G-FDD and 4G-TDD are reported as separate columns.
+    """
+    from core.radio.section_runner import cached_build
+
+    return cached_build(
+        "dashboard.operational_sites",
+        _get_operational_site_stats_uncached,
+        ttl=600,
+        copy=lambda payload: ([dict(col) for col in payload[0]], payload[1]),
+    )
+
+
+def _get_operational_site_stats_uncached():
+    """
+    Distinct on-air site counts per RAT, plus Huawei/Nokia cell counts for
+    vendor-balance dials. 4G-FDD and 4G-TDD are reported as separate columns.
     """
     union = perf_per_tech_union_sql_with_activity()
     sql = f'''
-        SELECT technology, vendor, site_id
-        FROM ({union}) v
-        WHERE activity_status = 'Active'
-          AND site_id IS NOT NULL
-          AND TRIM(COALESCE(CAST(site_id AS TEXT), '')) != ''
+        WITH active AS (
+            SELECT technology,
+                   vendor,
+                   CAST(site_id AS TEXT) AS site_id
+            FROM ({union}) v
+            WHERE activity_status = 'Active'
+              AND site_id IS NOT NULL
+              AND TRIM(COALESCE(CAST(site_id AS TEXT), '')) != ''
+        )
+        SELECT 'total' AS kind, '' AS technology, '' AS vendor, COUNT(DISTINCT site_id) AS qty
+        FROM active
+        UNION ALL
+        SELECT 'tech', technology, '', COUNT(DISTINCT site_id)
+        FROM active
+        GROUP BY technology
+        UNION ALL
+        SELECT 'vendor', technology, vendor_norm, COUNT(*)
+        FROM (
+            SELECT technology,
+                   CASE
+                     WHEN LOWER(TRIM(COALESCE(vendor, ''))) = 'huawei' THEN 'Huawei'
+                     WHEN LOWER(TRIM(COALESCE(vendor, ''))) = 'nokia' THEN 'Nokia'
+                     ELSE ''
+                   END AS vendor_norm
+            FROM active
+        ) vendors
+        WHERE vendor_norm != ''
+        GROUP BY technology, vendor_norm
     '''
     try:
         conn = connect_metadata()
@@ -142,20 +179,27 @@ def get_operational_site_stats():
         return cols, 0
 
     buckets = {
-        '2G': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
-        '3G': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
-        '4G-FDD': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
-        '4G-TDD': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
-        '5G': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
+        '2G': {'all': 0, 'vendors': {'Huawei': 0, 'Nokia': 0}},
+        '3G': {'all': 0, 'vendors': {'Huawei': 0, 'Nokia': 0}},
+        '4G-FDD': {'all': 0, 'vendors': {'Huawei': 0, 'Nokia': 0}},
+        '4G-TDD': {'all': 0, 'vendors': {'Huawei': 0, 'Nokia': 0}},
+        '5G': {'all': 0, 'vendors': {'Huawei': 0, 'Nokia': 0}},
     }
+    total_sites = 0
     for row in rows:
+        kind = str(row.get('kind') or '')
         tech = row.get('technology')
-        site_id = row.get('site_id')
-        vendor = str(row.get('vendor') or '').strip().title()
-        if tech in buckets and site_id is not None:
-            buckets[tech]['all'].add(site_id)
-            if vendor in ('Huawei', 'Nokia'):
-                buckets[tech]['vendors'][vendor].add(site_id)
+        vendor = str(row.get('vendor') or '').strip()
+        count = int(row.get('qty') or row.get('site_count') or 0)
+        if kind == 'total':
+            total_sites = count
+            continue
+        if tech not in buckets:
+            continue
+        if kind == 'tech':
+            buckets[tech]['all'] = count
+        elif kind == 'vendor' and vendor in buckets[tech]['vendors']:
+            buckets[tech]['vendors'][vendor] = count
 
     order = [
         ('2G', '2G', 'GSM / EDGE'),
@@ -165,18 +209,15 @@ def get_operational_site_stats():
         ('5G', '5G', 'NR'),
     ]
     columns = []
-    all_sites = set()
     for key, title, subtitle in order:
-        bucket = buckets.get(key, {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}})
-        s = bucket['all']
-        all_sites |= s
-        huawei_count = len(bucket['vendors']['Huawei'])
-        nokia_count = len(bucket['vendors']['Nokia'])
+        bucket = buckets.get(key, {'all': 0, 'vendors': {'Huawei': 0, 'Nokia': 0}})
+        huawei_count = int(bucket['vendors']['Huawei'])
+        nokia_count = int(bucket['vendors']['Nokia'])
         columns.append({
             'key': key,
             'title': title,
             'subtitle': subtitle,
-            'count': len(s),
+            'count': int(bucket['all']),
             'vendor_counts': {
                 'Huawei': huawei_count,
                 'Nokia': nokia_count,
@@ -186,7 +227,7 @@ def get_operational_site_stats():
                 {'label': 'Nokia', 'count': nokia_count},
             ],
         })
-    return columns, len(all_sites)
+    return columns, total_sites
 
 
 def format_user_data(user):
@@ -440,7 +481,7 @@ def dashboard_pm_health():
     try:
         from core.pm_health import get_pm_health_cached
 
-        payload = get_pm_health_cached(force_refresh=force)
+        payload = get_pm_health_cached(force_refresh=force, include_global_distinct=False)
         return jsonify({'success': True, **payload})
     except Exception:
         logger.exception('PM health check failed')
@@ -525,25 +566,14 @@ def dashboard_site_map():
         return jsonify(_site_map_cache['payload'])
 
     try:
-        from core.radio.metadata import list_cells
+        from core.radio.metadata import list_map_sites
 
-        by_site: dict[str, dict] = {}
-        for row in list_cells():
-            sid = str(row.get('site_id') or '').strip()
-            lat = row.get('latitude')
-            lon = row.get('longitude')
-            if not sid or sid in by_site or lat is None or lon is None:
-                continue
-            if not (_JO_LAT_MIN <= lat <= _JO_LAT_MAX and _JO_LON_MIN <= lon <= _JO_LON_MAX):
-                continue
-            by_site[sid] = {
-                'id': sid,
-                'name': str(row.get('site_name') or '').strip(),
-                'area': str(row.get('area') or '').strip(),
-                'lat': round(float(lat), 5),
-                'lon': round(float(lon), 5),
-            }
-        all_sites = list(by_site.values())
+        all_sites = list_map_sites(
+            lat_min=_JO_LAT_MIN,
+            lat_max=_JO_LAT_MAX,
+            lon_min=_JO_LON_MIN,
+            lon_max=_JO_LON_MAX,
+        )
         shown = _thin_site_points(all_sites, _SITE_MAP_MAX_POINTS)
         payload = {
             'success': True,

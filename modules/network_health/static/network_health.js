@@ -22,6 +22,9 @@
         tableLoading: false,
         kpiLoading: null,
         charts: { daily: null, hourly: null },
+        categories: {},
+        kpiCategories: {},
+        scorecard: [],
     };
 
     function esc(s) {
@@ -36,6 +39,28 @@
         const n = Number(v);
         if (Number.isNaN(n)) return esc(v);
         return n.toFixed(2);
+    }
+
+    function currentPreset() {
+        const cat = state.kpiCategories[state.kpi];
+        if (cat && state.categories[cat]) {
+            return Object.assign({ name: cat }, state.categories[cat]);
+        }
+        return null;
+    }
+
+    function isWorseDelta(delta, preset) {
+        const n = Number(delta);
+        if (Number.isNaN(n) || n === 0) return false;
+        if (preset && preset.direction === 'lower_worse') return n < 0;
+        return n > 0;
+    }
+
+    function fmtThreshold(v) {
+        if (v == null || v === '') return '';
+        const n = Number(v);
+        if (Number.isNaN(n)) return String(v);
+        return (Math.abs(n) >= 10 ? n.toFixed(0) : n.toFixed(1));
     }
 
     function showPrecalcStaleBanner() {
@@ -284,10 +309,11 @@
         if (reload !== false) {
             const tbody = document.getElementById('nh-tbody');
             if (!isKpiReady(kpi) && tbody) {
-                tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">Loading KPI…</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">Loading KPI…</td></tr>';
             }
             await ensureKpiLoaded(kpi);
             refreshTable(true);
+            renderScorecard();
             scrollActiveKpiTab();
         }
     }
@@ -323,12 +349,31 @@
         }
     }
 
+    function rowCluster(r) {
+        const n = Number(r && r.cluster);
+        if (Number.isFinite(n)) return n;
+        const m = String((r && r.cell_name) || '').match(/^(\d{3,6})/);
+        if (!m) return null;
+        return Math.floor(parseInt(m[1], 10) / 100);
+    }
+
     function filterTableRows(rows) {
         const q = (state.cellFilter || '').trim().toLowerCase();
+        const preset = currentPreset();
         return (rows || []).filter(function (r) {
             if (state.area && String(r.area || '') !== state.area) return false;
-            if (state.cluster != null && r.cluster !== state.cluster) return false;
+            if (state.cluster != null && rowCluster(r) !== state.cluster) return false;
             if (q && String(r.cell_name || '').toLowerCase().indexOf(q) < 0) return false;
+            if (state.sort === 'breached') {
+                if (r.breached === true) return true;
+                if (r.breached === false) return false;
+                const post = r.post != null ? Number(r.post) : NaN;
+                const thr = preset && preset.threshold_bad;
+                if (preset && !Number.isNaN(post) && thr != null) {
+                    return preset.direction === 'lower_worse' ? post < Number(thr) : post > Number(thr);
+                }
+                return false;
+            }
             return true;
         });
     }
@@ -338,12 +383,12 @@
         const tbody = document.getElementById('nh-tbody');
         if (!state.tableByKpi) {
             if (tbody && !state.tableLoading) {
-                tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">Loading table…</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">Loading table…</td></tr>';
             }
             return;
         }
         if (!state.tableByKpi[state.kpi] && state.kpiLoading === state.kpi) {
-            if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">Loading KPI…</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">Loading KPI…</td></tr>';
             return;
         }
         if (resetSelection) state.selectedCell = null;
@@ -367,7 +412,7 @@
             );
             const data = await res.json();
             if (!data.success) {
-                if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">' + esc(data.error || 'Failed') + '</td></tr>';
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">' + esc(data.error || 'Failed') + '</td></tr>';
                 if (loading) loading.textContent = data.error || 'Failed to load table';
                 return;
             }
@@ -379,7 +424,7 @@
                     hint = 'Precomputed store is empty (no cells matched PM). Rebuild after PM/cell-column fix.';
                 }
                 if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">' + esc(hint) +
+                    tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">' + esc(hint) +
                         ' Run: python scripts/build_network_health_precalc.py --vendor ' +
                         vendor + ' --rat ' + rat + '</td></tr>';
                 }
@@ -398,11 +443,11 @@
                 state.kpi = pre.length ? pre[0] : (state.kpis[0] || '');
             }
             renderKpiTabs({ skipReload: true });
-            if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">Loading KPI…</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">Loading KPI…</td></tr>';
             await ensureKpiLoaded(state.kpi);
             refreshTable(true);
         } catch (e) {
-            if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">Load failed.</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">Load failed.</td></tr>';
             if (loading) loading.textContent = 'Failed to load table';
         } finally {
             state.tableLoading = false;
@@ -436,6 +481,8 @@
                 state.precomputedKpis[k] = true;
             });
             state.totalKpiCount = data.count || state.kpis.length;
+            state.categories = data.categories || {};
+            state.kpiCategories = data.kpi_categories || {};
             if (!state.kpis.length) {
                 if (loading) {
                     loading.textContent = 'No KPIs for ' + vendor + ' / ' + rat;
@@ -468,9 +515,8 @@
             box.textContent = '—';
             return;
         }
-        const rnc = cell.rnc || '';
-        const ven = cell.vendor || '';
-        box.textContent = rnc ? (rnc + (ven ? '-' + ven : '')) : (ven || '—');
+        const rnc = String(cell.rnc || '').trim();
+        box.textContent = rnc || '—';
     }
 
     function prePostValues(row) {
@@ -497,6 +543,10 @@
             const n = Number(row.delta);
             return Number.isNaN(n) ? null : n;
         }
+        if (field === 'vs_threshold' || field === 'score') {
+            const n = Number(row.vs_threshold != null ? row.vs_threshold : row.score);
+            return Number.isNaN(n) ? null : n;
+        }
         return null;
     }
 
@@ -515,6 +565,18 @@
         const list = (rows || []).slice();
         const field = state.columnSort.field || 'delta';
         const asc = state.columnSort.dir === 'asc';
+
+        if (state.sort === 'breached') {
+            list.sort(function (a, b) {
+                const as = Number(a.score != null ? a.score : a.vs_threshold);
+                const bs = Number(b.score != null ? b.score : b.vs_threshold);
+                const av = Number.isNaN(as) ? -1 : as;
+                const bv = Number.isNaN(bs) ? -1 : bs;
+                if (av !== bv) return bv - av;
+                return String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
+            });
+            return list;
+        }
 
         if (state.sort === 'no_change' && field === 'delta') {
             list.sort(function (a, b) {
@@ -554,10 +616,18 @@
         const title = document.getElementById('nh-table-title');
         if (!tbody) return;
 
-        if (title) title.textContent = state.kpi || '—';
+        const preset = currentPreset();
+        if (title) {
+            let label = state.kpi || '—';
+            if (preset) {
+                const gte = preset.direction === 'lower_worse';
+                label += ' · ' + preset.name + ' target ' + (gte ? '≥' : '≤') + fmtThreshold(preset.threshold_bad);
+            }
+            title.textContent = label;
+        }
 
         if (!rows.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="nh-empty">No cells match filters.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="nh-empty">No cells match filters.</td></tr>';
             selectCell(null);
             return;
         }
@@ -570,13 +640,21 @@
 
         tbody.innerHTML = rows.map(function (r) {
             const sel = r.cell_name === state.selectedCell ? ' selected' : '';
-            const deltaCls = Number(r.delta) > 0 ? 'delta-up' : (Number(r.delta) < 0 ? 'delta-down' : '');
+            const worse = isWorseDelta(r.delta, preset);
+            const better = Number(r.delta) !== 0 && !worse && r.delta != null;
+            const deltaCls = worse ? 'delta-worse' : (better ? 'delta-better' : '');
             const noChange = isNoChangeRow(r);
-            return '<tr data-cell="' + cellDataAttr(r.cell_name) + '" class="' + sel.trim() + (noChange ? ' no-change' : '') + '" title="Click to view trend">' +
+            const breached = r.breached === true;
+            const vs = r.vs_threshold != null ? r.vs_threshold : '';
+            return '<tr data-cell="' + cellDataAttr(r.cell_name) + '" class="' +
+                (sel.trim() + (noChange ? ' no-change' : '') + (breached ? ' nh-breached' : '')).trim() +
+                '" title="Click to view trend">' +
                 '<td class="cell-name">' + esc(r.cell_name) + '</td>' +
                 '<td class="num">' + fmtNum(r.pre != null ? r.pre : r.week_avg) + '</td>' +
                 '<td class="num">' + fmtNum(r.post != null ? r.post : r.today_value) + '</td>' +
                 '<td class="num ' + deltaCls + '">' + fmtNum(r.delta) + '</td>' +
+                '<td class="num ' + (breached ? 'delta-worse' : '') + '">' +
+                    (vs === '' ? '—' : fmtNum(vs)) + '</td>' +
                 '</tr>';
         }).join('');
 
@@ -605,7 +683,7 @@
             return s;
         };
         const lines = [
-            ['KPI', 'Cell Name', 'Pre', 'Post', 'Delta', 'Area', 'Cluster', 'RNC', 'Vendor'].map(escCsv).join(','),
+            ['KPI', 'Cell Name', 'Pre', 'Post', 'Delta', 'vs target', 'Breached', 'Area', 'Cluster', 'RNC', 'Vendor'].map(escCsv).join(','),
         ];
         rows.forEach(function (r) {
             const vals = prePostValues(r);
@@ -615,6 +693,8 @@
                 vals.pre != null ? vals.pre : (r.week_avg != null ? r.week_avg : ''),
                 vals.post != null ? vals.post : (r.today_value != null ? r.today_value : ''),
                 r.delta,
+                r.vs_threshold != null ? r.vs_threshold : '',
+                r.breached ? 'yes' : '',
                 r.area || '',
                 r.cluster != null ? r.cluster : '',
                 r.rnc || '',
@@ -671,34 +751,48 @@
         const ctx = canvas.getContext('2d');
         const theme = chartTheme();
         const isHourly = key === 'hourly';
+        const datasets = [
+            {
+                label: prefix + ' · ' + yLabel,
+                data: avgValues,
+                borderColor: '#7fa6c2',
+                backgroundColor: 'rgba(127, 166, 194, 0.12)',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                pointHoverRadius: 3,
+                tension: 0.28,
+                fill: true,
+            },
+            {
+                label: prefix + ' trend',
+                data: linearValues,
+                borderColor: '#6d95b3',
+                backgroundColor: 'transparent',
+                borderWidth: 1.5,
+                borderDash: [5, 4],
+                pointRadius: 0,
+                tension: 0,
+            },
+        ];
+        const preset = currentPreset();
+        if (preset && preset.threshold_bad != null && labels.length) {
+            const thr = Number(preset.threshold_bad);
+            if (!Number.isNaN(thr)) {
+                datasets.push({
+                    label: 'Target ' + fmtThreshold(thr),
+                    data: labels.map(function () { return thr; }),
+                    borderColor: '#e67e22',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1.5,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    tension: 0,
+                });
+            }
+        }
         state.charts[key] = new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: prefix + ' · ' + yLabel,
-                        data: avgValues,
-                        borderColor: '#7fa6c2',
-                        backgroundColor: 'rgba(127, 166, 194, 0.12)',
-                        borderWidth: 2.5,
-                        pointRadius: 0,
-                        pointHoverRadius: 3,
-                        tension: 0.28,
-                        fill: true,
-                    },
-                    {
-                        label: prefix + ' trend',
-                        data: linearValues,
-                        borderColor: '#6d95b3',
-                        backgroundColor: 'transparent',
-                        borderWidth: 1.5,
-                        borderDash: [5, 4],
-                        pointRadius: 0,
-                        tension: 0,
-                    },
-                ],
-            },
+            data: { labels: labels, datasets: datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -711,9 +805,9 @@
                         align: 'start',
                         labels: {
                             color: theme.legend,
-                            boxWidth: 12,
-                            font: { size: 14, weight: '600' },
-                            padding: 10,
+                            boxWidth: 10,
+                            font: { size: 11, weight: '600' },
+                            padding: 6,
                         },
                     },
                     tooltip: {
@@ -733,12 +827,12 @@
                             maxTicksLimit: isHourly ? 8 : 10,
                             maxRotation: 0,
                             autoSkip: true,
-                            font: { size: 13 },
+                            font: { size: 11 },
                         },
                         grid: { color: theme.grid },
                     },
                     y: {
-                        ticks: { color: theme.tick, font: { size: 13 } },
+                        ticks: { color: theme.tick, font: { size: 11 } },
                         grid: { color: theme.grid },
                     },
                 },
@@ -821,7 +915,88 @@
                 destroyChart('hourly');
                 setChartEmpty('nh-chart-hourly', 'nh-chart-hourly-empty', true, 'No hourly data for this cell');
             }
-        } catch (e) { /* ignore */ }
+            requestAnimationFrame(function () {
+                ['daily', 'hourly'].forEach(function (key) {
+                    if (state.charts[key]) state.charts[key].resize();
+                });
+            });
+        }         catch (e) { /* ignore */ }
+    }
+
+    async function loadScorecard() {
+        const wrap = document.getElementById('nh-scorecard');
+        if (!wrap) return;
+        wrap.innerHTML = '<div class="nh-scorecard-empty">Loading categories…</div>';
+        try {
+            const q = new URLSearchParams({ vendor: vendor, rat: rat, top_n: '5' });
+            if (state.area) q.set('area', state.area);
+            if (state.cluster != null) q.set('cluster', String(state.cluster));
+            const res = await fetch('/api/network-health/summary?' + q.toString(), { credentials: 'same-origin' });
+            const data = await res.json();
+            if (!data.success) {
+                wrap.innerHTML = '<div class="nh-scorecard-empty">Scorecard unavailable</div>';
+                return;
+            }
+            if (data.presets) state.categories = Object.assign(state.categories || {}, data.presets);
+            state.scorecard = data.categories || [];
+            (state.scorecard || []).forEach(function (c) {
+                if (c.kpi) state.kpiCategories[c.kpi] = c.category;
+            });
+            renderScorecard();
+        } catch (e) {
+            wrap.innerHTML = '<div class="nh-scorecard-empty">Scorecard failed</div>';
+        }
+    }
+
+    function renderScorecard() {
+        const wrap = document.getElementById('nh-scorecard');
+        if (!wrap) return;
+        const cards = state.scorecard || [];
+        if (!cards.length) return;
+        wrap.innerHTML = cards.map(function (c) {
+            const active = state.kpi && c.kpi && c.kpi === state.kpi ? ' active' : '';
+            const tone = (c.count || 0) > 0 ? ' bad' : ' ok';
+            const missing = c.kpi ? '' : ' missing';
+            const kpiHint = c.kpi ? c.kpi : 'KPI not in this RAT';
+            return '<button type="button" class="nh-score-card' + active + tone + missing +
+                '" data-kpi="' + esc(c.kpi || '') + '" data-category="' + esc(c.category) +
+                '" title="' + esc(kpiHint) + '">' +
+                '<span class="nh-score-name">' + esc(c.tab_label || c.category) + '</span>' +
+                '<span class="nh-score-count">' + (c.count || 0) + '</span>' +
+                '<span class="nh-score-target">target ' + fmtThreshold(c.threshold_bad) + '</span>' +
+                '</button>';
+        }).join('');
+    }
+
+    async function loadGroups() {
+        const box = document.getElementById('nh-groups-list');
+        if (!box) return;
+        box.textContent = 'Loading…';
+        try {
+            const q = new URLSearchParams({ vendor: vendor, rat: rat, top_n: '8' });
+            const res = await fetch('/api/network-health/groups?' + q.toString(), { credentials: 'same-origin' });
+            const data = await res.json();
+            if (!data.success) {
+                box.textContent = '—';
+                return;
+            }
+            const issues = data.issues || [];
+            if (!issues.length) {
+                const util = (state.categories && state.categories.Utilization) || {};
+                box.innerHTML = '<div class="nh-groups-empty">No group pressure vs ' +
+                    fmtThreshold(util.threshold_bad != null ? util.threshold_bad : 80) + '% util</div>';
+                return;
+            }
+            box.innerHTML = issues.map(function (iss) {
+                const name = esc(iss.site_id || iss.title || 'Group');
+                const val = (iss.evidence && iss.evidence.value != null) ? fmtNum(iss.evidence.value) : fmtNum(iss.score);
+                return '<div class="nh-group-row" title="' + esc(iss.summary || '') + '">' +
+                    '<span class="nh-group-name">' + name + '</span>' +
+                    '<span class="nh-group-val">' + val + '</span></div>';
+            }).join('');
+        } catch (e) {
+            box.textContent = '—';
+        }
     }
 
     function bindEvents() {
@@ -907,7 +1082,10 @@
             document.querySelectorAll('.nh-area-btn').forEach(function (b) {
                 b.classList.toggle('active', b === btn);
             });
-            loadClusters().then(function () { refreshTable(true); });
+            loadClusters().then(function () {
+                refreshTable(true);
+                loadScorecard();
+            });
         });
 
         document.getElementById('nh-cluster-grid')?.addEventListener('click', function (ev) {
@@ -919,6 +1097,7 @@
                 b.classList.toggle('active', b === btn);
             });
             refreshTable(true);
+            loadScorecard();
         });
 
         document.querySelectorAll('.nh-change-btn').forEach(function (btn) {
@@ -928,6 +1107,8 @@
                     state.columnSort = { field: 'delta', dir: 'asc' };
                 } else if (state.sort === 'increased') {
                     state.columnSort = { field: 'delta', dir: 'desc' };
+                } else if (state.sort === 'breached') {
+                    state.columnSort = { field: 'vs_threshold', dir: 'desc' };
                 } else {
                     state.columnSort = { field: 'delta', dir: 'desc' };
                 }
@@ -937,6 +1118,23 @@
                 updateSortHeaderUi();
                 refreshTable(false);
             });
+        });
+
+        document.getElementById('nh-scorecard')?.addEventListener('click', function (ev) {
+            const card = ev.target.closest('.nh-score-card');
+            if (!card || !card.dataset.kpi) return;
+            setKpi(card.dataset.kpi);
+            state.sort = 'breached';
+            state.columnSort = { field: 'vs_threshold', dir: 'desc' };
+            document.querySelectorAll('.nh-change-btn').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.change === 'breached');
+            });
+            updateSortHeaderUi();
+            refreshTable(true);
+        });
+
+        document.addEventListener('primenet:theme-change', function () {
+            if (state.selectedCell) loadCellTrend(state.selectedCell);
         });
 
         document.getElementById('nh-tbody')?.addEventListener('click', function (ev) {
@@ -954,7 +1152,11 @@
         bindEvents();
         updateSortHeaderUi();
         loadAreas().then(function () {
-            loadClusters().then(loadKpis);
+            loadClusters().then(function () {
+                loadKpis();
+                loadScorecard();
+                loadGroups();
+            });
         });
     });
 })();

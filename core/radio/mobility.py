@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from . import metadata, neighbor
-from .scoring import bounded_score, filter_rows, issue, summarize, to_float, utc_now_iso
+from .scoring import bounded_score, filter_rows, issue, score_vs_preset, summarize, to_float, utc_now_iso
+from .section_runner import cached_insight
 
 
 def _rat_family(text: str) -> str:
@@ -19,8 +20,12 @@ def _rat_family(text: str) -> str:
     return t.strip() or ""
 
 
+@cached_insight("mobility_explorer")
 def mobility_explorer(*, vendor: str = "all", technology: str = "all", area: str = "", limit: int = 250) -> dict:
     """Relation performance workbook — not a map and not a scored issue-only list."""
+    from modules.network_health.config import CATEGORY_PRESETS
+
+    mobility_preset = CATEGORY_PRESETS["Mobility"]
     lines = neighbor.load_neighbor_lines(vendor, technology, min_attempts=5, max_lines=max(limit * 6, 800))
     cell_meta = metadata.cell_index()
     pair_set = {
@@ -39,7 +44,7 @@ def mobility_explorer(*, vendor: str = "all", technology: str = "all", area: str
         failures = to_float(row.get("ho_failures"))
         distance = to_float(row.get("distance_km"))
         missing_recip = (tgt.lower(), src.lower()) not in pair_set
-        sr_pen = max(0.0, 97.0 - sr) * 1.2 if sr is not None else 6.0
+        sr_pen = score_vs_preset(sr, mobility_preset) * 0.40 if sr is not None else 6.0
         fail_pen = min(30.0, (failures or 0) / max(1.0, attempts) * 100) if failures is not None else 0.0
         recip_pen = 18.0 if missing_recip else 0.0
         score = bounded_score(sr_pen, fail_pen, recip_pen, min(15.0, attempts / 200.0))
@@ -72,6 +77,7 @@ def mobility_explorer(*, vendor: str = "all", technology: str = "all", area: str
                 "one_way": missing_recip,
                 "target_vendor": row.get("target_vendor"),
                 "ta_mr_available": False,
+                "threshold_bad": mobility_preset.get("threshold_bad"),
             },
             recommendation="Review neighbor definition, HO thresholds, and whether the reverse relation exists.",
             source_url="/mobility-explorer",
@@ -87,7 +93,11 @@ def mobility_explorer(*, vendor: str = "all", technology: str = "all", area: str
     }
 
 
+@cached_insight("irat_border")
 def irat_border(*, vendor: str = "all", technology: str = "all", area: str = "", limit: int = 200) -> dict:
+    from modules.network_health.config import CATEGORY_PRESETS
+
+    mobility_preset = CATEGORY_PRESETS["Mobility"]
     lines = neighbor.load_neighbor_lines("all", "all" if technology in ("", "all", None) else technology, min_attempts=3, max_lines=max(limit * 8, 1200))
     cell_meta = metadata.cell_index()
     issues: list[dict] = []
@@ -113,7 +123,7 @@ def irat_border(*, vendor: str = "all", technology: str = "all", area: str = "",
         score = bounded_score(
             25 if vendor_border else 0,
             20 if rat_border else 0,
-            max(0.0, 96.0 - sr) if sr is not None else 8.0,
+            score_vs_preset(sr, mobility_preset) * 0.30 if sr is not None else 8.0,
             min(20.0, attempts / 150.0),
         )
         kind = []
@@ -141,6 +151,7 @@ def irat_border(*, vendor: str = "all", technology: str = "all", area: str = "",
                 "success_rate": sr,
                 "distance_km": row.get("distance_km"),
                 "source_azimuth": row.get("source_azimuth"),
+                "threshold_bad": mobility_preset.get("threshold_bad"),
             },
             recommendation="Check IRAT/vendor-border neighbor plan, HO allowed lists, and overlapping coverage on the Zain overlay.",
             source_url="/irat-border",

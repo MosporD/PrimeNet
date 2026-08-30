@@ -42,21 +42,38 @@
         };
     }
 
-    /** Map viewport pointer coords to canvas scene space under CSS zoom. */
+    /** Layout CSS box (pre-zoom). getBoundingClientRect() is visual under body { zoom }. */
+    function cssBoxSize(el) {
+        if (!el) return { w: 1, h: 1 };
+        return {
+            w: Math.max(1, el.offsetWidth || 0),
+            h: Math.max(1, el.offsetHeight || 0),
+        };
+    }
+
+    /**
+     * Map viewport pointer coords to the canvas 2D scene (the cssW/cssH
+     * space fitCanvas draws in). Visual fraction × scene size stays correct
+     * under CSS zoom, unlike offsetWidth vs getBoundingClientRect mixing.
+     */
     function clientToSceneXY(e, canvas) {
-        var z = uiZoom();
         if (canvas) {
             var rect = canvas.getBoundingClientRect();
             if (rect.width > 0 && rect.height > 0) {
-                var scaleX = canvas.offsetWidth / rect.width;
-                var scaleY = canvas.offsetHeight / rect.height;
-                if (Math.abs(scaleX - 1) < 0.015 && Math.abs(z - 1) > 0.015) {
-                    scaleX = 1 / z;
-                    scaleY = 1 / z;
+                var sceneW = canvas._pnSceneW;
+                var sceneH = canvas._pnSceneH;
+                if (!(sceneW > 0 && sceneH > 0)) {
+                    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    sceneW = canvas.width / dpr;
+                    sceneH = canvas.height / dpr;
+                }
+                if (!(sceneW > 0 && sceneH > 0)) {
+                    sceneW = canvas.offsetWidth || 1;
+                    sceneH = canvas.offsetHeight || 1;
                 }
                 return {
-                    x: (e.clientX - rect.left) * scaleX,
-                    y: (e.clientY - rect.top) * scaleY,
+                    x: (e.clientX - rect.left) / rect.width * sceneW,
+                    y: (e.clientY - rect.top) / rect.height * sceneH,
                 };
             }
         }
@@ -97,6 +114,8 @@
 
     function fitCanvas(canvas, cssW, cssH) {
         var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas._pnSceneW = cssW;
+        canvas._pnSceneH = cssH;
         canvas.width = Math.max(1, Math.round(cssW * dpr));
         canvas.height = Math.max(1, Math.round(cssH * dpr));
         var ctx = canvas.getContext('2d');
@@ -841,9 +860,9 @@
         }
 
         function resize() {
-            var rect = wrap.getBoundingClientRect();
-            vw = Math.max(200, rect.width);
-            vh = Math.max(200, rect.height);
+            var box = cssBoxSize(wrap);
+            vw = Math.max(200, box.w);
+            vh = Math.max(200, box.h);
             ctx = fitCanvas(canvas, vw, vh);
             cx = vw / 2;
             cy = vh / 2;
@@ -971,8 +990,8 @@
                 '<div class="radar-tip-title"><span class="radar-tip-dot" style="background:' + o.color + '"></span>' +
                 o.title + (o.subtitle ? ' <small>' + o.subtitle + '</small>' : '') + '</div>' +
                 '<div class="radar-tip-row"><span>On-air sites</span><strong>' + o.count.toLocaleString() + '</strong></div>' +
-                '<div class="radar-tip-row"><span>Huawei</span><strong>' + o.huawei.toLocaleString() + '</strong></div>' +
-                '<div class="radar-tip-row"><span>Nokia</span><strong>' + o.nokia.toLocaleString() + '</strong></div>';
+                '<div class="radar-tip-row"><span>Huawei cells</span><strong>' + o.huawei.toLocaleString() + '</strong></div>' +
+                '<div class="radar-tip-row"><span>Nokia cells</span><strong>' + o.nokia.toLocaleString() + '</strong></div>';
             tooltipEl.hidden = false;
             var pad = 14;
             var x = hoverBlip.blip.x + pad;
@@ -1086,9 +1105,9 @@
         }
 
         function resize() {
-            var rect = wrap.getBoundingClientRect();
-            vw = Math.max(200, rect.width);
-            vh = Math.max(200, rect.height);
+            var box = cssBoxSize(wrap);
+            vw = Math.max(200, box.w);
+            vh = Math.max(200, box.h);
             ctx = fitCanvas(canvas, vw, vh);
             fitProjection();
             placeSites();

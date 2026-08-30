@@ -13,6 +13,7 @@ NOKIA_PARAMS_DIR = os.path.join(_DIR, "Nokia Parameters")
 NOKIA_EXCEL_PATH = os.path.join(NOKIA_PARAMS_DIR, "Nokia Parameter Description.xlsx")
 RNC_BSC_EXCEL_PATH = os.path.join(NOKIA_PARAMS_DIR, "RNC & BSC Parameters.xlsx")
 NOKIA_CACHE_PATH = os.path.join(_DIR, "data", "nokia_parameters.json")
+NOKIA_INDEX_PATH = os.path.join(_DIR, "data", "nokia_parameters_index.json")
 RNC_BSC_SHEETS = ("RNC", "BSC")
 
 EXCEL_COLUMNS = [
@@ -47,6 +48,7 @@ EXCEL_COLUMNS = [
 ]
 
 _cache: dict[str, Any] | None = None
+_index_cache: dict[str, Any] | None = None
 
 
 def _clean(value: Any) -> str:
@@ -314,12 +316,28 @@ def build_nokia_data_from_excel() -> dict[str, Any]:
     }
 
 
+def write_nokia_index(data: dict[str, Any] | None = None) -> str:
+    payload = data if data is not None else load_nokia_data()
+    index = {
+        "columns": payload.get("columns") or EXCEL_COLUMNS,
+        "mo_index": payload.get("mo_index") or [],
+        "meta": payload.get("meta") or {},
+    }
+    os.makedirs(os.path.dirname(NOKIA_INDEX_PATH), exist_ok=True)
+    with open(NOKIA_INDEX_PATH, "w", encoding="utf-8") as f:
+        json.dump(index, f, ensure_ascii=False, separators=(",", ":"))
+    global _index_cache
+    _index_cache = index
+    return NOKIA_INDEX_PATH
+
+
 def write_nokia_cache(data: dict[str, Any] | None = None) -> str:
     """Write parsed Nokia data to JSON cache."""
     payload = data if data is not None else build_nokia_data_from_excel()
     os.makedirs(os.path.dirname(NOKIA_CACHE_PATH), exist_ok=True)
     with open(NOKIA_CACHE_PATH, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
+    write_nokia_index(payload)
     return NOKIA_CACHE_PATH
 
 
@@ -351,12 +369,31 @@ def get_nokia_mos_payload() -> dict[str, Any]:
 
 def get_nokia_index_payload() -> dict[str, Any]:
     """Lightweight payload: columns, MO index, meta (no parameter rows)."""
+    global _index_cache
+    excel_mtime = _excel_mtime()
+    try:
+        index_mtime = os.path.getmtime(NOKIA_INDEX_PATH)
+    except OSError:
+        index_mtime = 0.0
+    index_stale = index_mtime < excel_mtime if excel_mtime else False
+
+    if _index_cache is not None and not index_stale:
+        return _index_cache
+
+    if os.path.isfile(NOKIA_INDEX_PATH) and not index_stale:
+        with open(NOKIA_INDEX_PATH, encoding="utf-8") as f:
+            _index_cache = json.load(f)
+        return _index_cache
+
     data = load_nokia_data()
-    return {
+    _index_cache = {
         "columns": data.get("columns") or EXCEL_COLUMNS,
         "mo_index": data.get("mo_index") or [],
         "meta": data.get("meta") or {},
     }
+    if data.get("mo_index"):
+        write_nokia_index(data)
+    return _index_cache
 
 
 def get_nokia_list_payload() -> dict[str, Any]:
@@ -378,6 +415,25 @@ def get_nokia_mo_parameters(mo_name: str) -> dict[str, Any]:
         "parameter_count": len(mo_info.get("parameters") or []),
         "parameters": mo_info.get("parameters") or [],
     }
+
+
+def lookup_parameter_row(mo_name: str, abbreviated_name: str) -> dict[str, str] | None:
+    target = (abbreviated_name or "").strip().lower()
+    if not target:
+        return None
+    payload = get_nokia_mo_parameters(mo_name)
+    for row in payload.get("parameters") or []:
+        if str(row.get("Abbreviated Name") or "").strip().lower() == target:
+            return row
+    leaf = mo_name.split("/")[-1].strip().lower()
+    data = load_nokia_data()
+    for name, info in (data.get("mos") or {}).items():
+        if (info.get("leaf") or name.split("/")[-1]).strip().lower() != leaf:
+            continue
+        for row in info.get("parameters") or []:
+            if str(row.get("Abbreviated Name") or "").strip().lower() == target:
+                return row
+    return None
 
 
 def search_nokia_parameters(query: str, limit: int = 500) -> dict[str, Any]:

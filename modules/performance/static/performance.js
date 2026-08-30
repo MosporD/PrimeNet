@@ -331,6 +331,14 @@ function _kpiDisplayName(kpiKey) {
     return _normalizeKpiKey(KPI_DISPLAY_NAMES[key]) || key;
 }
 
+function _perfDictHref(kpiKey) {
+    const vendor = (document.getElementById('filter-vendor')?.value || 'nokia').trim().toLowerCase();
+    const q = encodeURIComponent(_kpiDisplayName(kpiKey) || kpiKey || '');
+    const vendorQs = vendor === 'huawei' ? 'huawei' : 'nokia';
+    const entity = vendorQs === 'huawei' ? 'counters' : 'kpis';
+    return `/performance-dictionary?vendor=${vendorQs}&entity=${entity}&q=${q}`;
+}
+
 async function ensureKpiCategoryConfigLoaded() {
     if (_kpiCategoryConfigPromise) return _kpiCategoryConfigPromise;
     _kpiCategoryConfigPromise = (async () => {
@@ -652,6 +660,7 @@ function updateKpiScopeUI() {
         return `<label class="kpi-scope-item" title="${escAttr(c)}">
             <input type="checkbox" class="kpi-scope-cb" id="kpi-cb-${i}" data-kpi-key="${escAttr(c)}"${checked}>
             <span class="kpi-scope-item-label">${escHtml(_kpiDisplayName(c))}</span>
+            <a class="kpi-dict-link" href="${escAttr(_perfDictHref(c))}" title="Open in Performance Dictionary" target="_blank" rel="noopener" onclick="event.stopPropagation()">ref</a>
         </label>`;
     }).join('');
     updateKpiSelectAllState();

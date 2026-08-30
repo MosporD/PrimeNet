@@ -1,202 +1,106 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>PrimeNet — SON Analytics</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-
-    <link rel="stylesheet" href="{{ url_for('son_analytics.static', filename='son_analytics.css') }}?v=1.2">
-
+    <link rel="stylesheet" href="{{ url_for('son_analytics.static', filename='son_analytics.css') }}?v=1.3">
 </head>
-
 <body class="son-page">
-
     <header class="son-topbar">
-
         <a href="/dashboard" class="son-back">Dashboard</a>
-
         <div class="son-topbar-title">
-
             <span class="son-brand">SON Analytics</span>
-
             <span class="son-stage-badge">{{ stage_label }}</span>
-
         </div>
-
         <div class="son-topbar-actions">
-
             <span class="son-user">{{ user.username }}</span>
-
             <button type="button" class="son-btn son-btn-ghost" id="son-refresh-btn">Refresh cache</button>
-
         </div>
-
     </header>
 
-
-
     <main class="son-main">
-
         <p class="son-lead">
-
-            Geographic performance clusters from <strong>daily PM</strong> KPIs and cell locations.
-
-            When multiple cells in the same area degrade vs the prior-week average, they appear here.
-
-            Read-only — no network changes are made.
-
+            Geographic and ML-ranked performance clusters from <strong>daily PM</strong> KPIs.
+            Week-over-week rules remain the safety net. Anomaly scores come from an offline
+            job (PCA + IsolationForest, optional autoencoder). Read-only — no network changes are made.
         </p>
 
-
-
         <div class="son-summary" id="son-summary">
-
             <div class="son-summary-card" data-cat="cluster"><span class="son-summary-label">Area clusters</span><span class="son-summary-val" id="sum-cluster">—</span></div>
-
+            <div class="son-summary-card" data-cat="anomaly"><span class="son-summary-label">Anomalies</span><span class="son-summary-val" id="sum-anomaly">—</span></div>
+            <div class="son-summary-card" data-cat="topology"><span class="son-summary-label">Topology</span><span class="son-summary-val" id="sum-topology">—</span></div>
             <div class="son-summary-card"><span class="son-summary-label">Degraded cells</span><span class="son-summary-val" id="sum-degraded">—</span></div>
-
             <div class="son-summary-card son-summary-total"><span class="son-summary-label">Total</span><span class="son-summary-val" id="sum-total">—</span></div>
-
         </div>
-
         <div class="son-meta" id="son-generated">Generated: —</div>
 
-
-
         <div class="son-filters">
-
             <label>Category
-
                 <select id="filter-category">
-
                     <option value="all">All</option>
-
                     <option value="Cluster">Cluster</option>
-
+                    <option value="Anomaly">Anomaly</option>
+                    <option value="Topology">Topology</option>
                 </select>
-
             </label>
-
             <label>Severity
-
                 <select id="filter-severity">
-
                     <option value="all">All</option>
-
                     <option value="high">High</option>
-
                     <option value="medium">Medium</option>
-
                 </select>
-
             </label>
-
             <label>Area
-
                 <select id="filter-area">
-
                     <option value="all">All areas</option>
-
                 </select>
-
             </label>
-
             <label>Vendor
-
                 <select id="filter-vendor">
-
                     <option value="all">All</option>
-
                     <option value="nokia">Nokia</option>
-
                     <option value="huawei">Huawei</option>
-
                 </select>
-
             </label>
-
             <label>Technology
-
                 <select id="filter-technology">
-
                     <option value="all">All</option>
-
                     <option value="4G" selected>4G</option>
-
                 </select>
-
             </label>
-
             <button type="button" class="son-btn son-btn-primary" id="son-apply-filters">Apply</button>
-
         </div>
-
-
 
         <div class="son-layout">
-
             <div class="son-table-wrap">
-
                 <table class="son-table" id="son-table">
-
                     <thead>
-
                         <tr>
-
                             <th>Severity</th>
-
                             <th>Category</th>
-
                             <th>Title</th>
-
                             <th>Area</th>
-
                             <th>Cells</th>
-
+                            <th>Score</th>
                             <th>Vendor</th>
-
                         </tr>
-
                     </thead>
-
                     <tbody id="son-tbody">
-
-                        <tr><td colspan="6" class="son-empty">Loading…</td></tr>
-
+                        <tr><td colspan="7" class="son-empty">Loading…</td></tr>
                     </tbody>
-
                 </table>
-
             </div>
-
             <aside class="son-detail" id="son-detail">
-
                 <h3>Evidence</h3>
-
                 <p class="son-detail-placeholder">Select a recommendation to view evidence and links.</p>
-
                 <div id="son-detail-body" hidden></div>
-
             </aside>
-
         </div>
-
     </main>
 
-
-
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
-
-    <script src="{{ url_for('son_analytics.static', filename='son_analytics.js') }}?v=1.2"></script>
-
+    <script src="{{ url_for('son_analytics.static', filename='son_analytics.js') }}?v=1.3"></script>
 </body>
-
 </html>
-

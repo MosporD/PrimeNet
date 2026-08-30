@@ -66,8 +66,11 @@ def _sector_health_page_context(*, all_cells: bool) -> dict:
         'all_cells': False,
         'page_title': 'Sector Health',
         'page_heading': '📡 Sector Health',
-        'page_subtitle': '2G / 3G / 5G sector counts; LTE pies (% of LTE sectors in view, excluding L35). Active cells only.',
-        'scope_note': 'Only on-air cells per vendor activity rules (admin_state / active_state).',
+        'page_subtitle': (
+            '2G / 3G / 5G sector counts; LTE pies (% of LTE sectors in view, excluding L35). '
+            'Active cells only, from metadata.db.'
+        ),
+        'scope_note': 'Only on-air cells per vendor activity rules (admin_state / active_state) in metadata.db.',
         'alt_view_href': '/sector-health-all',
         'alt_view_label': 'All configured cells',
         'report_href': '/reports',

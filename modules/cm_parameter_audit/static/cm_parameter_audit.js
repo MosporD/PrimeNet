@@ -646,5 +646,124 @@
         });
     });
 
+    async function applyDeepLink() {
+        const params = new URLSearchParams(window.location.search);
+        const nextVendor = (params.get('vendor') || '').toLowerCase();
+        const mo = (params.get('mo') || '').trim();
+        const param = (params.get('param') || '').trim();
+        if (!nextVendor && !mo && !param) return;
+        if (nextVendor === 'huawei' || nextVendor === 'nokia') {
+            setVendor(nextVendor);
+        }
+        await loadMoClasses();
+        if (mo) {
+            const match = moClasses.find((item) => {
+                const id = String(item.id || '');
+                const label = String(item.label || '');
+                return id === mo || id.endsWith(`/${mo}`) || id.split('/').pop() === mo || label === mo;
+            });
+            if (match) {
+                selectedMoId = match.id;
+                els.moInput.value = match.label ? `${match.id} — ${match.label}` : match.id;
+                await loadParameters(match.id);
+            } else {
+                els.moInput.value = mo;
+            }
+        }
+        if (param) {
+            selectedParam = param;
+            els.paramInput.value = param;
+            updateScanButton();
+        }
+    }
+
+    async function loadGoldenRules() {
+        const list = document.getElementById('rules-list');
+        const areaSelect = document.getElementById('rule-area');
+        if (!list) return;
+        try {
+            const res = await fetch('/api/cm-parameter-audit/rules');
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Failed to load rules');
+            if (areaSelect && Array.isArray(data.areas)) {
+                const current = areaSelect.value;
+                areaSelect.innerHTML = '<option value="">All areas</option>' + data.areas.map((area) =>
+                    `<option value="${escapeHtml(area)}">${escapeHtml(area)}</option>`
+                ).join('');
+                areaSelect.value = current;
+            }
+            const rules = data.rules || [];
+            if (!rules.length) {
+                list.innerHTML = '<p class="section-description">No golden rules yet.</p>';
+                return;
+            }
+            list.innerHTML = rules.map((rule) => {
+                const approved = rule.approved_by
+                    ? `Approved by ${escapeHtml(rule.approved_by)} ${escapeHtml(rule.approved_at || '')}`
+                    : 'Not approved';
+                const scope = [rule.technology, rule.band, rule.area].filter(Boolean).join(' / ') || 'all';
+                return `<div class="rule-card">
+                    <div><strong>${escapeHtml(rule.id)}</strong> · ${escapeHtml(rule.parameter)} · ${escapeHtml(rule.rule_type)} · ${escapeHtml(scope)}</div>
+                    <div class="rule-meta">${escapeHtml(rule.description || '')} · v${escapeHtml(rule.version || 1)} · ${approved}</div>
+                    <button type="button" class="btn-secondary rule-approve" data-id="${escapeHtml(rule.id)}">Approve</button>
+                </div>`;
+            }).join('');
+            list.querySelectorAll('.rule-approve').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    const baseline = document.getElementById('rule-baseline')?.value || '';
+                    const resp = await fetch(`/api/cm-parameter-audit/rules/${encodeURIComponent(btn.dataset.id)}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ baseline }),
+                    });
+                    const body = await resp.json();
+                    if (!body.success) {
+                        setStatus(body.error || 'Approve failed', 'error');
+                        return;
+                    }
+                    loadGoldenRules();
+                });
+            });
+        } catch (err) {
+            list.innerHTML = `<p class="section-description">${escapeHtml(err.message || 'Failed to load rules')}</p>`;
+        }
+    }
+
+    const ruleForm = document.getElementById('rule-form');
+    if (ruleForm) {
+        ruleForm.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const payload = {
+                id: document.getElementById('rule-id')?.value || '',
+                parameter: document.getElementById('rule-parameter')?.value || '',
+                mo_class: document.getElementById('rule-mo')?.value || '',
+                technology: document.getElementById('rule-tech')?.value || '',
+                band: document.getElementById('rule-band')?.value || '',
+                area: document.getElementById('rule-area')?.value || '',
+                rule_type: document.getElementById('rule-type')?.value || 'equals',
+                expected_value: document.getElementById('rule-expected')?.value || '',
+                min_value: document.getElementById('rule-min')?.value || null,
+                max_value: document.getElementById('rule-max')?.value || null,
+                severity: document.getElementById('rule-severity')?.value || 'Medium',
+                baseline: document.getElementById('rule-baseline')?.value || '',
+                description: document.getElementById('rule-description')?.value || '',
+            };
+            const resp = await fetch('/api/cm-parameter-audit/rules', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await resp.json();
+            if (!data.success) {
+                setStatus(data.error || 'Save failed', 'error');
+                return;
+            }
+            ruleForm.reset();
+            loadGoldenRules();
+        });
+    }
+
     setVendor('nokia');
+    applyDeepLink();
+    loadGoldenRules();
 })();

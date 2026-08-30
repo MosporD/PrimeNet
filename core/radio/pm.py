@@ -10,19 +10,18 @@ from modules.son_analytics.pm_helpers import PM_DATA_SCOPE, collect_degraded_cel
 VENDORS = ["nokia", "huawei"]
 RATS = ["2G", "3G", "4G-FDD", "4G-TDD", "5G"]
 
+_UTIL = nh_config.CATEGORY_PRESETS["Utilization"]
 KPI_RECIPES: dict[str, dict] = {
     "utilization": {
-        "direction": "higher_worse",
-        "aliases": [
-            "DL PRB Usage Rate(%)",
-            "UL PRB Usage Rate(%)",
-            "E-UTRAN Avg PRB usage per TTI DL",
-            "PRB util PDSCH",
-            "PRB util PUSCH",
+        "direction": _UTIL["direction"],
+        "threshold_bad": _UTIL["threshold_bad"],
+        "threshold_span": _UTIL.get("threshold_span"),
+        "aliases": list(dict.fromkeys([
+            *(_UTIL.get("aliases") or []),
             "PRB",
             "Utilization",
             "TCH availability ratio",
-        ],
+        ])),
     },
     "users": {
         "direction": "higher_worse",
@@ -109,6 +108,13 @@ def top_kpi_rows(
     top_n: int = 100,
     sort_mode: str = "increased",
 ) -> list[dict]:
+    from .section_runner import cached_build
+
+    key = f"pm.top|{recipe}|{vendor}|{rat}|{top_n}|{sort_mode}"
+    return cached_build(key, lambda: _top_kpi_rows_uncached(recipe, vendor, rat, top_n, sort_mode))
+
+
+def _top_kpi_rows_uncached(recipe: str, vendor: str, rat: str, top_n: int, sort_mode: str) -> list[dict]:
     vendors = VENDORS if vendor in ("", "all", None) else [vendor]
     rats = RATS if rat in ("", "all", None) else [rat]
     out: list[dict] = []
@@ -132,6 +138,13 @@ def top_kpi_rows(
 
 
 def degraded_cells(vendor: str = "all", technology: str = "4G", limit: int = 200) -> list[dict]:
+    from .section_runner import cached_build
+
+    key = f"pm.degraded|{vendor}|{technology}|{limit}"
+    return cached_build(key, lambda: _degraded_cells_uncached(vendor, technology, limit))
+
+
+def _degraded_cells_uncached(vendor: str, technology: str, limit: int) -> list[dict]:
     rows = collect_degraded_cells(
         nh_config.CATEGORY_PRESETS,
         vendor=vendor,

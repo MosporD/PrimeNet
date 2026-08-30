@@ -378,14 +378,31 @@ def remove_vendor_credentials(vendor: str):
 
 # ── API: preferences ──────────────────────────────────────────────────────────
 
+_PREF_MAX_BYTES = 32_000
+
+
+def _load_user_preferences(conn, user_id) -> dict:
+    row = execute_query(
+        conn,
+        'SELECT preferences FROM user_preferences WHERE user_id = ?',
+        (user_id,),
+    ).fetchone()
+    if not row:
+        return {}
+    try:
+        prefs = json.loads(row['preferences'] or '{}')
+    except (TypeError, json.JSONDecodeError, KeyError):
+        return {}
+    return prefs if isinstance(prefs, dict) else {}
+
+
 @user_profile_bp.route('/api/profile/preferences')
 @login_required
 def get_preferences():
     user = get_current_user()
     conn = _db()
-    row = execute_query(conn, 'SELECT preferences FROM user_preferences WHERE user_id = ?', (user['id'],)).fetchone()
+    prefs = _load_user_preferences(conn, user['id'])
     conn.close()
-    prefs = json.loads(row['preferences']) if row else {}
     return jsonify({'success': True, 'preferences': prefs})
 
 
@@ -393,10 +410,28 @@ def get_preferences():
 @login_required
 def save_preferences():
     user = get_current_user()
-    data = request.get_json()
-    prefs_json = json.dumps(data)
+    incoming = request.get_json(silent=True)
+    if not isinstance(incoming, dict):
+        return jsonify({'error': 'Invalid preferences'}), 400
 
     conn = _db()
+    merged = dict(_load_user_preferences(conn, user['id']))
+    for key, value in incoming.items():
+        if key == 'dashboard_layout' and isinstance(value, dict) and isinstance(merged.get(key), dict):
+            nested = dict(merged[key])
+            nested.update(value)
+            merged[key] = nested
+        else:
+            merged[key] = value
+    try:
+        prefs_json = json.dumps(merged)
+    except (TypeError, ValueError):
+        conn.close()
+        return jsonify({'error': 'Invalid preferences'}), 400
+    if len(prefs_json.encode('utf-8')) > _PREF_MAX_BYTES:
+        conn.close()
+        return jsonify({'error': 'Preferences too large'}), 400
+
     execute_query(conn, '''
         INSERT INTO user_preferences (user_id, preferences)
         VALUES (?, ?)
@@ -404,7 +439,7 @@ def save_preferences():
     ''', (user['id'], prefs_json))
     conn.commit()
     conn.close()
-    return jsonify({'success': True, 'message': 'Preferences saved'})
+    return jsonify({'success': True, 'message': 'Preferences saved', 'preferences': merged})
 
 
 # ── API: saved views (shareable filter snapshots) ────────────────────────────

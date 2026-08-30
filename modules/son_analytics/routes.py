@@ -1,4 +1,4 @@
-"""SON Analytics routes (development stage)."""
+"""SON Analytics routes."""
 
 from __future__ import annotations
 
@@ -59,7 +59,7 @@ def son_analytics_page():
     return render_template(
         "son_analytics.html",
         user=format_user(user),
-        stage_label="Development Stage",
+        stage_label="Read-only",
     )
 
 
@@ -90,10 +90,11 @@ def son_summary():
         )
         return jsonify({
             "success": True,
-            "stage": "development",
+            "stage": payload.get("stage"),
             "pm_data_scope": payload.get("pm_data_scope"),
             "generated_at": payload.get("generated_at"),
             "summary": summary,
+            "ml": payload.get("ml") or {},
             "area": request.args.get("area") or "all",
         })
     except Exception as exc:
@@ -122,9 +123,10 @@ def son_recommendations():
         )
         return jsonify({
             "success": True,
-            "stage": "development",
+            "stage": payload.get("stage"),
             "pm_data_scope": payload.get("pm_data_scope"),
             "generated_at": payload.get("generated_at"),
+            "ml": payload.get("ml") or {},
             "total": total,
             "limit": limit,
             "offset": offset,
@@ -147,7 +149,7 @@ def son_recommendation_detail(rec_id):
             return jsonify({"success": False, "error": "Not found"}), 404
         return jsonify({
             "success": True,
-            "stage": "development",
+            "stage": payload.get("stage"),
             "generated_at": payload.get("generated_at"),
             "recommendation": rec,
         })
@@ -168,10 +170,44 @@ def son_refresh():
         payload = build_all_recommendations(force_refresh=True)
         return jsonify({
             "success": True,
-            "stage": "development",
+            "stage": payload.get("stage"),
             "pm_data_scope": payload.get("pm_data_scope"),
             "generated_at": payload.get("generated_at"),
             "summary": payload.get("summary"),
+            "ml": payload.get("ml") or {},
         })
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500
+
+
+@son_analytics_bp.route("/api/son/ml-status")
+@login_required
+def son_ml_status():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    from modules.son_analytics.ml.infer import ml_status
+
+    return jsonify({"success": True, "ml": ml_status()})
+
+
+@son_analytics_bp.route("/api/son/feedback", methods=["POST"])
+@login_required
+def son_feedback():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    body = request.get_json(silent=True) or {}
+    rec_id = str(body.get("rec_id") or "").strip()
+    label = str(body.get("label") or "").strip().lower()
+    if not rec_id:
+        return jsonify({"success": False, "error": "rec_id required"}), 400
+    try:
+        from modules.son_analytics.ml.infer import save_feedback
+
+        result = save_feedback(user.get("username") or "", rec_id, label)
+        return jsonify({"success": True, **result})
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500

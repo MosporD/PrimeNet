@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.7">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.8">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.5">
     <style>
         /* Hide legacy op-sites widgets if the browser still serves an older cached dashboard.html */
@@ -69,7 +69,7 @@
                     <div class="radar-legend" id="radar-legend" role="group" aria-label="Technology layers"></div>
                     <div class="vendor-dials-section">
                         <div class="vendor-dials-head">
-                            <span>Vendor balance</span>
+                            <span>Vendor balance (cells)</span>
                             <span class="vendor-dials-key" aria-hidden="true">
                                 <i class="vendor-key-dot vendor-key-huawei"></i>Huawei
                                 <i class="vendor-key-dot vendor-key-nokia"></i>Nokia
@@ -93,6 +93,22 @@
                            placeholder="Search tools, sites, cells, PCI, parameters…" autocomplete="off"
                            role="combobox" aria-expanded="false" aria-controls="global-search-results">
                     <div class="global-search-results" id="global-search-results" hidden></div>
+                </div>
+                <div class="dashboard-layout-controls">
+                    <button type="button" class="dashboard-layout-toggle" id="dashboard-layout-toggle"
+                            aria-pressed="false" onclick="toggleDashboardLayoutEditing()">
+                        Customize layout
+                    </button>
+                    <div class="dashboard-layout-options" id="dashboard-layout-options" hidden>
+                        <label class="dashboard-layout-check">
+                            <input type="checkbox" id="layoutShowConstellation" checked
+                                   onchange="toggleDashboardConstellation(this.checked)">
+                            Network map
+                        </label>
+                        <button type="button" class="dashboard-layout-reset" onclick="resetDashboardTileOrder()">
+                            Reset tile order
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -662,8 +678,8 @@
     </div>
 
     <script id="radar-bootstrap-data" type="application/json">{{ {'columns': tech_site_columns, 'total': total_sites} | tojson }}</script>
-    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.9"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.1"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.5"></script>
     <script>
         // Jordan (UTC+3) clock — inlined so a stale cached common.js cannot break it.
         function formatDashboardClock(date = new Date()) {
@@ -824,7 +840,7 @@
                 const total = h + n;
                 const hPct = total ? (h / total) * 100 : 0;
                 return `
-                <div class="vendor-dial" title="${entry.title}: Huawei ${h.toLocaleString()} / Nokia ${n.toLocaleString()} sites">
+                <div class="vendor-dial" title="${entry.title}: Huawei ${h.toLocaleString()} / Nokia ${n.toLocaleString()} cells">
                     <svg viewBox="0 0 36 36" class="vendor-dial-svg" aria-hidden="true">
                         <circle class="vendor-dial-ring vendor-dial-nokia" cx="18" cy="18" r="15.9" pathLength="100"></circle>
                         <circle class="vendor-dial-ring vendor-dial-huawei" cx="18" cy="18" r="15.9" pathLength="100"
@@ -1216,6 +1232,71 @@
         }
 
         let dashboardPreferences = {};
+        let dashboardLayoutEditing = false;
+        let dashboardDefaultTileOrder = {};
+
+        function dashboardLayoutPrefs() {
+            const raw = dashboardPreferences.dashboard_layout;
+            return (raw && typeof raw === 'object') ? { ...raw } : {};
+        }
+
+        function isConstellationVisible() {
+            return dashboardLayoutPrefs().show_constellation !== false;
+        }
+
+        function collectDashboardTileOrder() {
+            const order = {};
+            document.querySelectorAll('.section-panel').forEach(panel => {
+                const section = (panel.id || '').replace(/^section-/, '');
+                const grid = panel.querySelector('.function-grid');
+                if (!section || !grid) return;
+                order[section] = Array.from(grid.querySelectorAll('.function-card[data-module-id]'))
+                    .map(card => card.dataset.moduleId)
+                    .filter(Boolean);
+            });
+            return order;
+        }
+
+        function applyDashboardTileOrder() {
+            const orderMap = dashboardPreferences.dashboard_tile_order;
+            if (!orderMap || typeof orderMap !== 'object') return;
+            document.querySelectorAll('.section-panel').forEach(panel => {
+                const section = (panel.id || '').replace(/^section-/, '');
+                const wanted = orderMap[section];
+                if (!Array.isArray(wanted) || !wanted.length) return;
+                const grid = panel.querySelector('.function-grid');
+                if (!grid) return;
+                const cards = new Map(
+                    Array.from(grid.querySelectorAll('.function-card[data-module-id]'))
+                        .map(card => [card.dataset.moduleId, card])
+                );
+                wanted.forEach(id => {
+                    const card = cards.get(String(id));
+                    if (card) grid.appendChild(card);
+                });
+            });
+        }
+
+        function applyDashboardDefaultTab() {
+            const tab = String(dashboardPreferences.default_tab || '').trim();
+            if (!tab) return;
+            const btn = document.getElementById('tab-' + tab);
+            if (btn && !btn.hidden) openSection(tab);
+        }
+
+        function applyDashboardLayout() {
+            const showMap = isConstellationVisible();
+            const deck = document.querySelector('.constellation-deck');
+            if (deck) deck.hidden = !showMap;
+            const checkbox = document.getElementById('layoutShowConstellation');
+            if (checkbox) checkbox.checked = showMap;
+            applyDashboardTileOrder();
+            applyDashboardFavorites();
+            if (showMap && !networkSiteMap) {
+                initNetworkRadar();
+                refreshConstellationData({ silent: true });
+            }
+        }
 
         function dashboardToolCards() {
             return Array.from(document.querySelectorAll('.function-card[data-module-id]'));
@@ -1298,7 +1379,8 @@
             } catch (err) {
                 console.warn('Could not load dashboard preferences', err);
             }
-            applyDashboardFavorites();
+            applyDashboardLayout();
+            applyDashboardDefaultTab();
         }
 
         async function saveDashboardPreferences() {
@@ -1312,6 +1394,101 @@
             if (!res.ok || !data.success) {
                 throw new Error(data.error || 'Could not save dashboard preferences');
             }
+            if (data.preferences && typeof data.preferences === 'object') {
+                dashboardPreferences = data.preferences;
+            }
+        }
+
+        function setDashboardLayoutEditing(on) {
+            dashboardLayoutEditing = Boolean(on);
+            document.body.classList.toggle('dashboard-layout-edit', dashboardLayoutEditing);
+            const btn = document.getElementById('dashboard-layout-toggle');
+            const opts = document.getElementById('dashboard-layout-options');
+            if (btn) {
+                btn.setAttribute('aria-pressed', dashboardLayoutEditing ? 'true' : 'false');
+                btn.textContent = dashboardLayoutEditing ? 'Done' : 'Customize layout';
+            }
+            if (opts) opts.hidden = !dashboardLayoutEditing;
+            document.querySelectorAll('.section-panel .function-card[data-module-id]').forEach(card => {
+                card.draggable = dashboardLayoutEditing;
+            });
+        }
+
+        function toggleDashboardLayoutEditing() {
+            setDashboardLayoutEditing(!dashboardLayoutEditing);
+        }
+
+        async function toggleDashboardConstellation(show) {
+            dashboardPreferences.dashboard_layout = {
+                ...dashboardLayoutPrefs(),
+                show_constellation: Boolean(show),
+            };
+            applyDashboardLayout();
+            try {
+                await saveDashboardPreferences();
+            } catch (err) {
+                alert(err.message || 'Could not save layout');
+                await loadDashboardPreferences();
+            }
+        }
+
+        async function resetDashboardTileOrder() {
+            dashboardPreferences.dashboard_tile_order = dashboardDefaultTileOrder;
+            applyDashboardTileOrder();
+            replayDashboardCardWash(document.querySelector('.section-panel:not(.hidden)') || document);
+            try {
+                await saveDashboardPreferences();
+            } catch (err) {
+                alert(err.message || 'Could not reset tile order');
+            }
+        }
+
+        function setupDashboardLayoutControls() {
+            dashboardDefaultTileOrder = collectDashboardTileOrder();
+            document.querySelectorAll('.section-panel .function-grid').forEach(grid => {
+                grid.addEventListener('click', event => {
+                    if (!dashboardLayoutEditing) return;
+                    if (event.target.closest('.favorite-toggle')) return;
+                    event.preventDefault();
+                });
+                grid.addEventListener('dragstart', event => {
+                    if (!dashboardLayoutEditing) return;
+                    const card = event.target.closest('.function-card[data-module-id]');
+                    if (!card || event.target.closest('.favorite-toggle')) {
+                        event.preventDefault();
+                        return;
+                    }
+                    card.classList.add('dashboard-tile-dragging');
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', card.dataset.moduleId || '');
+                });
+                grid.addEventListener('dragend', event => {
+                    const card = event.target.closest('.function-card');
+                    if (card) card.classList.remove('dashboard-tile-dragging');
+                });
+                grid.addEventListener('dragover', event => {
+                    if (!dashboardLayoutEditing) return;
+                    event.preventDefault();
+                    const over = event.target.closest('.function-card[data-module-id]');
+                    const dragging = grid.querySelector('.dashboard-tile-dragging');
+                    if (!over || !dragging || over === dragging) return;
+                    const rect = over.getBoundingClientRect();
+                    const before = (event.clientY < rect.top + rect.height / 2)
+                        || (event.clientX < rect.left + rect.width / 2);
+                    grid.insertBefore(dragging, before ? over : over.nextSibling);
+                });
+                grid.addEventListener('drop', async event => {
+                    if (!dashboardLayoutEditing) return;
+                    event.preventDefault();
+                    dashboardPreferences.dashboard_tile_order = collectDashboardTileOrder();
+                    replayDashboardCardWash(grid.closest('.section-panel') || grid);
+                    try {
+                        await saveDashboardPreferences();
+                    } catch (err) {
+                        alert(err.message || 'Could not save layout');
+                    }
+                });
+            });
         }
 
         async function toggleDashboardFavorite(event, el) {
@@ -1465,10 +1642,13 @@
             const union = data.distinct_cells_all_pm_cell_dbs_union;
             const meta = data.metadata_cells?.distinct_cells;
             const cached = data.cached ? ' (cached)' : '';
+            const cellsLabel = data.distinct_cells_scope === 'largest_db'
+                ? 'Distinct cells (largest PM DB)'
+                : 'Distinct cells (PM union)';
             summaryEl.innerHTML = `
                 <div class="pm-health-summary-grid">
                     <div><span class="pm-health-k">Checked (UTC)</span><span class="pm-health-v">${data.checked_at_utc || 'ظ¤'}${cached}</span></div>
-                    <div><span class="pm-health-k">Distinct cells (PM union)</span><span class="pm-health-v">${union != null ? Number(union).toLocaleString() : 'ظ¤'}</span></div>
+                    <div><span class="pm-health-k">${cellsLabel}</span><span class="pm-health-v">${union != null ? Number(union).toLocaleString() : '—'}</span></div>
                     <div><span class="pm-health-k">Metadata cells</span><span class="pm-health-v">${meta != null ? Number(meta).toLocaleString() : 'ظ¤'}</span></div>
                 </div>`;
 
@@ -1862,17 +2042,17 @@
                 window.dashboardAmbientBg = PrimeNetConstellation.initAmbientBackground(bgCanvas);
                 window.primeNetAmbientBg = window.dashboardAmbientBg;
             }
-            initNetworkRadar();
-            refreshConstellationData({ silent: true });
             setupDashboardToolSearch();
             setupGlobalSearchDropdown();
+            setupDashboardLayoutControls();
             refreshNetworkActivity();
             setInterval(refreshNetworkActivity, 10 * 60 * 1000);
             loadDashboardPreferences();
             replayDashboardCardWash(document.querySelector('.section-panel:not(.hidden)') || document);
             document.addEventListener('keydown', event => {
-                if (event.key === 'Escape') {
+                    if (event.key === 'Escape') {
                     toggleOperationsPanel(false);
+                    if (dashboardLayoutEditing) setDashboardLayoutEditing(false);
                 }
             });
             if (document.getElementById('pm-health-widget')) {

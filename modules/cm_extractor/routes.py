@@ -42,8 +42,10 @@ from core.cm_extractor.huawei_semantics import (
 from core.cm_extractor.site_catalog import (
     list_huawei_areas,
     list_huawei_db_sites,
-    resolve_huawei_ne_names,
+    list_nokia_inventory_areas,
+    list_nokia_inventory_sites,
     merge_huawei_ne_names,
+    resolve_huawei_ne_names,
 )
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.cm_extractor.nokia_excel_reimport import (
@@ -56,10 +58,6 @@ from core.cm_extractor.nokia_semantics import (
     fetch_parameters_for_classes,
     get_mo_class_catalog,
     preview_nokia_selection,
-)
-from core.cm_extractor.site_catalog import (
-    list_nokia_areas,
-    list_nokia_db_sites,
 )
 from core.cm_extractor.job_scheduler import (
     count_unread_notifications as cm_count_unread_notifications,
@@ -536,16 +534,16 @@ def nokia_sites():
         limit = 2000
 
     try:
-        sites = list_nokia_db_sites(query, scope_level=scope_level, limit=limit)
+        sites, source = list_nokia_inventory_sites(query, scope_level=scope_level, limit=limit)
         for site in sites:
-            site.setdefault('source', 'metadata')
+            site.setdefault('source', source)
             site.setdefault('metadata_site_id', site.get('site_id'))
         return jsonify({
             'success': True,
             'sites': sites,
             'count': len(sites),
             'scope_level': scope_level,
-            'source': 'metadata',
+            'source': source,
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': f'Failed to load Nokia sites: {exc}'}), 500
@@ -559,13 +557,13 @@ def nokia_areas():
 
     scope_level = (request.args.get('scope') or 'MRBTS').strip().upper()
     try:
-        areas = list_nokia_areas(scope_level=scope_level)
+        areas = list_nokia_inventory_areas(scope_level=scope_level)
         return jsonify({
             'success': True,
             'areas': areas,
             'count': len(areas),
             'scope_level': scope_level,
-            'source': 'metadata',
+            'source': 'inventory',
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': f'Failed to load areas: {exc}'}), 500
@@ -587,7 +585,7 @@ def nokia_reconcile_inventory():
 
         reload_inventory_from_disk(force=True)
         changed = ensure_nokia_inventory_enriched(persist=True)
-        areas = list_nokia_areas(scope_level='MRBTS')
+        areas = list_nokia_inventory_areas(scope_level='MRBTS')
         south_jordan = next(
             (row for row in areas if row.get('area') == 'South Jordan'),
             None,
