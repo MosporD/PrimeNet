@@ -5,6 +5,7 @@ Pull configuration data from Nokia NetAct CM Open API and Huawei U2020 MML API.
 
 from __future__ import annotations
 
+import logging
 import os
 import tempfile
 import threading
@@ -73,6 +74,8 @@ from core.cm_extractor.job_scheduler import (
     set_enabled as cm_set_enabled,
 )
 from database_enhanced import get_user_by_session, log_activity
+
+logger = logging.getLogger(__name__)
 
 cm_extractor_bp = Blueprint(
     'cm_extractor',
@@ -227,6 +230,7 @@ def _extract_worker(file_id: str, output_path: str, data: dict, user) -> None:
             label=result.get('summary', '')[:200],
         )
     except Exception as exc:
+        logger.exception('CM extract worker failed file_id=%s', file_id)
         update_export_record(file_id, status='error', error=str(exc) or 'Extraction failed')
 
 
@@ -1085,8 +1089,9 @@ def extract():
         return jsonify({'error': str(exc)}), 502
     except ValueError as exc:
         return jsonify({'error': str(exc)}), 400
-    except Exception:
-        return jsonify({'error': 'Extraction failed'}), 500
+    except Exception as exc:
+        logger.exception('CM extract failed')
+        return jsonify({'error': str(exc) or 'Extraction failed'}), 500
 
 
 @cm_extractor_bp.route('/api/cm-extractor/extract-status/<file_id>')
