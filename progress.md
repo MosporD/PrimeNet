@@ -2,11 +2,16 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** UI unification (`checklist.md`). Auth pages aligned to NexusCore constellation; module header/body-class pass done. Browser verify still open.
+**Current track:** Dark-mode contrast fixes across heatmap / femto / SON / CM / audit / XML / radio modules.
 
-**Parked:** SON trust browser click-through (`/son-analytics` Topology). Browser-verify `/xml-parser`, `/excel-generator`, `/parameter-dictionary`, `/performance-dictionary`, `/cm-parameter-audit`. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id` (Health unchanged).
+**Parked:** SON trust browser click-through (`/son-analytics` Topology). Server still may be on `afc1124f` until pull of bulk + these fixes. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id` (Health unchanged).
 
-**NEXT:** Browser-verify UI consistency — dashboard, login/register, one radio module (`radio_module.html`), one standalone (Network Health or SON), light+dark toggle.
+**NEXT:** Browser-verify dark-mode contrast fixes (heatmap, femto, CM extract scrollbars, parameter audit golden rules, XML plan validation, overshooting bg) and SON header without READ-ONLY.
+
+## 2026-09-08 (dark-mode UI fixes)
+
+- Done: Cell Heatmap status text, Femto Create KPI button, SON header (no READ-ONLY, standard topbar), CM Extractor scrollbars, Parameter Audit golden-rules panel, XML Parser plan validation, Overshooting/radio-module opaque dark background.
+- Deploy note: server must `git pull` to `a575aeba+` then rebuild; these fixes are local until pushed.
 
 ## 2026-09-06 (UI unification)
 

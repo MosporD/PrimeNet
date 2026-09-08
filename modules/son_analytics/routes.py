@@ -59,7 +59,6 @@ def son_analytics_page():
     return render_template(
         "son_analytics.html",
         user=format_user(user),
-        stage_label="Read-only",
     )
 
 

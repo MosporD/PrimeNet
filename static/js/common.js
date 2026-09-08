@@ -51,7 +51,7 @@ const CONSTELLATION_CSS_VERSION = '1.9';
 const CONSTELLATION_JS_VERSION = '2.2';
 
 function _constellationBgExcluded(path) {
-    return /^\/(login|register|activation|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
+    return /^\/(login|register|activation|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer|overshooting-detector|capacity-hotspots|sleeping-cells|layer-coverage|neighbor-quality|change-impact|radio-morning-report|mobility-explorer|alarm-impact|group-health|irat-border)(\/|$)/.test(path);
 }
 
 function _shouldMountConstellationBackground() {
