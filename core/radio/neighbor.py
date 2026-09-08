@@ -14,6 +14,7 @@ from modules.network_map.routes import (
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
 from .scoring import bounded_score, issue, score_vs_preset
+from db.runtime import open_db, store_available
 
 
 TECHNOLOGIES = ["2G-2G", "3G-3G", "4G-4G", "5G-5G"]
@@ -32,10 +33,9 @@ def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
 
 def _load_vendor_lines(vendor: str, technology: str, *, min_attempts: float, max_lines: int) -> list[dict]:
     db_path = HUAWEI_NEIGHBOR_RAW_DB if vendor == "huawei" else NEIGHBOR_KPI_DB
-    if not os.path.isfile(db_path):
+    if not store_available(db_path):
         return []
-    conn = sqlite3.connect(db_path, timeout=30)
-    conn.row_factory = sqlite3.Row
+    conn = open_db(db_path, timeout=30)
     try:
         if vendor == "huawei":
             tables = [_resolve_huawei_neighbor_export_table(conn, technology)]

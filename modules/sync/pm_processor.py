@@ -40,6 +40,7 @@ from core.pm_timestamp import (
     format_pm_report_time,
     parse_pm_datetime,
 )
+from db.runtime import open_db, store_available
 from sync_config import (
     NOKIA_PM_DB,
     HUAWEI_PM_DB,
@@ -889,7 +890,7 @@ def _insert_df(db_path, df, technology):
     ]
     cell_index = build_cell_area_index()
 
-    conn = sqlite3.connect(db_path, timeout=120)
+    conn = open_db(db_path, timeout=120)
     try:
         conn.execute('PRAGMA busy_timeout=120000')  # ms — parallel RAT ingests share one DB file
     except sqlite3.Error:
@@ -1008,7 +1009,7 @@ def clear_nokia_pm_tables():
     """Remove all Nokia PM rows before a new pull."""
     tables = [pm_table_name(t) for t in PM_TECHNOLOGIES]
 
-    conn = sqlite3.connect(NOKIA_PM_DB, timeout=30)
+    conn = open_db(NOKIA_PM_DB, timeout=30)
     cleared = 0
     for table in tables:
         try:
@@ -1421,7 +1422,7 @@ def _huawei_zip_tabular_paths(extracted_root: str, max_files: int = 5, trace: bo
 def _clear_huawei_pm_tables():
     """Delete all rows from fixed RAT tables (same layout as Nokia PM)."""
     tables = [pm_table_name(t) for t in PM_TECHNOLOGIES]
-    conn = sqlite3.connect(HUAWEI_PM_DB, timeout=30)
+    conn = open_db(HUAWEI_PM_DB, timeout=30)
     cleared = 0
     for table in tables:
         try:
@@ -1455,10 +1456,10 @@ def huawei_pm_kpi_tables(db_path: str | None = None) -> list[str]:
     path = HUAWEI_PM_DB if db_path is None else db_path
     scope = 'daily' if 'daily' in os.path.normpath(str(path or '')).replace('\\', '/').lower() else 'hourly'
     bases = [pm_table_name(t, scope) for t in PM_TECHNOLOGIES]
-    if not path or not os.path.isfile(path):
+    if not path or not store_available(path):
         return bases
     try:
-        conn = sqlite3.connect(path, timeout=15)
+        conn = open_db(path, timeout=15)
         try:
             names = [
                 r[0]
@@ -1523,7 +1524,7 @@ def huawei_pm_table_for_cell(
     probe_order = [preferred, base]
     names: list[str] = []
 
-    conn = sqlite3.connect(path, timeout=15)
+    conn = open_db(path, timeout=15)
     try:
         names = [
             r[0]

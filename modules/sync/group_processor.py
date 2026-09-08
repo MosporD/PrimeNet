@@ -15,6 +15,7 @@ from datetime import datetime
 
 import pandas as pd
 
+from db.runtime import open_db
 from sync_config import (
     METADATA_DB,
     NOKIA_GROUPS_DB,
@@ -72,7 +73,7 @@ def _norm(v):
 
 
 def _build_metadata_index(vendor: str):
-    conn = sqlite3.connect(METADATA_DB, timeout=30)
+    conn = open_db(METADATA_DB, timeout=30)
     rows = conn.execute(
         '''
         SELECT cell_name, site_id, technology
@@ -169,7 +170,7 @@ def process_group_file(file_path: str, vendor: str, default_technology: str = ''
 
     meta_idx = _build_metadata_index(vendor)
     db = _groups_db(vendor)
-    conn = sqlite3.connect(db, timeout=30)
+    conn = open_db(db, timeout=30)
     conn.execute('PRAGMA journal_mode=WAL')
 
     imported_rows = 0

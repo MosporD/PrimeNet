@@ -9,6 +9,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
+from db.runtime import open_db, store_available
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
 _CACHE_TTL_SEC = 600
@@ -35,6 +36,8 @@ _TS_KEYWORDS = (
 
 
 def _file_health(path: str) -> dict:
+    if store_available(path) and not os.path.isfile(path):
+        return {"exists": True, "path": path, "backend": "postgres"}
     if not os.path.isfile(path):
         return {"exists": False, "path": path}
     st = os.stat(path)
@@ -153,7 +156,7 @@ def audit_neighbor_db(path: str, label: str) -> dict:
         result["overall"] = "MISSING"
         return result
 
-    conn = sqlite3.connect(path, timeout=60)
+    conn = open_db(path, timeout=60)
     try:
         tables = [
             r[0]

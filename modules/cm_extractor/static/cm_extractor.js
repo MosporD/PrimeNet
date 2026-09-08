@@ -29,6 +29,9 @@ let nokiaSiteCatalog = [];
 /** @type {Array<{area, site_count}>} */
 let nokiaAreas = [];
 
+/** @type {Array<{cluster, area, site_count}>} */
+let nokiaClusters = [];
+
 /** @type {Set<string>} */
 const selectedSiteIds = new Set();
 
@@ -57,6 +60,9 @@ let huaweiCatalogLoaded = false;
 
 /** @type {Array<{area, site_count}>} */
 let huaweiAreas = [];
+
+/** @type {Array<{cluster, area, site_count}>} */
+let huaweiClusters = [];
 
 const QUERY_PARAM_MAX = 250;
 
@@ -449,7 +455,7 @@ async function loadNokiaAreas() {
     if (!select || !row) return;
     try {
         const scope = encodeURIComponent(getScopeLevel());
-        const response = await fetch(`/api/cm-extractor/nokia/areas?scope=${scope}&v=2`, {
+        const response = await fetch(`/api/cm-extractor/nokia/areas?scope=${scope}&v=3`, {
             credentials: 'same-origin',
         });
         const data = await response.json();
@@ -457,51 +463,103 @@ async function loadNokiaAreas() {
             throw new Error(data.error || 'Failed to load areas');
         }
         nokiaAreas = data.areas || [];
+        nokiaClusters = data.clusters || [];
     } catch (error) {
         nokiaAreas = [];
+        nokiaClusters = [];
     }
     row.hidden = !nokiaAreas.length;
     const previous = select.value;
-    select.innerHTML = '<option value="">All areas</option>' +
-        nokiaAreas.map((a) =>
-            `<option value="${escapeHtml(a.area)}">${escapeHtml(a.area)} (${a.site_count})</option>`
-        ).join('');
-    if (previous && nokiaAreas.some((a) => a.area === previous)) {
+    select.innerHTML = buildAreaClusterOptions(nokiaAreas, nokiaClusters);
+    if (previous && select.querySelector(`option[value="${CSS.escape(previous)}"]`)) {
         select.value = previous;
     }
 }
 
-function selectedNokiaArea() {
+/**
+ * Build <option> + <optgroup> HTML for combined area / cluster dropdown.
+ * Values use prefixes: "area:North Jordan" or "cluster:10".
+ */
+function buildAreaClusterOptions(areas, clusters) {
+    const hasAnyClusters = clusters && clusters.length > 0;
+    let html = `<option value="">${hasAnyClusters ? 'All areas / clusters' : 'All areas'}</option>`;
+    const clustersByArea = {};
+    for (const cl of clusters) {
+        const a = cl.area || '';
+        if (!clustersByArea[a]) clustersByArea[a] = [];
+        clustersByArea[a].push(cl);
+    }
+    for (const a of areas) {
+        const areaVal = `area:${a.area}`;
+        const areaClusters = clustersByArea[a.area] || [];
+        if (areaClusters.length) {
+            html += `<optgroup label="${escapeHtml(a.area)} (${a.site_count} sites)">`;
+            html += `<option value="${escapeHtml(areaVal)}">All ${escapeHtml(a.area)} (${a.site_count})</option>`;
+            for (const cl of areaClusters) {
+                const clVal = `cluster:${cl.cluster}`;
+                html += `<option value="${escapeHtml(clVal)}">Cluster ${escapeHtml(cl.cluster)} (${cl.site_count})</option>`;
+            }
+            html += '</optgroup>';
+        } else {
+            html += `<option value="${escapeHtml(areaVal)}">${escapeHtml(a.area)} (${a.site_count})</option>`;
+        }
+    }
+    return html;
+}
+
+/**
+ * Parse dropdown value: returns {type: 'area'|'cluster'|'', value: string}.
+ */
+function parseAreaClusterValue(raw) {
+    if (!raw) return { type: '', value: '' };
+    if (raw.startsWith('area:')) return { type: 'area', value: raw.slice(5) };
+    if (raw.startsWith('cluster:')) return { type: 'cluster', value: raw.slice(8) };
+    // Legacy fallback (plain area name without prefix)
+    return { type: 'area', value: raw };
+}
+
+function selectedNokiaAreaRaw() {
     return document.getElementById('nokia-area-select')?.value || '';
 }
 
+function selectedNokiaAreaParsed() {
+    return parseAreaClusterValue(selectedNokiaAreaRaw());
+}
+
+function siteMatchesSelection(site, sel) {
+    if (!sel.value) return true;
+    if (sel.type === 'cluster') return site.cluster === sel.value;
+    return site.area === sel.value;
+}
+
 function addNokiaAreaSites() {
-    const area = selectedNokiaArea();
+    const sel = selectedNokiaAreaParsed();
     const statusEl = document.getElementById('nokia-site-paste-status');
-    if (!area) {
+    if (!sel.value) {
         statusEl.hidden = false;
-        statusEl.textContent = 'Pick an area first, then click Add all sites in area.';
+        statusEl.textContent = 'Pick an area or cluster first, then click Add all sites.';
         return;
     }
-    const matches = nokiaSiteCatalog.filter((site) => site.area === area);
+    const matches = nokiaSiteCatalog.filter((site) => siteMatchesSelection(site, sel));
+    const label = sel.type === 'cluster' ? `cluster ${sel.value}` : `area "${sel.value}"`;
     if (!matches.length) {
         statusEl.hidden = false;
-        statusEl.textContent = `No sites found for area "${area}" in the current list.`;
+        statusEl.textContent = `No sites found for ${label} in the current list.`;
         return;
     }
     matches.forEach((site) => selectedSiteIds.add(site.site_id));
     renderSiteList();
     updateActionState();
     statusEl.hidden = false;
-    statusEl.textContent = `Added ${matches.length} site(s) from area "${area}".`;
+    statusEl.textContent = `Added ${matches.length} site(s) from ${label}.`;
 }
 
 function filteredSites() {
     const query = document.getElementById('nokia-site-search').value.trim().toLowerCase();
     const areaFilterOn = document.getElementById('nokia-area-filter-list')?.checked;
-    const area = areaFilterOn ? selectedNokiaArea() : '';
+    const sel = areaFilterOn ? selectedNokiaAreaParsed() : { type: '', value: '' };
     return nokiaSiteCatalog.filter((site) => {
-        if (area && site.area !== area) return false;
+        if (sel.value && !siteMatchesSelection(site, sel)) return false;
         if (!query) return true;
         const hay = `${site.site_id} ${site.metadata_site_id || ''} ${site.site_name} ${site.label} ${site.area || ''} ${site.cluster || ''}`.toLowerCase();
         return hay.includes(query);
@@ -744,7 +802,7 @@ async function loadHuaweiAreas() {
     if (!select) return;
     try {
         const scope = encodeURIComponent(getHuaweiScopeLevel());
-        const response = await fetch(`/api/cm-extractor/huawei/areas?scope=${scope}`, {
+        const response = await fetch(`/api/cm-extractor/huawei/areas?scope=${scope}&v=3`, {
             credentials: 'same-origin',
         });
         const data = await response.json();
@@ -752,50 +810,54 @@ async function loadHuaweiAreas() {
             throw new Error(data.error || 'Failed to load areas');
         }
         huaweiAreas = data.areas || [];
+        huaweiClusters = data.clusters || [];
     } catch (error) {
         huaweiAreas = [];
+        huaweiClusters = [];
     }
     const previous = select.value;
-    select.innerHTML = '<option value="">All areas</option>' +
-        huaweiAreas.map((a) =>
-            `<option value="${escapeHtml(a.area)}">${escapeHtml(a.area)} (${a.site_count})</option>`
-        ).join('');
-    if (previous && huaweiAreas.some((a) => a.area === previous)) {
+    select.innerHTML = buildAreaClusterOptions(huaweiAreas, huaweiClusters);
+    if (previous && select.querySelector(`option[value="${CSS.escape(previous)}"]`)) {
         select.value = previous;
     }
 }
 
-function selectedHuaweiArea() {
+function selectedHuaweiAreaRaw() {
     return document.getElementById('huawei-area-select')?.value || '';
 }
 
+function selectedHuaweiAreaParsed() {
+    return parseAreaClusterValue(selectedHuaweiAreaRaw());
+}
+
 function addHuaweiAreaSites() {
-    const area = selectedHuaweiArea();
+    const sel = selectedHuaweiAreaParsed();
     const statusEl = document.getElementById('huawei-ne-paste-status');
-    if (!area) {
+    if (!sel.value) {
         statusEl.hidden = false;
-        statusEl.textContent = 'Pick an area first, then click Add all sites in area.';
+        statusEl.textContent = 'Pick an area or cluster first, then click Add all sites.';
         return;
     }
-    const matches = huaweiNeCatalog.filter((site) => site.area === area);
+    const matches = huaweiNeCatalog.filter((site) => siteMatchesSelection(site, sel));
+    const label = sel.type === 'cluster' ? `cluster ${sel.value}` : `area "${sel.value}"`;
     if (!matches.length) {
         statusEl.hidden = false;
-        statusEl.textContent = `No sites found for area "${area}" in the current list.`;
+        statusEl.textContent = `No sites found for ${label} in the current list.`;
         return;
     }
     matches.forEach((site) => selectedHuaweiSiteIds.add(site.site_id));
     renderHuaweiNeList();
     updateHuaweiActionState();
     statusEl.hidden = false;
-    statusEl.textContent = `Added ${matches.length} site(s) from area "${area}".`;
+    statusEl.textContent = `Added ${matches.length} site(s) from ${label}.`;
 }
 
 function filteredHuaweiNes() {
     const query = document.getElementById('huawei-ne-search').value.trim().toLowerCase();
     const areaFilterOn = document.getElementById('huawei-area-filter-list')?.checked;
-    const area = areaFilterOn ? selectedHuaweiArea() : '';
+    const sel = areaFilterOn ? selectedHuaweiAreaParsed() : { type: '', value: '' };
     return huaweiNeCatalog.filter((site) => {
-        if (area && site.area !== area) return false;
+        if (sel.value && !siteMatchesSelection(site, sel)) return false;
         if (!query) return true;
         const hay = `${site.site_id} ${site.site_name} ${site.ne_name} ${site.label} ${site.area || ''} ${site.cluster || ''}`.toLowerCase();
         return hay.includes(query);
@@ -2376,7 +2438,7 @@ function schedFilteredSites() {
     const query = (document.getElementById('sched-site-search')?.value || '').trim().toLowerCase();
     return schedState.siteCatalog.filter((site) => {
         if (!query) return true;
-        const hay = `${site.site_id} ${site.metadata_site_id || ''} ${site.site_name || ''} ${site.label || ''} ${site.area || ''}`.toLowerCase();
+        const hay = `${site.site_id} ${site.metadata_site_id || ''} ${site.site_name || ''} ${site.label || ''} ${site.area || ''} ${site.cluster || ''}`.toLowerCase();
         return hay.includes(query);
     });
 }

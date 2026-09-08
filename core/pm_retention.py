@@ -12,6 +12,7 @@ import sqlite3
 import pandas as pd
 
 from modules.sync.pm_processor import _pick_best_timestamp_column
+from db.runtime import open_db, store_available
 
 
 def _retention_parse_label(db_path: str, label: str) -> str:
@@ -51,14 +52,14 @@ def apply_retention(db_path: str, days: int, label: str) -> int:
     Delete rows with timestamp strictly before ``now - days``.
     Returns approximate number of rows deleted.
     """
-    if days <= 0 or not os.path.isfile(db_path):
+    if days <= 0 or not store_available(db_path):
         return 0
 
     parse_label = _retention_parse_label(db_path, label)
     cutoff = pd.Timestamp.now().normalize() - pd.Timedelta(days=int(days))
     deleted_total = 0
 
-    conn = sqlite3.connect(db_path, timeout=120)
+    conn = open_db(db_path, timeout=120)
     try:
         conn.execute("PRAGMA busy_timeout=120000")
     except sqlite3.Error:

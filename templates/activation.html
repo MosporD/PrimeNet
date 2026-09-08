@@ -3,20 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimeNet - Operator Activation</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <title>NexusCore - Operator Activation</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon-nexuscore.png?v=1" data-page-favicon>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}?v=1.0">
 </head>
-<body>
-    <div class="auth-container">
-        <div class="auth-box">
-            <div class="auth-header">
-                <h1>PrimeNet</h1>
-                <p>Operator activation required</p>
+<body class="auth-page activation-page">
+    <canvas id="constellation-canvas" aria-hidden="true"></canvas>
+    <div class="hud-overlay" aria-hidden="true"></div>
+    <div class="login-theme-mount" aria-label="Theme controls"></div>
+
+    <main class="login-shell login-shell-centered">
+        <section class="brand-pane" aria-label="NexusCore branding">
+            <div class="brand-lockup">
+                <img src="/static/images/nexuscore-logo.png?v=1" alt="NexusCore logo" class="brand-logo">
+                <div>
+                    <div class="brand-name">NexusCore</div>
+                    <div class="brand-sub">Unified Telecom &amp; ISP Platform</div>
+                </div>
             </div>
 
-            <form id="activation-form" class="auth-form">
-                <h2>Operator unlock</h2>
-                <p class="auth-link" style="margin-bottom: 1rem;">
+            <div class="telemetry-card" aria-hidden="true">
+                <div class="telemetry-head"><span class="live-dot"></span> License gate</div>
+                <div class="telemetry-ticker">Operator unlock required before Engineering Portal access.</div>
+                <ul class="rat-chips">
+                    <li class="rat-chip"><i style="background:#fbbf24"></i>2G GSM</li>
+                    <li class="rat-chip"><i style="background:#38bdf8"></i>3G UMTS</li>
+                    <li class="rat-chip"><i style="background:#34d399"></i>4G FDD</li>
+                    <li class="rat-chip"><i style="background:#a78bfa"></i>4G TDD</li>
+                    <li class="rat-chip"><i style="background:#f472b6"></i>5G NR</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card-pane">
+            <form id="activation-form" class="auth-card" autocomplete="on">
+                <h2>Operator Unlock</h2>
+                <p class="card-sub">
                     {% if mode == 'remote' %}
                     Enter your operator password. PrimeNet will request a license from
                     <strong>{{ server_url }}</strong> (instance: <code>{{ instance_id }}</code>).
@@ -28,7 +50,7 @@
                 </p>
 
                 {% if not configured %}
-                <div class="error-message" style="display: block;">
+                <div class="error-message" style="display: block;" role="alert">
                     {% if mode == 'remote' %}
                     Remote licensing is not fully configured. Set <code>NCM_LICENSE_SERVER_URL</code> and deploy
                     <code>public.pem</code> as <code>NCM_LICENSE_PUBLIC_KEY_PATH</code>.
@@ -40,25 +62,52 @@
                 {% else %}
                 <div class="form-group">
                     <label for="password">Operator password</label>
-                    <input type="password" id="password" name="password" required autofocus>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128273;</span>
+                        <input type="password" id="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required autofocus autocomplete="current-password">
+                    </div>
                 </div>
 
-                <div id="error-message" class="error-message" style="display: none;"></div>
+                <div id="error-message" class="error-message" role="alert"></div>
 
-                <button type="submit" class="btn-primary">Unlock</button>
+                <button type="submit" class="btn-signin" id="unlock-btn">
+                    <span class="btn-ping" aria-hidden="true"></span><span class="btn-label">Unlock</span>
+                </button>
                 {% endif %}
-            </form>
-        </div>
-    </div>
 
+                <div class="card-footer-line" aria-hidden="true">
+                    <span>ACTIVATION</span>
+                    <span>SECURE LINK</span>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <div class="page-credit">Developed by Malek Mohammad</div>
+
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.1"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
     <script>
+        (function () {
+            if (window.PrimeNetConstellation) {
+                PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
+            }
+        })();
+
         const form = document.getElementById('activation-form');
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const err = document.getElementById('error-message');
                 const password = document.getElementById('password')?.value || '';
+                const card = document.querySelector('.auth-card');
+                const btn = document.getElementById('unlock-btn');
+                if (!err || !btn) return;
                 err.style.display = 'none';
+                card.classList.remove('shake');
+                btn.disabled = true;
+                btn.classList.add('loading');
+                btn.querySelector('.btn-label').textContent = 'Unlocking…';
                 try {
                     const res = await fetch('/api/activation/unlock', {
                         method: 'POST',
@@ -69,12 +118,20 @@
                     if (!res.ok) {
                         err.textContent = data.error || 'Unlock failed';
                         err.style.display = 'block';
+                        card.classList.add('shake');
+                        btn.disabled = false;
+                        btn.classList.remove('loading');
+                        btn.querySelector('.btn-label').textContent = 'Unlock';
                         return;
                     }
                     window.location.href = '/dashboard';
                 } catch {
                     err.textContent = 'Network error. Try again.';
                     err.style.display = 'block';
+                    card.classList.add('shake');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    btn.querySelector('.btn-label').textContent = 'Unlock';
                 }
             });
         }

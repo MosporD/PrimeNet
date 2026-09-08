@@ -30,6 +30,7 @@ import pandas as pd
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 from sync_config import NEIGHBOR_KPI_DB, NOKIA_NEIGHBOR_TECH_TABLES
+from db.runtime import open_db
 from pipeline.paths import raw_path
 
 from modules.network_map.neighbor_raw_linking import (  # noqa: E402
@@ -116,6 +117,22 @@ def _read_tabular(path: str, *, use_huawei_prs: bool = False) -> pd.DataFrame:
         return pd.read_csv(path, sep=sep, dtype=str, low_memory=False, encoding="utf-8")
     except Exception:
         return pd.read_csv(path, sep=sep, dtype=str, low_memory=False, encoding="latin-1")
+
+
+def _iter_tabular_chunks(path: str, *, chunksize: int = 75_000):
+    """Yield DataFrames so a 600MB+ Nokia 4G export does not sit fully in RAM."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext in (".xlsx", ".xls", ".xlsm"):
+        yield _read_tabular(path)
+        return
+    sep = ";" if ext in (".csv", ".txt") else ","
+    try:
+        reader = pd.read_csv(path, sep=sep, dtype=str, encoding="utf-8", chunksize=chunksize)
+        yield from reader
+        return
+    except Exception:
+        reader = pd.read_csv(path, sep=sep, dtype=str, encoding="latin-1", chunksize=chunksize)
+        yield from reader
 
 
 def _drop_nonpositive_attempt_rows(df: pd.DataFrame, attempts_col: str = "ho_attempts") -> pd.DataFrame:
@@ -400,6 +417,57 @@ def _write_merged_wide_only(conn: sqlite3.Connection, merged: pd.DataFrame, tabl
     return n
 
 
+def _write_4g_wide_chunked(
+    conn: sqlite3.Connection,
+    load: NeighborVendorLoad,
+    folder: str,
+    tabular_names: list[str],
+) -> int:
+    """Stream 4G CSV chunks into nokia_neighbor_4g without holding the full file in RAM."""
+    table = load.wide_4g_table
+    if not tabular_names:
+        pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+            table, conn, if_exists="replace", index=False, chunksize=800
+        )
+        print(f"[neighbor-raw] 4G -> {table}: 0 rows (wide raw)")
+        return 0
+
+    stamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute(f'DROP TABLE IF EXISTS "{table}"')
+    n_wide = 0
+    first = True
+    ncols = 0
+    for name in tabular_names:
+        path = os.path.join(folder, name)
+        try:
+            chunks = _iter_tabular_chunks(path)
+        except Exception as ex:
+            print(f"[neighbor-raw] skip {name}: {ex}")
+            continue
+        for df in chunks:
+            if df is None or df.empty:
+                continue
+            df = df.copy()
+            df.columns = [_sanitize_col(c) for c in df.columns]
+            if df.shape[1] > MAX_SQLITE_COLUMNS:
+                df = df[list(df.columns[:MAX_SQLITE_COLUMNS])]
+            df.insert(0, "_source_file", name)
+            df.insert(1, "_ingested_at", stamp)
+            df.to_sql(table, conn, if_exists="replace" if first else "append", index=False, chunksize=800)
+            first = False
+            n_wide += len(df)
+            ncols = int(df.shape[1])
+            print(f"[neighbor-raw] 4G chunk {name}: +{len(df)} (total {n_wide})")
+    if first:
+        pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+            table, conn, if_exists="replace", index=False, chunksize=800
+        )
+        print(f"[neighbor-raw] 4G -> {table}: 0 rows (wide raw)")
+        return 0
+    print(f"[neighbor-raw] 4G -> {table}: {n_wide} rows, {ncols} columns (wide raw, chunked)")
+    return n_wide
+
+
 def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad) -> int:
     """Load raw/<vendor>/neighbor/4G — wide raw table and empty intra/inter, or slim intra+inter."""
     tech = "4G"
@@ -421,6 +489,14 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
         if os.path.isfile(os.path.join(folder, name)) and name.lower().endswith(_TABULAR_EXT)
     ]
 
+    if not load.slim:
+        n_wide = _write_4g_wide_chunked(conn, load, folder, tabular_names)
+        empty = pd.DataFrame(columns=_empty_4g_slim_columns())
+        empty.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
+        print(f"[neighbor-raw] 4G -> {intra_table}, {inter_table}: 0 rows (wide-raw mode; use {load.wide_4g_table})")
+        return n_wide
+
     frames: list[pd.DataFrame] = []
     for name in sorted(os.listdir(folder)):
         path = os.path.join(folder, name)
@@ -434,9 +510,7 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
         except Exception as ex:
             print(f"[neighbor-raw] skip {name}: {ex}")
             continue
-        if df is None:
-            continue
-        if df.empty and load.slim:
+        if df is None or df.empty:
             continue
         df = df.copy()
         df.columns = [_sanitize_col(c) for c in df.columns]
@@ -456,22 +530,9 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
         empty = pd.DataFrame(columns=_empty_4g_slim_columns())
         empty.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
         empty.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
-        if not load.slim:
-            pd.DataFrame(columns=["_no_export_rows"]).to_sql(
-                load.wide_4g_table, conn, if_exists="replace", index=False, chunksize=800
-            )
-            print(f"[neighbor-raw] 4G -> {load.wide_4g_table}: 0 rows (wide raw)")
         return 0
 
     merged = pd.concat(frames, ignore_index=True, sort=False)
-
-    if not load.slim:
-        n_wide = _write_merged_wide_only(conn, merged, load.wide_4g_table, tech)
-        empty = pd.DataFrame(columns=_empty_4g_slim_columns())
-        empty.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
-        empty.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
-        print(f"[neighbor-raw] 4G -> {intra_table}, {inter_table}: 0 rows (wide-raw mode; use {load.wide_4g_table})")
-        return n_wide
 
     total = 0
     intra = _build_4g_intra_slim_dataframe(merged)
@@ -650,13 +711,23 @@ def main() -> int:
         action="store_true",
         help="Map wide exports to slim tables for neighbor_raw_linking (default: full wide merge only)",
     )
+    ap.add_argument(
+        "--only-4g",
+        action="store_true",
+        help="Refresh nokia_neighbor_4g only; leave 2G/3G tables untouched",
+    )
     args = ap.parse_args()
     load = _neighbor_load_cfg(args.vendor, slim=args.slim)
 
     n_files = _count_neighbor_tabular_files(load.raw_root)
     os.makedirs(os.path.dirname(NEIGHBOR_KPI_DB), exist_ok=True)
-    conn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=120)
+    conn = open_db(NEIGHBOR_KPI_DB, timeout=120)
     try:
+        if args.only_4g:
+            total = _load_4g_neighbor_tables(conn, load)
+            conn.commit()
+            print(f"[neighbor-raw/{load.slug}] 4G-only done db={NEIGHBOR_KPI_DB} rows~{total}")
+            return 0
         conn.executescript(
             """
             DROP TABLE IF EXISTS huawei_neighbor_2g;

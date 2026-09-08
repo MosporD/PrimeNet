@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, request, url_for
+from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
 import os
 import sys
 import subprocess
@@ -157,14 +157,37 @@ def _env_true(key: str, default: bool = False) -> bool:
 # ERROR HANDLERS
 # ============================================================================
 
+def _wants_json_error() -> bool:
+    path = request.path or ""
+    if path.startswith("/api/"):
+        return True
+    accept = (request.headers.get("Accept") or "").lower()
+    if "application/json" in accept and "text/html" not in accept:
+        return True
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
+@app.errorhandler(404)
+def not_found(error):
+    if _wants_json_error():
+        return jsonify({"error": "Not found"}), 404
+    user = None
+    try:
+        token = request.cookies.get("session_token")
+        if token:
+            user = get_user_by_session(token)
+    except Exception:
+        user = None
+    raw_path = (request.path or "").strip()[:180]
+    return render_template("404.html", user=user, requested_path=raw_path), 404
+
+
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    from flask import jsonify
     return jsonify({'error': 'File too large. Maximum size is 100MB'}), 413
 
 @app.errorhandler(500)
 def internal_error(error):
-    from flask import jsonify
     return jsonify({'error': 'Internal server error'}), 500
 
 # ============================================================================
@@ -267,6 +290,21 @@ def health_check():
         return jsonify(payload), 503
     return jsonify(payload), 200
 
+
+@app.route("/robots.txt")
+def robots_txt():
+    """Public crawler policy — this platform is internal, not for indexing."""
+    body = (
+        "User-agent: *\n"
+        "Disallow: /\n"
+        "\n"
+        "# NexusCore / PrimeNet is an internal operator platform.\n"
+    )
+    resp = Response(body, mimetype="text/plain; charset=utf-8")
+    resp.headers["X-Robots-Tag"] = "noindex, nofollow"
+    return resp
+
+
 # ============================================================================
 # REQUEST HOOKS
 # ============================================================================
@@ -282,6 +320,7 @@ def enforce_monthly_operator_activation():
         '/api/activation/unlock',
         '/health',
         '/api/health',
+        '/robots.txt',
     }
     if path in allowed:
         return None
@@ -411,6 +450,7 @@ def enforce_password_rotation():
         '/api/logout',
         '/profile',
         '/api/profile/change-password',
+        '/robots.txt',
     }
     if path in allowed_exact or path.startswith('/user_profile/static/'):
         return None
@@ -455,6 +495,7 @@ def set_security_headers(resp):
     resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     resp.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+    resp.headers.setdefault("X-Robots-Tag", "noindex, nofollow, noarchive")
     csp = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://unpkg.com; "
@@ -472,7 +513,7 @@ def set_security_headers(resp):
     # Run as first thing inside <body> so body.dark-mode exists before content paints.
     try:
         ctype = (resp.headers.get("Content-Type") or "").lower()
-        if resp.status_code == 200 and "text/html" in ctype and not resp.direct_passthrough:
+        if resp.status_code in (200, 404) and "text/html" in ctype and not resp.direct_passthrough:
             data = resp.get_data(as_text=True)
             if data and "data-primenet-theme-boot" not in data:
                 data2, n = re.subn(

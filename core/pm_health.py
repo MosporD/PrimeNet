@@ -10,6 +10,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
+from db.runtime import open_db, store_available
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DB,
@@ -78,6 +79,8 @@ def _optional_empty_tables(label: str) -> frozenset[str]:
 
 
 def _file_health(path: str) -> dict:
+    if store_available(path) and not os.path.isfile(path):
+        return {"exists": True, "path": path, "backend": "postgres"}
     if not os.path.isfile(path):
         return {"exists": False, "path": path}
     st = os.stat(path)
@@ -349,7 +352,7 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
         result["overall"] = "MISSING"
         return result
 
-    conn = sqlite3.connect(path, timeout=120)
+    conn = open_db(path, timeout=120)
     try:
         tables = [
             r[0]
@@ -450,9 +453,9 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
 
 
 def metadata_distinct_cells() -> dict | None:
-    if not os.path.isfile(METADATA_DB):
+    if not store_available(METADATA_DB):
         return None
-    conn = sqlite3.connect(METADATA_DB, timeout=60)
+    conn = open_db(METADATA_DB, timeout=60)
     try:
         tables = [
             r[0]
@@ -476,9 +479,9 @@ def metadata_distinct_cells() -> dict | None:
 def pm_union_distinct_cells(pm_paths: list[str]) -> int:
     all_cells: set[str] = set()
     for path in pm_paths:
-        if not os.path.isfile(path):
+        if not store_available(path):
             continue
-        conn = sqlite3.connect(path, timeout=120)
+        conn = open_db(path, timeout=120)
         try:
             tables = [
                 r[0]

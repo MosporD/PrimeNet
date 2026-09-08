@@ -571,10 +571,13 @@ def nokia_areas():
 
     scope_level = (request.args.get('scope') or 'MRBTS').strip().upper()
     try:
-        areas = list_nokia_inventory_areas(scope_level=scope_level)
+        areas, clusters = list_nokia_inventory_areas(
+            scope_level=scope_level, include_clusters=True,
+        )
         return jsonify({
             'success': True,
             'areas': areas,
+            'clusters': clusters,
             'count': len(areas),
             'scope_level': scope_level,
             'source': 'inventory',
@@ -809,10 +812,13 @@ def huawei_areas():
 
     scope_level = (request.args.get('scope') or 'ENODEB').strip().upper()
     try:
-        areas = list_huawei_areas(scope_level=scope_level)
+        areas, clusters = list_huawei_areas(
+            scope_level=scope_level, include_clusters=True,
+        )
         return jsonify({
             'success': True,
             'areas': areas,
+            'clusters': clusters,
             'count': len(areas),
             'scope_level': scope_level,
         })

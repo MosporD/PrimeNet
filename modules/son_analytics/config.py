@@ -1,4 +1,4 @@
-"""Tunable thresholds for SON Analytics (development stage)."""
+"""Tunable thresholds for SON Analytics (read-only 4G insights)."""
 
 from __future__ import annotations
 

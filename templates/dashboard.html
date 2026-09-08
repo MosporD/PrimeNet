@@ -4,21 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=6.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.5">
-    <style>
-        /* Hide legacy op-sites widgets if the browser still serves an older cached dashboard.html */
-        .dashboard-overview-row,
-        .dashboard-op-sites,
-        .dashboard-op-sites-main,
-        .op-sites-vendor-panels,
-        .op-sites-summary-columns-main {
-            display: none !important;
-        }
-    </style>
 </head>
 <body class="has-constellation-bg">
+    {%- macro module_version_badge(module_id) -%}
+      {%- set ver = module_versions.get(module_id) -%}
+      {%- if ver %}<span class="function-version">{{ ver }}</span>{%- endif -%}
+    {%- endmacro %}
     <canvas id="primenet-bg-canvas" class="primenet-bg-canvas" aria-hidden="true"></canvas>
     <div class="container">
         <header>
@@ -163,65 +157,65 @@
             <!-- ── Performance panel ── -->
             <div class="section-panel" id="section-performance" role="tabpanel" aria-labelledby="tab-performance">
                 <div class="function-grid">
-                    <a href="/performance" class="function-card" data-module-id="performance" data-module-name="Performance Explorer" data-module-href="/performance">
+                    <a href="/performance" class="function-card" data-module-id="performance" data-module-version="{{ module_versions.get('performance', '') }}" data-module-name="Performance Explorer" data-module-href="/performance">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Performance Explorer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📈</div>
-                        <div class="function-name">Performance Explorer</div>
+                        <div class="function-name">Performance Explorer {{ module_version_badge('performance') }}</div>
                     </a>
-                    <a href="/performance-analytics" class="function-card" data-module-id="performance-analytics" data-module-name="Huawei PM Query Studio" data-module-href="/performance-analytics">
+                    <a href="/performance-analytics" class="function-card" data-module-id="performance-analytics" data-module-version="{{ module_versions.get('performance-analytics', '') }}" data-module-name="Huawei PM Query Studio" data-module-href="/performance-analytics">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Huawei PM Query Studio" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📡</div>
-                        <div class="function-name">Huawei PM Query Studio</div>
+                        <div class="function-name">Huawei PM Query Studio {{ module_version_badge('performance-analytics') }}</div>
                     </a>
-                    <a href="/network-map" class="function-card" data-module-id="network-map" data-module-name="Network Topology" data-module-href="/network-map">
+                    <a href="/network-map" class="function-card" data-module-id="network-map" data-module-version="{{ module_versions.get('network-map', '') }}" data-module-name="Network Topology" data-module-href="/network-map">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Topology" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#127757;</div>
-                        <div class="function-name">Network Topology</div>
+                        <div class="function-name">Network Topology {{ module_version_badge('network-map') }}</div>
                     </a>
-                    <a href="/neighbor-analysis" class="function-card" data-module-id="neighbor-analysis" data-module-name="Neighbor Relations Analyzer" data-module-href="/neighbor-analysis">
+                    <a href="/neighbor-analysis" class="function-card" data-module-id="neighbor-analysis" data-module-version="{{ module_versions.get('neighbor-analysis', '') }}" data-module-name="Neighbor Relations Analyzer" data-module-href="/neighbor-analysis">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Neighbor Relations Analyzer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#129309;</div>
-                        <div class="function-name">Neighbor Relations Analyzer</div>
+                        <div class="function-name">Neighbor Relations Analyzer {{ module_version_badge('neighbor-analysis') }}</div>
                     </a>
-                    <a href="/reports" class="function-card" data-module-id="reports" data-module-name="Performance Reports" data-module-href="/reports">
+                    <a href="/reports" class="function-card" data-module-id="reports" data-module-version="{{ module_versions.get('reports', '') }}" data-module-name="Performance Reports" data-module-href="/reports">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Performance Reports" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📊</div>
-                        <div class="function-name">Performance Reports</div>
+                        <div class="function-name">Performance Reports {{ module_version_badge('reports') }}</div>
                     </a>
-                    <a href="/power-bi" class="function-card" data-module-id="power-bi" data-module-name="Power BI Reports" data-module-href="/power-bi">
+                    <a href="/power-bi" class="function-card" data-module-id="power-bi" data-module-version="{{ module_versions.get('power-bi', '') }}" data-module-name="Power BI Reports" data-module-href="/power-bi">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Power BI Reports" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128200;</div>
-                        <div class="function-name">Power BI Reports</div>
+                        <div class="function-name">Power BI Reports {{ module_version_badge('power-bi') }}</div>
                     </a>
-                    <a href="/cell-heatmap" class="function-card" data-module-id="cell-heatmap" data-module-name="Network Coverage Heatmap" data-module-href="/cell-heatmap">
+                    <a href="/cell-heatmap" class="function-card" data-module-id="cell-heatmap" data-module-version="{{ module_versions.get('cell-heatmap', '') }}" data-module-name="Network Coverage Heatmap" data-module-href="/cell-heatmap">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Coverage Heatmap" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🗺️</div>
-                        <div class="function-name">Network Coverage Heatmap</div>
+                        <div class="function-name">Network Coverage Heatmap {{ module_version_badge('cell-heatmap') }}</div>
                     </a>
-                    <a href="/sector-health" class="function-card" data-module-id="sector-health" data-module-name="Sector Health Monitor" data-module-href="/sector-health">
+                    <a href="/sector-health" class="function-card" data-module-id="sector-health" data-module-version="{{ module_versions.get('sector-health', '') }}" data-module-name="Sector Health Monitor" data-module-href="/sector-health">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Sector Health Monitor" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📡</div>
-                        <div class="function-name">Sector Health Monitor</div>
+                        <div class="function-name">Sector Health Monitor {{ module_version_badge('sector-health') }}</div>
                     </a>
-                    <a href="/conflict-map" class="function-card" data-module-id="conflict-map" data-module-name="Conflict Map" data-module-href="/conflict-map">
+                    <a href="/conflict-map" class="function-card" data-module-id="conflict-map" data-module-version="{{ module_versions.get('conflict-map', '') }}" data-module-name="Conflict Map" data-module-href="/conflict-map">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Conflict Map" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">	&#127760;</div>
-                        <div class="function-name">Conflict Map</div>
+                        <div class="function-name">Conflict Map {{ module_version_badge('conflict-map') }}</div>
                     </a>
-                    <a href="/femto-pm" class="function-card" data-module-id="femto-pm" data-module-name="Femto Performance Explorer" data-module-href="/femto-pm">
+                    <a href="/femto-pm" class="function-card" data-module-id="femto-pm" data-module-version="{{ module_versions.get('femto-pm', '') }}" data-module-name="Femto Performance Explorer" data-module-href="/femto-pm">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Femto Performance Explorer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📶</div>
-                        <div class="function-name">Femto Performance Explorer</div>
+                        <div class="function-name">Femto Performance Explorer {{ module_version_badge('femto-pm') }}</div>
                     </a>
-                    <a href="/son-analytics" class="function-card" data-module-id="son-analytics" data-module-name="SON Optimization Insights" data-module-href="/son-analytics">
+                    <a href="/son-analytics" class="function-card" data-module-id="son-analytics" data-module-version="{{ module_versions.get('son-analytics', '') }}" data-module-name="SON Optimization Insights" data-module-href="/son-analytics">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin SON Optimization Insights" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🤖</div>
-                        <div class="function-name">SON Optimization Insights</div>
+                        <div class="function-name">SON Optimization Insights {{ module_version_badge('son-analytics') }}</div>
                     </a>
-                    <a href="/network-health" class="function-card" data-module-id="network-health" data-module-name="Network Health Overview" data-module-href="/network-health">
+                    <a href="/network-health" class="function-card" data-module-id="network-health" data-module-version="{{ module_versions.get('network-health', '') }}" data-module-name="Network Health Overview" data-module-href="/network-health">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Health Overview" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">💚</div>
-                        <div class="function-name">Network Health Overview</div>
+                        <div class="function-name">Network Health Overview {{ module_version_badge('network-health') }}</div>
                     </a>
                 </div>
             </div>
@@ -229,61 +223,61 @@
             <!-- ── Configuration panel ── -->
             <div class="section-panel hidden" id="section-configuration" role="tabpanel" aria-labelledby="tab-configuration" hidden>
                 <div class="function-grid">
-                    <a href="/parameter-dictionary" class="function-card" data-module-id="parameter-dictionary" data-module-name="Parameter Dictionary" data-module-href="/parameter-dictionary">
+                    <a href="/parameter-dictionary" class="function-card" data-module-id="parameter-dictionary" data-module-version="{{ module_versions.get('parameter-dictionary', '') }}" data-module-name="Parameter Dictionary" data-module-href="/parameter-dictionary">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Parameter Dictionary" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📚</div>
-                        <div class="function-name">Parameter Dictionary</div>
+                        <div class="function-name">Parameter Dictionary {{ module_version_badge('parameter-dictionary') }}</div>
                     </a>
-                    <a href="/performance-dictionary" class="function-card" data-module-id="performance-dictionary" data-module-name="Performance Dictionary" data-module-href="/performance-dictionary">
+                    <a href="/performance-dictionary" class="function-card" data-module-id="performance-dictionary" data-module-version="{{ module_versions.get('performance-dictionary', '') }}" data-module-name="Performance Dictionary" data-module-href="/performance-dictionary">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Performance Dictionary" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📈</div>
-                        <div class="function-name">Performance Dictionary</div>
+                        <div class="function-name">Performance Dictionary {{ module_version_badge('performance-dictionary') }}</div>
                     </a>
-                    <a href="/cm-extractor" class="function-card" data-module-id="cm-extractor" data-module-name="Configuration Data Extractor" data-module-href="/cm-extractor">
+                    <a href="/cm-extractor" class="function-card" data-module-id="cm-extractor" data-module-version="{{ module_versions.get('cm-extractor', '') }}" data-module-name="Configuration Data Extractor" data-module-href="/cm-extractor">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration Data Extractor" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📡</div>
-                        <div class="function-name">Configuration Data Extractor</div>
+                        <div class="function-name">Configuration Data Extractor {{ module_version_badge('cm-extractor') }}</div>
                     </a>
-                    <a href="/cm-parameter-audit" class="function-card" data-module-id="cm-parameter-audit" data-module-name="CM Parameter Audit" data-module-href="/cm-parameter-audit">
+                    <a href="/cm-parameter-audit" class="function-card" data-module-id="cm-parameter-audit" data-module-version="{{ module_versions.get('cm-parameter-audit', '') }}" data-module-name="CM Parameter Audit" data-module-href="/cm-parameter-audit">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin CM Parameter Audit" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128736;</div>
-                        <div class="function-name">CM Parameter Audit</div>
+                        <div class="function-name">CM Parameter Audit {{ module_version_badge('cm-parameter-audit') }}</div>
                     </a>
-                    <a href="/xml-parser" class="function-card" data-module-id="xml-parser" data-module-name="Configuration XML Parser" data-module-href="/xml-parser">
+                    <a href="/xml-parser" class="function-card" data-module-id="xml-parser" data-module-version="{{ module_versions.get('xml-parser', '') }}" data-module-name="Configuration XML Parser" data-module-href="/xml-parser">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration XML Parser" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📄</div>
-                        <div class="function-name">Configuration XML Parser</div>
+                        <div class="function-name">Configuration XML Parser {{ module_version_badge('xml-parser') }}</div>
                     </a>
-                    <a href="/excel-generator" class="function-card" data-module-id="excel-generator" data-module-name="Configuration XML Generator" data-module-href="/excel-generator">
+                    <a href="/excel-generator" class="function-card" data-module-id="excel-generator" data-module-version="{{ module_versions.get('excel-generator', '') }}" data-module-name="Configuration XML Generator" data-module-href="/excel-generator">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration XML Generator" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📊</div>
-                        <div class="function-name">Configuration XML Generator</div>
+                        <div class="function-name">Configuration XML Generator {{ module_version_badge('excel-generator') }}</div>
                     </a>
-                    <a href="/ne-comparison" class="function-card" data-module-id="ne-comparison" data-module-name="Network Element Comparison" data-module-href="/ne-comparison">
+                    <a href="/ne-comparison" class="function-card" data-module-id="ne-comparison" data-module-version="{{ module_versions.get('ne-comparison', '') }}" data-module-name="Network Element Comparison" data-module-href="/ne-comparison">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Element Comparison" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🔍</div>
-                        <div class="function-name">Network Element Comparison</div>
+                        <div class="function-name">Network Element Comparison {{ module_version_badge('ne-comparison') }}</div>
                     </a>
-                    <a href="/ret-management" class="function-card" data-module-id="ret-management" data-module-name="RET Management" data-module-href="/ret-management">
+                    <a href="/ret-management" class="function-card" data-module-id="ret-management" data-module-version="{{ module_versions.get('ret-management', '') }}" data-module-name="RET Management" data-module-href="/ret-management">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RET Management" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📐</div>
-                        <div class="function-name">RET Management</div>
+                        <div class="function-name">RET Management {{ module_version_badge('ret-management') }}</div>
                     </a>
-                    <a href="/config-task-scheduler" class="function-card" data-module-id="config-task-scheduler" data-module-name="Configuration Job Scheduler" data-module-href="/config-task-scheduler">
+                    <a href="/config-task-scheduler" class="function-card" data-module-id="config-task-scheduler" data-module-version="{{ module_versions.get('config-task-scheduler', '') }}" data-module-name="Configuration Job Scheduler" data-module-href="/config-task-scheduler">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration Job Scheduler" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🗓️</div>
-                        <div class="function-name">Configuration Job Scheduler</div>
+                        <div class="function-name">Configuration Job Scheduler {{ module_version_badge('config-task-scheduler') }}</div>
                     </a>
-                    <a href="/ran-features" class="function-card" data-module-id="ran-features" data-module-name="RAN Feature Library" data-module-href="/ran-features">
+                    <a href="/ran-features" class="function-card" data-module-id="ran-features" data-module-version="{{ module_versions.get('ran-features', '') }}" data-module-name="RAN Feature Library" data-module-href="/ran-features">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RAN Feature Library" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128218;</div>
-                        <div class="function-name">RAN Feature Library</div>
+                        <div class="function-name">RAN Feature Library {{ module_version_badge('ran-features') }}</div>
                     </a>
                     {% if '/documentation' in allowed_hrefs %}
-                    <a href="/documentation" class="function-card" data-module-id="documentation" data-module-name="Developer Documentation" data-module-href="/documentation">
+                    <a href="/documentation" class="function-card" data-module-id="documentation" data-module-version="{{ module_versions.get('documentation', '') }}" data-module-name="Developer Documentation" data-module-href="/documentation">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Developer Documentation" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128210;</div>
-                        <div class="function-name">Developer Documentation</div>
+                        <div class="function-name">Developer Documentation {{ module_version_badge('documentation') }}</div>
                     </a>
                     {% endif %}
                 </div>
@@ -292,10 +286,10 @@
             <!-- Fault Management panel -->
             <div class="section-panel hidden" id="section-fault-management" role="tabpanel" aria-labelledby="tab-fault-management" hidden>
                 <div class="function-grid">
-                    <a href="/fault-management" class="function-card" data-module-id="fault-management" data-module-name="Fault Management" data-module-href="/fault-management">
+                    <a href="/fault-management" class="function-card" data-module-id="fault-management" data-module-version="{{ module_versions.get('fault-management', '') }}" data-module-name="Fault Management" data-module-href="/fault-management">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Fault Management" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#9888;</div>
-                        <div class="function-name">Fault Management</div>
+                        <div class="function-name">Fault Management {{ module_version_badge('fault-management') }}</div>
                     </a>
                 </div>
             </div>
@@ -304,75 +298,75 @@
             <!-- Radio Optimization panel -->
             <div class="section-panel hidden" id="section-radio-optimization" role="tabpanel" aria-labelledby="tab-radio-optimization" hidden>
                 <div class="function-grid">
-                    <a href="/rf-optimization" class="function-card" data-module-id="rf-optimization" data-module-name="RF Optimization Workbench" data-module-href="/rf-optimization">
+                    <a href="/rf-optimization" class="function-card" data-module-id="rf-optimization" data-module-version="{{ module_versions.get('rf-optimization', '') }}" data-module-name="RF Optimization Workbench" data-module-href="/rf-optimization">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RF Optimization Workbench" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128225;</div>
-                        <div class="function-name">RF Optimization Workbench</div>
+                        <div class="function-name">RF Optimization Workbench {{ module_version_badge('rf-optimization') }}</div>
                     </a>
-                    <a href="/neighbor-quality" class="function-card" data-module-id="neighbor-quality" data-module-name="Neighbor Quality Analyzer" data-module-href="/neighbor-quality">
+                    <a href="/neighbor-quality" class="function-card" data-module-id="neighbor-quality" data-module-version="{{ module_versions.get('neighbor-quality', '') }}" data-module-name="Neighbor Quality Analyzer" data-module-href="/neighbor-quality">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Neighbor Quality Analyzer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#129309;</div>
-                        <div class="function-name">Neighbor Quality Analyzer</div>
+                        <div class="function-name">Neighbor Quality Analyzer {{ module_version_badge('neighbor-quality') }}</div>
                     </a>
-                    <a href="/capacity-hotspots" class="function-card" data-module-id="capacity-hotspots" data-module-name="Capacity Hotspots" data-module-href="/capacity-hotspots">
+                    <a href="/capacity-hotspots" class="function-card" data-module-id="capacity-hotspots" data-module-version="{{ module_versions.get('capacity-hotspots', '') }}" data-module-name="Capacity Hotspots" data-module-href="/capacity-hotspots">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Capacity Hotspots" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#9889;</div>
-                        <div class="function-name">Capacity Hotspots</div>
+                        <div class="function-name">Capacity Hotspots {{ module_version_badge('capacity-hotspots') }}</div>
                     </a>
-                    <a href="/sleeping-cells" class="function-card" data-module-id="sleeping-cells" data-module-name="Sleeping Cell Detector" data-module-href="/sleeping-cells">
+                    <a href="/sleeping-cells" class="function-card" data-module-id="sleeping-cells" data-module-version="{{ module_versions.get('sleeping-cells', '') }}" data-module-name="Sleeping Cell Detector" data-module-href="/sleeping-cells">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Sleeping Cell Detector" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128564;</div>
-                        <div class="function-name">Sleeping Cell Detector</div>
+                        <div class="function-name">Sleeping Cell Detector {{ module_version_badge('sleeping-cells') }}</div>
                     </a>
-                    <a href="/layer-coverage" class="function-card" data-module-id="layer-coverage" data-module-name="Layer Coverage Gaps" data-module-href="/layer-coverage">
+                    <a href="/layer-coverage" class="function-card" data-module-id="layer-coverage" data-module-version="{{ module_versions.get('layer-coverage', '') }}" data-module-name="Layer Coverage Gaps" data-module-href="/layer-coverage">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Layer Coverage Gaps" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128506;</div>
-                        <div class="function-name">Layer Coverage Gaps</div>
+                        <div class="function-name">Layer Coverage Gaps {{ module_version_badge('layer-coverage') }}</div>
                     </a>
-                    <a href="/overshooting-detector" class="function-card" data-module-id="overshooting-detector" data-module-name="Overshooting Detector" data-module-href="/overshooting-detector">
+                    <a href="/overshooting-detector" class="function-card" data-module-id="overshooting-detector" data-module-version="{{ module_versions.get('overshooting-detector', '') }}" data-module-name="Overshooting Detector" data-module-href="/overshooting-detector">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Overshooting Detector" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128246;</div>
-                        <div class="function-name">Overshooting Detector</div>
+                        <div class="function-name">Overshooting Detector {{ module_version_badge('overshooting-detector') }}</div>
                     </a>
-                    <a href="/change-impact" class="function-card" data-module-id="change-impact" data-module-name="Change Impact Tracker" data-module-href="/change-impact">
+                    <a href="/change-impact" class="function-card" data-module-id="change-impact" data-module-version="{{ module_versions.get('change-impact', '') }}" data-module-name="Change Impact Tracker" data-module-href="/change-impact">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Change Impact Tracker" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128202;</div>
-                        <div class="function-name">Change Impact Tracker</div>
+                        <div class="function-name">Change Impact Tracker {{ module_version_badge('change-impact') }}</div>
                     </a>
-                    <a href="/radio-morning-report" class="function-card" data-module-id="radio-morning-report" data-module-name="Radio Morning Report" data-module-href="/radio-morning-report">
+                    <a href="/radio-morning-report" class="function-card" data-module-id="radio-morning-report" data-module-version="{{ module_versions.get('radio-morning-report', '') }}" data-module-name="Radio Morning Report" data-module-href="/radio-morning-report">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Radio Morning Report" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#127749;</div>
-                        <div class="function-name">Radio Morning Report</div>
+                        <div class="function-name">Radio Morning Report {{ module_version_badge('radio-morning-report') }}</div>
                     </a>
-                    <a href="/nokia-load-balancing" class="function-card" data-module-id="nokia-load-balancing" data-module-name="Nokia Load Balancing" data-module-href="/nokia-load-balancing">
+                    <a href="/nokia-load-balancing" class="function-card" data-module-id="nokia-load-balancing" data-module-version="{{ module_versions.get('nokia-load-balancing', '') }}" data-module-name="Nokia Load Balancing" data-module-href="/nokia-load-balancing">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Nokia Load Balancing" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#9878;</div>
-                        <div class="function-name">Nokia Load Balancing</div>
+                        <div class="function-name">Nokia Load Balancing {{ module_version_badge('nokia-load-balancing') }}</div>
                     </a>
-                    <a href="/huawei-load-balancing" class="function-card" data-module-id="huawei-load-balancing" data-module-name="Huawei Load Balancing" data-module-href="/huawei-load-balancing">
+                    <a href="/huawei-load-balancing" class="function-card" data-module-id="huawei-load-balancing" data-module-version="{{ module_versions.get('huawei-load-balancing', '') }}" data-module-name="Huawei Load Balancing" data-module-href="/huawei-load-balancing">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Huawei Load Balancing" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#9878;</div>
-                        <div class="function-name">Huawei Load Balancing</div>
+                        <div class="function-name">Huawei Load Balancing {{ module_version_badge('huawei-load-balancing') }}</div>
                     </a>
-                    <a href="/mobility-explorer" class="function-card" data-module-id="mobility-explorer" data-module-name="Mobility HO Explorer" data-module-href="/mobility-explorer">
+                    <a href="/mobility-explorer" class="function-card" data-module-id="mobility-explorer" data-module-version="{{ module_versions.get('mobility-explorer', '') }}" data-module-name="Mobility HO Explorer" data-module-href="/mobility-explorer">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Mobility HO Explorer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#8644;</div>
-                        <div class="function-name">Mobility / HO Explorer</div>
+                        <div class="function-name">Mobility / HO Explorer {{ module_version_badge('mobility-explorer') }}</div>
                     </a>
-                    <a href="/alarm-impact" class="function-card" data-module-id="alarm-impact" data-module-name="Alarm PM Correlator" data-module-href="/alarm-impact">
+                    <a href="/alarm-impact" class="function-card" data-module-id="alarm-impact" data-module-version="{{ module_versions.get('alarm-impact', '') }}" data-module-name="Alarm PM Correlator" data-module-href="/alarm-impact">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Alarm PM Correlator" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128680;</div>
-                        <div class="function-name">Alarm–PM Correlator</div>
+                        <div class="function-name">Alarm–PM Correlator {{ module_version_badge('alarm-impact') }}</div>
                     </a>
-                    <a href="/group-health" class="function-card" data-module-id="group-health" data-module-name="Group Cluster Health" data-module-href="/group-health">
+                    <a href="/group-health" class="function-card" data-module-id="group-health" data-module-version="{{ module_versions.get('group-health', '') }}" data-module-name="Group Cluster Health" data-module-href="/group-health">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Group Cluster Health" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128202;</div>
-                        <div class="function-name">Group / Cluster Health</div>
+                        <div class="function-name">Group / Cluster Health {{ module_version_badge('group-health') }}</div>
                     </a>
-                    <a href="/irat-border" class="function-card" data-module-id="irat-border" data-module-name="IRAT Vendor Border" data-module-href="/irat-border">
+                    <a href="/irat-border" class="function-card" data-module-id="irat-border" data-module-version="{{ module_versions.get('irat-border', '') }}" data-module-name="IRAT Vendor Border" data-module-href="/irat-border">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin IRAT Vendor Border" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128737;</div>
-                        <div class="function-name">IRAT / Vendor Border</div>
+                        <div class="function-name">IRAT / Vendor Border {{ module_version_badge('irat-border') }}</div>
                     </a>
                 </div>
             </div>
@@ -679,7 +673,7 @@
 
     <script id="radar-bootstrap-data" type="application/json">{{ {'columns': tech_site_columns, 'total': total_sites} | tojson }}</script>
     <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.2"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.5"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
     <script>
         // Jordan (UTC+3) clock — inlined so a stale cached common.js cannot break it.
         function formatDashboardClock(date = new Date()) {
@@ -1521,7 +1515,7 @@
             input.addEventListener('input', () => {
                 const q = input.value.trim().toLowerCase();
                 dashboardToolCards().forEach(card => {
-                    const text = `${card.dataset.moduleName || ''} ${card.getAttribute('href') || ''}`.toLowerCase();
+                    const text = `${card.dataset.moduleName || ''} ${card.dataset.moduleVersion || ''} ${card.getAttribute('href') || ''}`.toLowerCase();
                     card.hidden = q ? !text.includes(q) : false;
                 });
                 document.querySelectorAll('.section-panel:not(.hidden), #dashboard-pinned-tools:not([hidden])')

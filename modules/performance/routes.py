@@ -47,13 +47,20 @@ from sync_config import (
     pm_table_name,
 )
 from core.resource_limits import heavy_query_required
-from db.runtime import apply_pm_read_pragmas
 from core.site_area import (
     list_pm_partition_tables,
     preferred_pm_table,
     site_id_from_cell_name,
 )
-from db.runtime import connect_app, connect_metadata, execute_query
+from db.runtime import (
+    apply_pm_read_pragmas,
+    connect_app,
+    connect_metadata,
+    execute_query,
+    open_db,
+    performance_meta_pm_conn,
+    store_available,
+)
 from database_enhanced import get_user_by_session, log_activity
 from modules.sync.metadata_active_sql import (
     perf_per_tech_union_sql,
@@ -970,9 +977,7 @@ def _user_id(user):
 
 
 def _groups_conn(vendor: str, scope: str = 'hourly'):
-    conn = sqlite3.connect(_groups_db_for_vendor(vendor, scope), timeout=15)
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.row_factory = sqlite3.Row
+    conn = open_db(_groups_db_for_vendor(vendor, scope), timeout=15)
     return conn
 
 
@@ -1053,9 +1058,8 @@ def _ensure_reports_table():
 # ---------------------------------------------------------------------------
 
 def _meta_conn():
-    conn = sqlite3.connect(METADATA_DB, timeout=15)
+    conn = connect_metadata()
     apply_pm_read_pragmas(conn)
-    conn.row_factory = sqlite3.Row
     return conn
 
 
@@ -1138,19 +1142,18 @@ def _pm_table_cell_scope_sql(resolved_cell_col: str, scoped_cell_names: list[str
     return clause, list(scoped_cell_names)
 
 
-def _open_pm_db(db_path: str) -> sqlite3.Connection:
-    """Open PM SQLite with read-friendly pragmas (large DBs on Windows)."""
+def _open_pm_db(db_path: str):
+    """Open PM store with read-friendly pragmas (SQLite) or mapped Postgres schema."""
     abs_path = os.path.normpath(os.path.abspath(db_path))
     with _PM_INDEX_ENSURE_LOCK:
-        if abs_path not in _PM_INDEX_ENSURED_PATHS and os.path.isfile(abs_path):
+        if abs_path not in _PM_INDEX_ENSURED_PATHS and store_available(abs_path):
             _PM_INDEX_ENSURED_PATHS.add(abs_path)
             try:
                 from core.pm_indexes import ensure_pm_database
                 ensure_pm_database(abs_path, analyze=False)
             except Exception:
                 pass
-    conn = sqlite3.connect(db_path, timeout=15)
-    conn.row_factory = sqlite3.Row
+    conn = open_db(db_path, timeout=15)
     apply_pm_read_pragmas(conn)
     return conn
 
@@ -1609,14 +1612,13 @@ def _query_cell_trend_from_tables(
 def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: str) -> set[str]:
     """Cell names with retained PM rows for the current Performance object scope."""
     db_path = _pm_db_for_vendor(vendor, scope)
-    if not os.path.isfile(db_path):
+    if not store_available(db_path):
         return set()
 
     names: set[str] = set()
-    conn: sqlite3.Connection | None = None
+    conn = None
     try:
-        conn = sqlite3.connect(db_path, timeout=15)
-        conn.row_factory = sqlite3.Row
+        conn = open_db(db_path, timeout=15)
         existing = [
             r[0]
             for r in conn.execute(
@@ -1847,7 +1849,7 @@ def _get_pm_cols(db_path, technology=None):
             tables = [t for t in tables if huawei_table_matches_technology(t, technology)]
 
         try:
-            conn = sqlite3.connect(db_path, timeout=30)
+            conn = open_db(db_path, timeout=30)
             for table in tables:
                 try:
                     result.update(_kpi_columns_for_sqlite_table(conn, table))
@@ -1861,7 +1863,7 @@ def _get_pm_cols(db_path, technology=None):
     techs = [technology] if technology else PM_TECHNOLOGIES
     data_scope = _scope_from_pm_db(db_path)
     try:
-        conn = sqlite3.connect(db_path, timeout=30)
+        conn = open_db(db_path, timeout=30)
         existing = [
             r[0]
             for r in conn.execute(
@@ -1905,7 +1907,7 @@ def _pm_extra_trend_time_columns(conn, table: str) -> str:
 def _load_pm_cols_for_table(db_path, table):
     """Return non-empty KPI columns for a specific table (uncached)."""
     try:
-        conn = sqlite3.connect(db_path, timeout=30)
+        conn = open_db(db_path, timeout=30)
         try:
             return _kpi_columns_for_sqlite_table(conn, table)
         finally:
@@ -1930,23 +1932,10 @@ def _get_pm_cols_for_table(db_path, table):
 
 def _pm_conn(vendor=None, scope: str = 'hourly'):
     """
-    Open metadata.db and ATTACH the right PM db(s).
+    Open metadata and ATTACH (SQLite) or schema-qualify (Postgres) PM stores.
     Returns (conn, pm_alias_or_None).
     """
-    conn = sqlite3.connect(METADATA_DB, timeout=15)
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.row_factory = sqlite3.Row
-
-    if vendor is None or (isinstance(vendor, str) and not str(vendor).strip()):
-        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Nokia', scope)}'  AS nokia_pm")
-        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Huawei', scope)}' AS huawei_pm")
-        return conn, None
-    nv = _norm_vendor_for_pm(vendor)
-    if nv == 'Nokia':
-        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Nokia', scope)}'  AS pm")
-        return conn, 'pm'
-    conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Huawei', scope)}' AS pm")
-    return conn, 'pm'
+    return performance_meta_pm_conn(vendor, scope)
 
 
 def _build_pm_union(alias, db_path, technology=None):
@@ -1976,7 +1965,7 @@ def _build_pm_union(alias, db_path, technology=None):
         ]
 
     try:
-        conn = sqlite3.connect(db_path, timeout=30)
+        conn = open_db(db_path, timeout=30)
         for table in tables:
             try:
                 good = _kpi_columns_for_sqlite_table(conn, table)

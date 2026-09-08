@@ -16,6 +16,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from db.runtime import open_db
 from sync_config import (
     PROJECT_ROOT,
     METADATA_DB,
@@ -69,7 +70,7 @@ _KPI_COLS = '''
 
 
 def _create_pm_db(db_path):
-    conn = sqlite3.connect(db_path)
+    conn = open_db(db_path)
     cursor = conn.cursor()
     for tech in PM_TECHNOLOGIES:
         table = pm_table_name(tech)
@@ -99,7 +100,7 @@ def _init_huawei_pm_db(db_path):
 
 
 def _create_metadata_db():
-    conn = sqlite3.connect(METADATA_DB)
+    conn = open_db(METADATA_DB)
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -159,8 +160,10 @@ def _create_metadata_db():
 
 
 def _ensure_sync_log():
-    conn = sqlite3.connect(APP_DB)
-    conn.execute('''
+    from db.runtime import connect_app, execute_query
+
+    conn = connect_app()
+    execute_query(conn, '''
         CREATE TABLE IF NOT EXISTS sync_log (
             id            INTEGER PRIMARY KEY AUTOINCREMENT,
             sync_type     TEXT NOT NULL,
@@ -177,7 +180,7 @@ def _ensure_sync_log():
 
 def _create_cell_groups_db(db_path):
     """Create one vendor-specific cell groups DB."""
-    conn = sqlite3.connect(db_path)
+    conn = open_db(db_path)
     conn.execute('PRAGMA journal_mode=WAL')
     cur = conn.cursor()
     cur.execute('''
@@ -251,7 +254,7 @@ def _migrate_legacy_group_db():
         by_vendor[v][gid]['cells'].append(r)
 
     for vendor, db_path in (('Nokia', NOKIA_GROUPS_DB), ('Huawei', HUAWEI_GROUPS_DB)):
-        conn = sqlite3.connect(db_path)
+        conn = open_db(db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         for payload in by_vendor[vendor].values():
@@ -326,7 +329,7 @@ def ensure_per_tech_columns():
     Add any missing columns to existing per-tech tables (SQLite has no DROP COLUMN
     in older versions; ALTER ADD is safe for upgrades).
     """
-    conn = sqlite3.connect(METADATA_DB)
+    conn = open_db(METADATA_DB)
     cursor = conn.cursor()
     for table, cols in PER_TECH_CSV_SCHEMA.items():
         try:
@@ -365,7 +368,7 @@ def _create_per_tech_tables():
     # Legacy DBs may predate ``technology`` / ``updated_at``; add them before indexes.
     ensure_per_tech_columns()
 
-    conn = sqlite3.connect(METADATA_DB)
+    conn = open_db(METADATA_DB)
     cursor = conn.cursor()
 
     for table, csv_cols in PER_TECH_CSV_SCHEMA.items():

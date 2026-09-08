@@ -219,7 +219,8 @@ def _migrate_legacy_db_names():
 _migrate_legacy_db_names()
 
 # ── Database backend ─────────────────────────────────────────────────────────
-# SQLite only (local files under ``databases/``). PostgreSQL support was removed.
+# App DB (ncm_users): SQLite unless NCM_APP_DATABASE_URL is a postgresql:// URL.
+# Metadata / PM / neighbors stay SQLite.
 
 
 def use_postgresql() -> bool:

@@ -22,7 +22,14 @@ def _numpy_graph_scores(
     scores = []
     for i, row in enumerate(rows):
         key = str(row.get("cell_name") or "").strip().lower()
-        neigh = [index[n] for n in adjacency.get(key, []) if n in index]
+        neigh: list[int] = []
+        seen: set[int] = set()
+        for n in adjacency.get(key, []):
+            j = index.get(n)
+            if j is None or j == i or j in seen:
+                continue
+            seen.add(j)
+            neigh.append(j)
         nbr_pen = float(row.get("nbr_missing_recip") or 0) * 40.0
         dist_pen = 15.0 if float(row.get("nbr_distance_km") or 0) >= 12 else 0.0
         ho_pen = 25.0 if 0 < float(row.get("nbr_ho_sr") or 100) < 95 else 0.0
@@ -31,7 +38,8 @@ def _numpy_graph_scores(
             mean_n = mean_n / (np.linalg.norm(mean_n) + 1e-9)
             isol = float(1.0 - np.clip(np.dot(unit[i], mean_n), -1.0, 1.0)) * 50.0
         else:
-            isol = 10.0
+            # No embedding match: do not invent isolation. HO / recip / distance still apply.
+            isol = 0.0
         scores.append(float(min(100.0, isol + nbr_pen + dist_pen + ho_pen)))
     return scores
 

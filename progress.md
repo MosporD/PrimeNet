@@ -2,9 +2,69 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Module gap-fix pass. Config dictionaries/XML/CM-audit shipped locally; SON ML pipeline also shipped.
+**Current track:** UI unification (`checklist.md`). Auth pages aligned to NexusCore constellation; module header/body-class pass done. Browser verify still open.
 
-**NEXT:** Browser-verify `/xml-parser`, `/excel-generator`, `/parameter-dictionary`, `/performance-dictionary`, `/cm-parameter-audit`. Then `/son-analytics` after `python scripts/pipeline/run_son_ml_job.py --force`.
+**Parked:** SON trust browser click-through (`/son-analytics` Topology). Browser-verify `/xml-parser`, `/excel-generator`, `/parameter-dictionary`, `/performance-dictionary`, `/cm-parameter-audit`. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id` (Health unchanged).
+
+**NEXT:** Browser-verify UI consistency — dashboard, login/register, one radio module (`radio_module.html`), one standalone (Network Health or SON), light+dark toggle.
+
+## 2026-09-06 (UI unification)
+
+- Done: Extracted login inline CSS → `static/css/login.css`; register + activation rebuilt on the same NexusCore constellation shell.
+- Done: Module body page-classes for 11 templates; Documentation + SON logout; `common.js` theme toggle mounts on `.doc-header-right`; dark page-class allowlist expanded in `common.css`.
+- Done: Dashboard legacy op-sites hide rule moved from inline `<style>` to `dashboard.css`.
+- Not done: live browser pass (checklist last box).
+
+## 2026-09-02 (SON ML rebuild)
+
+- Done: Topology join no longer samples map lines. SQL aggregates Huawei `Local_cell_name`/`Target_Cell_Name` and Nokia `Source_LNCEL_name` + ECI→metadata `cell_name` (NetAct leaves Target LNCEL empty).
+- Done: SON-only Huawei Cell Name keys (`prefer_cell_cols` on `_cell_daily_kpi_series`). Health still uses LocalCell Id. Huawei scores 27,547 cells (was ~124 numeric ids).
+- Done: Loaded unused Nokia 4G export (`raw/nokia/neighbor/all/hourly/4G`, 2,354,489 rows) via `load_nokia_neighbor_raw_to_db.py --only-4g` (2G/3G untouched).
+- Done: Graph isolation is 0 when no embedding neighbor (no fake 10.0). HO / recip / distance penalties still apply.
+- Verified: Nokia 15,236/15,482 cells with neighbors, 5,417 graph≥55; Huawei 22,775/27,547 matched, 3,260 graph≥55. Tests 15/15 (`test_neighbor_graph.py` + `test_recommendations.py`).
+- Not done: no browser click this session; treatment still heuristic (0 CM+PM pairs). No 2G/3G/5G ML. No closed-loop.
+
+
+## 2026-09-02 (feature briefs)
+
+- Done: Agent context briefs for every dashboard tile + shared platform (`docs/features/`). Not user manuals. Cursor rule `feature-briefs.mdc` loads them when those files are in play. Update History/Plans on the matching brief when a feature actually changes.
+
+## 2026-08-31 (Postgres phases 2–4 plumbing)
+
+- Done: Opt-in domain routing — `NCM_DATABASE_URL` + `NCM_PG_DOMAINS=app,metadata,neighbors,groups,balance,pm`. Unset = SQLite as today. `NCM_APP_DATABASE_URL` alone still means **app only**.
+- Done: Separate Postgres schemas so Nokia/Huawei hourly table names can collide (`pm_nokia_hourly` vs `pm_huawei_hourly`). SQLite ATTACH aliases become schema-qualified `alias."table"`.
+- Done: `db.runtime.open_db` / `store_available` used by Performance, ingest, neighbors, groups, SON PM helpers, pipeline loader. Femto / SON ML / KPI headers stay SQLite.
+- Done: `python scripts/migrate_sqlite_domain_to_postgres.py --schema metadata` and `python scripts/migrate_all_sqlite_to_postgres.py` (chunked copy; does not delete SQLite files).
+- Verified: adapter tests 16/16; `init_db` still SQLite; no Postgres URL set on this laptop.
+- Not done: no live Postgres here — do not set the URL until the server has Postgres and migrate has been run. PM ingest on Postgres is not load-tested (14 GB).
+
+## 2026-08-31 (Postgres phase 0–1)
+
+- Done: Phase 0 inventory — `python scripts/inventory_sqlite_databases.py`. App DB `ncm_users.db` is 548 KB / 22 tables / 3879 rows (57 users). PM+femto are multi-GB; stay SQLite. ATTACH in `performance_meta_pm_conn` blocks PM Postgres.
+- Done: Phase 1 opt-in — `NCM_APP_DATABASE_URL=postgresql://…` switches **only** `connect_app()` (users/sessions + other ncm_users tables). Unset = SQLite as today. Adapter tests 6/6. `init_db` still works on SQLite (57 users).
+- Done: `scripts/migrate_ncm_users_to_postgres.py` copies SQLite → schema `app`. Optional Compose profile `app-db` for a local Postgres (not started by default).
+- Not done: no live Postgres on this laptop; do not set the URL until the server has Postgres and the migrate script has been run.
+
+## 2026-08-31 (platform hygiene)
+
+**NEXT:** Rebuild SON ML so Topology can use the raised neighbor-line cap (`NEIGHBOR_MAX_LINES=100000`). Then click through `/son-analytics` in a browser (no browser MCP this session; APIs were verified via Flask test client).
+
+## 2026-08-31 (platform hygiene)
+
+- Done: Custom HTML 404 (`templates/404.html`, NexusCore constellation) + JSON `{"error":"Not found"}` for `/api/*`. Flask test client: HTML 404, API 404.
+- Done: Public `/robots.txt` (`User-agent: *` / `Disallow: /`). `X-Robots-Tag: noindex, nofollow` on all responses.
+- Done: Neighbor Relations Analyzer Excel export — `/api/network-map/neighbors/export` + **Export Excel** on `/neighbor-analysis`. Same filters as map lines. Workbook builder verified (`PK` xlsx). Live neighbor DB returned 0 lines in this session (export would 400 until a cell is drawn).
+- **NEXT:** SON ML rebuild (above). Postgres cutover is opt-in on the server (`NCM_DATABASE_URL`); this laptop stays SQLite.
+
+## 2026-08-30 (SON trust)
+
+- Done: isolated branch `son/trust-insights`; progress parked off CM Extractor
+- Done: `test_recommendations.py` — Cluster min-size / spatial key, Anomaly floor 70 + skip clustered + missed_by_wow + alias dedupe, Topology floor 55, rules-only fallback. `python modules/son_analytics/test_recommendations.py` — 10/10
+- Done: `python scripts/pipeline/run_son_ml_job.py --force` — Nokia 15466 scores / 807841 cell-days (445s); Huawei 122 scores / 4176 cell-days (131s); treatment still heuristic (0 CM+PM pairs). Job now stamps PM fingerprint at save so a rebuild is not immediately self-stale
+- Done: HTTP verify (minimal Flask app, admin session): page 200 Read-only + filters; ml-status available; summary Cluster 12 / Anomaly 36 / Topology 0; category/severity/vendor filters do not leak; detail + thumbs; refresh 200; missing id 404
+- Done: load errors no longer swallowed in `son_analytics.js`; Anomaly/Topology dedupe vendor-alias keys
+- Diagnose (not fixed here): Huawei cells named like `144.0` because `pm_helpers` prefers `LocalCell Id` (61 distinct) over `Cell Name` (27k). Topology empty because graph scores were all 10 (no neighbor match under the old 8000-line cap) — cap raised, needs another ML rebuild to take effect
+- First `/api/son/summary` ~13 min (WoW scan of daily PM); cached 1h after that
 
 ## 2026-08-19 (SON ML)
 

@@ -23,6 +23,7 @@ import sqlite3
 from typing import Any, Callable
 
 from sync_config import METADATA_DB
+from db.runtime import open_db
 
 
 def _norm_header_key(name: str) -> str:
@@ -947,8 +948,7 @@ def build_raw_neighbor_lines(
     narrow_where: str | None = None
     narrow_params: list[Any] = []
 
-    meta = sqlite3.connect(METADATA_DB, timeout=30)
-    meta.row_factory = sqlite3.Row
+    meta = open_db(METADATA_DB, timeout=30)
     try:
         if tech_u.startswith("2G"):
             by_name, by_site_cell, by_cell_id = _load_2g_indexes(meta)

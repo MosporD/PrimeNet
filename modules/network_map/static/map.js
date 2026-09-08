@@ -1984,22 +1984,7 @@ async function refreshNeighborOverlay() {
     const minFilterValue = Number.isFinite(minRaw)
         ? minRaw
         : (_neighborFailuresMode() ? 1 : 10);
-    const maxLines = Number(document.getElementById('neighbor-max-lines')?.value || 300);
-    const qs = new URLSearchParams();
-    qs.set('vendor', vendor);
-    qs.set('technology', activeTech);
-    qs.set('max_lines', String(Number.isFinite(maxLines) ? Math.max(10, maxLines) : 300));
-    if (selectedSiteId) qs.set('site_id', selectedSiteId);
-    if (selectedNeighborCell) qs.set('cell_name', selectedNeighborCell);
-    qs.set('direction', _neighborDirection());
-    if (_neighborFailuresMode()) {
-        qs.set('failures_only', '1');
-        const mf = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 1;
-        qs.set('min_failures', String(mf));
-    } else {
-        const ma = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 10;
-        qs.set('min_attempts', String(ma));
-    }
+    const qs = _neighborLinesQueryString();
 
     try {
         const res = await fetch(`/api/network-map/neighbors/lines?${qs.toString()}`);
@@ -2023,6 +2008,81 @@ async function refreshNeighborOverlay() {
     } catch (e) {
         console.error('Neighbor lines error:', e);
         showNotification('Failed to load neighbor lines', 'error');
+    }
+}
+
+function _neighborLinesQueryString() {
+    const vendor = document.getElementById('vendor-filter')?.value || 'all';
+    const minEl = document.getElementById('neighbor-min-attempts');
+    const minRaw = Number(minEl?.value);
+    const maxLines = Number(document.getElementById('neighbor-max-lines')?.value || 300);
+    const qs = new URLSearchParams();
+    qs.set('vendor', vendor);
+    qs.set('technology', activeTech);
+    qs.set('max_lines', String(Number.isFinite(maxLines) ? Math.max(10, maxLines) : 300));
+    if (selectedSiteId) qs.set('site_id', selectedSiteId);
+    if (selectedNeighborCell) qs.set('cell_name', selectedNeighborCell);
+    qs.set('direction', _neighborDirection());
+    if (_neighborFailuresMode()) {
+        qs.set('failures_only', '1');
+        const mf = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 1;
+        qs.set('min_failures', String(mf));
+    } else {
+        const ma = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 10;
+        qs.set('min_attempts', String(ma));
+    }
+    return qs;
+}
+
+async function exportNeighborRelationsExcel() {
+    if (NEIGHBOR_ONLY_MODE && !_neighborDirectionSelected()) {
+        showNotification('Choose handover direction first.', 'info');
+        return;
+    }
+    if (NEIGHBOR_ONLY_MODE) {
+        _syncActiveTechFromNeighborRatSelect();
+    }
+    if (activeTech === 'all') {
+        showNotification('Select a technology (RAT) to export neighbor relations.', 'info');
+        return;
+    }
+    const btn = document.getElementById('neighbor-export-excel');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Exporting…';
+    }
+    try {
+        const qs = _neighborLinesQueryString();
+        const res = await fetch(`/api/network-map/neighbors/export?${qs.toString()}`);
+        if (!res.ok) {
+            let message = 'Excel export failed';
+            try {
+                const data = await res.json();
+                message = data.error || message;
+            } catch (_) { /* ignore */ }
+            throw new Error(message);
+        }
+        const blob = await res.blob();
+        const disposition = res.headers.get('Content-Disposition') || '';
+        const match = disposition.match(/filename="?([^";]+)"?/i);
+        const filename = match ? match[1] : `neighbor_relations_${Date.now()}.xlsx`;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        showNotification('Neighbor relations Excel downloaded.', 'success');
+    } catch (e) {
+        console.error('Neighbor Excel export error:', e);
+        showNotification(e.message || 'Excel export failed', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Export Excel';
+        }
     }
 }
 

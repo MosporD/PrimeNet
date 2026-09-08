@@ -254,11 +254,15 @@ def _build_anomaly_recommendations(
         scores.values(),
         key=lambda r: -float(r.get("anomaly_score") or 0),
     )
+    seen: set[str] = set()
     for row in ranked:
         cell = str(row.get("cell_name") or "").strip()
         if not cell:
             continue
         key = cell.lower()
+        if key in seen:
+            continue
+        seen.add(key)
         score = float(row.get("anomaly_score") or 0)
         if score < ml_cfg.ANOMALY_MIN_SCORE:
             continue
@@ -318,13 +322,16 @@ def _build_topology_recommendations(scores: dict[str, dict], clustered_cells: se
     area_map = get_cell_area_map()
     out: list[dict] = []
     ranked = sorted(scores.values(), key=lambda r: -float(r.get("graph_score") or 0))
+    seen: set[str] = set()
     for row in ranked:
         cell = str(row.get("cell_name") or "").strip()
         g = float(row.get("graph_score") or 0)
         if not cell or g < ml_cfg.TOPOLOGY_MIN_SCORE:
             continue
-        if cell.lower() in clustered_cells:
+        key = cell.lower()
+        if key in seen or key in clustered_cells:
             continue
+        seen.add(key)
         loc = loc_map.get(cell) or {}
         out.append({
             "id": _rec_id("topology", cell, str(row.get("day") or "")),

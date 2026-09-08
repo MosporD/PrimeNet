@@ -43,7 +43,7 @@ import logging
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from db.runtime import adapt_placeholders, connect_metadata, execute_query
+from db.runtime import adapt_placeholders, connect_metadata, execute_query, open_db
 from sync_config import HUAWEI_PM_DB, METADATA_DB
 from .db_migration import PER_TECH_CSV_SCHEMA
 from .metadata_active_sql import legacy_cells_activity_case_sql
@@ -443,8 +443,8 @@ def seed_pm_cells_to_metadata(pm_db_path, vendor):
     pm_conn = None
     meta_conn = None
     try:
-        pm_conn = sqlite3.connect(pm_db_path)
-        meta_conn = sqlite3.connect(METADATA_DB, timeout=30)
+        pm_conn = open_db(pm_db_path)
+        meta_conn = connect_metadata()
 
         pm_rows = []
         huawei_abs = os.path.abspath(HUAWEI_PM_DB)

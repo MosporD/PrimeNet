@@ -12,6 +12,8 @@ import re
 import sqlite3
 from typing import Iterable
 
+from db.runtime import open_db, store_available
+
 _TIME_ALIASES = (
     "timestamp",
     "report_date",
@@ -222,11 +224,11 @@ def ensure_pm_database(
     tag = label or os.path.basename(db_path)
     result: dict = {"label": tag, "path": db_path, "tables": {}, "indexes": [], "missing": False}
 
-    if not os.path.isfile(db_path):
+    if not store_available(db_path):
         result["missing"] = True
         return result
 
-    conn = sqlite3.connect(db_path, timeout=120)
+    conn = open_db(db_path, timeout=120)
     try:
         conn.execute("PRAGMA busy_timeout=120000")
     except sqlite3.Error:

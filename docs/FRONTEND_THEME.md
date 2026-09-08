@@ -232,6 +232,8 @@ See `modules/sector_health/static/sector_health.js` (`shPieColors`, `primenet:th
 5. `.son-topbar .son-topbar-actions`
 6. `.nh-header .nh-header-right`
 7. `.nh-select-header`
+8. `.doc-header .doc-header-right`
+9. `.login-theme-mount` / `.portal-theme-mount`
 
 **If dark mode toggle is missing**, ensure the template has one of these containers and loads `common.js`.
 

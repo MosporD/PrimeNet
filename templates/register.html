@@ -3,93 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimeNet - Create Account</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <title>NexusCore - Create Account</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon-nexuscore.png?v=1" data-page-favicon>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}?v=1.0">
 </head>
-<body>
-    <div class="auth-container">
-        <div class="auth-box register-box">
-            <div class="auth-header">
-                <h1>PrimeNet</h1>
-                <p>Network Performance &amp; Configuration Platform</p>
+<body class="auth-page register-page">
+    <canvas id="constellation-canvas" aria-hidden="true"></canvas>
+    <div class="hud-overlay" aria-hidden="true"></div>
+    <div class="login-theme-mount" aria-label="Theme controls"></div>
+
+    <main class="login-shell login-shell-centered">
+        <section class="brand-pane" aria-label="NexusCore branding">
+            <div class="brand-lockup">
+                <img src="/static/images/nexuscore-logo.png?v=1" alt="NexusCore logo" class="brand-logo">
+                <div>
+                    <div class="brand-name">NexusCore</div>
+                    <div class="brand-sub">Unified Telecom &amp; ISP Platform</div>
+                </div>
             </div>
 
-            <form id="register-form" class="auth-form">
+            <div class="telemetry-card" aria-hidden="true">
+                <div class="telemetry-head"><span class="live-dot"></span> Operator onboarding</div>
+                <div class="telemetry-ticker">Request access to the Engineering Portal (PrimeNet).</div>
+                <ul class="rat-chips">
+                    <li class="rat-chip"><i style="background:#fbbf24"></i>2G GSM</li>
+                    <li class="rat-chip"><i style="background:#38bdf8"></i>3G UMTS</li>
+                    <li class="rat-chip"><i style="background:#34d399"></i>4G FDD</li>
+                    <li class="rat-chip"><i style="background:#a78bfa"></i>4G TDD</li>
+                    <li class="rat-chip"><i style="background:#f472b6"></i>5G NR</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card-pane">
+            <form id="register-form" class="auth-card auth-card-wide" autocomplete="on">
                 <h2>Create Account</h2>
-                
+                <p class="card-sub">
+                    Already have an account?
+                    <a href="{{ url_for('auth.login_page') }}">Sign in</a>
+                </p>
+
                 <div class="form-group">
                     <label for="username">Username *</label>
-                    <input type="text" id="username" name="username" required autofocus>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128100;</span>
+                        <input type="text" id="username" name="username" placeholder="operator id" required autofocus autocomplete="username">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#9993;</span>
+                        <input type="email" id="email" name="email" placeholder="name@company.com" required autocomplete="email">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password * (min 6 characters)</label>
-                    <input type="password" id="password" name="password" required minlength="6">
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128273;</span>
+                        <input type="password" id="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required minlength="6" autocomplete="new-password">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="confirm-password">Confirm Password *</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128273;</span>
+                        <input type="password" id="confirm-password" name="confirm-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required autocomplete="new-password">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="full-name">Full Name</label>
-                    <input type="text" id="full-name" name="full-name">
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128100;</span>
+                        <input type="text" id="full-name" name="full-name" placeholder="optional" autocomplete="name">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="department">Department</label>
-                    <input type="text" id="department" name="department" placeholder="e.g., Radio Network Optimization">
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#127970;</span>
+                        <input type="text" id="department" name="department" placeholder="e.g., Radio Network Optimization" autocomplete="organization-title">
+                    </div>
                 </div>
 
-                <div id="error-message" class="error-message" style="display: none;"></div>
-                <div id="success-message" class="success-message" style="display: none;"></div>
+                <div id="error-message" class="error-message" role="alert"></div>
+                <div id="success-message" class="success-message" role="status"></div>
 
-                <button type="submit" class="btn-primary">Create Account</button>
+                <button type="submit" class="btn-signin" id="register-btn">
+                    <span class="btn-ping" aria-hidden="true"></span><span class="btn-label">Create Account</span>
+                </button>
 
-                <p class="auth-link">
-                    Already have an account? <a href="{{ url_for('auth.login_page') }}">Sign in here</a>
-                </p>
+                <div class="card-footer-line" aria-hidden="true">
+                    <span>ONBOARDING</span>
+                    <span>SECURE LINK</span>
+                </div>
             </form>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
+    <div class="page-credit">Developed by Malek Mohammad</div>
+
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.1"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
     <script>
+        (function () {
+            if (window.PrimeNetConstellation) {
+                PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
+            }
+        })();
+
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const fullName = document.getElementById('full-name').value;
             const department = document.getElementById('department').value;
-            
+
             const errorDiv = document.getElementById('error-message');
             const successDiv = document.getElementById('success-message');
-            
+            const card = document.querySelector('.auth-card');
+            const btn = document.getElementById('register-btn');
+            const btnLabel = btn.querySelector('.btn-label');
+
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
-            
-            // Validate passwords match
+            card.classList.remove('shake');
+
             if (password !== confirmPassword) {
                 errorDiv.textContent = 'Passwords do not match';
                 errorDiv.style.display = 'block';
+                card.classList.add('shake');
                 return;
             }
-            
+
+            btn.disabled = true;
+            btn.classList.add('loading');
+            btnLabel.textContent = 'Creating…';
+
             try {
                 const response = await fetch('/api/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         username,
                         email,
@@ -98,24 +160,28 @@
                         department
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
-                    successDiv.textContent = 'Registration successful! Redirecting to login...';
+                    successDiv.textContent = 'Registration successful! Redirecting to login…';
                     successDiv.style.display = 'block';
-                    
-                    // Redirect to login after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = '/login';
-                    }, 2000);
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
                 } else {
                     errorDiv.textContent = data.error || 'Registration failed';
                     errorDiv.style.display = 'block';
+                    card.classList.add('shake');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    btnLabel.textContent = 'Create Account';
                 }
             } catch (error) {
                 errorDiv.textContent = 'Connection error. Please try again.';
                 errorDiv.style.display = 'block';
+                card.classList.add('shake');
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btnLabel.textContent = 'Create Account';
             }
         });
     </script>

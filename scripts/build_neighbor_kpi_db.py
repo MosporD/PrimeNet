@@ -16,6 +16,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sync_config import NEIGHBOR_KPI_DB
+from db.runtime import open_db
 
 
 def _drop_legacy_neighbor_tables(conn: sqlite3.Connection) -> None:
@@ -38,7 +39,7 @@ def ensure_neighbor_schema(conn: sqlite3.Connection) -> None:
 
 def build() -> str:
     os.makedirs(os.path.dirname(NEIGHBOR_KPI_DB), exist_ok=True)
-    conn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=30)
+    conn = open_db(NEIGHBOR_KPI_DB, timeout=30)
     try:
         _drop_legacy_neighbor_tables(conn)
         conn.commit()

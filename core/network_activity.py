@@ -14,6 +14,7 @@ import sqlite3
 import time
 
 from sync_config import HUAWEI_PM_DB, NOKIA_PM_DB, pm_table_name
+from db.runtime import open_db, store_available
 
 TRAFFIC_ALIASES = [
     "Traffic Volume", "Payload", "Data Volume", "DL Traffic", "UL Traffic",
@@ -61,10 +62,9 @@ def _resolve_columns(conn: sqlite3.Connection, table: str) -> tuple[str, str] | 
 
 def _vendor_activity(db_path: str, table: str) -> dict | None:
     """Per-vendor level: latest-hour traffic sum vs peak hour in the scan window."""
-    if not db_path or not os.path.isfile(db_path):
+    if not store_available(db_path):
         return None
-    conn = sqlite3.connect(db_path, timeout=30)
-    conn.execute("PRAGMA busy_timeout=30000")
+    conn = open_db(db_path, timeout=30)
     try:
         resolved = _resolve_columns(conn, table)
         if not resolved:

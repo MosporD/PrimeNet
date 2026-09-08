@@ -315,6 +315,23 @@ def areas_from_site_items(items: list[dict[str, Any]]) -> list[dict[str, str | i
     ]
 
 
+def clusters_from_site_items(items: list[dict[str, Any]]) -> list[dict[str, str | int]]:
+    """Distinct clusters with parent area and site counts from a picker list."""
+    counts: dict[str, dict[str, object]] = {}
+    for item in items:
+        cluster = str(item.get('cluster') or '').strip()
+        if not cluster:
+            continue
+        area = str(item.get('area') or '').strip()
+        if cluster not in counts:
+            counts[cluster] = {'area': area, 'count': 0}
+        counts[cluster]['count'] += 1
+    return [
+        {'cluster': cl, 'area': info['area'], 'site_count': info['count']}
+        for cl, info in sorted(counts.items(), key=lambda kv: (kv[1]['area'].lower(), kv[0]))
+    ]
+
+
 def nokia_mrbts_area_for_site(
     netact_site_id: str,
     *,
@@ -846,13 +863,23 @@ def list_nokia_inventory_sites(
     return items[:cap], 'api'
 
 
-def list_nokia_inventory_areas(scope_level: str = 'MRBTS') -> list[dict[str, str | int]]:
-    """Area list (with counts) from the same Nokia picker population as sites."""
+def list_nokia_inventory_areas(
+    scope_level: str = 'MRBTS',
+    *,
+    include_clusters: bool = False,
+) -> list[dict[str, str | int]] | tuple[list[dict], list[dict]]:
+    """Area list (with counts) from the same Nokia picker population as sites.
+
+    When *include_clusters* is True return ``(areas, clusters)`` tuple.
+    """
     level = normalize_scope_level(scope_level)
     if level != 'MRBTS':
-        return []
+        return ([], []) if include_clusters else []
     items, _source = list_nokia_inventory_sites('', scope_level=level, limit=5000)
-    return areas_from_site_items(items)
+    areas = areas_from_site_items(items)
+    if not include_clusters:
+        return areas
+    return areas, clusters_from_site_items(items)
 
 
 HUAWEI_SCOPE_LEVELS = ('ENODEB', 'RNC', 'BSC')
@@ -1390,11 +1417,18 @@ def huawei_area_map(scope_level: str = 'ENODEB') -> dict[str, dict[str, str]]:
     return _vendor_area_map('%huawei%', _HUAWEI_AREA_SOURCES.get(level, ()))
 
 
-def list_huawei_areas(scope_level: str = 'ENODEB') -> list[dict[str, str | int]]:
-    """Return distinct areas with site counts matching the Huawei picker list."""
+def list_huawei_areas(
+    scope_level: str = 'ENODEB',
+    *,
+    include_clusters: bool = False,
+) -> list[dict[str, str | int]] | tuple[list[dict], list[dict]]:
+    """Return distinct areas with site counts matching the Huawei picker list.
+
+    When *include_clusters* is True return ``(areas, clusters)`` tuple.
+    """
     level = normalize_huawei_scope_level(scope_level)
     if level in ('RNC', 'BSC'):
-        return []
+        return ([], []) if include_clusters else []
     rows = _huawei_picker_rows('', scope_level=level, limit=5000)
     area_map = huawei_area_map(level)
     index = _site_area_index()
@@ -1408,8 +1442,12 @@ def list_huawei_areas(scope_level: str = 'ENODEB') -> list[dict[str, str | int]]
                 fallback=str(area_info.get('area') or ''),
                 index=index,
             ),
+            'cluster': area_info.get('cluster', ''),
         })
-    return areas_from_site_items(items)
+    areas = areas_from_site_items(items)
+    if not include_clusters:
+        return areas
+    return areas, clusters_from_site_items(items)
 
 
 _ALL_CELL_AREA_SOURCES: tuple[tuple[str, str], ...] = (

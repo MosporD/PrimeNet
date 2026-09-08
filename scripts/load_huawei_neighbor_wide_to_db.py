@@ -30,6 +30,7 @@ import pandas as pd
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _HERE)
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, PROJECT_ROOT  # noqa: E402
+from db.runtime import open_db  # noqa: E402
 from pipeline.paths import raw_path  # noqa: E402
 from modules.network_map.huawei_prs_tabular import read_huawei_prs_tabular  # noqa: E402
 
@@ -191,7 +192,7 @@ def main() -> int:
     raw_root = os.path.abspath(args.raw_root)
 
     os.makedirs(os.path.dirname(HUAWEI_NEIGHBOR_RAW_DB), exist_ok=True)
-    conn = sqlite3.connect(HUAWEI_NEIGHBOR_RAW_DB, timeout=120)
+    conn = open_db(HUAWEI_NEIGHBOR_RAW_DB, timeout=120)
     catalog_accum: dict[tuple[str, str], dict] = {}
     try:
         _init_db(conn)

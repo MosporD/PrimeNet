@@ -14,7 +14,7 @@ from .models.cause import fit_cause
 from .models.graph import graph_scores
 from .models.spatial import cluster_spatial
 from .models.treatment import train_treatment
-from .neighbor_agg import attach_neighbor_features, neighbor_adjacency
+from .neighbor_agg import attach_neighbor_features, neighbor_adjacency_and_stats
 
 logger = logging.getLogger(__name__)
 
@@ -35,16 +35,19 @@ def build_vendor_rat(vendor: str, rat: str = cfg.TECHNOLOGY, *, force: bool = Fa
             }
 
     cell_days = build_cell_days(vkey, rat)
-    attach_neighbor_features(cell_days, vkey)
+    adj, nbr_stats = neighbor_adjacency_and_stats(vkey)
+    attach_neighbor_features(cell_days, vkey, stats=nbr_stats, adj=adj)
     store.replace_cell_days(vkey, rat, cell_days)
 
     latest = latest_rows(cell_days)
+    nbr_hit = sum(1 for r in latest if float(r.get("nbr_count") or 0) > 0)
+    logger.info("SON ML %s/%s latest neighbor match %s/%s", vkey, rat, nbr_hit, len(latest))
     if len(latest) < 8:
         store.replace_scores(vkey, rat, [])
         store.save_build_meta(
             vkey,
             rat,
-            fingerprint=fingerprint,
+            fingerprint=store.pm_fingerprint(vkey, rat),
             model_versions={"anomaly": "none"},
             row_count=len(cell_days),
             score_count=0,
@@ -67,7 +70,6 @@ def build_vendor_rat(vendor: str, rat: str = cfg.TECHNOLOGY, *, force: bool = Fa
     anomaly = fit_anomaly(x, names)
     weak = collect_weak_labels(vkey, rat)
     causes = fit_cause(x, latest, weak)
-    adj = neighbor_adjacency(vkey)
     gscores = graph_scores(latest, anomaly["embedding"], adj)
     spatial = cluster_spatial(latest, anomaly["embedding"])
 
@@ -92,7 +94,7 @@ def build_vendor_rat(vendor: str, rat: str = cfg.TECHNOLOGY, *, force: bool = Fa
     store.save_build_meta(
         vkey,
         rat,
-        fingerprint=fingerprint,
+        fingerprint=store.pm_fingerprint(vkey, rat),
         model_versions={
             "anomaly": anomaly["model_name"],
             "cause": "ovr-logreg" if weak else "heuristic",
@@ -113,6 +115,8 @@ def build_vendor_rat(vendor: str, rat: str = cfg.TECHNOLOGY, *, force: bool = Fa
         "score_count": len(scores),
         "model": anomaly["model_name"],
         "seconds": elapsed,
+        "nbr_matched": nbr_hit,
+        "nbr_cells": len(latest),
     }
 
 

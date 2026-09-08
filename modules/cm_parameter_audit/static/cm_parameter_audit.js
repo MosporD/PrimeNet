@@ -2,16 +2,21 @@
     const body = document.body;
     const nokiaConfigured = body.dataset.nokiaConfigured === 'true';
     const huaweiConfigured = body.dataset.huaweiConfigured === 'true';
+    const isAdmin = (body.dataset.userRole || '').trim().toLowerCase() === 'admin';
 
     let vendor = 'nokia';
     let moClasses = [];
     let moCatalog = new Map();
     let parametersByMo = new Map();
     let currentRows = [];
+    let parameterSummaries = [];
     let lastExportId = null;
     let selectedMoId = '';
     let selectedParam = '';
+    let entireMo = false;
+    let selectedSummaryParam = '';
     let sortState = { key: null, dir: 1 };
+    let paramSortState = { key: 'inconsistency_pct', dir: -1 };
 
     const els = {
         scope: document.getElementById('audit-scope'),
@@ -21,9 +26,13 @@
         moList: document.getElementById('audit-mo-list'),
         paramInput: document.getElementById('audit-param-input'),
         paramList: document.getElementById('audit-param-list'),
+        entireMo: document.getElementById('audit-entire-mo'),
         scan: document.getElementById('audit-scan'),
         status: document.getElementById('audit-status'),
         summary: document.getElementById('audit-summary'),
+        parameters: document.getElementById('audit-parameters'),
+        paramBody: document.getElementById('audit-param-body'),
+        parametersMeta: document.getElementById('audit-parameters-meta'),
         distribution: document.getElementById('audit-distribution'),
         distributionBars: document.getElementById('distribution-bars'),
         distributionNote: document.getElementById('distribution-note'),
@@ -39,6 +48,12 @@
         summaryDominant: document.getElementById('summary-dominant'),
         summaryStatus: document.getElementById('summary-status'),
         exportBtn: document.getElementById('audit-export'),
+        exportMoBtn: document.getElementById('audit-export-mo'),
+        labelNes: document.querySelector('[data-summary-label="nes"]'),
+        labelObjects: document.querySelector('[data-summary-label="objects"]'),
+        labelDistinct: document.querySelector('[data-summary-label="distinct"]'),
+        labelDominant: document.querySelector('[data-summary-label="dominant"]'),
+        labelStatus: document.querySelector('[data-summary-label="status"]'),
     };
 
     function escapeHtml(value) {
@@ -57,7 +72,22 @@
     }
 
     function updateScanButton() {
-        els.scan.disabled = !(selectedMoId && selectedParam);
+        els.scan.disabled = !(selectedMoId && (entireMo || selectedParam));
+    }
+
+    function setEntireMo(enabled) {
+        entireMo = !!enabled;
+        if (els.entireMo) els.entireMo.checked = entireMo;
+        if (els.paramInput) {
+            els.paramInput.disabled = entireMo || !selectedMoId;
+            els.paramInput.placeholder = entireMo
+                ? 'All queryable parameters'
+                : (selectedMoId ? 'Search and select parameter…' : 'Search and select parameter…');
+        }
+        if (entireMo) {
+            els.paramList.hidden = true;
+        }
+        updateScanButton();
     }
 
     function scopeLevel() {
@@ -234,11 +264,11 @@
             items.forEach((item) => moCatalog.set(item.id, item));
             const ready = !!items.length;
             els.moInput.disabled = !ready;
-            els.paramInput.disabled = !ready;
+            els.paramInput.disabled = !ready || entireMo;
             els.moInput.placeholder = ready ? 'Search and select MO…' : 'No MO classes';
-            els.paramInput.placeholder = ready
-                ? 'Type or select parameter…'
-                : 'No parameters';
+            els.paramInput.placeholder = entireMo
+                ? 'All queryable parameters'
+                : (ready ? 'Type or select parameter…' : 'No parameters');
             setStatus('');
         } catch (err) {
             setStatus(err.message || 'Failed to load MO classes', 'error');
@@ -277,10 +307,10 @@
                 params = (data.parameters && data.parameters[moId.toUpperCase()]) || [];
             }
             parametersByMo.set(moId, params);
-            els.paramInput.disabled = false;
-            els.paramInput.placeholder = params.length
-                ? 'Search and select parameter…'
-                : 'Type parameter name…';
+            els.paramInput.disabled = entireMo || false;
+            els.paramInput.placeholder = entireMo
+                ? 'All queryable parameters'
+                : (params.length ? 'Search and select parameter…' : 'Type parameter name…');
             if (preservedParam) {
                 selectedParam = preservedParam;
                 els.paramInput.value = preservedParam;
@@ -290,6 +320,83 @@
         } catch (err) {
             setStatus(err.message || 'Failed to load parameters', 'error');
         }
+    }
+
+    function setSummaryLabels(mode) {
+        if (els.labelDistinct) {
+            els.labelDistinct.textContent = mode === 'mo' ? 'Parameters' : 'Distinct values';
+        }
+        if (els.labelDominant) {
+            els.labelDominant.textContent = mode === 'mo' ? 'Inconsistent parameters' : 'Dominant value';
+        }
+        if (els.labelStatus) {
+            els.labelStatus.textContent = 'Consistency';
+        }
+    }
+
+    function visibleParameterSummaries() {
+        return parameterSummaries;
+    }
+
+    function sortedParameterSummaries() {
+        const rows = visibleParameterSummaries();
+        const key = paramSortState.key;
+        const dir = paramSortState.dir;
+        return [...rows].sort((left, right) => dir * compareValues(
+            left[key] ?? '',
+            right[key] ?? '',
+        ));
+    }
+
+    function renderParameterTable() {
+        if (!els.paramBody || !els.parameters) return;
+        const rows = sortedParameterSummaries();
+        if (els.parametersMeta) {
+            els.parametersMeta.textContent = rows.length
+                ? `${rows.length} parameter(s) · click a row for value mix`
+                : '';
+        }
+        document.querySelectorAll('#audit-param-table th.sortable-th').forEach((th) => {
+            const key = th.dataset.sort;
+            const base = th.dataset.label || th.textContent.replace(/\s*[↑↓]$/, '').trim();
+            th.dataset.label = base;
+            let marker = '';
+            if (paramSortState.key === key) {
+                marker = paramSortState.dir > 0 ? ' ↑' : ' ↓';
+            }
+            th.textContent = `${base}${marker}`;
+        });
+        if (!rows.length) {
+            els.paramBody.innerHTML = '<tr><td colspan="6" class="empty-row">No parameters returned for this MO.</td></tr>';
+            return;
+        }
+        els.paramBody.innerHTML = rows.map((item) => {
+            const status = item.status || 'consistent';
+            const active = item.parameter === selectedSummaryParam ? ' is-selected' : '';
+            return `
+                <tr class="param-row${active}" data-parameter="${escapeHtml(item.parameter)}">
+                    <td><code>${escapeHtml(item.parameter)}</code></td>
+                    <td>${escapeHtml(item.distinct_values ?? 0)}</td>
+                    <td><code>${escapeHtml(item.most_common_value || '(empty)')}</code></td>
+                    <td>${escapeHtml(item.inconsistent_count ?? 0)}</td>
+                    <td>${escapeHtml(item.inconsistency_pct ?? 0)}%</td>
+                    <td><span class="value-status ${status === 'consistent' ? 'consistent' : 'variant'}">${escapeHtml(status)}</span></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function selectSummaryParameter(parameter) {
+        selectedSummaryParam = parameter || '';
+        const item = parameterSummaries.find((row) => row.parameter === selectedSummaryParam);
+        renderParameterTable();
+        if (!item) {
+            els.distribution.hidden = true;
+            return;
+        }
+        renderDistribution(item.value_distribution || [], item);
+        const distTitle = els.distribution.querySelector('h2');
+        if (distTitle) distTitle.textContent = `Value distribution — ${item.parameter}`;
     }
 
     function renderDistribution(items, summary) {
@@ -426,23 +533,50 @@
     function renderResult(payload) {
         const summary = payload.summary || {};
         const scope = payload.ne_scope || {};
+        const mode = payload.audit_mode === 'mo' ? 'mo' : 'parameter';
 
         els.summary.hidden = false;
-        els.results.hidden = false;
+        setSummaryLabels(mode);
 
         els.summaryNes.textContent = `${scope.queried || 0}${scope.truncated ? ` / ${scope.available}` : ''}`;
         els.summaryObjects.textContent = summary.object_count ?? 0;
-        els.summaryDistinct.textContent = summary.distinct_values ?? 0;
-        els.summaryDominant.textContent = summary.most_common_value || '(empty)';
         els.summaryStatus.textContent = summary.status || 'consistent';
         els.summaryStatus.className = `status-pill status-${escapeHtml(summary.status || 'consistent')}`;
 
+        lastExportId = payload.export_id || null;
+        if (els.exportBtn) els.exportBtn.disabled = !lastExportId;
+        if (els.exportMoBtn) els.exportMoBtn.disabled = !lastExportId;
+
+        if (mode === 'mo') {
+            els.summaryDistinct.textContent = summary.parameter_count ?? (payload.parameter_summaries || []).length;
+            els.summaryDominant.textContent = summary.inconsistent_parameter_count ?? 0;
+            parameterSummaries = payload.parameter_summaries || [];
+            currentRows = [];
+            selectedSummaryParam = '';
+            paramSortState = { key: 'inconsistency_pct', dir: -1 };
+            if (els.parameters) els.parameters.hidden = false;
+            if (els.results) els.results.hidden = true;
+            if (els.exportBtn) els.exportBtn.hidden = true;
+            const distTitle = els.distribution.querySelector('h2');
+            if (distTitle) distTitle.textContent = 'Value distribution';
+            els.distribution.hidden = true;
+            renderParameterTable();
+            showWarnings(payload.warnings, payload.note);
+            return;
+        }
+
+        if (els.parameters) els.parameters.hidden = true;
+        if (els.exportBtn) els.exportBtn.hidden = false;
+        els.results.hidden = false;
+        els.summaryDistinct.textContent = summary.distinct_values ?? 0;
+        els.summaryDominant.textContent = summary.most_common_value || '(empty)';
+        parameterSummaries = [];
+        const distTitle = els.distribution.querySelector('h2');
+        if (distTitle) distTitle.textContent = 'Value distribution';
         renderDistribution(summary.value_distribution || [], summary);
         currentRows = payload.rows || [];
         sortState = { key: null, dir: 1 };
         if (els.resultsFilter) els.resultsFilter.value = '';
-        lastExportId = payload.export_id || null;
-        if (els.exportBtn) els.exportBtn.disabled = !lastExportId;
         renderRows();
         showWarnings(payload.warnings, payload.note);
     }
@@ -453,6 +587,7 @@
             return;
         }
         if (els.exportBtn) els.exportBtn.disabled = true;
+        if (els.exportMoBtn) els.exportMoBtn.disabled = true;
         setStatus('Building Excel report…', 'loading');
         try {
             const res = await fetch(`/api/cm-parameter-audit/export/${encodeURIComponent(lastExportId)}`, {
@@ -483,6 +618,7 @@
             setStatus(err.message || 'Export failed', 'error');
         } finally {
             if (els.exportBtn) els.exportBtn.disabled = !lastExportId;
+            if (els.exportMoBtn) els.exportMoBtn.disabled = !lastExportId;
         }
     }
 
@@ -490,17 +626,25 @@
         const moId = selectedMoId;
         const parameter = selectedParam;
         const mo = moCatalog.get(moId) || {};
-        if (!moId || !parameter) return;
+        if (!moId || !(entireMo || parameter)) return;
 
         els.scan.disabled = true;
-        const modeHint = vendor === 'nokia' ? 'one network-wide CM query' : 'chunked U2020 MML';
-        setStatus(`Querying live CM for ${parameter} (${modeHint})…`, 'loading');
+        const target = entireMo ? `all ${moId} parameters` : parameter;
+        const modeHint = vendor === 'nokia'
+            ? (entireMo ? 'chunked network-wide CM queries' : 'one network-wide CM query')
+            : 'chunked U2020 MML';
+        setStatus(
+            isAdmin ? `Querying live CM for ${target} (${modeHint})…` : 'Querying...',
+            'loading',
+        );
         els.summary.hidden = true;
         els.distribution.hidden = true;
         els.results.hidden = true;
         els.warnings.hidden = true;
+        if (els.parameters) els.parameters.hidden = true;
         lastExportId = null;
         if (els.exportBtn) els.exportBtn.disabled = true;
+        if (els.exportMoBtn) els.exportMoBtn.disabled = true;
 
         try {
             const res = await fetch('/api/cm-parameter-audit/live', {
@@ -511,7 +655,8 @@
                     scope_level: scopeLevel(),
                     mo_class: moId,
                     mo_version: mo.version || '',
-                    parameter,
+                    parameter: entireMo ? '*' : parameter,
+                    entire_mo: entireMo,
                     conf_id: Number(els.confId.value || 1),
                     area: els.area.value || 'all',
                 }),
@@ -519,12 +664,22 @@
             const data = await res.json();
             if (!data.success) throw new Error(data.error || 'Live scan failed');
             renderResult(data);
-            setStatus(
-                `Live scan complete — ${data.summary?.object_count || 0} object(s), `
-                + `${data.summary?.ne_count || 0} NE(s) `
-                + `(${data.query_mode || 'live'}).`,
-                'success',
-            );
+            if (data.audit_mode === 'mo') {
+                setStatus(
+                    `Live MO scan complete — ${data.summary?.parameter_count || 0} parameter(s), `
+                    + `${data.summary?.object_count || 0} object(s), `
+                    + `${data.summary?.inconsistent_parameter_count || 0} inconsistent `
+                    + `(${data.query_mode || 'live'}).`,
+                    'success',
+                );
+            } else {
+                setStatus(
+                    `Live scan complete — ${data.summary?.object_count || 0} object(s), `
+                    + `${data.summary?.ne_count || 0} NE(s) `
+                    + `(${data.query_mode || 'live'}).`,
+                    'success',
+                );
+            }
         } catch (err) {
             setStatus(err.message || 'Live scan failed', 'error');
         } finally {
@@ -577,6 +732,7 @@
     });
 
     els.paramInput.addEventListener('focus', () => {
+        if (entireMo) return;
         closeComboLists(els.paramList);
         if (!selectedMoId) {
             renderComboList(
@@ -623,6 +779,37 @@
 
     els.scan.addEventListener('click', scanNetwork);
     if (els.exportBtn) els.exportBtn.addEventListener('click', exportReport);
+    if (els.exportMoBtn) els.exportMoBtn.addEventListener('click', exportReport);
+    if (els.entireMo) {
+        els.entireMo.addEventListener('change', () => setEntireMo(els.entireMo.checked));
+    }
+    if (els.paramBody) {
+        els.paramBody.addEventListener('click', (ev) => {
+            const row = ev.target.closest('tr.param-row');
+            if (!row) return;
+            selectSummaryParameter(row.dataset.parameter || '');
+        });
+    }
+    document.querySelectorAll('#audit-param-table th.sortable-th').forEach((th) => {
+        th.tabIndex = 0;
+        th.title = 'Click to sort';
+        th.addEventListener('click', () => {
+            const key = th.dataset.sort;
+            if (!key || !parameterSummaries.length) return;
+            if (paramSortState.key === key) {
+                paramSortState.dir = -paramSortState.dir;
+            } else {
+                paramSortState = { key, dir: key === 'inconsistency_pct' ? -1 : 1 };
+            }
+            renderParameterTable();
+        });
+        th.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                th.click();
+            }
+        });
+    });
     els.resultsFilter.addEventListener('input', renderRows);
 
     document.querySelectorAll('#audit-results-table th.sortable-th').forEach((th) => {
@@ -651,7 +838,8 @@
         const nextVendor = (params.get('vendor') || '').toLowerCase();
         const mo = (params.get('mo') || '').trim();
         const param = (params.get('param') || '').trim();
-        if (!nextVendor && !mo && !param) return;
+        const entire = (params.get('entire') || params.get('entire_mo') || '').trim();
+        if (!nextVendor && !mo && !param && !entire) return;
         if (nextVendor === 'huawei' || nextVendor === 'nokia') {
             setVendor(nextVendor);
         }
@@ -670,7 +858,9 @@
                 els.moInput.value = mo;
             }
         }
-        if (param) {
+        if (param === '*' || param.toLowerCase() === 'all' || entire === '1' || entire.toLowerCase() === 'true') {
+            setEntireMo(true);
+        } else if (param) {
             selectedParam = param;
             els.paramInput.value = param;
             updateScanButton();

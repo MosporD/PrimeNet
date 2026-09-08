@@ -24,7 +24,7 @@ from core.user_vendor_credentials import (
     list_user_vendor_credential_status,
     save_user_vendor_credentials,
 )
-from db.runtime import execute_query
+from db.runtime import execute_query, table_columns
 from sync_config import PROJECT_ROOT
 
 user_profile_bp = Blueprint(
@@ -81,9 +81,7 @@ _PHOTO_APPROVER_ROLES = {'admin', 'noc_sys'}
 
 
 def _ensure_profile_photo_schema(conn):
-    if not isinstance(conn, sqlite3.Connection):
-        return
-    conn.execute('''
+    execute_query(conn, '''
         CREATE TABLE IF NOT EXISTS profile_photo_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -99,9 +97,9 @@ def _ensure_profile_photo_schema(conn):
             FOREIGN KEY (reviewed_by) REFERENCES users(id)
         )
     ''')
-    cols = [r[1] for r in conn.execute("PRAGMA table_info(users)").fetchall()]
+    cols = table_columns(conn, 'users')
     if 'profile_photo_path' not in cols:
-        conn.execute('ALTER TABLE users ADD COLUMN profile_photo_path TEXT')
+        execute_query(conn, 'ALTER TABLE users ADD COLUMN profile_photo_path TEXT')
 
 
 def _can_approve_photo(user):
@@ -451,9 +449,7 @@ def _generate_view_id() -> str:
 
 
 def _ensure_saved_views_schema(conn):
-    if not isinstance(conn, sqlite3.Connection):
-        return
-    conn.execute('''
+    execute_query(conn, '''
         CREATE TABLE IF NOT EXISTS saved_views (
             id TEXT PRIMARY KEY,
             user_id INTEGER NOT NULL,
@@ -465,8 +461,9 @@ def _ensure_saved_views_schema(conn):
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    conn.execute(
-        'CREATE INDEX IF NOT EXISTS idx_saved_views_user_module ON saved_views(user_id, module)'
+    execute_query(
+        conn,
+        'CREATE INDEX IF NOT EXISTS idx_saved_views_user_module ON saved_views(user_id, module)',
     )
 
 

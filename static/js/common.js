@@ -37,7 +37,9 @@ function _isDashboardPage() {
 
 function _isPublicAuthPage() {
     const p = String(window.location?.pathname || '').trim();
-    return p === '/login' || p === '/login/' || p === '/register' || p === '/register/';
+    return p === '/login' || p === '/login/'
+        || p === '/register' || p === '/register/'
+        || p === '/activation' || p === '/activation/';
 }
 
 function _isPortalPage() {
@@ -49,7 +51,7 @@ const CONSTELLATION_CSS_VERSION = '1.9';
 const CONSTELLATION_JS_VERSION = '2.2';
 
 function _constellationBgExcluded(path) {
-    return /^\/(login|register|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
+    return /^\/(login|register|activation|portals|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
 }
 
 function _shouldMountConstellationBackground() {
@@ -274,6 +276,7 @@ function _ensureThemeToggle() {
         || document.querySelector('.son-topbar .son-topbar-actions')
         || document.querySelector('.nh-header .nh-header-right')
         || document.querySelector('.nh-select-header')
+        || document.querySelector('.doc-header .doc-header-right')
         || document.querySelector('.login-theme-mount')
         || document.querySelector('.portal-theme-mount');
     if (!mount) return;

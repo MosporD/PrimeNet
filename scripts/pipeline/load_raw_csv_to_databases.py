@@ -32,6 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from db.runtime import open_db
 from sync_config import (
     PROJECT_ROOT,
     HUAWEI_PM_DB,
@@ -1123,7 +1124,7 @@ def _load_folder_tabular_to_db(
     files.sort()
     loaded = 0
     failed = 0
-    conn = sqlite3.connect(db_path, timeout=60)
+    conn = open_db(db_path, timeout=60)
     try:
         for fn in files:
             full_path = os.path.join(folder, fn)

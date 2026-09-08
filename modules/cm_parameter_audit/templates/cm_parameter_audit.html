@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - CM Parameter Audit</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.5">
-    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.3">
 </head>
 <body class="cm-audit-page"
       data-nokia-configured="{{ 'true' if nokia_configured else 'false' }}"
-      data-huawei-configured="{{ 'true' if huawei_configured else 'false' }}">
+      data-huawei-configured="{{ 'true' if huawei_configured else 'false' }}"
+      data-user-role="{{ user.role }}">
     <div class="container">
         <header class="cm-audit-topbar">
             <div class="header-content">
                 <a href="/dashboard" class="back-link">Dashboard</a>
                 <div class="header-left">
                     <h1>CM Parameter Audit <span class="module-version">{{ module_version }}</span></h1>
-                    <p>Select a parameter and scan live configuration values across the network.</p>
+                    <p>Scan one parameter, or audit every queryable parameter on the selected MO.</p>
                 </div>
                 <div class="header-right">
                     <span class="user-name">{{ user.username }}</span>
@@ -80,6 +81,13 @@
                                 <ul id="audit-param-list" class="combo-list" hidden role="listbox"></ul>
                             </div>
                         </label>
+                        <label class="entire-mo-toggle" for="audit-entire-mo">
+                            <input type="checkbox" id="audit-entire-mo">
+                            <span>
+                                <strong>Entire MO</strong>
+                                Audit every queryable parameter on this class
+                            </span>
+                        </label>
                         <div class="form-action">
                             <button type="button" class="btn-primary" id="audit-scan" disabled>Scan network live</button>
                         </div>
@@ -87,6 +95,7 @@
                 </div>
             </section>
 
+            {% if user.role == 'admin' %}
             <section class="cm-audit-panel cm-rules-panel">
                 <details id="golden-rules">
                     <summary>Golden configuration rules</summary>
@@ -144,29 +153,56 @@
                     </form>
                 </details>
             </section>
+            {% endif %}
 
             <section class="cm-audit-status" id="audit-status" hidden aria-live="polite"></section>
 
             <section class="cm-audit-summary" id="audit-summary" hidden>
                 <div class="summary-card">
-                    <span>Network elements</span>
+                    <span data-summary-label="nes">Network elements</span>
                     <strong id="summary-nes">-</strong>
                 </div>
                 <div class="summary-card">
-                    <span>Objects</span>
+                    <span data-summary-label="objects">Objects</span>
                     <strong id="summary-objects">-</strong>
                 </div>
                 <div class="summary-card">
-                    <span>Distinct values</span>
+                    <span data-summary-label="distinct">Distinct values</span>
                     <strong id="summary-distinct">-</strong>
                 </div>
                 <div class="summary-card">
-                    <span>Dominant value</span>
+                    <span data-summary-label="dominant">Dominant value</span>
                     <strong id="summary-dominant">-</strong>
                 </div>
                 <div class="summary-card">
-                    <span>Consistency</span>
+                    <span data-summary-label="status">Consistency</span>
                     <strong id="summary-status" class="status-pill">-</strong>
+                </div>
+            </section>
+
+            <section class="cm-audit-parameters" id="audit-parameters" hidden>
+                <div class="section-head">
+                    <div>
+                        <h2>Parameter consistency</h2>
+                        <p class="distribution-note" id="parameters-note">Click a parameter to see its value mix. Per-object values for the whole MO are in the Excel report.</p>
+                    </div>
+                    <button type="button" class="btn-secondary" id="audit-export-mo" disabled>Export Excel report</button>
+                </div>
+                <p id="audit-parameters-meta" class="results-meta" aria-live="polite"></p>
+                <div class="results-table-wrap">
+                    <table class="results-table" id="audit-param-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable-th" data-sort="parameter">Parameter</th>
+                                <th class="sortable-th" data-sort="distinct_values">Distinct</th>
+                                <th class="sortable-th" data-sort="most_common_value">Dominant</th>
+                                <th class="sortable-th" data-sort="inconsistent_count">Variants</th>
+                                <th class="sortable-th" data-sort="inconsistency_pct">Inconsistent %</th>
+                                <th class="sortable-th" data-sort="status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-param-body"></tbody>
+                    </table>
                 </div>
             </section>
 
@@ -213,7 +249,7 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.4"></script>
-    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=2.0"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
+    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=2.3"></script>
 </body>
 </html>

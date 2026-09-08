@@ -25,7 +25,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from db.runtime import connect_app, execute_query
+from db.runtime import connect_app, execute_query, table_columns
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +44,7 @@ _run_lock = threading.Lock()
 # ---------------------------------------------------------------------------
 
 def _table_columns(conn, table: str) -> set[str]:
-    cur = execute_query(conn, f'PRAGMA table_info({table})')
-    return {str(row[1]) for row in cur.fetchall()}
+    return table_columns(conn, table)
 
 
 def _ensure_column(conn, table: str, column: str, ddl: str) -> None:

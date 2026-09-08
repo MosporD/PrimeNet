@@ -58,18 +58,16 @@ def format_user(user):
 
 def _ncm():
     conn = connect_app()
-    if isinstance(conn, sqlite3.Connection):
-        conn.row_factory = sqlite3.Row
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS elevation_cache (
-                coord_key TEXT PRIMARY KEY,
-                lat REAL NOT NULL,
-                lng REAL NOT NULL,
-                elevation_m REAL,
-                updated_at TEXT NOT NULL
-            )
-        ''')
-        conn.commit()
+    execute_query(conn, '''
+        CREATE TABLE IF NOT EXISTS elevation_cache (
+            coord_key TEXT PRIMARY KEY,
+            lat REAL NOT NULL,
+            lng REAL NOT NULL,
+            elevation_m REAL,
+            updated_at TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
     return conn
 
 
@@ -554,25 +552,15 @@ def generate_report():
 
     conn = _ncm()
     params = (filename, report_type, file_path, os.path.getsize(file_path), user['id'])
-    if isinstance(conn, sqlite3.Connection):
-        execute_query(
-            conn,
-            '''
-            INSERT INTO report_archive (report_name, report_type, file_path, file_size, generated_by)
-            VALUES (?, ?, ?, ?, ?)
-            ''',
-            params,
-        )
-        archive_id = execute_query(conn, 'SELECT last_insert_rowid()', ()).fetchone()[0]
-    else:
-        archive_id = execute_query(
-            conn,
-            '''
-            INSERT INTO report_archive (report_name, report_type, file_path, file_size, generated_by)
-            VALUES (?, ?, ?, ?, ?) RETURNING id
-            ''',
-            params,
-        ).fetchone()['id']
+    execute_query(
+        conn,
+        '''
+        INSERT INTO report_archive (report_name, report_type, file_path, file_size, generated_by)
+        VALUES (?, ?, ?, ?, ?)
+        ''',
+        params,
+    )
+    archive_id = execute_query(conn, 'SELECT last_insert_rowid()', ()).fetchone()[0]
     conn.commit()
     conn.close()
 

@@ -18,6 +18,7 @@ import sys
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+from db.runtime import open_db, store_available
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -137,10 +138,10 @@ def pull_all_raw_master():
 
 
 def _all_table_row_counts(db_path: str) -> dict[str, int]:
-    if not os.path.isfile(db_path):
+    if not store_available(db_path):
         return {}
     out: dict[str, int] = {}
-    conn = sqlite3.connect(db_path)
+    conn = open_db(db_path)
     try:
         cur = conn.cursor()
         tables = cur.execute(

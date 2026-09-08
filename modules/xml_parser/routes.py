@@ -256,9 +256,7 @@ def _uid(user):
 
 
 def _ensure_saved_views(conn):
-    if not isinstance(conn, sqlite3.Connection):
-        return
-    conn.execute('''
+    execute_query(conn, '''
         CREATE TABLE IF NOT EXISTS saved_views (
             id TEXT PRIMARY KEY,
             user_id INTEGER NOT NULL,

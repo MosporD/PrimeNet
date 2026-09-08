@@ -16,6 +16,16 @@ from modules.son_analytics.pm_helpers import (
 
 from . import config as cfg
 
+# SON ML only: Huawei 4G PM must key by Cell Name so neighbor Local_cell_name joins.
+# Shared Health/SON helper still prefers LocalCell Id unless this override is passed.
+_HUAWEI_CELL_COLS = ["Cell Name", "cell_name", "Local_cell_name"]
+
+
+def _prefer_cell_cols(vendor: str) -> list[str] | None:
+    if (vendor or "").strip().lower() == "huawei":
+        return list(_HUAWEI_CELL_COLS)
+    return None
+
 
 def _guess_layer(cell_name: str) -> str:
     token = str(cell_name or "").upper()
@@ -62,7 +72,11 @@ def build_cell_days(
             if not col:
                 continue
             part = _cell_daily_kpi_series(
-                db_path, table, col, lookback_days=lookback_days,
+                db_path,
+                table,
+                col,
+                lookback_days=lookback_days,
+                prefer_cell_cols=_prefer_cell_cols(vkey),
             )
             for cell, series in part.items():
                 if cell not in merged or len(series) > len(merged[cell]):

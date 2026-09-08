@@ -11,6 +11,7 @@ import sqlite3
 from datetime import datetime
 from typing import Any
 
+from db.runtime import open_db, store_available
 from pipeline.paths import iter_pm_raw_paths
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
@@ -46,14 +47,14 @@ def count_raw_tabular_files(scope: str) -> int:
 
 
 def _db_fingerprint(db_path: str) -> dict[str, Any]:
-    if not os.path.isfile(db_path):
+    if not store_available(db_path):
         return {"row_count": 0, "max_timestamp": None, "tables": {}}
 
     out_tables: dict[str, dict[str, Any]] = {}
     total_rows = 0
     global_max: datetime | None = None
 
-    conn = sqlite3.connect(db_path, timeout=30)
+    conn = open_db(db_path, timeout=30)
     try:
         tables = [
             r[0]

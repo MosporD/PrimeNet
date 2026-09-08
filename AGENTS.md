@@ -43,6 +43,11 @@ Code map lives in `graphify-out/` (AST extract, no API). The CLI is `python -m g
 - Ignore rules: `.graphifyignore` (plus `.gitignore`)
 - Human view: `/documentation` → Overview → **Graph** / **Code map** / **Call flow**
 
+## Feature briefs
+
+Per-blueprint agent context lives in `docs/features/` (index `docs/features/README.md`).
+Read the matching brief **before** changing that module. Radio wrappers also read `_radio-engine.md`.
+
 ## Session handoff
 
 Read `progress.md` for current work and the NEXT pointer. Scope is defined in `checklist.md`.

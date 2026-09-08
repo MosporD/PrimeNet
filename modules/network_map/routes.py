@@ -22,7 +22,8 @@ from sync_config import (
     NEIGHBOR_KPI_DB,
     pm_table_name,
 )
-from db.runtime import connect_metadata, execute_query
+from db.runtime import connect_metadata, execute_query, open_db, store_available
+from core.table_excel_export import build_table_workbook
 from .neighbor_raw_linking import build_raw_neighbor_lines, neighbor_ho_failures
 from .repeater_loader import load_all_repeaters, repeaters_for_map
 from database_enhanced import get_user_by_session, log_activity
@@ -573,9 +574,9 @@ def _any_raw_neighbor_table_exists(nokia_conn: sqlite3.Connection, technology: s
     """Nokia tables in ``neighbor_kpis.db`` or Huawei export tables in ``huawei_neighbor_raw.db``."""
     if _resolve_raw_neighbor_tables_for_vendor(nokia_conn, technology, "nokia"):
         return True
-    if not os.path.isfile(HUAWEI_NEIGHBOR_RAW_DB):
+    if not store_available(HUAWEI_NEIGHBOR_RAW_DB):
         return False
-    hconn = sqlite3.connect(HUAWEI_NEIGHBOR_RAW_DB, timeout=20)
+    hconn = open_db(HUAWEI_NEIGHBOR_RAW_DB, timeout=20)
     try:
         ht = _resolve_huawei_neighbor_export_table(hconn, technology)
         return bool(ht and _neighbor_table_non_empty(hconn, ht))
@@ -1409,7 +1410,7 @@ def get_cell_kpis(cell_id):
             if not table:
                 cell_data['kpis'] = None
             else:
-                pm_conn = sqlite3.connect(pm_db)
+                pm_conn = open_db(pm_db)
                 pm_conn.row_factory = sqlite3.Row
                 try:
                     kpi = execute_query(pm_conn, f'''
@@ -1520,7 +1521,7 @@ def get_cell_kpis_by_name():
             if not table:
                 cell_data['kpis'] = None
             else:
-                pm_conn = sqlite3.connect(pm_db)
+                pm_conn = open_db(pm_db)
                 pm_conn.row_factory = sqlite3.Row
                 try:
                     kpi = execute_query(pm_conn, f'''
@@ -2121,23 +2122,12 @@ def export_sites_kml():
         return jsonify({'error': str(e)}), 500
 
 
-@network_map_bp.route('/api/network-map/neighbors/lines', methods=['GET'])
-def get_neighbor_lines():
-    """Neighbor lines; ``vendor`` scopes the **source** for raw export linking (targets may be any vendor).
+def _fetch_neighbor_lines_payload() -> tuple[dict, int]:
+    """Build neighbor-line payload from the current request query string.
 
-    Query ``cell_name`` (normalized) matches the **source** cell for outgoing (default) or the
-    **target** cell when ``direction=incoming``.
-
-    ``direction``: ``outgoing`` (default) or ``incoming`` — which side ``cell_name`` / ``site_id`` filter applies to.
-
-    ``failures_only=1`` (or ``true``): return only links with estimated failures meeting
-    ``min_failures`` (default **1.0**): failures = ``attempts × (1 − SR/100)`` (or ``attempts − successes``);
-    requires SR or success counts. ``min_attempts`` is ignored for filtering in this mode (only attempts ≥ 1).
+    ``vendor`` scopes the **source** for raw export linking (targets may be any vendor).
+    Query ``cell_name`` matches the source cell (outgoing) or target cell (incoming).
     """
-    user = get_current_user()
-    if not user:
-        return jsonify({'error': 'Unauthorized'}), 401
-
     vendor = (request.args.get('vendor') or '').strip()
     technology = _normalize_ui_map_tech_token((request.args.get('technology') or '').strip())
     site_id = (request.args.get('site_id') or '').strip()
@@ -2152,10 +2142,10 @@ def get_neighbor_lines():
     incoming = direction == 'incoming'
 
     if not technology:
-        return jsonify({'error': 'technology is required'}), 400
+        return {'error': 'technology is required'}, 400
 
     try:
-        nconn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=30)
+        nconn = open_db(NEIGHBOR_KPI_DB, timeout=30)
         nconn.row_factory = sqlite3.Row
         _ensure_neighbor_schema(nconn)
 
@@ -2167,8 +2157,8 @@ def get_neighbor_lines():
             if not v_req or v_low == "all":
                 for nrt in _resolve_raw_neighbor_tables_for_vendor(nconn, technology, "nokia"):
                     jobs.append((NEIGHBOR_KPI_DB, nrt, "Nokia"))
-                if os.path.isfile(HUAWEI_NEIGHBOR_RAW_DB):
-                    htmp = sqlite3.connect(HUAWEI_NEIGHBOR_RAW_DB, timeout=30)
+                if store_available(HUAWEI_NEIGHBOR_RAW_DB):
+                    htmp = open_db(HUAWEI_NEIGHBOR_RAW_DB, timeout=30)
                     htmp.row_factory = sqlite3.Row
                     try:
                         hrt = _resolve_huawei_neighbor_export_table(htmp, technology)
@@ -2178,8 +2168,8 @@ def get_neighbor_lines():
                         htmp.close()
             else:
                 if v_low == "huawei":
-                    if os.path.isfile(HUAWEI_NEIGHBOR_RAW_DB):
-                        htmp = sqlite3.connect(HUAWEI_NEIGHBOR_RAW_DB, timeout=30)
+                    if store_available(HUAWEI_NEIGHBOR_RAW_DB):
+                        htmp = open_db(HUAWEI_NEIGHBOR_RAW_DB, timeout=30)
                         htmp.row_factory = sqlite3.Row
                         try:
                             hrt = _resolve_huawei_neighbor_export_table(htmp, technology)
@@ -2200,7 +2190,7 @@ def get_neighbor_lines():
                 messages: list[str] = []
                 for db_path, raw_tbl, v_label in jobs:
                     reuse = db_path == NEIGHBOR_KPI_DB
-                    wconn = nconn if reuse else sqlite3.connect(db_path, timeout=30)
+                    wconn = nconn if reuse else open_db(db_path, timeout=30)
                     if not reuse:
                         wconn.row_factory = sqlite3.Row
                     try:
@@ -2242,22 +2232,22 @@ def get_neighbor_lines():
                 }
                 if messages:
                     payload["message"] = "; ".join(dict.fromkeys(messages))
-                return jsonify(payload)
+                return payload, 200
 
             nconn.close()
-            return jsonify({
+            return {
                 "success": True,
                 "period_start": None,
                 "lines": [],
                 "skipped_missing_coords": 0,
                 "total_candidates": 0,
-            })
+            }, 200
 
         cell_norm = _norm_cell_key(cell_name) if cell_name else ''
         tech_vals = _neighbor_hourly_tech_aliases(technology)
         if not tech_vals:
             nconn.close()
-            return jsonify({'error': 'technology is required'}), 400
+            return {'error': 'technology is required'}, 400
         tech_ph = ",".join("?" for _ in tech_vals)
         where = [f"technology IN ({tech_ph})"]
         params: list[object] = [*tech_vals]
@@ -2283,13 +2273,13 @@ def get_neighbor_lines():
         period = max_period["p"] if max_period else None
         if not period:
             nconn.close()
-            return jsonify({
+            return {
                 'success': True,
                 'period_start': None,
                 'lines': [],
                 'skipped_missing_coords': 0,
                 'total_candidates': 0,
-            })
+            }, 200
 
         rows = execute_query(nconn,
             f"""
@@ -2365,15 +2355,141 @@ def get_neighbor_lines():
             if len(lines) >= max_lines:
                 break
 
-        return jsonify({
+        return {
             "success": True,
             "period_start": period,
             "lines": lines,
             "skipped_missing_coords": skipped_missing,
             "total_candidates": len(rows),
-        })
+        }, 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return {'error': str(e)}, 500
+
+
+_NEIGHBOR_EXPORT_COLUMNS = [
+    'vendor',
+    'technology',
+    'source_cell',
+    'source_site_id',
+    'target_cell',
+    'target_site_id',
+    'target_vendor',
+    'relation_scope',
+    'ho_attempts',
+    'ho_successes',
+    'ho_success_rate',
+    'ho_failures',
+    'ho_failure_rate_percent',
+    'source_lat',
+    'source_lng',
+    'target_lat',
+    'target_lng',
+    'period_start',
+]
+
+_NEIGHBOR_EXPORT_LABELS = {
+    'vendor': 'Vendor',
+    'technology': 'Technology',
+    'source_cell': 'Source cell',
+    'source_site_id': 'Source site',
+    'target_cell': 'Target cell',
+    'target_site_id': 'Target site',
+    'target_vendor': 'Target vendor',
+    'relation_scope': 'Relation (intra/inter)',
+    'ho_attempts': 'HO attempts',
+    'ho_successes': 'HO successes',
+    'ho_success_rate': 'HO SR %',
+    'ho_failures': 'HO failures',
+    'ho_failure_rate_percent': 'Failure rate %',
+    'source_lat': 'Source lat',
+    'source_lng': 'Source lng',
+    'target_lat': 'Target lat',
+    'target_lng': 'Target lng',
+    'period_start': 'Period',
+}
+
+
+@network_map_bp.route('/api/network-map/neighbors/lines', methods=['GET'])
+def get_neighbor_lines():
+    """Neighbor lines; ``vendor`` scopes the **source** for raw export linking (targets may be any vendor)."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    payload, status = _fetch_neighbor_lines_payload()
+    return jsonify(payload), status
+
+
+@network_map_bp.route('/api/network-map/neighbors/export', methods=['GET'])
+def export_neighbor_lines_excel():
+    """Excel workbook of neighbor relations for the current analyzer filters."""
+    from flask import send_file
+
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    payload, status = _fetch_neighbor_lines_payload()
+    if status != 200:
+        return jsonify(payload), status
+    lines = payload.get('lines') or []
+    if not lines:
+        return jsonify({'error': 'No neighbor relations to export for the current filters.'}), 400
+
+    vendor = (request.args.get('vendor') or 'all').strip() or 'all'
+    technology = (request.args.get('technology') or '').strip() or 'all'
+    direction = (request.args.get('direction') or 'outgoing').strip().lower()
+    site_id = (request.args.get('site_id') or '').strip()
+    cell_name = (request.args.get('cell_name') or '').strip()
+    failures_only = (request.args.get('failures_only') or '').strip().lower() in (
+        '1', 'true', 'yes', 'on',
+    )
+
+    period = payload.get('period_start')
+    export_rows = []
+    for ln in lines:
+        row = dict(ln)
+        if not row.get('period_start') and period:
+            row['period_start'] = period
+        export_rows.append(row)
+
+    try:
+        workbook, filename = build_table_workbook(
+            filename_stem=f'neighbor_relations_{technology}_{direction}',
+            report_title='Neighbor Relations Analyzer',
+            sheet_title='Relations',
+            columns=_NEIGHBOR_EXPORT_COLUMNS,
+            rows=export_rows,
+            column_labels=_NEIGHBOR_EXPORT_LABELS,
+            meta={
+                'Vendor': vendor,
+                'Technology': technology,
+                'Direction': direction,
+                'Site': site_id or '—',
+                'Cell': cell_name or '—',
+                'Metric': 'Failures' if failures_only else 'Attempts and success rate',
+                'Period': payload.get('period_start') or '—',
+                'Row Count': len(lines),
+                'Skipped missing coords': payload.get('skipped_missing_coords') or 0,
+                'Exported By': (
+                    user.get('username') if isinstance(user, dict) else user[1]
+                ),
+            },
+        )
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'neighbor_excel_export',
+            f'Neighbor Excel: {technology} {direction} ({len(lines)} relations)',
+        )
+        return send_file(
+            workbook,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
 
 
 @network_map_bp.route('/api/network-map/neighbors/cell-summary', methods=['GET'])
@@ -2392,7 +2508,7 @@ def get_neighbor_cell_summary():
         return jsonify({'error': 'technology and cell_name are required'}), 400
     cell_norm = _norm_cell_key(cell_name)
     try:
-        conn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=30)
+        conn = open_db(NEIGHBOR_KPI_DB, timeout=30)
         conn.row_factory = sqlite3.Row
         _ensure_neighbor_schema(conn)
         if not _neighbor_table_exists(conn, "neighbor_hourly"):

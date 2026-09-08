@@ -55,6 +55,15 @@
         } catch (e) { /* ignore */ }
     }
 
+    function showLoadError(msg) {
+        const el = document.getElementById('son-generated');
+        if (el) el.textContent = msg;
+        const tbody = document.getElementById('son-tbody');
+        if (tbody && tbody.querySelector('.son-empty')) {
+            tbody.innerHTML = '<tr><td colspan="7" class="son-empty">' + esc(msg) + '</td></tr>';
+        }
+    }
+
     async function loadSummary() {
         const res = await fetch('/api/son/summary?' + queryParams(), { credentials: 'same-origin' });
         const data = await res.json();
@@ -191,13 +200,13 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         loadAreas().then(function () {
-            loadSummary().catch(function () {});
-            loadRecommendations().catch(function () {});
+            loadSummary().catch(function (e) { showLoadError(e.message || 'Summary failed'); });
+            loadRecommendations().catch(function (e) { showLoadError(e.message || 'Recommendations failed'); });
         });
 
         document.getElementById('son-apply-filters')?.addEventListener('click', function () {
-            loadSummary().catch(function () {});
-            loadRecommendations().catch(function () {});
+            loadSummary().catch(function (e) { showLoadError(e.message || 'Summary failed'); });
+            loadRecommendations().catch(function (e) { showLoadError(e.message || 'Recommendations failed'); });
         });
 
         document.getElementById('son-refresh-btn')?.addEventListener('click', refreshCache);
@@ -211,8 +220,8 @@
                     else if (cat.toLowerCase() === 'anomaly') sel.value = 'Anomaly';
                     else if (cat.toLowerCase() === 'topology') sel.value = 'Topology';
                     else sel.value = cat;
-                    loadSummary().catch(function () {});
-                    loadRecommendations().catch(function () {});
+                    loadSummary().catch(function (e) { showLoadError(e.message || 'Summary failed'); });
+                    loadRecommendations().catch(function (e) { showLoadError(e.message || 'Recommendations failed'); });
                 }
             });
         });

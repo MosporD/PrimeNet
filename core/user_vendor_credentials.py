@@ -5,13 +5,12 @@ from __future__ import annotations
 import base64
 import hashlib
 import os
-import sqlite3
 from typing import Any
 
 from cryptography.fernet import Fernet, InvalidToken
 
 from database_enhanced import get_db
-from db.runtime import execute_query
+from db.runtime import execute_query, table_columns
 
 VENDORS = frozenset({'nokia', 'huawei'})
 
@@ -54,16 +53,12 @@ def _decrypt(ciphertext: str) -> str:
         raise ValueError('Stored vendor credential could not be decrypted.') from exc
 
 
-def ensure_user_vendor_credentials_schema(conn: sqlite3.Connection | None = None) -> None:
+def ensure_user_vendor_credentials_schema(conn=None) -> None:
     close_after = False
     if conn is None:
         conn = get_db()
         close_after = True
-    if not isinstance(conn, sqlite3.Connection):
-        if close_after:
-            conn.close()
-        return
-    conn.execute('''
+    execute_query(conn, '''
         CREATE TABLE IF NOT EXISTS user_vendor_credentials (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -75,9 +70,10 @@ def ensure_user_vendor_credentials_schema(conn: sqlite3.Connection | None = None
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
-    conn.execute(
+    execute_query(
+        conn,
         'CREATE INDEX IF NOT EXISTS idx_user_vendor_credentials_user '
-        'ON user_vendor_credentials(user_id)'
+        'ON user_vendor_credentials(user_id)',
     )
     conn.commit()
     if close_after:
@@ -89,7 +85,7 @@ def get_user_vendor_credentials(user_id: int, vendor: str) -> dict[str, str] | N
     if vendor not in VENDORS:
         raise ValueError(f'Unsupported vendor: {vendor}')
     conn = get_db()
-    ensure_user_vendor_credentials_schema(conn if isinstance(conn, sqlite3.Connection) else None)
+    ensure_user_vendor_credentials_schema(conn)
     row = execute_query(conn, '''
         SELECT username, password_encrypted
         FROM user_vendor_credentials
@@ -125,7 +121,7 @@ def save_user_vendor_credentials(
         raise ValueError('Password is required')
 
     conn = get_db()
-    ensure_user_vendor_credentials_schema(conn if isinstance(conn, sqlite3.Connection) else None)
+    ensure_user_vendor_credentials_schema(conn)
     execute_query(conn, '''
         INSERT INTO user_vendor_credentials (user_id, vendor, username, password_encrypted)
         VALUES (?, ?, ?, ?)
@@ -143,7 +139,7 @@ def delete_user_vendor_credentials(user_id: int, vendor: str) -> bool:
     if vendor not in VENDORS:
         raise ValueError(f'Unsupported vendor: {vendor}')
     conn = get_db()
-    ensure_user_vendor_credentials_schema(conn if isinstance(conn, sqlite3.Connection) else None)
+    ensure_user_vendor_credentials_schema(conn)
     cur = execute_query(conn, '''
         DELETE FROM user_vendor_credentials WHERE user_id = ? AND vendor = ?
     ''', (user_id, vendor))
@@ -155,7 +151,7 @@ def delete_user_vendor_credentials(user_id: int, vendor: str) -> bool:
 
 def list_user_vendor_credential_status(user_id: int) -> dict[str, dict[str, Any]]:
     conn = get_db()
-    ensure_user_vendor_credentials_schema(conn if isinstance(conn, sqlite3.Connection) else None)
+    ensure_user_vendor_credentials_schema(conn)
     rows = execute_query(conn, '''
         SELECT vendor, username, updated_at
         FROM user_vendor_credentials

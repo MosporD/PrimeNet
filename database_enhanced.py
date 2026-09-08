@@ -17,7 +17,14 @@ from db.runtime import adapt_app_sql, connect_app, execute_query
 
 
 def _unique_constraint_error(exc):
-    return isinstance(exc, sqlite3.IntegrityError)
+    if isinstance(exc, sqlite3.IntegrityError):
+        return True
+    try:
+        from psycopg.errors import IntegrityError as PgIntegrity
+        from psycopg.errors import UniqueViolation
+        return isinstance(exc, (UniqueViolation, PgIntegrity))
+    except ImportError:
+        return False
 
 
 def _exec(cur, sql: str, params=()):
@@ -25,8 +32,21 @@ def _exec(cur, sql: str, params=()):
 
 
 def _insert_return_id(conn, sql: str, params):
+    from db.runtime import is_app_postgresql
+
     sql = adapt_app_sql(sql)
     params = tuple(params)
+    if is_app_postgresql():
+        stripped = sql.rstrip().rstrip(';')
+        if 'returning' not in stripped.lower():
+            stripped = stripped + ' RETURNING id'
+        cur = conn.execute(stripped, params)
+        row = cur.fetchone()
+        if row is None:
+            return None
+        if isinstance(row, dict):
+            return row.get('id')
+        return row[0]
     cur = conn.cursor()
     cur.execute(sql, params)
     return cur.lastrowid
@@ -266,6 +286,125 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (task_id) REFERENCES config_scheduler_tasks(id) ON DELETE CASCADE,
             FOREIGN KEY (uploaded_by) REFERENCES users(id)
+        )
+    ''')
+
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN profile_photo_path TEXT')
+    except Exception:
+        pass
+
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS feature_access (
+            href       TEXT PRIMARY KEY,
+            roles      TEXT NOT NULL DEFAULT '',
+            updated_by TEXT,
+            updated_at TEXT
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS sync_log (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            sync_type     TEXT NOT NULL,
+            technology    TEXT NOT NULL,
+            status        TEXT NOT NULL,
+            rows_affected INTEGER DEFAULT 0,
+            message       TEXT,
+            started_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS performance_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            report_name TEXT NOT NULL,
+            report_config TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_perf_reports_user_name
+        ON performance_reports(user_id, report_name)
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS profile_photo_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            original_file_name TEXT NOT NULL,
+            stored_file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            reviewed_by INTEGER,
+            reviewed_at TIMESTAMP,
+            review_note TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (reviewed_by) REFERENCES users(id)
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS elevation_cache (
+            coord_key TEXT PRIMARY KEY,
+            lat REAL NOT NULL,
+            lng REAL NOT NULL,
+            elevation_m REAL,
+            updated_at TEXT NOT NULL
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS cm_extractor_jobs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            vendor TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            schedule_type TEXT NOT NULL,
+            schedule_time TEXT,
+            schedule_days TEXT,
+            interval_hours INTEGER,
+            run_at TEXT,
+            next_run_at TEXT,
+            enabled INTEGER NOT NULL DEFAULT 1,
+            keep_runs INTEGER NOT NULL DEFAULT 5,
+            user_specific INTEGER NOT NULL DEFAULT 1,
+            owner_username TEXT,
+            storage_subpath TEXT,
+            last_run_at TEXT,
+            last_status TEXT,
+            last_message TEXT,
+            created_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS cm_extractor_job_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            job_id INTEGER NOT NULL,
+            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            finished_at TIMESTAMP,
+            status TEXT NOT NULL DEFAULT 'running',
+            trigger TEXT NOT NULL DEFAULT 'schedule',
+            row_count INTEGER DEFAULT 0,
+            message TEXT,
+            file_name TEXT,
+            file_path TEXT,
+            created_by INTEGER,
+            FOREIGN KEY (job_id) REFERENCES cm_extractor_jobs(id) ON DELETE CASCADE
+        )
+    ''')
+    _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS cm_extractor_job_notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            job_id INTEGER NOT NULL,
+            job_name TEXT,
+            run_id INTEGER,
+            status TEXT NOT NULL,
+            message TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            seen INTEGER NOT NULL DEFAULT 0,
+            FOREIGN KEY (job_id) REFERENCES cm_extractor_jobs(id) ON DELETE CASCADE
         )
     ''')
 

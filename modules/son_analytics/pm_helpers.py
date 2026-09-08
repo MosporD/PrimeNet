@@ -7,6 +7,7 @@ import re
 import sqlite3
 import time
 
+from db.runtime import open_db, store_available
 from sync_config import (
     HUAWEI_PM_DAILY_DB,
     HUAWEI_PM_DB,
@@ -44,6 +45,10 @@ _PM_CACHE_TTL_SECONDS = 3600
 
 
 def _pm_db_mtime(db_path: str) -> float:
+    from db.pg_domains import schema_for_sqlite_path
+
+    if schema_for_sqlite_path(db_path):
+        return float(int(time.time() // _PM_CACHE_TTL_SECONDS) * _PM_CACHE_TTL_SECONDS)
     try:
         return os.path.getmtime(db_path)
     except OSError:
@@ -85,11 +90,17 @@ def _resolve_pm_table_axes(
     conn: sqlite3.Connection,
     table_name: str,
     kpi_column: str,
+    *,
+    prefer_cell_cols: list[str] | None = None,
 ) -> tuple[str, str, str] | None:
     cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()]
     if not cols or kpi_column not in cols:
         return None
-    cell_col = _find_col(cols, _CELL_COL_CANDIDATES + ["DN", "dn"])
+    cell_candidates: list[str] = []
+    for name in list(prefer_cell_cols or []) + _CELL_COL_CANDIDATES + ["DN", "dn"]:
+        if name not in cell_candidates:
+            cell_candidates.append(name)
+    cell_col = _find_col(cols, cell_candidates)
     ts_col = _find_col(cols, _TS_COL_CANDIDATES + ["Date", "date", "Time", "time"])
     if not cell_col or not ts_col:
         return None
@@ -142,13 +153,13 @@ def _pm_db_paths(vendor: str, scope: str) -> tuple[str | None, str | None]:
 
     if v == "nokia":
         return (
-            nokia_primary if os.path.isfile(nokia_primary) else None,
-            nokia_fb if nokia_fb and os.path.isfile(nokia_fb) else None,
+            nokia_primary if store_available(nokia_primary) else None,
+            nokia_fb if nokia_fb and store_available(nokia_fb) else None,
         )
     if v == "huawei":
         return (
-            huawei_primary if os.path.isfile(huawei_primary) else None,
-            huawei_fb if huawei_fb and os.path.isfile(huawei_fb) else None,
+            huawei_primary if store_available(huawei_primary) else None,
+            huawei_fb if huawei_fb and store_available(huawei_fb) else None,
         )
     # all vendors — caller iterates both
     return None, None
@@ -194,9 +205,9 @@ def _table_has_rows(conn: sqlite3.Connection, table_name: str) -> bool:
 
 
 def resolve_kpi_column(pm_db_path: str, table_name: str, aliases: list[str]) -> str | None:
-    if not pm_db_path or not os.path.isfile(pm_db_path):
+    if not store_available(pm_db_path):
         return None
-    conn = sqlite3.connect(pm_db_path, timeout=30)
+    conn = open_db(pm_db_path, timeout=30)
     conn.execute("PRAGMA busy_timeout=30000")
     try:
         cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()]
@@ -233,10 +244,10 @@ def latest_kpi_values(
     *,
     limit: int = 8000,
 ) -> dict[str, float]:
-    if not pm_db_path or not os.path.isfile(pm_db_path):
+    if not store_available(pm_db_path):
         return {}
     out: dict[str, float] = {}
-    conn = sqlite3.connect(pm_db_path, timeout=30)
+    conn = open_db(pm_db_path, timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA busy_timeout=30000")
     try:
@@ -282,9 +293,9 @@ def _resolve_pm_source(
     found: list[tuple[str, str]] = []
 
     def _collect(db_path: str, base: str) -> list[tuple[str, str]]:
-        if not os.path.isfile(db_path):
+        if not store_available(db_path):
             return []
-        conn = sqlite3.connect(db_path, timeout=30)
+        conn = open_db(db_path, timeout=30)
         try:
             names = [
                 r[0]
@@ -307,7 +318,7 @@ def _resolve_pm_source(
         found = _collect(db_fallback, table_hourly)
         if found:
             return found
-    if os.path.isfile(db_primary):
+    if store_available(db_primary):
         return [(db_primary, table_daily)]
     return []
 
@@ -383,22 +394,26 @@ def _cell_daily_kpi_series(
     kpi_column: str,
     *,
     lookback_days: int = 7,
+    prefer_cell_cols: list[str] | None = None,
 ) -> dict[str, list[tuple[str, float]]]:
     """Return cell -> [(date_iso, value), ...] newest first, up to lookback_days+1 points."""
-    if not pm_db_path or not os.path.isfile(pm_db_path):
+    if not store_available(pm_db_path):
         return {}
 
-    cache_key = f"series|{pm_db_path}|{table_name}|{kpi_column}|{lookback_days}"
+    pref_key = ",".join(prefer_cell_cols or [])
+    cache_key = f"series|{pm_db_path}|{table_name}|{kpi_column}|{lookback_days}|{pref_key}"
     cached = _cache_get(_SERIES_CACHE, cache_key, pm_db_path)
     if cached is not None:
         return cached
 
     out: dict[str, list[tuple[str, float]]] = {}
-    conn = sqlite3.connect(pm_db_path, timeout=30)
+    conn = open_db(pm_db_path, timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA busy_timeout=30000")
     try:
-        axes = _resolve_pm_table_axes(conn, table_name, kpi_column)
+        axes = _resolve_pm_table_axes(
+            conn, table_name, kpi_column, prefer_cell_cols=prefer_cell_cols,
+        )
         if not axes:
             return out
         cell_col, ts_col, kpi_col = axes
@@ -446,7 +461,7 @@ def _single_cell_daily_kpi_series(
     fuzzy: bool = True,
 ) -> list[tuple[str, float]]:
     """Daily KPI points for one cell, newest first."""
-    if not pm_db_path or not os.path.isfile(pm_db_path) or not cell_name:
+    if not store_available(pm_db_path) or not cell_name:
         return []
 
     resolved_kpi = _resolve_kpi_column_in_table(pm_db_path, table_name, kpi_column)
@@ -461,7 +476,7 @@ def _single_cell_daily_kpi_series(
     fetch_limit = max(30, (lookback_days + 1) * 4)
 
     def _query(exact: bool) -> list[tuple[str, float]]:
-        conn = sqlite3.connect(pm_db_path, timeout=30)
+        conn = open_db(pm_db_path, timeout=30)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA busy_timeout=30000")
         try:
@@ -738,10 +753,10 @@ def _scan_all_kpi_daily_series(
 ) -> dict[str, dict[str, list[tuple[str, float]]]]:
     """Single PM table scan -> {kpi: {cell: [(day, value), ...]}} newest first."""
     empty: dict[str, dict[str, list[tuple[str, float]]]] = {}
-    if not pm_db_path or not os.path.isfile(pm_db_path) or not kpi_columns:
+    if not store_available(pm_db_path) or not kpi_columns:
         return empty
 
-    conn = sqlite3.connect(pm_db_path, timeout=30)
+    conn = open_db(pm_db_path, timeout=30)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA busy_timeout=30000")
     try:
@@ -882,9 +897,9 @@ def collect_kpi_benchmarks(
 
 
 def _table_columns(db_path: str, table: str) -> set[str]:
-    if not db_path or not os.path.isfile(db_path):
+    if not store_available(db_path):
         return set()
-    conn = sqlite3.connect(db_path, timeout=30)
+    conn = open_db(db_path, timeout=30)
     try:
         return {r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()}
     except sqlite3.Error:
@@ -910,7 +925,7 @@ def _cell_kpi_hourly_series(
     fuzzy: bool = True,
 ) -> list[tuple[str, float]]:
     """Hourly KPI points for one cell, oldest first."""
-    if not pm_db_path or not os.path.isfile(pm_db_path):
+    if not store_available(pm_db_path):
         return []
     resolved_kpi = _resolve_kpi_column_in_table(pm_db_path, table_name, kpi_column)
     if not resolved_kpi:
@@ -937,7 +952,7 @@ def _cell_kpi_hourly_series(
 
     def _query(exact: bool) -> list[tuple[str, float]]:
         out: list[tuple[str, float]] = []
-        conn = sqlite3.connect(pm_db_path, timeout=30)
+        conn = open_db(pm_db_path, timeout=30)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA busy_timeout=30000")
         try:
