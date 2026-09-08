@@ -13,8 +13,8 @@ MODULE_VERSIONS: dict[str, str] = {
     "reports": "V1.1",
     "power-bi": "V1.0",
     "cell-heatmap": "V1.0",
-    "sector-health": "V1.2",
-    "sector-health-all": "V1.2",
+    "sector-health": "V1.3",
+    "sector-health-all": "V1.3",
     "conflict-map": "V1.0",
     "femto-pm": "V1.0",
     "son-analytics": "V1.1",
@@ -49,6 +49,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "irat-border": "V1.0",
     "admin-panel": "V1.0",
     "profile": "V1.0",
+    "documentation": "V1.0",
 }
 
 HREF_MODULE_IDS: dict[str, str] = {
@@ -95,6 +96,7 @@ HREF_MODULE_IDS: dict[str, str] = {
     "/irat-border": "irat-border",
     "/admin-panel": "admin-panel",
     "/profile": "profile",
+    "/documentation": "documentation",
 }
 
 

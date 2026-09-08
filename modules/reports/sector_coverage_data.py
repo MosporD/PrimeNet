@@ -15,10 +15,10 @@ from .metadata_helpers import (
     resolve_site_name,
 )
 
+# Sparse / non-deployed layers dropped from the coverage matrix.
+# Do not exclude vendor label variants of live 2G bands (Nokia uses "GSM 900"
+# with a space; Huawei uses "GSM900") — that zeroed Nokia 2G sector counts.
 EXCLUDED_TECH_BANDS = {
-    '2G / DCS1800',
-    '2G / GSM 900',
-    '2G / GSM900_DCS1800',
     '3G / 3048',
     '3G / 3088',
 }
@@ -28,6 +28,8 @@ MERGE_TECH_BANDS: dict[str, str] = {
     '5G / 100MHz': '5G',
     '3G / 10762': '3G',
     '3G / 10562': '3G',
+    # Nokia metadata label → same column as Huawei GSM900
+    '2G / GSM 900': '2G / GSM900',
 }
 
 TECH_SPECS = [
