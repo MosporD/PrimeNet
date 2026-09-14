@@ -1682,7 +1682,7 @@ def export_nokia_selection_to_excel(
     scope_level: str = 'MRBTS',
     conf_id: int = 1,
 ) -> tuple[int, list[str], str]:
-    from core.cm_extractor.config import build_nokia_operations_client, nokia_export_ssh_settings
+    from core.cm_extractor.config import build_nokia_operations_client
     from core.cm_extractor.nokia_bulk_export import (
         NokiaBulkExportError,
         export_controller_selection_to_excel,

@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import math
-import os
-import sqlite3
 
 from modules.network_map.neighbor_raw_linking import build_raw_neighbor_lines
 from modules.network_map.routes import (

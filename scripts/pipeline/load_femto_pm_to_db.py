@@ -9,7 +9,6 @@ Design:
 from __future__ import annotations
 
 import os
-import re
 import sqlite3
 import tarfile
 import xml.etree.ElementTree as ET

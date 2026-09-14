@@ -31,7 +31,10 @@ services:
     volumes:
       - primenet-data:/data
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      # Liveness, not readiness: /health returns 503 until an operator activates,
+      # which would leave the container permanently unhealthy on a fresh deploy
+      # and block the scheduler's depends_on below.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -68,9 +71,14 @@ services:
     environment:
       POSTGRES_DB: ${NCM_APP_POSTGRES_DB:-primenet}
       POSTGRES_USER: ${NCM_APP_POSTGRES_USER:-primenet}
-      POSTGRES_PASSWORD: ${NCM_APP_POSTGRES_PASSWORD:-changeme}
+      # Required — no default. `docker compose up` fails fast rather than
+      # starting a database with a well-known password.
+      POSTGRES_PASSWORD: ${NCM_APP_POSTGRES_PASSWORD:?set NCM_APP_POSTGRES_PASSWORD in .env}
     ports:
-      - "${NCM_APP_POSTGRES_PORT:-5432}:5432"
+      # Loopback only. The app reaches Postgres over the compose network, so this
+      # mapping exists for local psql access — it must not expose the database
+      # on every host interface. Override the host side deliberately if needed.
+      - "127.0.0.1:${NCM_APP_POSTGRES_PORT:-5432}:5432"
     volumes:
       - primenet-postgres:/var/lib/postgresql/data
     healthcheck:

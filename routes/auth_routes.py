@@ -9,7 +9,7 @@ import time
 from collections import defaultdict, deque
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, make_response, g
 from database_enhanced import (
-    create_user, authenticate_user, create_session,
+    authenticate_user, create_session,
     get_user_by_session, delete_session, log_activity, is_password_change_required
 )
 from db.runtime import connect_metadata, execute_query

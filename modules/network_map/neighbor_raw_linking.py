@@ -20,7 +20,7 @@ from __future__ import annotations
 import math
 import re
 import sqlite3
-from typing import Any, Callable
+from typing import Any
 
 from sync_config import METADATA_DB
 from db.runtime import open_db

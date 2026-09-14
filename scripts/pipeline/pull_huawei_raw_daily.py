@@ -20,7 +20,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from sync_config import (
     HUAWEI_PM_DAILY_SERVER,
     HUAWEI_GROUPS_DAILY_SERVER,
-    PROJECT_ROOT,
     RAW_KEEP_FILES_PER_TECH,
     RAW_PULL_CLEAR_BEFORE,
     RAW_PULL_PRUNE_AFTER,

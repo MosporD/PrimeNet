@@ -52,12 +52,16 @@ Rollout (preferred — no bulk migration):
 
 from __future__ import annotations
 
+import logging
 import re
+import sqlite3
 import time
 from collections import Counter
 from typing import Any
 
 from db.runtime import connect_metadata, execute_query
+
+logger = logging.getLogger(__name__)
 
 # Cluster = floor(canonical_site_id / 100) → area (same map as network map / performance).
 CLUSTER_AREA: dict[int, str] = {
@@ -339,6 +343,11 @@ def build_site_area_index(*, force_refresh: bool = False) -> dict[str, str]:
             normalize_site_id(r["site_id"] if isinstance(r, dict) else r[0])
             for r in rows
         ]
+    except sqlite3.OperationalError:
+        # Metadata never synced: no `sites` table yet. The cell-table votes below
+        # still populate whatever areas are known.
+        logger.warning("Site-area index: metadata `sites` table missing; seeding from cell tables only.")
+        site_ids = []
     finally:
         conn.close()
 

@@ -9,7 +9,6 @@ import logging
 import os
 import tempfile
 import threading
-import uuid
 from functools import wraps
 
 from flask import Blueprint, g, jsonify, redirect, render_template, request, send_file, url_for
@@ -38,7 +37,6 @@ from core.cm_extractor.huawei_semantics import (
     get_mo_object_catalog,
     get_parameters_for_object,
     preview_huawei_selection,
-    resolve_ne_names_for_site_ids,
 )
 from core.cm_extractor.site_catalog import (
     list_huawei_areas,

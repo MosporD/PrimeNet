@@ -8,7 +8,6 @@ from typing import Any
 from core.cm_extractor.config import build_nokia_operations_client
 from core.cm_extractor.nokia_excel_reimport import _upload_to_omc
 
-from .export import build_changes_xml
 from .logic import load_preview, preview_xml, write_preview_xml
 
 

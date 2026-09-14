@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import re
+import sqlite3
 import time
+from typing import Any
 
 from db.runtime import connect_metadata, execute_query
+
+logger = logging.getLogger(__name__)
 
 SCOPE_LEVELS = ('MRBTS', 'RNC', 'BSC')
 _PASTE_SPLIT_RE = re.compile(r'[\s,;]+')
@@ -126,6 +131,11 @@ def _known_nokia_metadata_site_ids(*, force_refresh: bool = False) -> set[str]:
             [],
         ).fetchall()
         known = {str(row['site_id']).strip() for row in rows if str(row['site_id'] or '').strip()}
+    except sqlite3.OperationalError:
+        # Metadata never synced: no `sites` table yet. Callers treat an empty set
+        # as "no id mapping known" and fall back to the raw token.
+        logger.warning('Nokia site-id resolution: metadata `sites` table missing; using raw site ids.')
+        known = set()
     finally:
         conn.close()
     _KNOWN_METADATA_IDS_CACHE = known
@@ -750,6 +760,10 @@ def _nokia_metadata_names(site_ids: list[str]) -> dict[str, dict[str, Any]]:
                     'longitude': row['longitude'],
                 }
         return out
+    except sqlite3.OperationalError:
+        # Labels are cosmetic — an unsynced metadata DB should not fail the picker.
+        logger.warning('Nokia picker labels: metadata `sites` table missing.')
+        return {}
     finally:
         conn.close()
 

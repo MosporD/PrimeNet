@@ -464,7 +464,6 @@ def download_task_file(task_id: int, file_id: int):
     if not trow:
         conn.close()
         return jsonify({'error': 'Task not found.'}), 404
-    task = dict(trow)
     cur.execute(adapt_placeholders('''
         SELECT * FROM config_scheduler_task_files
         WHERE id = ? AND task_id = ?
@@ -491,7 +490,6 @@ def download_result_file(task_id: int, file_id: int):
     if not trow:
         conn.close()
         return jsonify({'error': 'Task not found.'}), 404
-    task = dict(trow)
     cur.execute(adapt_placeholders('''
         SELECT * FROM config_scheduler_result_files
         WHERE id = ? AND task_id = ?

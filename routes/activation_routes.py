@@ -8,7 +8,6 @@ from core.activation_gate import (
     ActivationRequired,
     activation_period_days,
     activation_status,
-    is_activated,
     unlock,
 )
 
@@ -19,7 +18,7 @@ activation_bp = Blueprint("activation", __name__)
 def activation_page():
     status = activation_status()
     if status.get("activated"):
-        from flask import redirect, url_for
+        from flask import redirect
 
         return redirect("/dashboard")
     return render_template(

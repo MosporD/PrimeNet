@@ -206,9 +206,10 @@ function _renderOneProgressCard(key, data) {
     const message = data?.message || '';
     const updatedAt = data?.updated_at || '';
 
-    card.classList.remove('running', 'done', 'error');
+    card.classList.remove('running', 'done', 'error', 'skipped');
     if (running || stage === 'running') card.classList.add('running');
     else if (stage === 'error') card.classList.add('error');
+    else if (stage === 'skipped') card.classList.add('skipped');
     else if (stage === 'done') card.classList.add('done');
 
     fill.style.width = `${percent}%`;

@@ -29,7 +29,7 @@ import pandas as pd
 
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _HERE)
-from sync_config import HUAWEI_NEIGHBOR_RAW_DB, PROJECT_ROOT  # noqa: E402
+from sync_config import HUAWEI_NEIGHBOR_RAW_DB  # noqa: E402
 from db.runtime import open_db  # noqa: E402
 from pipeline.paths import raw_path  # noqa: E402
 from modules.network_map.huawei_prs_tabular import read_huawei_prs_tabular  # noqa: E402

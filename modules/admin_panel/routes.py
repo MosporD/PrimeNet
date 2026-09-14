@@ -18,8 +18,8 @@ from database_enhanced import (
     get_all_users,
     reset_user_password,
     set_user_force_password_change,
-    update_user_role,
-    update_user_status,
+    update_user_role as db_update_user_role,
+    update_user_status as db_update_user_status,
     get_db,
 )
 from db.runtime import execute_query
@@ -352,7 +352,7 @@ def update_user_role(user_id):
         if new_role not in ['admin', 'user', 'ran_config_user', 'noc_sys']:
             return jsonify({'error': 'Invalid role'}), 400
 
-        if not update_user_role(user_id, new_role):
+        if not db_update_user_role(user_id, new_role):
             return jsonify({'error': 'User not found'}), 404
 
         log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'admin_change_role', f'Changed user {user_id} role to {new_role}')
@@ -419,7 +419,7 @@ def update_user_status(user_id):
         if is_active is None:
             return jsonify({'error': 'is_active required'}), 400
 
-        if not update_user_status(user_id, int(is_active)):
+        if not db_update_user_status(user_id, int(is_active)):
             return jsonify({'error': 'User not found'}), 404
 
         status_text = 'activated' if is_active else 'deactivated'
@@ -856,6 +856,7 @@ def admin_export_excel():
             sheet_title=sheet_title,
             columns=columns,
             rows=rows,
+            column_labels=column_labels,
             meta={
                 **meta,
                 'Exported By': (user.get('username') if isinstance(user, dict) else user[1]),

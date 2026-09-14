@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import re
 import sqlite3
-from datetime import datetime
 
 from sync_config import DATABASES_ROOT
 

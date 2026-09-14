@@ -8,7 +8,6 @@ for each ``product_name`` (e.g. BTS3900) and classifying the response.
 
 from __future__ import annotations
 
-import re
 import time
 from typing import Any
 

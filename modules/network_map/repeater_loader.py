@@ -4,7 +4,6 @@ Load repeater device records from manual Excel/CSV files under network-map/repea
 
 from __future__ import annotations
 
-import os
 import re
 from pathlib import Path
 from typing import Any

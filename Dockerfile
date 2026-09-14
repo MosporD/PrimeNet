@@ -41,8 +41,9 @@ RUN useradd --create-home --uid 1000 --shell /usr/sbin/nologin primenet \
 
 EXPOSE 8000
 
+# Liveness, not readiness: /health returns 503 until an operator activates.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=5)"
 
 USER root
 ENTRYPOINT ["/app/deploy/entrypoint.sh"]

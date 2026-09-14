@@ -430,7 +430,6 @@ def _cell_daily_kpi_series(
             ORDER BY "{cell_col}", "{ts_col}" DESC
         """
         seen: dict[str, set[str]] = {}
-        max_points = lookback_days + 1
         for row in conn.execute(sql, params):
             cell = str(row["cell_name"] or "").strip()
             day = parse_pm_timestamp(row["ts_raw"])

@@ -16,8 +16,8 @@ import paramiko
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from sync_config import NOKIA_PM_DAILY_SERVER, NOKIA_GROUPS_DAILY_SERVER, PROJECT_ROOT
-from pipeline.paths import iter_pm_raw_paths, raw_path
+from sync_config import NOKIA_PM_DAILY_SERVER, NOKIA_GROUPS_DAILY_SERVER
+from pipeline.paths import raw_path
 
 
 ALLOWED_EXTS = (".xlsx", ".xls", ".xlsm", ".csv", ".zip")

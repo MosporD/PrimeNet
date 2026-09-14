@@ -21,10 +21,9 @@ import tempfile
 import zipfile
 
 import paramiko
-import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from sync_config import HUAWEI_NEIGHBOR_SERVER, PROJECT_ROOT
+from sync_config import HUAWEI_NEIGHBOR_SERVER
 from pipeline.paths import raw_path
 
 ALLOWED_ZIP = ".zip"

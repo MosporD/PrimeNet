@@ -13,12 +13,12 @@ import time
 from pathlib import Path
 from typing import Any
 
-_DISCOVERY_RETRY_STATUSES = {429, 500, 502, 503, 504}
-_CATALOG_PATH = Path(__file__).resolve().parents[2] / 'data' / 'huawei_u2020_ne_catalog.json'
-
+from core.cm_extractor.http_util import request_json
 from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.huawei_mml_discovery import discover_commands_by_product
-from core.cm_extractor.http_util import request_json
+
+_DISCOVERY_RETRY_STATUSES = {429, 500, 502, 503, 504}
+_CATALOG_PATH = Path(__file__).resolve().parents[2] / 'data' / 'huawei_u2020_ne_catalog.json'
 
 _SITE_ID_RE = re.compile(r'^(\d+)-')
 _CACHE: dict[str, Any] = {

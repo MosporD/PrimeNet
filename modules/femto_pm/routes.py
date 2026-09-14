@@ -18,7 +18,6 @@ from modules.femto_pm.kpi_store import (
     default_categories,
     delete_user_kpi,
     formula_to_sql_preview,
-    get_user_kpi,
     list_user_kpis,
     update_user_kpi,
     user_kpi_conn,

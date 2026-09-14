@@ -13,7 +13,6 @@ from core.cm_extractor.nokia_mass_modify import (
     apply_mass_modifications,
     is_empty_plan_error,
 )
-from core.cm_extractor.nokia_operations_client import NokiaOperationsError
 from core.cm_extractor.nokia_semantics import (
     build_mo_path,
     filter_mo_ids_for_site,

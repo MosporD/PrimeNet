@@ -35,18 +35,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from core.pm_timestamp import (
     PM_REPORT_DATE_COL,
     PM_REPORT_TIME_COL,
-    canonicalize_pm_timestamp,
     format_pm_report_date,
     format_pm_report_time,
     parse_pm_datetime,
 )
 from db.runtime import open_db, store_available
+from modules.sync.reset_mode import sync_reset_mode
 from sync_config import (
     NOKIA_PM_DB,
     HUAWEI_PM_DB,
     pm_table_name,
     PM_TECHNOLOGIES,
-    PM_SYNC_FULL_CLEAR,
     PM_INSERT_BATCH_SIZE,
     PM_INGEST_PARALLEL_WORKERS,
 )
@@ -1004,9 +1003,10 @@ def apply_pm_retention(db_path: str, days: int) -> None:
 # ---------------------------------------------------------------------------
 
 def clear_nokia_pm_tables():
-    logger.info('PM reset mode: clear_nokia_pm_tables disabled.')
-    return
     """Remove all Nokia PM rows before a new pull."""
+    if sync_reset_mode():
+        logger.info('PM reset mode: clear_nokia_pm_tables disabled.')
+        return
     tables = [pm_table_name(t) for t in PM_TECHNOLOGIES]
 
     conn = open_db(NOKIA_PM_DB, timeout=30)
@@ -1022,13 +1022,14 @@ def clear_nokia_pm_tables():
     logger.info('Nokia PM: cleared %s table(s) in SQLite file.', cleared)
 
 def process_nokia_pm_file(file_path, technology):
-    logger.info('PM reset mode: process_nokia_pm_file disabled (%s, %s).', technology, file_path)
-    return 0, 0, 'PM ingest disabled (reset mode)'
     """
     Process a Nokia PM file (XLSX, XLS, or CSV).
     Auto-detects cell_name and timestamp columns.
     Returns (inserted, skipped, error_message).
     """
+    if sync_reset_mode():
+        logger.info('PM reset mode: process_nokia_pm_file disabled (%s, %s).', technology, file_path)
+        return 0, 0, 'PM ingest disabled (reset mode)'
     ext0 = os.path.splitext(file_path)[1].lower()
     if ext0 == '.zip':
         tmp_dir = tempfile.mkdtemp(prefix='nokia_pm_zip_')
@@ -1091,11 +1092,6 @@ def process_nokia_pm_file(file_path, technology):
 
 
 def run_nokia_pm_sync(downloaded_files, column_maps=None):
-    del column_maps
-    summary: dict = {}
-    for tech in (downloaded_files or {}):
-        summary[tech] = {'status': 'skipped', 'reason': 'PM ingest disabled (reset mode)'}
-    return summary
     """
     downloaded_files = {technology: local_path or None}
     column_maps is accepted but ignored (kept for call-site compatibility).
@@ -1104,6 +1100,12 @@ def run_nokia_pm_sync(downloaded_files, column_maps=None):
     own hourly table in the same SQLite DB). Set ``PM_INGEST_PARALLEL_WORKERS``
     to cap threads (default 5).
     """
+    del column_maps
+    if sync_reset_mode():
+        return {
+            tech: {'status': 'skipped', 'reason': 'PM ingest disabled (reset mode)'}
+            for tech in (downloaded_files or {})
+        }
     summary: dict = {}
     pending: list[tuple[str, str]] = []
     for tech, file_path in downloaded_files.items():
@@ -1192,17 +1194,17 @@ def _collect_pm_files(root_dir: str, recursive: bool = True) -> list[str]:
 
 
 def import_pm_from_directory(root_dir: str, vendor: str = 'all', recursive: bool = True) -> dict:
-    del recursive
-    return {
-        'status': 'error',
-        'path': root_dir,
-        'vendor': vendor,
-        'error': 'PM local import disabled (reset mode)',
-    }
     """
     Import all PM files found under ``root_dir``.
     Vendor can be: all | nokia | huawei.
     """
+    if sync_reset_mode():
+        return {
+            'status': 'error',
+            'path': root_dir,
+            'vendor': vendor,
+            'error': 'PM local import disabled (reset mode)',
+        }
     if not root_dir or not os.path.isdir(root_dir):
         return {'status': 'error', 'error': f'Invalid path: {root_dir!r}'}
 
@@ -1436,9 +1438,11 @@ def _clear_huawei_pm_tables():
 
 
 def clear_huawei_pm_tables():
-    """Public wrapper — disabled in reset mode."""
-    logger.info('PM reset mode: clear_huawei_pm_tables disabled.')
-    return
+    """Public wrapper around :func:`_clear_huawei_pm_tables`."""
+    if sync_reset_mode():
+        logger.info('PM reset mode: clear_huawei_pm_tables disabled.')
+        return
+    _clear_huawei_pm_tables()
 
 
 def _clear_huawei_pm_tables_if_full_sync():
@@ -1682,13 +1686,6 @@ def debug_huawei_pm_zip(file_path: str) -> dict:
 
 
 def process_huawei_pm_file(file_path, column_maps=None, sheet_tech_map=None, default_technology=None):
-    del column_maps, sheet_tech_map, default_technology
-    return {
-        os.path.basename(file_path) or 'file': {
-            'status': 'skipped',
-            'reason': 'Huawei PM ingest disabled (reset mode)',
-        }
-    }
     """
     Ingest Huawei PM like Nokia PM: rows go into ``2G_Hourly`` … ``5G_Hourly`` in ``huawei_pm_cells.db``.
 
@@ -1700,6 +1697,13 @@ def process_huawei_pm_file(file_path, column_maps=None, sheet_tech_map=None, def
 
     ``column_maps`` / ``sheet_tech_map`` are ignored (call-site compatibility).
     """
+    if sync_reset_mode():
+        return {
+            os.path.basename(file_path) or 'file': {
+                'status': 'skipped',
+                'reason': 'Huawei PM ingest disabled (reset mode)',
+            }
+        }
     del column_maps, sheet_tech_map
     dt = (default_technology or '').strip() or None
 

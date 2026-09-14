@@ -18,7 +18,7 @@ from typing import Any
 
 from core.cm_extractor.config import huawei_defaults, nokia_configured, nokia_defaults
 from core.cm_extractor.excel_writer import write_huawei_sheets_excel
-from core.cm_extractor.huawei_client import HuaweiCmClient
+from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.huawei_semantics import export_huawei_selection_to_excel
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.cm_extractor.nokia_semantics import export_nokia_selection_to_excel

@@ -273,7 +273,7 @@ def _build_3g_slim_dataframe(merged: pd.DataFrame) -> pd.DataFrame | None:
         print(f"[neighbor-raw] 3G: missing scid/tcid columns (sc={sc!r}, tc={tc!r}); skip slim build")
         return None
     if not att:
-        print(f"[neighbor-raw] 3G: missing attempts column (M1013C0 / SHO_ADJ…ATT); skip slim build")
+        print("[neighbor-raw] 3G: missing attempts column (M1013C0 / SHO_ADJ…ATT); skip slim build")
         return None
     if not compl:
         print("[neighbor-raw] 3G: missing completions column (M1013C1); ho_completions set to 0")

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 import traceback
@@ -14,8 +13,8 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(ROOT, '.env'), override=True)
 
-from core.cm_extractor.config import build_nokia_operations_client, huawei_defaults, nokia_defaults
-from core.cm_extractor.extraction import build_huawei_client, build_nokia_client
+from core.cm_extractor.config import huawei_defaults, nokia_defaults
+from core.cm_extractor.extraction import build_huawei_client
 from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.cm_extractor.nokia_operations_client import NokiaOperationsClient, NokiaOperationsError

@@ -27,7 +27,18 @@ install_sqlite_gate()
 # Initialize Flask app
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
-app.config['SECRET_KEY'] = (os.getenv('FLASK_SECRET_KEY') or os.getenv('SECRET_KEY') or secrets.token_hex(32))
+# A per-process random fallback keeps the app bootable, but it rotates on every restart:
+# sessions drop and anything encrypted with it (vendor credentials) becomes unreadable.
+# SECRET_KEY_EPHEMERAL lets those consumers refuse the fallback instead of silently using it.
+_configured_secret = (os.getenv('FLASK_SECRET_KEY') or os.getenv('SECRET_KEY') or '').strip()
+app.config['SECRET_KEY'] = _configured_secret or secrets.token_hex(32)
+app.config['SECRET_KEY_EPHEMERAL'] = not _configured_secret
+if not _configured_secret:
+    print(
+        '[WARNING] FLASK_SECRET_KEY is not set — using a random per-process secret. '
+        'Sessions reset on restart and saved vendor credentials cannot be decrypted. '
+        'Set FLASK_SECRET_KEY in .env for a stable deployment.'
+    )
 
 
 @app.context_processor
@@ -220,9 +231,9 @@ def _start_live_logger_terminal():
     Open a separate terminal window that tails sync_log entries (Windows dev only).
     Disabled in containers and when NCM_DISABLE_LIVE_LOGGER_TERMINAL=1.
     """
-    if _env_true('NCM_CONTAINER') or _env_true('NCM_DISABLE_LIVE_LOGGER_TERMINAL'):
+    if os.name != 'nt':
         return
-    if os.environ.get('NCM_DISABLE_LIVE_LOGGER_TERMINAL', '').strip().lower() in ('1', 'true', 'yes'):
+    if _env_true('NCM_CONTAINER') or _env_true('NCM_DISABLE_LIVE_LOGGER_TERMINAL'):
         return
     # Start once from the reloader parent to avoid duplicate windows.
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
@@ -247,6 +258,8 @@ _start_live_logger_terminal()
 
 def _open_dashboard_browser():
     """Open the dashboard in the default browser (Windows dev only)."""
+    if os.name != 'nt':
+        return
     if _env_true('NCM_CONTAINER') or _env_true('NCM_DISABLE_AUTO_BROWSER'):
         return
     port = int(os.getenv('FLASK_PORT', '5000'))
@@ -262,6 +275,19 @@ def _open_dashboard_browser():
 # ============================================================================
 # HEALTH (container orchestration / load balancers)
 # ============================================================================
+
+@app.route('/health/live')
+@app.route('/api/health/live')
+def health_live():
+    """Liveness: is the process up and serving?
+
+    Deliberately says nothing about activation or the database. The container
+    HEALTHCHECK uses this so a fresh deployment awaiting operator activation is
+    not marked unhealthy — which otherwise blocked the scheduler service, whose
+    `depends_on` waits for web to become healthy. Use /health for readiness.
+    """
+    return jsonify({'status': 'ok', 'service': 'primenet'}), 200
+
 
 @app.route('/health')
 @app.route('/api/health')
@@ -320,6 +346,8 @@ def enforce_monthly_operator_activation():
         '/api/activation/unlock',
         '/health',
         '/api/health',
+        '/health/live',
+        '/api/health/live',
         '/robots.txt',
     }
     if path in allowed:

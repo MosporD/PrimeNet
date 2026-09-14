@@ -32,9 +32,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from db.runtime import open_db
+from db.runtime import open_db, sqlite_ident
 from sync_config import (
-    PROJECT_ROOT,
     HUAWEI_PM_DB,
     HUAWEI_GROUPS_DB,
     NOKIA_PM_DB,
@@ -838,8 +837,7 @@ def _pragma_column_names(conn: sqlite3.Connection, table: str) -> list[str]:
     return [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
 
 
-def _sqlite_ident(name: str) -> str:
-    return '"' + str(name).replace('"', '""') + '"'
+_sqlite_ident = sqlite_ident
 
 
 def _ensure_table_columns(

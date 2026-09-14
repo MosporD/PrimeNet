@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 def build_vendor_rat(vendor: str, rat: str = cfg.TECHNOLOGY, *, force: bool = False) -> dict:
     t0 = time.time()
     vkey = (vendor or "").strip().lower()
-    fingerprint = store.pm_fingerprint(vkey, rat)
     if not force:
         meta = store.get_build_meta(vkey, rat)
         if meta and not meta.get("is_stale") and int(meta.get("score_count") or 0) > 0:

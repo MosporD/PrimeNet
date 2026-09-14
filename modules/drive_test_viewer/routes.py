@@ -32,7 +32,10 @@ _UPLOAD_DIR = os.path.join(PROJECT_ROOT, 'uploads', 'drive_test_viewer')
 _MAX_POINTS = 8000
 _ALLOWED_GPX = {'.gpx'}
 _ALLOWED_NMFS = {'.nmfs'}
-_NEMO_BASE_DIR = r'C:\Program Files\Anite\Nemo Analyze'
+# Nemo Analyze reference files ship with the desktop install, whose default
+# path is Windows-only. Override with NEMO_ANALYZE_DIR so a Linux/container
+# deployment can point at a mounted copy instead of silently finding nothing.
+_NEMO_BASE_DIR = (os.getenv('NEMO_ANALYZE_DIR') or '').strip() or r'C:\Program Files\Anite\Nemo Analyze'
 _NEMO_FF2_PATH = os.path.join(_NEMO_BASE_DIR, 'Documentation', 'FF2.html')
 _NEMO_OBJECT_MAPPER_PATH = os.path.join(_NEMO_BASE_DIR, 'object_mapper.xml')
 _NEMO_REF_CACHE = {'ff2': None, 'object_mapper': None}

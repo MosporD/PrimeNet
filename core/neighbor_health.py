@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-from db.runtime import open_db, store_available
+from db.runtime import open_db, sqlite_ident, store_available
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
 _CACHE_TTL_SEC = 600
@@ -51,8 +51,7 @@ def _file_health(path: str) -> dict:
     }
 
 
-def _sqlite_ident(name: str) -> str:
-    return '"' + str(name).replace('"', '""') + '"'
+_sqlite_ident = sqlite_ident
 
 
 def _column_names(conn: sqlite3.Connection, table: str) -> list[str]:

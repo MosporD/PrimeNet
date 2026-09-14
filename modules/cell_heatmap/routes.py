@@ -7,10 +7,9 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from functools import wraps
 from datetime import datetime
 import sqlite3
-import math
 import re
 
-from db.runtime import connect_metadata, connect_pm_db, execute_query
+from db.runtime import connect_metadata, connect_pm_db, execute_query, sqlite_ident
 from database_enhanced import get_user_by_session, log_activity
 from core.elevation import coord_key as elevation_coord_key, elevation_for_points
 from sync_config import (
@@ -302,8 +301,7 @@ _TS_COL_CANDIDATES = [
 ]
 
 
-def _sqlite_ident(name: str) -> str:
-    return '"' + str(name).replace('"', '""') + '"'
+_sqlite_ident = sqlite_ident
 
 
 def _find_col(cols: list[str], candidates: list[str]) -> str | None:

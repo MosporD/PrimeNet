@@ -10,7 +10,7 @@ from typing import Any
 from cryptography.fernet import Fernet, InvalidToken
 
 from database_enhanced import get_db
-from db.runtime import execute_query, table_columns
+from db.runtime import execute_query
 
 VENDORS = frozenset({'nokia', 'huawei'})
 
@@ -23,6 +23,11 @@ def _resolve_app_secret() -> str:
     try:
         from flask import current_app
 
+        # app.py falls back to a random per-process secret when none is configured.
+        # Encrypting with it looks fine until the next restart, when every stored
+        # credential fails to decrypt — refuse it so the caller gets a clear error.
+        if current_app.config.get('SECRET_KEY_EPHEMERAL'):
+            return ''
         cfg_secret = current_app.config.get('SECRET_KEY')
         if cfg_secret:
             return str(cfg_secret).strip()

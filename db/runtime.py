@@ -213,6 +213,21 @@ def _is_pg_conn(conn) -> bool:
     return mod.startswith('psycopg')
 
 
+def sqlite_ident(name: str) -> str:
+    """Quote a SQL identifier (handles embedded double quotes).
+
+    Table and column names cannot be parameterised, so anything interpolated
+    into a statement goes through here. Previously copy-pasted into four
+    modules; keep the single definition so a fix lands everywhere.
+    """
+    return '"' + str(name).replace('"', '""') + '"'
+
+
+def sqlite_text_lit(value: object) -> str:
+    """Quote a SQL text literal (single-quoted, escaped)."""
+    return "'" + str(value).replace("'", "''") + "'"
+
+
 def execute_query(conn, sql: str, params=None):
     """Run SQL. SQLite uses ``?``; Postgres connections are adapted automatically."""
     params = params or ()

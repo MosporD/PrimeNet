@@ -18,7 +18,7 @@ from paramiko.ssh_exception import SSHException
 
 from core.cm_extractor.config import nokia_export_ssh_settings, nokia_bulk_export_settings
 from core.cm_extractor.nokia_client import NokiaCmClient
-from core.cm_extractor.nokia_operations_client import NokiaOperationsClient, NokiaOperationsError
+from core.cm_extractor.nokia_operations_client import NokiaOperationsClient
 from core.cm_extractor.site_catalog import normalize_scope_level, resolve_bulk_export_dns
 from ncm_core import FilterConfig, XMLToExcelConverter
 

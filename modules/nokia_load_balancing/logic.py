@@ -33,7 +33,6 @@ from .rules import (
     parse_dn_parts,
     parse_sector_id,
     propose_parameter_set,
-    propose_value,
     qualifies_highest_lowest_pair,
     sector_id_from_row,
     target_layer_from_sector,

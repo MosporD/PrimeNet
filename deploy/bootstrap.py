@@ -36,7 +36,7 @@ def run_bootstrap(*, start_scheduler: bool | None = None) -> None:
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-    from core.activation_gate import install_sqlite_gate, is_activated, require_activation
+    from core.activation_gate import install_sqlite_gate, require_activation
 
     install_sqlite_gate()
     require_activation()

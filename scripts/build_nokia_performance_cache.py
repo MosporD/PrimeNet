@@ -8,7 +8,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from modules.performance_dictionary.nokia_loader import (
     NOKIA_CACHE_DIR,
-    NOKIA_CACHE_INDEX,
     NOKIA_CACHE_PATH,
     NOKIA_PERF_DIR,
     build_nokia_data_from_excel,

@@ -17,7 +17,6 @@ from database_enhanced import get_user_by_session, log_activity
 from db.runtime import connect_app, connect_metadata, execute_query
 from core.elevation import coord_key as _shared_coord_key, elevation_for_points as _shared_elevation_for_points
 from .metadata_helpers import _metadata_table_columns, _pick_col, _sql_ident
-from modules.sync.metadata_active_sql import PER_TABLE_ACTIVE_WHERE
 from sync_config import PROJECT_ROOT
 
 reports_bp = Blueprint(

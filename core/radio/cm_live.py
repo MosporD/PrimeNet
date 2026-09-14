@@ -881,7 +881,6 @@ def _query_nokia_mo_records(
     ne_by_site = _ne_lookup(nes)
     area_filter = (area or 'all').strip().lower()
     scoped = bool(site_ids) or (area_filter not in ('', 'all'))
-    allowed_sites = set(ne_by_site.keys()) if scoped else None
     if not ne_by_site and not scoped:
         inventory, _ = list_nokia_inventory_sites('', scope_level=scope_level, limit=5000)
         ne_by_site = _ne_lookup(inventory)

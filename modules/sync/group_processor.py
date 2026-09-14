@@ -6,7 +6,6 @@ Imports vendor group files and stores group memberships in vendor-specific DBs.
 
 import os
 import re
-import sqlite3
 import zipfile
 import tempfile
 import shutil
@@ -16,6 +15,7 @@ from datetime import datetime
 import pandas as pd
 
 from db.runtime import open_db
+from modules.sync.reset_mode import sync_reset_mode
 from sync_config import (
     METADATA_DB,
     NOKIA_GROUPS_DB,
@@ -117,9 +117,9 @@ def _upsert_group(conn, user_id: int, name: str, description: str = '', is_share
 
 
 def process_group_file(file_path: str, vendor: str, default_technology: str = '') -> dict:
-    del default_technology
-    logger.info('Groups reset mode: process_group_file disabled (%s, %s).', vendor, file_path)
-    return {'status': 'skipped', 'reason': 'Group ingest disabled (reset mode)'}
+    if sync_reset_mode():
+        logger.info('Groups reset mode: process_group_file disabled (%s, %s).', vendor, file_path)
+        return {'status': 'skipped', 'reason': 'Group ingest disabled (reset mode)'}
     ext = os.path.splitext(file_path)[1].lower()
     if ext == '.zip':
         tmp_dir = tempfile.mkdtemp(prefix='group_zip_')

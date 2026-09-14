@@ -14,7 +14,7 @@ import paramiko
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from sync_config import METADATA_SERVER, PROJECT_ROOT
+from sync_config import METADATA_SERVER
 from pipeline.paths import raw_path
 
 

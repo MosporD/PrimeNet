@@ -6,7 +6,6 @@ Uses the same timestamp column detection and vendor-specific parsing as the raw 
 
 from __future__ import annotations
 
-import os
 import sqlite3
 
 import pandas as pd

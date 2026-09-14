@@ -23,7 +23,7 @@ from modules.nokia_load_balancing.balance_store import (
 from modules.nokia_load_balancing.ingest_job import ingest_status, run_balance_ingest
 
 from . import config
-from .logic import analyze_sectors, load_preview, preview_excel, preview_mml, save_preview
+from .logic import analyze_sectors, preview_excel, preview_mml, save_preview
 
 huawei_load_balancing_bp = Blueprint(
     "huawei_load_balancing",

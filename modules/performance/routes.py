@@ -23,9 +23,7 @@ import sys
 import json
 import time
 import threading
-import re
 import math
-import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from sync_config import (
@@ -59,12 +57,12 @@ from db.runtime import (
     execute_query,
     open_db,
     performance_meta_pm_conn,
+    sqlite_ident,
+    sqlite_text_lit,
     store_available,
 )
 from database_enhanced import get_user_by_session, log_activity
 from modules.sync.metadata_active_sql import (
-    perf_per_tech_union_sql,
-    perf_per_tech_union_sql_with_activity,
     perf_cell_source_sql_with_activity,
 )
 from .kpi_catalog import KPI_HEADERS_MAP
@@ -1169,14 +1167,8 @@ def _is_huawei_pm_db(db_path: str) -> bool:
         return False
 
 
-def _sqlite_ident(name: str) -> str:
-    """Quote a SQLite identifier (handles embedded double quotes)."""
-    return '"' + str(name).replace('"', '""') + '"'
-
-
-def _sqlite_text_lit(value: object) -> str:
-    """Quote a SQLite text literal (single-quoted, escaped)."""
-    return "'" + str(value).replace("'", "''") + "'"
+_sqlite_ident = sqlite_ident
+_sqlite_text_lit = sqlite_text_lit
 
 
 def _norm_col_name(name: str) -> str:
@@ -2466,7 +2458,6 @@ def get_group_trend():
     group_ref = (request.args.get('group_ref') or '').strip()
     granularity = _normalize_granularity(request.args.get('granularity'))
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
-    hours = _hours_from_request(data_scope)
     requested_kpis = _requested_trend_kpi_names()
     if not group_ref:
         return jsonify({'error': 'group_ref is required'}), 400
@@ -2863,7 +2854,6 @@ def get_cells():
     cluster    = request.args.get('cluster', '')
     area       = request.args.get('area', '')
     search     = request.args.get('search', '').strip()
-    data_scope = _normalize_data_scope(request.args.get('data_scope'))
     cache_key = _cell_cache_key(
         vendor,
         technology,
@@ -3339,7 +3329,6 @@ def get_pm_table():
             merged.update(_resolve_group_ref_cell_names(uid, gref, vendor, technology, data_scope))
         scoped_cell_names = sorted(merged)
 
-    static_cfg = _PM_STATIC_COLS.get(vendor, {}).get(technology, [])
     cell_label = _PM_CELL_LABEL.get(vendor, {}).get(technology, 'Cell Name')
 
     empty = {

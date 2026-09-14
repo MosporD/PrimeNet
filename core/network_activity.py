@@ -9,7 +9,6 @@ decisions. Results are cached for 10 minutes per PM database mtime.
 
 from __future__ import annotations
 
-import os
 import sqlite3
 import time
 

@@ -8,12 +8,10 @@ Three background jobs:
 """
 
 import logging
-import sqlite3
 import os
 import glob
 import gc
 import threading
-import subprocess
 import sys
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -26,6 +24,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from core.subprocess_runner import run_logged_subprocess
 from .sftp_client import SFTPClient
+from .reset_mode import sync_reset_mode
 from .pm_processor import (
     run_nokia_pm_sync,
     process_huawei_pm_file,
@@ -388,12 +387,10 @@ def run_manual_category_sync(category: str):
     load_script = os.path.join('pipeline', 'load', 'hourly', 'load_all.py')
     pull_args: list[str] = []
     load_args: list[str] = []
-    is_daily = False
     sync_type = category.replace('-', '_')
     if category.endswith('daily'):
         pull_script = os.path.join('pipeline', 'pull', 'daily', 'pull_all.py')
         load_script = os.path.join('pipeline', 'load', 'daily', 'load_all.py')
-        is_daily = True
     if category.startswith('cells-'):
         pull_args.extend(['--category', 'cells'])
         load_args.extend(['--category', 'cells'])
@@ -488,6 +485,19 @@ def _finish_progress(job_key: str, ok: bool, message: str) -> None:
     )
 
 
+def _skip_progress(job_key: str, message: str) -> None:
+    """Park a job without claiming success.
+
+    ``_finish_progress(..., ok=True, ...)`` renders a green "done" card, which
+    is a lie for a job that was switched off and never pulled anything. The
+    ``skipped`` stage renders neutral instead.
+    """
+    _set_progress(job_key, running=False, stage='skipped', progress=0, total=0, message=message)
+    with _sync_progress_lock:
+        if job_key in _sync_progress:
+            _sync_progress[job_key]['percent'] = 0
+
+
 def get_sync_progress() -> dict:
     with _sync_progress_lock:
         return {k: dict(v) for k, v in _sync_progress.items()}
@@ -545,9 +555,10 @@ def _log_sync(sync_type, technology, status, rows=0, message=None):
 # ---------------------------------------------------------------------------
 
 def pull_nokia_pm():
-    _finish_progress('nokia_pm', True, 'Reset mode: Nokia PM pull disabled.')
-    logger.info('Reset mode: pull_nokia_pm is disabled.')
-    return
+    if sync_reset_mode():
+        _skip_progress('nokia_pm', 'Reset mode: Nokia PM pull disabled.')
+        logger.info('Reset mode: pull_nokia_pm is disabled.')
+        return
     from sync_config import (
         NOKIA_PM_SERVER,
         LOCAL_DOWNLOAD_DIR,
@@ -668,9 +679,10 @@ def pull_nokia_pm():
 # ---------------------------------------------------------------------------
 
 def pull_huawei_pm():
-    _finish_progress('huawei_pm', True, 'Reset mode: Huawei PM pull disabled.')
-    logger.info('Reset mode: pull_huawei_pm is disabled.')
-    return
+    if sync_reset_mode():
+        _skip_progress('huawei_pm', 'Reset mode: Huawei PM pull disabled.')
+        logger.info('Reset mode: pull_huawei_pm is disabled.')
+        return
     from sync_config import (
         HUAWEI_PM_SERVER,
         LOCAL_DOWNLOAD_DIR,
@@ -764,9 +776,10 @@ def pull_huawei_pm():
 # ---------------------------------------------------------------------------
 
 def pull_metadata():
-    _finish_progress('metadata', True, 'Reset mode: Metadata pull disabled.')
-    logger.info('Reset mode: pull_metadata is disabled.')
-    return
+    if sync_reset_mode():
+        _skip_progress('metadata', 'Reset mode: Metadata pull disabled.')
+        logger.info('Reset mode: pull_metadata is disabled.')
+        return
     from sync_config import METADATA_SERVER, LOCAL_DOWNLOAD_DIR
 
     host = METADATA_SERVER['host']
@@ -829,8 +842,9 @@ def pull_metadata():
 # ---------------------------------------------------------------------------
 
 def pull_nokia_groups():
-    logger.info('Reset mode: pull_nokia_groups is disabled.')
-    return
+    if sync_reset_mode():
+        logger.info('Reset mode: pull_nokia_groups is disabled.')
+        return
     from sync_config import NOKIA_GROUPS_SERVER, LOCAL_DOWNLOAD_DIR
 
     host = NOKIA_GROUPS_SERVER['host']
@@ -902,8 +916,9 @@ def run_remote_pull_watcher_once():
 
 
 def pull_huawei_groups():
-    logger.info('Reset mode: pull_huawei_groups is disabled.')
-    return
+    if sync_reset_mode():
+        logger.info('Reset mode: pull_huawei_groups is disabled.')
+        return
     from sync_config import HUAWEI_GROUPS_SERVER, LOCAL_DOWNLOAD_DIR
 
     host = HUAWEI_GROUPS_SERVER['host']
@@ -1193,7 +1208,6 @@ def start_scheduler():
     flags = _compute_scheduler_flags()
     legacy_enabled = flags['legacy_enabled']
     watcher_enabled = flags['watcher_enabled']
-    watcher_primary = flags['watcher_primary']
     scheduled_ingest_enabled = flags['scheduled_ingest_enabled']
 
     # Scheduled hourly + daily pull→load (OSS cadence: hourly every N hours, daily once per day).

@@ -146,7 +146,6 @@ def audit_db(label: str, vendor: str, path: str) -> list[dict]:
 
 def main() -> int:
     all_issues: list[dict] = []
-    summary: list[str] = []
 
     print("PM / groups legacy column audit\n" + "=" * 72)
     for label, vendor, path in PM_DBS:
@@ -166,7 +165,6 @@ def main() -> int:
                 if "CELL" not in table.upper() and table not in ("groups", "group_cells"):
                     continue
                 tech = _table_technology(table) or "?"
-                cols = [r[1] for r in conn.execute(f"PRAGMA table_info({_sqlite_ident(table)})").fetchall()]
                 cc, tc = _resolve_pm_axis_columns_sqlite(conn, table)
                 n = int(conn.execute(f"SELECT COUNT(*) FROM {_sqlite_ident(table)}").fetchone()[0])
                 tables_ok.append((table, tech, n, cc, tc))

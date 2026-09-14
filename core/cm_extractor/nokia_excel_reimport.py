@@ -16,7 +16,6 @@ from typing import Any
 import openpyxl
 
 from core.cm_extractor.config import build_nokia_operations_client, nokia_export_ssh_settings
-from core.cm_extractor.nokia_operations_client import NokiaOperationsError
 
 try:
     import paramiko
