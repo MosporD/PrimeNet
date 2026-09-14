@@ -2560,9 +2560,11 @@ function pointInPolygon(lat, lng, ring) {
 function _updatePolygonClearButton() {
     const clearBtn = document.getElementById('polygon-clear-btn');
     const extractBtn = document.getElementById('polygon-extract-btn');
+    const selectionBtn = document.getElementById('polygon-selection-btn');
     const visible = Boolean(selectionPolygon);
     if (clearBtn) clearBtn.style.display = visible ? '' : 'none';
     if (extractBtn) extractBtn.style.display = visible ? '' : 'none';
+    if (selectionBtn) selectionBtn.style.display = visible ? '' : 'none';
 }
 
 function clearSelectionPolygon() {
@@ -2722,6 +2724,64 @@ function extractFromCurrentPolygon() {
         return;
     }
     void extractFromSelectionPolygon(selectionPolygon);
+}
+
+/** Push polygon cells/sites into shared selection context for Optimization Cases. */
+async function sendPolygonToSelection() {
+    if (!selectionPolygon) {
+        showNotification('Draw a polygon first', 'info');
+        return;
+    }
+    if (!window.PrimeNetSelection) {
+        showNotification('Selection helper not loaded', 'error');
+        return;
+    }
+    const ring = _polygonRingFromLayer(selectionPolygon);
+    if (!ring || ring.length < 3) {
+        showNotification('Invalid polygon', 'error');
+        return;
+    }
+    const body = _polygonSpatialRequestBody(ring);
+    // Cases need cell names — prefer cells layer for selection sync.
+    body.layer = 'cells';
+    try {
+        const res = await fetch('/api/map/spatial/within', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        const items = data.items || data.results || [];
+        const cells = [];
+        const sites = [];
+        items.forEach((item) => {
+            const cell = item.cell_name || item.Cell_Name || item.name;
+            const site = item.site_id || item.site_name;
+            if (cell) cells.push(String(cell));
+            if (site) sites.push(String(site));
+        });
+        const uniqueCells = [...new Set(cells)];
+        const uniqueSites = [...new Set(sites)];
+        if (!uniqueCells.length && !uniqueSites.length) {
+            showNotification('No cells/sites inside polygon', 'info');
+            return;
+        }
+        const saved = await window.PrimeNetSelection.save({
+            kind: uniqueCells.length ? 'polygon' : 'sites',
+            cells: uniqueCells.length ? uniqueCells : uniqueSites,
+            sites: uniqueSites,
+            polygon: ring,
+            label: `Map polygon (${uniqueCells.length || uniqueSites.length})`,
+            source: 'network-map',
+            meta: { layer: body.layer },
+        });
+        const n = (saved.cells || []).length;
+        showNotification(`Selection saved: ${n} item(s). Open Optimization Cases to continue.`, 'success');
+    } catch (err) {
+        showNotification(err.message || 'Failed to save selection', 'error');
+    }
 }
 
 function _polygonSpatialRequestBody(ring) {

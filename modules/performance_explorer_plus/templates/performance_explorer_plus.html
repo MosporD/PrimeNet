@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Explorer Plus - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.8">
+    <link rel="stylesheet" href="{{ url_for('performance_explorer_plus.static', filename='performance_explorer_plus.css') }}?v=2.0">
+    <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
+</head>
+<body class="perf-page pep-page">
+<div class="container perf-container">
+
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">Dashboard</a>
+                <h1>📈 Performance Explorer Plus</h1>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="perf-body" id="pep-body">
+
+        <!-- ================================================================
+             LEFT: Filter Panel (same shell as Performance Explorer)
+        ================================================================ -->
+        <aside id="perf-left-panel" class="filter-panel perf-filter-hw">
+            <input type="hidden" id="filter-site" value="">
+            <input type="hidden" id="filter-object-dn" value="">
+
+            <div class="perf-time-window-row">
+                <label class="perf-time-window-label" for="pep-resolution">Data scope</label>
+                <select id="pep-resolution" class="perf-time-window-select">
+                    <option value="15m">15 min (ROP)</option>
+                    <option value="hour" selected>Hourly</option>
+                    <option value="day">Daily</option>
+                </select>
+            </div>
+
+            <div id="cell-list-wrap" class="hw-tree-panel">
+                <div class="perf-sidebar-section perf-sidebar-cells">
+                    <button type="button" class="perf-sidebar-toggle" id="perf-toggle-cells"
+                            aria-expanded="true" aria-controls="perf-cells-body"
+                            onclick="pepSidebarToggle(this)">
+                        <span class="perf-chevron" aria-hidden="true">▼</span>
+                        <span>Objects</span>
+                    </button>
+                    <div id="perf-cells-body" class="perf-sidebar-body perf-cells-body">
+                        <div class="hw-tree-toolbar">
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Vendor</span>
+                                    <select id="filter-vendor" class="hw-real-select" disabled title="Nokia only in V1">
+                                        <option value="Nokia" selected>Nokia</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Site key</span>
+                                    <input type="text" id="pep-site" class="hw-tree-search"
+                                           placeholder="MRBTS-1001" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row hw-tree-toolbar-row--tools">
+                                <input type="search" id="cell-search" class="hw-tree-search"
+                                       placeholder="Filter objects by DN…" autocomplete="off">
+                                <button type="button" class="hw-icon-btn hw-icon-btn-refresh"
+                                        title="Refresh objects" id="pep-refresh-objects">↻</button>
+                            </div>
+                            <div class="hw-tree-meta"><span id="cell-count-badge"></span></div>
+                        </div>
+                        <div id="pep-object-list" class="hw-object-tree" role="listbox" aria-label="Objects"></div>
+                    </div>
+                </div>
+
+                <div id="kpi-scope-panel" class="kpi-scope-panel" aria-label="Counters and KPIs">
+                    <div class="kpi-scope-head">
+                        <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest"
+                                id="perf-toggle-kpis" aria-expanded="true" aria-controls="perf-kpis-body"
+                                title="Collapse or expand" onclick="pepSidebarToggle(this)">
+                            <span class="perf-chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <span class="kpi-scope-title" id="kpi-scope-title">Counters / KPIs</span>
+                        <span class="kpi-scope-count" id="kpi-scope-count"></span>
+                    </div>
+                    <div id="perf-kpis-body" class="perf-sidebar-body perf-kpis-body">
+                        <div class="kpi-scope-controls pep-kpi-mode-row">
+                            <label class="kpi-scope-select-all">
+                                <input type="radio" name="pep-metric-mode" value="counters" checked>
+                                <span>Counters</span>
+                            </label>
+                            <label class="kpi-scope-select-all">
+                                <input type="radio" name="pep-metric-mode" value="kpi">
+                                <span>Saved KPI</span>
+                            </label>
+                        </div>
+                        <input type="search" id="pep-counter-search" class="hw-tree-search"
+                               placeholder="Filter counters…" autocomplete="off">
+                        <select id="pep-kpi-select" class="hw-real-select pep-kpi-select" style="display:none;">
+                            <option value="">Select saved KPI…</option>
+                        </select>
+                        <div id="kpi-scope-list" class="kpi-scope-list"></div>
+                        <div class="pep-formula-box">
+                            <span class="hw-field-label">Formula (optional override)</span>
+                            <input type="text" id="pep-formula" class="hw-tree-search"
+                                   placeholder="M8005C1 / M8005C0 * 100" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perf-query-bar" role="region" aria-label="Run query">
+                <div class="perf-bottom-mode">
+                    <button type="button" class="perf-mode-btn active" id="pep-mode-explore"
+                            data-mode="explore">Explore</button>
+                    <button type="button" class="perf-mode-btn" id="pep-mode-builder"
+                            data-mode="builder">KPI Builder</button>
+                    <button type="button" class="perf-mode-btn" id="pep-mode-health"
+                            data-mode="health">Ingest Health</button>
+                </div>
+                <div id="pep-explore-controls">
+                    <button type="button" class="btn-query" id="pep-run">Query</button>
+                </div>
+                <div id="pep-builder-controls" style="display:none;">
+                    <button type="button" class="btn-query" id="pep-kpi-validate">Validate</button>
+                    <button type="button" class="btn-query" id="pep-kpi-save">Save KPI</button>
+                </div>
+                <div id="pep-health-controls" style="display:none;">
+                    <button type="button" class="btn-query" id="pep-refresh-health">Refresh</button>
+                    <button type="button" class="btn-query" id="pep-run-rollup">Full rollup</button>
+                </div>
+            </div>
+        </aside>
+
+        <button type="button" id="perf-left-panel-toggle" class="perf-left-panel-toggle"
+                aria-label="Collapse left panel" aria-expanded="true"
+                title="Collapse filters" onclick="togglePepLeftPanel()">
+            ◀
+        </button>
+
+        <!-- ================================================================
+             RIGHT: Charts Area
+        ================================================================ -->
+        <main class="charts-area">
+
+            <div class="charts-header">
+                <div class="charts-header-top">
+                    <div class="charts-header-titles">
+                        <div id="charts-title" class="charts-title">Select objects and counters, then Query</div>
+                    </div>
+                    <div class="header-actions">
+                        <button type="button" id="btn-export" class="btn-export" style="display:none;">Export CSV</button>
+                        <button type="button" id="pep-save-view" class="btn-query" style="display:none;">Save view</button>
+                    </div>
+                </div>
+                <div class="charts-header-bottom">
+                    <div id="view-toggle" class="view-toggle">
+                        <button type="button" id="btn-charts-view" class="view-btn active" data-view="charts">Charts</button>
+                        <button type="button" id="btn-table-view" class="view-btn" data-view="table">Data table</button>
+                        <button type="button" id="btn-drill-view" class="view-btn" data-view="drill">Drill</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pep-meta" class="pep-meta-bar" aria-live="polite"></div>
+
+            <div id="no-selection" class="no-selection">
+                <div class="no-selection-icon">📊</div>
+                <p>Browse objects on the left, pick counters or a saved KPI, then click <strong>Query</strong>.</p>
+            </div>
+
+            <div id="loading-charts" class="loading-charts" style="display:none;">
+                <div class="loading-spinner"></div>
+                <p>Loading warehouse data…</p>
+            </div>
+
+            <div id="charts-wrap" class="charts-wrap" style="display:none;">
+                <div class="kpi-chart-card kpi-chart-card--full">
+                    <canvas id="pep-chart" height="110"></canvas>
+                </div>
+            </div>
+
+            <div id="pm-table-view" class="pm-table-view" style="display:none;">
+                <div class="hw-table-container">
+                    <table class="pep-data-table" id="pep-table">
+                        <thead>
+                            <tr><th>Time</th><th>Object</th><th>Metric</th><th>Value</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="pep-drill-view" class="pep-drill-view" style="display:none;">
+                <div class="pep-drill-card">
+                    <h3>Drill</h3>
+                    <p class="pep-muted">Click a table row to inspect contributing counters.</p>
+                    <pre id="pep-drill-body"></pre>
+                </div>
+            </div>
+
+            <!-- KPI Builder surface (same right pane, toggled) -->
+            <div id="pep-builder-view" class="pep-builder-view" style="display:none;">
+                <div class="pep-builder-card">
+                    <div class="charts-title">KPI Builder</div>
+                    <label class="pep-field">Name
+                        <input type="text" id="pep-kpi-name" class="hw-tree-search" placeholder="Cell avail %">
+                    </label>
+                    <label class="pep-field">Formula
+                        <input type="text" id="pep-kpi-formula" class="hw-tree-search"
+                               placeholder="M8005C1 / M8005C0 * 100">
+                    </label>
+                    <label class="pep-field">Description
+                        <input type="text" id="pep-kpi-desc" class="hw-tree-search">
+                    </label>
+                    <pre id="pep-kpi-msg" class="pep-msg"></pre>
+                    <div class="charts-title" style="margin-top:1rem;">Saved KPIs</div>
+                    <ul id="pep-kpi-list" class="pep-list"></ul>
+                </div>
+            </div>
+
+            <!-- Ingest health surface -->
+            <div id="pep-health-view" class="pep-health-view" style="display:none;">
+                <div class="charts-title">Ingest Health</div>
+                <div class="pep-health" id="pep-health">
+                    <p class="pep-muted">Loading…</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.5"></script>
+<script src="{{ url_for('performance_explorer_plus.static', filename='performance_explorer_plus.js') }}?v=2.1"></script>
+</body>
+</html>

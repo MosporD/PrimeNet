@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimization Cases - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('optimization_cases.static', filename='optimization_cases.css') }}?v=1.0">
+</head>
+<body class="opt-cases-page" data-focus-case="{{ request.args.get('case', '') }}">
+<div class="container opt-cases-container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">Dashboard</a>
+                <h1>Optimization Cases</h1>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username if user else '' }}</span>
+                <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="opt-cases-layout">
+        <aside class="opt-cases-sidebar">
+            <div class="opt-panel">
+                <h2>Filters</h2>
+                <label class="opt-field">
+                    <span>State</span>
+                    <select id="filter-state">
+                        <option value="">All</option>
+                        {% for st in states %}
+                        <option value="{{ st }}">{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="opt-field">
+                    <span>Search</span>
+                    <input type="search" id="filter-search" placeholder="Title, cell, area…">
+                </label>
+                <button type="button" class="btn-primary" id="btn-refresh-list">Refresh</button>
+            </div>
+
+            <div class="opt-panel">
+                <h2>Selection context</h2>
+                <p class="opt-muted" id="selection-summary">No shared selection.</p>
+                <label class="opt-field">
+                    <span>Paste cells</span>
+                    <textarea id="selection-cells" rows="4" placeholder="One cell per line or comma-separated"></textarea>
+                </label>
+                <label class="opt-field">
+                    <span>Label</span>
+                    <input type="text" id="selection-label" placeholder="Cluster / corridor name">
+                </label>
+                <div class="opt-btn-row">
+                    <button type="button" class="btn-secondary" id="btn-save-selection">Save selection</button>
+                    <button type="button" class="btn-secondary" id="btn-clear-selection">Clear</button>
+                </div>
+                <button type="button" class="btn-primary" id="btn-case-from-selection">Open case from selection</button>
+            </div>
+
+            <div class="opt-panel opt-stats" id="case-stats">
+                <h2>Stats</h2>
+                <dl id="case-stats-body"></dl>
+            </div>
+        </aside>
+
+        <section class="opt-cases-main">
+            <div class="opt-panel">
+                <div class="opt-list-head">
+                    <h2>Cases</h2>
+                    <span class="opt-muted" id="case-count"></span>
+                </div>
+                <div class="opt-table-wrap">
+                    <table class="opt-table">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th>Sev</th>
+                                <th>Title</th>
+                                <th>Cells</th>
+                                <th>Owner</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="case-rows">
+                            <tr><td colspan="6">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="opt-panel opt-detail" id="case-detail">
+                <p class="opt-muted">Select a case to review narrative, evidence, scorecard, and transitions.</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.4"></script>
+<script src="{{ url_for('static', filename='js/selection_context.js') }}?v=1.0"></script>
+<script src="{{ url_for('optimization_cases.static', filename='optimization_cases.js') }}?v=1.0"></script>
+</body>
+</html>

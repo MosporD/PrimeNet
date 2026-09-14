@@ -2,11 +2,32 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Dark-mode contrast fixes across heatmap / femto / SON / CM / audit / XML / radio modules.
+**Current track:** Optimization Cases V1 (A–C: Case + scorecard + correlator + selection).
 
-**Parked:** SON trust browser click-through (`/son-analytics` Topology). Server still may be on `afc1124f` until pull of bulk + these fixes. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id` (Health unchanged).
+**Parked:** Dark-mode contrast browser verify; SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus live SFTP (needs `NCM_ENABLE_ETL=1` on server). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
-**NEXT:** Browser-verify dark-mode contrast fixes (heatmap, femto, CM extract scrollbars, parameter audit golden rules, XML plan validation, overshooting bg) and SON header without READ-ONLY.
+**NEXT:** Browser click `/optimization-cases`; open a case from Change Impact / Alarm Impact; map polygon → Use as selection → Open case from selection. Then optional post-KPI scorecard fill.
+
+## 2026-09-14 (Optimization Cases A–C)
+
+- Done: `core/cases/` — schema/store/state machine, deterministic correlator, scorecard v1, per-user selection context.
+- Done: Module `/optimization-cases` workspace + APIs; dashboard tile; admin nav.
+- Done: Radio modules **Open Optimization Case**; SON detail **Open Optimization Case**; Network Map polygon **Use as selection**.
+- Done: Unit tests `core.cases.test_cases` (4/4); smoke script `scripts/_smoke_optimization_cases.py`.
+
+## 2026-09-11 (ETL gate + local cleanup)
+
+- Done: `core/etl_gate.py` — `NCM_ENABLE_ETL=0/1` master switch (loads `.env`); wired into bootstrap, scheduler, sync triggers, pipeline orchestrators/pull/load, PM Plus workers.
+- Done: Local `.env` + `.env.example` set `NCM_ENABLE_ETL=0`; server scheduler entrypoint defaults to `1`.
+- Done: `scripts/clear_local_etl_data.py` — wipes PM/raw/sync_downloads, keeps admin+metadata+geo.
+
+## 2026-09-11 (Performance Explorer Plus)
+
+- Done: `core/pm_plus/` — streaming TS 32.435 parser, ledger, ingest cycle, hour→day rollup, KPI compiler, query/export, VendorAdapter (Huawei stub).
+- Done: Scripts `scripts/pm_plus/run_pilot.py`, `run_ingest_worker.py`, `run_rollup.py`.
+- Done: Module `/performance-explorer-plus` (Explorer / KPI Builder / Ingest Health) + dashboard tile; old `/performance` unchanged.
+- Done: Unit tests 7/7 (`core.pm_plus.test_pm_plus`); pilot sample ingest ~0.02s.
+- Store: SQLite fallback `databases/pm_plus/pm_plus.db`; Postgres via `PM_PLUS_DATABASE_URL`.
 
 ## 2026-09-08 (dark-mode UI fixes)
 

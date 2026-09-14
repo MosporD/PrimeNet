@@ -168,12 +168,52 @@
                 (kpis ? '<p>Top KPIs: ' + kpis + '</p>' : '') +
                 '<p>Cells: ' + esc((r.cells || []).join(', ')) + '</p>' +
                 '<div class="son-feedback">' +
+                    '<button type="button" class="son-btn son-btn-primary" id="son-open-case-btn">Open Optimization Case</button> ' +
                     '<button type="button" class="son-btn son-btn-primary" data-fb="up">Helpful</button> ' +
                     '<button type="button" class="son-btn son-btn-ghost son-btn-dark" data-fb="down">Not helpful</button>' +
                     '<span id="son-feedback-status" class="son-feedback-status"></span>' +
                 '</div>' +
                 '<pre class="son-evidence-pre">' + esc(JSON.stringify(ev, null, 2)) + '</pre>' +
                 (links ? '<div class="son-detail-links">' + links + '</div>' : '');
+            const openCaseBtn = body.querySelector('#son-open-case-btn');
+            if (openCaseBtn) {
+                openCaseBtn.addEventListener('click', async function () {
+                    openCaseBtn.disabled = true;
+                    openCaseBtn.textContent = 'Opening…';
+                    try {
+                        const issue = {
+                            id: r.id,
+                            module: 'SON Optimization Insights',
+                            category: r.category || 'SON',
+                            title: r.title || 'SON recommendation',
+                            summary: r.summary || '',
+                            score: r.anomaly_score || r.score || (r.severity === 'High' ? 75 : 55),
+                            severity: r.severity || 'Medium',
+                            cells: r.cells || [],
+                            area: r.area || '',
+                            vendor: r.vendor || '',
+                            technology: r.technology || '4G',
+                            evidence: r.evidence || {},
+                            recommendation: r.treatment || r.recommendation || r.summary || '',
+                            source_url: '/son-analytics',
+                        };
+                        const cres = await fetch('/api/optimization-cases/from-issue', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ issue: issue }),
+                        });
+                        const cdata = await cres.json();
+                        if (!cdata.success) throw new Error(cdata.error || 'Failed to open case');
+                        window.location.href = cdata.case_url ||
+                            ('/optimization-cases?case=' + encodeURIComponent(cdata.case.case_id));
+                    } catch (err) {
+                        openCaseBtn.disabled = false;
+                        openCaseBtn.textContent = 'Open Optimization Case';
+                        alert(err.message || 'Failed to open case');
+                    }
+                });
+            }
             body.querySelectorAll('[data-fb]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     sendFeedback(r.id, btn.getAttribute('data-fb'));

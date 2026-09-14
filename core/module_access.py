@@ -16,6 +16,7 @@ NAV_SECTIONS: list[dict] = [
         "links": [
             {"label": "Dashboard", "href": "/dashboard", "visibility": "all"},
             {"label": "Performance Explorer", "href": "/performance", "visibility": "all"},
+            {"label": "Performance Explorer Plus", "href": "/performance-explorer-plus", "visibility": "all"},
             {"label": "Huawei PM Query Studio", "href": "/performance-analytics", "visibility": "admin"},
             {"label": "Network Coverage Heatmap", "href": "/cell-heatmap", "visibility": "all"},
             {"label": "Network Map", "href": "/network-map", "visibility": "all"},
@@ -33,6 +34,7 @@ NAV_SECTIONS: list[dict] = [
         "title": "Radio Optimization",
         "links": [
             {"label": "SON Optimization Insights", "href": "/son-analytics", "visibility": "admin"},
+            {"label": "Optimization Cases", "href": "/optimization-cases", "visibility": "admin"},
             {"label": "Network Health Overview", "href": "/network-health", "visibility": "admin"},
             {"label": "RF Optimization Workbench", "href": "/rf-optimization", "visibility": "admin"},
             {"label": "Neighbor Quality Analyzer", "href": "/neighbor-quality", "visibility": "admin"},

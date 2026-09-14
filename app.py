@@ -78,6 +78,7 @@ from modules.son_analytics.routes import son_analytics_bp
 from modules.network_health.routes import network_health_bp
 from modules.sector_health.routes import sector_health_bp
 from modules.performance_analytics import performance_analytics_bp
+from modules.performance_explorer_plus import performance_explorer_plus_bp
 from modules.radio_api import radio_api_bp
 from modules.neighbor_quality import neighbor_quality_bp
 from modules.capacity_hotspots import capacity_hotspots_bp
@@ -99,6 +100,7 @@ from modules.mobility_explorer import mobility_explorer_bp
 from modules.alarm_impact import alarm_impact_bp
 from modules.group_health import group_health_bp
 from modules.irat_border import irat_border_bp
+from modules.optimization_cases import optimization_cases_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(activation_bp)
@@ -126,6 +128,7 @@ app.register_blueprint(son_analytics_bp)
 app.register_blueprint(network_health_bp)
 app.register_blueprint(sector_health_bp)
 app.register_blueprint(performance_analytics_bp)
+app.register_blueprint(performance_explorer_plus_bp)
 app.register_blueprint(radio_api_bp)
 app.register_blueprint(neighbor_quality_bp)
 app.register_blueprint(capacity_hotspots_bp)
@@ -147,6 +150,7 @@ app.register_blueprint(mobility_explorer_bp)
 app.register_blueprint(alarm_impact_bp)
 app.register_blueprint(group_health_bp)
 app.register_blueprint(irat_border_bp)
+app.register_blueprint(optimization_cases_bp)
 
 
 @app.route("/amle-optimizer")

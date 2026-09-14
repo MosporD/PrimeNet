@@ -99,10 +99,38 @@
             </dl>
             <h3>Recommended Action</h3>
             <p>${escapeHtml(row.recommendation || 'Review the issue evidence and source module before action.')}</p>
+            <div class="radio-detail-actions">
+                <button type="button" class="btn-primary" id="radio-open-case-btn">Open Optimization Case</button>
+                ${sourceLink}
+            </div>
             <h3>Evidence</h3>
             ${formatEvidence(row.evidence || {})}
-            ${sourceLink}
         `;
+        const openBtn = document.getElementById('radio-open-case-btn');
+        if (openBtn) {
+            openBtn.addEventListener('click', async () => {
+                openBtn.disabled = true;
+                openBtn.textContent = 'Opening…';
+                try {
+                    const res = await fetch('/api/optimization-cases/from-issue', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ issue: row }),
+                    });
+                    const data = await res.json();
+                    if (!data.success) {
+                        throw new Error(data.error || 'Failed to open case');
+                    }
+                    const url = data.case_url || `/optimization-cases?case=${encodeURIComponent(data.case.case_id)}`;
+                    window.location.href = url;
+                } catch (err) {
+                    openBtn.disabled = false;
+                    openBtn.textContent = 'Open Optimization Case';
+                    alert(err.message || 'Failed to open case');
+                }
+            });
+        }
     }
 
     function renderRows(rows) {

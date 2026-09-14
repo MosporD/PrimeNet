@@ -40,6 +40,7 @@ next step moved. Bump `core/module_versions.py` when the UI label should change.
 
 - [Dashboard](dashboard.md)
 - [Performance Explorer](performance.md)
+- [Performance Explorer Plus](performance-explorer-plus.md)
 - [Huawei PM Query Studio](performance-analytics.md)
 - [Network Coverage Heatmap](cell-heatmap.md)
 - [Network Map](network-map.md)
@@ -54,6 +55,7 @@ next step moved. Bump `core/module_versions.py` when the UI label should change.
 ### Radio Optimization
 
 - [SON Optimization Insights](son-analytics.md)
+- [Optimization Cases](optimization-cases.md)
 - [Network Health Overview](network-health.md)
 - [RF Optimization Workbench](rf-optimization.md)
 - [Neighbor Quality Analyzer](neighbor-quality.md)

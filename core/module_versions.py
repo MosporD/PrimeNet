@@ -7,6 +7,7 @@ from modules.cm_parameter_audit.version import MODULE_VERSION_LABEL as CM_PARAME
 # Bump the label here when a module changes (e.g. "V1.1").
 MODULE_VERSIONS: dict[str, str] = {
     "performance": "V1.0",
+    "performance-explorer-plus": "V1.0",
     "performance-analytics": "V1.0",
     "network-map": "V1.0",
     "neighbor-analysis": "V1.0",
@@ -18,6 +19,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "conflict-map": "V1.0",
     "femto-pm": "V1.0",
     "son-analytics": "V1.1",
+    "optimization-cases": "V1.0",
     "network-health": "V1.1",
     "parameter-dictionary": "V1.1",
     "performance-dictionary": "V1.1",
@@ -54,6 +56,7 @@ MODULE_VERSIONS: dict[str, str] = {
 
 HREF_MODULE_IDS: dict[str, str] = {
     "/performance": "performance",
+    "/performance-explorer-plus": "performance-explorer-plus",
     "/performance-analytics": "performance-analytics",
     "/network-map": "network-map",
     "/neighbor-analysis": "neighbor-analysis",
@@ -65,6 +68,7 @@ HREF_MODULE_IDS: dict[str, str] = {
     "/conflict-map": "conflict-map",
     "/femto-pm": "femto-pm",
     "/son-analytics": "son-analytics",
+    "/optimization-cases": "optimization-cases",
     "/network-health": "network-health",
     "/parameter-dictionary": "parameter-dictionary",
     "/performance-dictionary": "performance-dictionary",
