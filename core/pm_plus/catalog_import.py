@@ -8,7 +8,7 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 from core.pm_plus.agg_rules import normalize_agg_rule
-from core.pm_plus.db import connect, execute, fetchone, qident
+from core.pm_plus.db import connect, execute, fetchone
 from core.pm_plus.schema import init_schema
 
 
@@ -67,17 +67,17 @@ def import_counter_agg_rules(xlsx: Path | str) -> dict:
 
             execute(
                 conn,
-                f"INSERT INTO dim_counter "
-                f"(counter_id, vendor, family, display_name, agg_rule, time_agg, nw_agg, "
-                f"time_agg_override, nw_agg_override, updated_at) "
-                f"VALUES (?,?,?,?,?,?,?,0,0,?) "
-                f"ON CONFLICT(counter_id) DO UPDATE SET "
-                f"family=COALESCE(NULLIF(excluded.family,''), dim_counter.family), "
-                f"display_name=COALESCE(NULLIF(excluded.display_name,''), dim_counter.display_name), "
-                f"time_agg=CASE WHEN dim_counter.time_agg_override=1 THEN dim_counter.time_agg ELSE excluded.time_agg END, "
-                f"nw_agg=CASE WHEN dim_counter.nw_agg_override=1 THEN dim_counter.nw_agg ELSE excluded.nw_agg END, "
-                f"agg_rule=CASE WHEN dim_counter.time_agg_override=1 THEN dim_counter.agg_rule ELSE excluded.time_agg END, "
-                f"updated_at=excluded.updated_at",
+                "INSERT INTO dim_counter "
+                "(counter_id, vendor, family, display_name, agg_rule, time_agg, nw_agg, "
+                "time_agg_override, nw_agg_override, updated_at) "
+                "VALUES (?,?,?,?,?,?,?,0,0,?) "
+                "ON CONFLICT(counter_id) DO UPDATE SET "
+                "family=COALESCE(NULLIF(excluded.family,''), dim_counter.family), "
+                "display_name=COALESCE(NULLIF(excluded.display_name,''), dim_counter.display_name), "
+                "time_agg=CASE WHEN dim_counter.time_agg_override=1 THEN dim_counter.time_agg ELSE excluded.time_agg END, "
+                "nw_agg=CASE WHEN dim_counter.nw_agg_override=1 THEN dim_counter.nw_agg ELSE excluded.nw_agg END, "
+                "agg_rule=CASE WHEN dim_counter.time_agg_override=1 THEN dim_counter.agg_rule ELSE excluded.time_agg END, "
+                "updated_at=excluded.updated_at",
                 (cid, "nokia", family, display, time_agg, time_agg, nw_agg, now),
             )
             n_counters += 1

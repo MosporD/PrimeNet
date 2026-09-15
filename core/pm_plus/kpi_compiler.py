@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import ast
 import re
-from typing import Any
 
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.]*")
 _AGG_CALL_RE = re.compile(r"\b(SUM|AVG)\s*\(\s*([^)]+)\s*\)", re.I)

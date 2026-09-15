@@ -13,7 +13,7 @@ Grain model (do not collapse these in primary keys):
 from __future__ import annotations
 
 from core.pm_plus import config
-from core.pm_plus.db import connect, execute, fetchone, qident
+from core.pm_plus.db import connect
 
 SCHEMA_VERSION = 3
 
