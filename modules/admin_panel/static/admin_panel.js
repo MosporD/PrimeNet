@@ -62,6 +62,9 @@ function openAdminPage(pageName) {
     if (pageName === 'activity-log' && !activityLoaded) {
         loadActivityLog();
     }
+    if (pageName === 'pm-plus-rules') {
+        refreshPmPlusRules();
+    }
 }
 
 // ── Feature Access ─────────────────────────────────────────────────────────
@@ -1378,5 +1381,178 @@ async function exportAdminTable(tableKey) {
         showNotification(`Downloaded ${payload.rows.length} row(s) to Excel`, 'success');
     } catch (error) {
         showNotification(error.message || 'Excel export failed', 'error');
+    }
+}
+
+// ── PM Plus aggregation rules ──────────────────────────────────────────────
+let pmPlusCounterTimer = null;
+
+function _pmPlusMsg(text, show) {
+    const el = document.getElementById('pm-plus-rules-msg');
+    if (!el) return;
+    el.textContent = text || '';
+    el.style.display = show === false || !text ? 'none' : '';
+}
+
+async function refreshPmPlusRules() {
+    const famBox = document.getElementById('pm-plus-families');
+    if (!famBox) return;
+    famBox.innerHTML = '<p class="api-connections-intro">Loading…</p>';
+    try {
+        const fres = await fetch('/api/admin/pm-plus/rules/families');
+        const fdata = await fres.json();
+        if (!fres.ok || !fdata.success) {
+            famBox.innerHTML = `<p class="api-connections-intro">${(fdata && fdata.error) || 'Failed to load families'}</p>`;
+            return;
+        }
+        const opts = ['SUM', 'AVG', 'MAX', 'MIN'];
+        const rows = (fdata.families || []).slice(0, 300);
+        if (!rows.length) {
+            famBox.innerHTML = '<p class="api-connections-intro">No family rules yet — import Nokia Excel catalog.</p>';
+        } else {
+            famBox.innerHTML = rows.map((f) => {
+                const ta = opts.map((o) =>
+                    `<option value="${o}" ${f.time_agg === o ? 'selected' : ''}>${o}</option>`
+                ).join('');
+                const na = opts.map((o) =>
+                    `<option value="${o}" ${f.nw_agg === o ? 'selected' : ''}>${o}</option>`
+                ).join('');
+                return `<div class="pm-plus-rule-row">
+                    <strong>${f.family}</strong>
+                    <label>time <select data-fam="${f.family}" data-field="time_agg">${ta}</select></label>
+                    <label>nw <select data-fam="${f.family}" data-field="nw_agg">${na}</select></label>
+                    <button type="button" class="btn-user-secondary" data-fam="${f.family}" onclick="savePmPlusFamily(this)">Save</button>
+                </div>`;
+            }).join('');
+        }
+        await loadPmPlusCounters();
+    } catch (e) {
+        famBox.innerHTML = '<p class="api-connections-intro">Network error loading rules.</p>';
+    }
+}
+
+async function savePmPlusFamily(btn) {
+    const fam = btn.dataset.fam;
+    const famBox = document.getElementById('pm-plus-families');
+    const timeSel = famBox.querySelector(`select[data-fam="${fam}"][data-field="time_agg"]`);
+    const nwSel = famBox.querySelector(`select[data-fam="${fam}"][data-field="nw_agg"]`);
+    try {
+        const res = await fetch('/api/admin/pm-plus/rules/families', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                family: fam,
+                time_agg: timeSel.value,
+                nw_agg: nwSel.value,
+                enabled: true,
+            }),
+        });
+        const data = await res.json();
+        _pmPlusMsg(JSON.stringify(data, null, 2));
+        showNotification(data.success ? `Saved ${fam}` : (data.error || 'Save failed'), data.success ? 'success' : 'error');
+    } catch (e) {
+        showNotification('Network error saving family', 'error');
+    }
+}
+
+function debouncePmPlusCounters() {
+    clearTimeout(pmPlusCounterTimer);
+    pmPlusCounterTimer = setTimeout(loadPmPlusCounters, 300);
+}
+
+async function loadPmPlusCounters() {
+    const ctrBox = document.getElementById('pm-plus-counters');
+    if (!ctrBox) return;
+    const q = (document.getElementById('pm-plus-counter-q')?.value || '').trim();
+    ctrBox.innerHTML = '<p class="api-connections-intro">Loading…</p>';
+    try {
+        const res = await fetch(`/api/admin/pm-plus/rules/counters?q=${encodeURIComponent(q)}&limit=80`);
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            ctrBox.innerHTML = `<p class="api-connections-intro">${(data && data.error) || 'Failed'}</p>`;
+            return;
+        }
+        const opts = ['SUM', 'AVG', 'MAX', 'MIN'];
+        ctrBox.innerHTML = (data.counters || []).map((c) => {
+            const ta = opts.map((o) =>
+                `<option value="${o}" ${c.time_agg === o ? 'selected' : ''}>${o}</option>`
+            ).join('');
+            const ov = c.time_agg_override ? ' (override)' : '';
+            return `<div class="pm-plus-rule-row">
+                <strong>${c.counter_id}</strong>
+                <span class="api-connections-intro">${c.family || ''}${ov}</span>
+                <select data-cid="${c.counter_id}">${ta}</select>
+                <button type="button" class="btn-user-secondary" data-cid="${c.counter_id}" onclick="savePmPlusCounter(this)">Override</button>
+                <button type="button" class="btn-user-secondary" data-cid="${c.counter_id}" onclick="clearPmPlusCounter(this)">Clear</button>
+            </div>`;
+        }).join('') || '<p class="api-connections-intro">No counters match.</p>';
+    } catch (e) {
+        ctrBox.innerHTML = '<p class="api-connections-intro">Network error.</p>';
+    }
+}
+
+async function savePmPlusCounter(btn) {
+    const cid = btn.dataset.cid;
+    const sel = document.querySelector(`#pm-plus-counters select[data-cid="${cid}"]`);
+    try {
+        const res = await fetch('/api/admin/pm-plus/rules/counters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ counter_id: cid, time_agg: sel.value, nw_agg: sel.value }),
+        });
+        const data = await res.json();
+        _pmPlusMsg(JSON.stringify(data, null, 2));
+        showNotification(data.success ? `Override ${cid}` : (data.error || 'Failed'), data.success ? 'success' : 'error');
+    } catch (e) {
+        showNotification('Network error', 'error');
+    }
+}
+
+async function clearPmPlusCounter(btn) {
+    try {
+        const res = await fetch('/api/admin/pm-plus/rules/counters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ counter_id: btn.dataset.cid, clear: true }),
+        });
+        const data = await res.json();
+        _pmPlusMsg(JSON.stringify(data, null, 2));
+        showNotification(data.success ? 'Cleared override' : (data.error || 'Failed'), data.success ? 'success' : 'error');
+        loadPmPlusCounters();
+    } catch (e) {
+        showNotification('Network error', 'error');
+    }
+}
+
+async function importPmPlusCatalog() {
+    _pmPlusMsg('Importing catalog…');
+    try {
+        const res = await fetch('/api/admin/pm-plus/catalog/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+        });
+        const data = await res.json();
+        _pmPlusMsg(JSON.stringify(data, null, 2));
+        showNotification(data.success ? 'Catalog imported' : (data.error || 'Import failed'), data.success ? 'success' : 'error');
+        if (data.success) refreshPmPlusRules();
+    } catch (e) {
+        showNotification('Network error importing catalog', 'error');
+    }
+}
+
+async function runPmPlusRollup() {
+    _pmPlusMsg('Running rollup…');
+    try {
+        const res = await fetch('/api/admin/pm-plus/rollup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ retention: true }),
+        });
+        const data = await res.json();
+        _pmPlusMsg(JSON.stringify(data, null, 2));
+        showNotification(data.success ? 'Rollup finished' : (data.error || 'Rollup failed'), data.success ? 'success' : 'error');
+    } catch (e) {
+        showNotification('Network error running rollup', 'error');
     }
 }

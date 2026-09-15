@@ -197,6 +197,27 @@
                             recommendation: r.treatment || r.recommendation || r.summary || '',
                             source_url: '/son-analytics',
                         };
+                        try {
+                            const tres = await fetch('/api/optimization-cases/treatments?min_improve=3', {
+                                credentials: 'same-origin',
+                            });
+                            const tdata = await tres.json();
+                            const treatments = (tdata && tdata.treatments) || [];
+                            const rec = String(issue.recommendation || '').toLowerCase();
+                            const match = treatments.find(function (t) {
+                                const title = String(t.title || '').toLowerCase();
+                                return title && (rec.indexOf(title.slice(0, 24)) >= 0 ||
+                                    String(t.category || '') === String(issue.category || ''));
+                            });
+                            if (match) {
+                                issue.recommendation = match.title +
+                                    ' (trusted: improve=' + (match.improve_count || 0) + ')';
+                                issue.proposed_change = match.title;
+                                issue.evidence = Object.assign({}, issue.evidence, {
+                                    trusted_treatment: match,
+                                });
+                            }
+                        } catch (_) { /* treatments optional */ }
                         const cres = await fetch('/api/optimization-cases/from-issue', {
                             method: 'POST',
                             credentials: 'same-origin',

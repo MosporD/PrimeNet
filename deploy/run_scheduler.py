@@ -17,6 +17,7 @@ if _PROJECT_ROOT not in sys.path:
 
 os.environ.setdefault("NCM_CONTAINER", "1")
 os.environ.setdefault("NCM_RUN_SCHEDULER", "1")
+os.environ.setdefault("NCM_ENABLE_ETL", "1")
 os.environ.setdefault("NCM_DISABLE_SCHEDULER", "0")
 os.environ.setdefault("NCM_BOOTSTRAP_ON_IMPORT", "0")
 

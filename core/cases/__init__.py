@@ -1,15 +1,28 @@
-"""Optimization Cases — persistent evidence → decision → proof loop."""
+"""Optimization Cases — detect → correlate → case → propose → scorecard."""
 
-from __future__ import annotations
-
-from core.cases import correlator, scorecard, selection, service, store
-from core.cases.schema import init_schema
+from core.cases.service import (
+    create_complaint_case,
+    open_case_from_issue,
+    open_cases_from_morning_report,
+    open_complaint_case,
+    open_energy_case,
+    pm_deeplink_for_case,
+    refresh_case_evidence,
+    refresh_case_scorecard,
+)
+from core.cases.store import get_case, list_cases, transition_case, update_case
 
 __all__ = [
-    "init_schema",
-    "store",
-    "correlator",
-    "scorecard",
-    "selection",
-    "service",
+    "create_complaint_case",
+    "get_case",
+    "list_cases",
+    "open_case_from_issue",
+    "open_cases_from_morning_report",
+    "open_complaint_case",
+    "open_energy_case",
+    "pm_deeplink_for_case",
+    "refresh_case_evidence",
+    "refresh_case_scorecard",
+    "transition_case",
+    "update_case",
 ]

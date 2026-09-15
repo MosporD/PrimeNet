@@ -1250,6 +1250,11 @@ def _relocate_legacy_all_inputs(scope: str, vendor: str, category: str) -> None:
 
 
 def main() -> int:
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return 0
+
     args = _parse_args()
     scope = args.scope
     is_daily = scope == "daily"

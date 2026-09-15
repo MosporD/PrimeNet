@@ -47,6 +47,7 @@
                 <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
                 <button class="admin-page-tab" data-page="feature-access" type="button" onclick="openAdminPage('feature-access')">Feature Access</button>
                 <button class="admin-page-tab" data-page="api-connections" type="button" onclick="openAdminPage('api-connections')">API Connections</button>
+                <button class="admin-page-tab" data-page="pm-plus-rules" type="button" onclick="openAdminPage('pm-plus-rules')">PM Plus Rules</button>
                 <button class="admin-page-tab" data-page="activity-log" type="button" onclick="openAdminPage('activity-log')">Activity Log</button>
                 {% else %}
                 <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
@@ -279,6 +280,33 @@
                         </tbody>
                     </table>
                     <div id="activity-log-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="pm-plus-rules">
+                <div class="sync-section">
+                    <div class="section-title-row">
+                        <h2 class="section-title">PM Plus Aggregation Rules</h2>
+                        <button type="button" class="btn-history-reload" onclick="refreshPmPlusRules()">↻ Refresh</button>
+                    </div>
+                    <p class="api-connections-intro">
+                        Cascade: hour←ROP, day←ROP, week←day, month←week, year←month.
+                        NONE→SUM. Family default, or per-counter override. Used by Performance Explorer Plus rollups.
+                    </p>
+                    <div class="sync-actions" style="margin-bottom:12px;">
+                        <button type="button" class="btn-sync meta" onclick="importPmPlusCatalog()">Import Nokia Excel catalog</button>
+                        <button type="button" class="btn-sync refresh" onclick="runPmPlusRollup()">Run full rollup + retention</button>
+                    </div>
+                    <h3 class="section-subtitle">Families</h3>
+                    <div id="pm-plus-families" class="pm-plus-rules-box">
+                        <p class="api-connections-intro">Open this tab to load rules…</p>
+                    </div>
+                    <h3 class="section-subtitle">Counter overrides
+                        <input type="search" id="pm-plus-counter-q" placeholder="M55… or family"
+                               autocomplete="off" oninput="debouncePmPlusCounters()">
+                    </h3>
+                    <div id="pm-plus-counters" class="pm-plus-rules-box"></div>
+                    <pre id="pm-plus-rules-msg" class="inspect-output" style="display:none;"></pre>
                 </div>
             </div>
             {% endif %}

@@ -25,6 +25,12 @@ def _run(path_parts: list[str], category: str | None = None) -> int:
 
 
 def main() -> int:
+    sys.path.insert(0, PROJECT_ROOT)
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return EXIT_OK
+
     parser = argparse.ArgumentParser(description="Daily pull wrapper")
     parser.add_argument("--category", choices=["cells", "groups"])
     args = parser.parse_args()

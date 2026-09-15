@@ -4775,6 +4775,22 @@ document.addEventListener('DOMContentLoaded', () => {
     ensureKpiCategoryConfigLoaded();
     perfPmViewPrefPromise = loadPmViewPreference();
     void loadTimeFrameConfig();
+
+    // Prefill from shared Cases / map selection
+    (async () => {
+        if (!window.PrimeNetSelection) return;
+        let sel = window.PrimeNetSelection.readLocal();
+        try {
+            sel = await window.PrimeNetSelection.fetchServer();
+        } catch (_) { /* local */ }
+        const cells = (sel && sel.cells) || [];
+        if (!cells.length) return;
+        const search = document.getElementById('cell-search');
+        if (search) {
+            search.value = cells.slice(0, 5).join(',');
+            search.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    })();
 });
 
 // ============================================================

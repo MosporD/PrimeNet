@@ -16,6 +16,10 @@ from pipeline.paths import ensure_taxonomy_dirs  # noqa: E402
 
 
 def main() -> int:
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return 0
     ensure_taxonomy_dirs()
     pull_rc = run_neighbor_pull()
     load_rc = run_neighbor_load(slim=True)

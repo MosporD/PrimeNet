@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optimization Cases - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
-    <link rel="stylesheet" href="{{ url_for('optimization_cases.static', filename='optimization_cases.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('optimization_cases.static', filename='optimization_cases.css') }}?v=1.1">
 </head>
 <body class="opt-cases-page" data-focus-case="{{ request.args.get('case', '') }}">
 <div class="container opt-cases-container">
@@ -58,6 +58,17 @@
                     <button type="button" class="btn-secondary" id="btn-clear-selection">Clear</button>
                 </div>
                 <button type="button" class="btn-primary" id="btn-case-from-selection">Open case from selection</button>
+                <button type="button" class="btn-secondary" id="btn-cluster-acceptance">Cluster acceptance checklist</button>
+            </div>
+
+            <div class="opt-panel">
+                <h2>Complaint intake</h2>
+                <label class="opt-field"><span>Ticket id</span><input type="text" id="complaint-ticket" placeholder="TT / CRM id"></label>
+                <label class="opt-field"><span>Site</span><input type="text" id="complaint-site" placeholder="Site id"></label>
+                <label class="opt-field"><span>Postcode / area</span><input type="text" id="complaint-postcode"></label>
+                <label class="opt-field"><span>Cells</span><textarea id="complaint-cells" rows="3" placeholder="Paste cells"></textarea></label>
+                <label class="opt-field"><span>Summary</span><textarea id="complaint-summary" rows="2"></textarea></label>
+                <button type="button" class="btn-primary" id="btn-complaint">Open complaint case</button>
             </div>
 
             <div class="opt-panel opt-stats" id="case-stats">
@@ -78,6 +89,7 @@
                             <tr>
                                 <th>State</th>
                                 <th>Sev</th>
+                                <th>Impact (PM)</th>
                                 <th>Title</th>
                                 <th>Cells</th>
                                 <th>Owner</th>
@@ -85,7 +97,7 @@
                             </tr>
                         </thead>
                         <tbody id="case-rows">
-                            <tr><td colspan="6">Loading…</td></tr>
+                            <tr><td colspan="7">Loading…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -100,6 +112,6 @@
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.4"></script>
 <script src="{{ url_for('static', filename='js/selection_context.js') }}?v=1.0"></script>
-<script src="{{ url_for('optimization_cases.static', filename='optimization_cases.js') }}?v=1.0"></script>
+<script src="{{ url_for('optimization_cases.static', filename='optimization_cases.js') }}?v=1.1"></script>
 </body>
 </html>

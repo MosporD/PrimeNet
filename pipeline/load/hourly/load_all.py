@@ -15,6 +15,12 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(o
 
 
 def main() -> int:
+    sys.path.insert(0, PROJECT_ROOT)
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return 0
+
     parser = argparse.ArgumentParser(description="Hourly loader wrapper")
     parser.add_argument("--category", action="append", choices=["cells", "groups"])
     args = parser.parse_args()

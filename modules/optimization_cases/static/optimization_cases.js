@@ -57,7 +57,7 @@
         const tbody = document.getElementById("case-rows");
         document.getElementById("case-count").textContent = `${cases.length} shown`;
         if (!cases.length) {
-            tbody.innerHTML = '<tr><td colspan="6">No cases yet. Open one from a radio issue or selection.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7">No cases yet. Open one from a radio issue or selection.</td></tr>';
             return;
         }
         tbody.innerHTML = cases
@@ -65,6 +65,7 @@
                 <tr data-id="${escapeHtml(row.case_id)}" class="${row.case_id === activeId ? "selected" : ""}">
                     <td><span class="opt-state ${escapeHtml(row.state)}">${escapeHtml(row.state)}</span></td>
                     <td><span class="opt-sev ${escapeHtml(row.severity)}">${escapeHtml(row.severity)}</span></td>
+                    <td>${escapeHtml(row.impact_score ?? "—")}</td>
                     <td>
                         <strong>${escapeHtml(row.title)}</strong>
                         <div class="opt-muted">${escapeHtml(row.source_module || "")}</div>
@@ -84,6 +85,23 @@
         });
     }
 
+    function checklistHtml(checklist) {
+        const keys = ["availability_ok", "cssr_ok", "cdr_ok", "alarms_cleared", "map_location_ok"];
+        if (!checklist || !Object.keys(checklist).length) return "";
+        return `
+            <h3>Cluster checklist</h3>
+            <div class="opt-checklist" id="case-checklist">
+                ${keys.map((k) => `
+                    <label><input type="checkbox" data-check="${k}" ${checklist[k] ? "checked" : ""}> ${escapeHtml(k)}</label>
+                `).join("")}
+                <label class="opt-field"><span>Notes</span>
+                    <textarea id="checklist-notes" rows="2">${escapeHtml(checklist.notes || "")}</textarea>
+                </label>
+                <button type="button" class="btn-secondary" id="btn-save-checklist">Save checklist</button>
+            </div>
+        `;
+    }
+
     function renderDetail(payload) {
         const el = document.getElementById("case-detail");
         if (!payload || !payload.case) {
@@ -95,6 +113,10 @@
         const sc = c.scorecard || {};
         const facts = ((c.evidence || {}).correlator || {}).facts || [];
         const events = payload.events || [];
+        const related = payload.related_cases || [];
+        const pm = payload.pm_deeplink || {};
+        const post = sc.post || {};
+        const impact = ((c.evidence || {}).impact || {});
 
         el.innerHTML = `
             <h2>${escapeHtml(c.title)}</h2>
@@ -102,8 +124,10 @@
             <dl class="opt-detail-meta">
                 <div><dt>State</dt><dd><span class="opt-state ${escapeHtml(c.state)}">${escapeHtml(c.state)}</span></dd></div>
                 <div><dt>Severity</dt><dd>${escapeHtml(c.severity)} (${escapeHtml(c.score)})</dd></div>
+                <div><dt>Impact Score (PM)</dt><dd>${escapeHtml(c.impact_score ?? impact.impact_score ?? "—")}</dd></div>
                 <div><dt>Source</dt><dd>${escapeHtml(c.source_module || "—")}</dd></div>
                 <div><dt>Owner</dt><dd>${escapeHtml(c.owner || "—")}</dd></div>
+                <div><dt>Ticket</dt><dd>${escapeHtml(c.ticket_id || "—")}</dd></div>
                 <div><dt>Vendor / RAT</dt><dd>${escapeHtml(c.vendor || "—")} / ${escapeHtml(c.technology || "—")}</dd></div>
                 <div><dt>Area</dt><dd>${escapeHtml(c.area || "—")}</dd></div>
                 <div><dt>Cells</dt><dd>${escapeHtml((c.cells || []).join(", ") || c.site_id || "—")}</dd></div>
@@ -115,7 +139,13 @@
                 <button type="button" class="btn-secondary" id="btn-refresh-evidence">Refresh evidence</button>
                 <button type="button" class="btn-secondary" id="btn-refresh-scorecard">Refresh scorecard</button>
                 ${c.source_url ? `<a class="btn-secondary" href="${escapeHtml(c.source_url)}">Open source</a>` : ""}
+                <a class="btn-secondary" id="btn-pm-link" href="${escapeHtml(pm.performance_url || "/performance")}">Open Performance</a>
+                <a class="btn-secondary" href="${escapeHtml(pm.performance_plus_url || "/performance-explorer-plus")}">Open Performance Plus</a>
             </div>
+            <label class="opt-field">
+                <span>Override note (conflict / golden-rule approve)</span>
+                <input type="text" id="override-note" placeholder="Required when gates block approval">
+            </label>
 
             <h3>Narrative</h3>
             <pre class="opt-narrative">${escapeHtml(c.narrative || "No narrative yet.")}</pre>
@@ -136,13 +166,29 @@
             <h3>Scorecard</h3>
             <dl class="opt-detail-meta">
                 <div><dt>Status</dt><dd>${escapeHtml(sc.status || "—")}</dd></div>
+                <div><dt>Verdict</dt><dd>${escapeHtml(sc.verdict || "—")}</dd></div>
                 <div><dt>Completeness</dt><dd>${escapeHtml(sc.completeness ?? "—")}</dd></div>
                 <div><dt>Confidence</dt><dd>${escapeHtml(sc.confidence ?? "—")}</dd></div>
                 <div><dt>Baseline signals</dt><dd>${escapeHtml((sc.baseline || {}).signal_count ?? 0)}</dd></div>
+                <div><dt>Post signals</dt><dd>${escapeHtml(post.signal_count ?? 0)}</dd></div>
                 <div><dt>Control neighbors</dt><dd>${escapeHtml(((sc.control_neighbors || []).length) || 0)}</dd></div>
             </dl>
             <p>${escapeHtml(sc.rollback_warning || "")}</p>
+            <p class="opt-muted">${escapeHtml(post.note || "")}</p>
             ${(sc.gaps || []).length ? `<ul class="opt-scorecard-gaps">${sc.gaps.map((g) => `<li>${escapeHtml(g)}</li>`).join("")}</ul>` : ""}
+
+            ${checklistHtml(c.checklist)}
+
+            <h3>Same-cell history (30d)</h3>
+            <ul class="opt-events">
+                ${related.map((r) => `
+                    <li>
+                        <a href="/optimization-cases?case=${encodeURIComponent(r.case_id)}">${escapeHtml(r.case_id)}</a>
+                        · ${escapeHtml(r.state)} · ${escapeHtml(r.title || "")}
+                        <div class="opt-muted">${escapeHtml(r.source_module || "")} · ${escapeHtml((r.updated_at || "").slice(0, 16))}</div>
+                    </li>
+                `).join("") || "<li class='opt-muted'>No related cases in the last 30 days.</li>"}
+            </ul>
 
             <h3>Evidence facts (${facts.length})</h3>
             <pre class="opt-narrative">${escapeHtml(JSON.stringify(facts.slice(0, 30), null, 2))}</pre>
@@ -160,14 +206,26 @@
             </ul>
         `;
 
+        // Persist selection for Performance deep-links
+        if ((c.cells || []).length && window.PrimeNetSelection) {
+            window.PrimeNetSelection.save({
+                kind: "cells",
+                cells: c.cells,
+                label: c.title || "",
+                source: "optimization-cases",
+                meta: { case_id: c.case_id, start: pm.start || "", end: pm.end || "" },
+            }).catch(() => {});
+        }
+
         el.querySelectorAll("[data-transition]").forEach((btn) => {
             btn.addEventListener("click", async () => {
                 const state = btn.getAttribute("data-transition");
+                const overrideNote = (document.getElementById("override-note") || {}).value || "";
                 const res = await fetch(`/api/optimization-cases/${encodeURIComponent(c.case_id)}/transition`, {
                     method: "POST",
                     credentials: "same-origin",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ state }),
+                    body: JSON.stringify({ state, override_note: overrideNote }),
                 });
                 const data = await res.json();
                 if (!data.success) {
@@ -226,6 +284,25 @@
                     credentials: "same-origin",
                 });
                 await loadDetail(c.case_id);
+            });
+        }
+        const saveCheck = document.getElementById("btn-save-checklist");
+        if (saveCheck) {
+            saveCheck.addEventListener("click", async () => {
+                const checklist = Object.assign({}, c.checklist || {});
+                el.querySelectorAll("[data-check]").forEach((cb) => {
+                    checklist[cb.getAttribute("data-check")] = !!cb.checked;
+                });
+                checklist.notes = (document.getElementById("checklist-notes") || {}).value || "";
+                const res = await fetch(`/api/optimization-cases/${encodeURIComponent(c.case_id)}`, {
+                    method: "PATCH",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ checklist }),
+                });
+                const data = await res.json();
+                if (!data.success) alert(data.error || "Checklist save failed");
+                else await loadDetail(c.case_id);
             });
         }
     }
@@ -318,6 +395,57 @@
         await loadDetail(activeId);
     }
 
+    async function openClusterAcceptance() {
+        await saveSelection();
+        const cells = parseCells(document.getElementById("selection-cells").value);
+        if (!cells.length) {
+            alert("Add cells for cluster acceptance.");
+            return;
+        }
+        const label = document.getElementById("selection-label").value.trim();
+        const res = await fetch("/api/optimization-cases/cluster-acceptance", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: label || `Cluster acceptance (${cells.length} cells)`,
+                cells,
+            }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            alert(data.error || "Failed to create cluster case");
+            return;
+        }
+        activeId = data.case.case_id;
+        await loadList();
+        await loadDetail(activeId);
+    }
+
+    async function openComplaint() {
+        const cells = parseCells(document.getElementById("complaint-cells").value);
+        const res = await fetch("/api/optimization-cases/complaint", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                ticket_id: document.getElementById("complaint-ticket").value.trim(),
+                site_id: document.getElementById("complaint-site").value.trim(),
+                postcode: document.getElementById("complaint-postcode").value.trim(),
+                cells,
+                summary: document.getElementById("complaint-summary").value.trim(),
+            }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            alert(data.error || "Complaint case failed");
+            return;
+        }
+        activeId = data.case.case_id;
+        await loadList();
+        await loadDetail(activeId);
+    }
+
     document.getElementById("btn-refresh-list").addEventListener("click", () => loadList().catch((e) => alert(e.message)));
     document.getElementById("filter-state").addEventListener("change", () => loadList().catch((e) => alert(e.message)));
     document.getElementById("filter-search").addEventListener("keydown", (ev) => {
@@ -331,6 +459,8 @@
         renderSelection(sel);
     });
     document.getElementById("btn-case-from-selection").addEventListener("click", () => openCaseFromSelection().catch((e) => alert(e.message)));
+    document.getElementById("btn-cluster-acceptance").addEventListener("click", () => openClusterAcceptance().catch((e) => alert(e.message)));
+    document.getElementById("btn-complaint").addEventListener("click", () => openComplaint().catch((e) => alert(e.message)));
 
     Promise.all([loadSelection(), loadList()])
         .then(() => {
@@ -339,6 +469,6 @@
         })
         .catch((err) => {
             document.getElementById("case-rows").innerHTML =
-                `<tr><td colspan="6">${escapeHtml(err.message || "Failed to load")}</td></tr>`;
+                `<tr><td colspan="7">${escapeHtml(err.message || "Failed to load")}</td></tr>`;
         });
 })();

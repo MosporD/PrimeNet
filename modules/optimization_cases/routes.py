@@ -105,17 +105,144 @@ def api_list():
         return _json_error(exc, 500)
 
 
-@optimization_cases_bp.route("/api/optimization-cases/<case_id>")
+# Static path routes MUST come before /<case_id>
+@optimization_cases_bp.route("/api/optimization-cases/from-issue", methods=["POST"])
 @login_required
-def api_get(case_id: str):
+def api_from_issue():
     try:
         init_schema()
-        case = store.get_case(case_id)
-        if not case:
-            return _json_error("Case not found", 404)
-        events = store.list_events(case_id)
-        allowed = sorted(TRANSITIONS.get(case.get("state") or "open", frozenset()))
-        return jsonify({"success": True, "case": case, "events": events, "allowed_transitions": allowed})
+        body = request.get_json(silent=True) or {}
+        issue = body.get("issue") or body
+        case = service.open_case_from_issue(issue, actor=_username())
+        try:
+            log_activity(_username(), "optimization_case_from_issue", f"case_id={case['case_id']}")
+        except Exception:
+            pass
+        return jsonify({"success": True, "case": case, "case_url": f"/optimization-cases?case={case['case_id']}"})
+    except store.CaseError as exc:
+        return _json_error(exc, 400)
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/from-morning-report", methods=["POST"])
+@login_required
+def api_from_morning_report():
+    try:
+        init_schema()
+        body = request.get_json(silent=True) or {}
+        issues = body.get("issues")
+        if issues is None:
+            from core.radio.insights import radio_morning_report
+
+            area = str(body.get("area") or "all")
+            vendor = str(body.get("vendor") or "all")
+            technology = str(body.get("technology") or "all")
+            limit = int(body.get("limit") or 100)
+            payload = radio_morning_report(area=area, vendor=vendor, technology=technology, limit=limit)
+            issues = payload.get("issues") or []
+        result = service.open_cases_from_morning_report(
+            issues,
+            actor=_username(),
+            severities=tuple(body.get("severities") or ("Critical", "High")),
+            limit=int(body.get("max_cases") or 25),
+            dedupe_days=int(body.get("dedupe_days") or 7),
+        )
+        try:
+            log_activity(
+                _username(),
+                "optimization_cases_morning_report",
+                f"created={result.get('created_count')} skipped={result.get('skipped_count')}",
+            )
+        except Exception:
+            pass
+        return jsonify({"success": True, **result})
+    except store.CaseError as exc:
+        return _json_error(exc, 400)
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/complaint", methods=["POST"])
+@login_required
+def api_complaint():
+    try:
+        init_schema()
+        body = request.get_json(silent=True) or {}
+        cells = body.get("cells") or []
+        if isinstance(cells, str):
+            cells = [c.strip() for c in cells.replace(";", ",").split(",") if c.strip()]
+        case = service.create_complaint_case(
+            ticket_id=str(body.get("ticket_id") or ""),
+            site_id=str(body.get("site_id") or ""),
+            postcode=str(body.get("postcode") or ""),
+            cells=cells,
+            summary=str(body.get("summary") or ""),
+            actor=_username(),
+        )
+        return jsonify({"success": True, "case": case, "case_url": f"/optimization-cases?case={case['case_id']}"})
+    except store.CaseError as exc:
+        return _json_error(exc, 400)
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/energy", methods=["POST"])
+@login_required
+def api_energy():
+    try:
+        init_schema()
+        body = request.get_json(silent=True) or {}
+        issue = body.get("issue") or body
+        case = service.open_energy_case(issue, actor=_username())
+        return jsonify({"success": True, "case": case, "case_url": f"/optimization-cases?case={case['case_id']}"})
+    except store.CaseError as exc:
+        return _json_error(exc, 400)
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/cluster-acceptance", methods=["POST"])
+@login_required
+def api_cluster_acceptance():
+    try:
+        init_schema()
+        body = request.get_json(silent=True) or {}
+        cells = body.get("cells") or []
+        if isinstance(cells, str):
+            cells = [c.strip() for c in cells.replace(";", ",").split(",") if c.strip()]
+        issue = {
+            "title": body.get("title") or "Cluster acceptance",
+            "summary": body.get("summary") or "Cluster acceptance checklist case",
+            "category": "Cluster Acceptance",
+            "case_type": "cluster_acceptance",
+            "module": "Cluster Acceptance",
+            "severity": body.get("severity") or "Medium",
+            "score": body.get("score") or 50,
+            "cells": cells,
+            "site_id": body.get("site_id") or "",
+            "vendor": body.get("vendor") or "",
+            "technology": body.get("technology") or "",
+            "checklist": body.get("checklist") or {},
+            "source_url": "/optimization-cases",
+        }
+        case = service.open_case_from_issue(issue, actor=_username())
+        return jsonify({"success": True, "case": case})
+    except store.CaseError as exc:
+        return _json_error(exc, 400)
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/treatments")
+@login_required
+def api_treatments():
+    try:
+        from core.cases import treatments
+
+        init_schema()
+        rows = treatments.list_trusted(min_improve=int(request.args.get("min_improve") or 3))
+        return jsonify({"success": True, "treatments": rows})
     except Exception as exc:
         return _json_error(exc, 500)
 
@@ -144,21 +271,32 @@ def api_create():
         return _json_error(exc, 500)
 
 
-@optimization_cases_bp.route("/api/optimization-cases/from-issue", methods=["POST"])
+@optimization_cases_bp.route("/api/optimization-cases/<case_id>")
 @login_required
-def api_from_issue():
+def api_get(case_id: str):
     try:
         init_schema()
-        body = request.get_json(silent=True) or {}
-        issue = body.get("issue") or body
-        case = service.open_case_from_issue(issue, actor=_username())
-        try:
-            log_activity(_username(), "optimization_case_from_issue", f"case_id={case['case_id']}")
-        except Exception:
-            pass
-        return jsonify({"success": True, "case": case, "case_url": f"/optimization-cases?case={case['case_id']}"})
-    except store.CaseError as exc:
-        return _json_error(exc, 400)
+        case = store.get_case(case_id)
+        if not case:
+            return _json_error("Case not found", 404)
+        events = store.list_events(case_id)
+        allowed = sorted(TRANSITIONS.get(case.get("state") or "open", frozenset()))
+        related = store.find_related_by_cells(
+            case.get("cells") or [],
+            exclude_case_id=case_id,
+            within_days=30,
+        )
+        pm_link = service.pm_deeplink_for_case(case)
+        return jsonify(
+            {
+                "success": True,
+                "case": case,
+                "events": events,
+                "allowed_transitions": allowed,
+                "related_cases": related,
+                "pm_deeplink": pm_link,
+            }
+        )
     except Exception as exc:
         return _json_error(exc, 500)
 
@@ -188,6 +326,7 @@ def api_transition(case_id: str):
             str(body.get("state") or ""),
             actor=_username(),
             note=str(body.get("note") or ""),
+            override_note=str(body.get("override_note") or ""),
         )
         return jsonify({"success": True, "case": case})
     except store.CaseError as exc:
@@ -218,6 +357,37 @@ def api_refresh_scorecard(case_id: str):
         return jsonify({"success": True, "case": case})
     except store.CaseError as exc:
         return _json_error(exc, 400)
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/<case_id>/related")
+@login_required
+def api_related(case_id: str):
+    try:
+        init_schema()
+        case = store.get_case(case_id)
+        if not case:
+            return _json_error("Case not found", 404)
+        related = store.find_related_by_cells(
+            case.get("cells") or [],
+            exclude_case_id=case_id,
+            within_days=int(request.args.get("days") or 30),
+        )
+        return jsonify({"success": True, "related_cases": related})
+    except Exception as exc:
+        return _json_error(exc, 500)
+
+
+@optimization_cases_bp.route("/api/optimization-cases/<case_id>/pm-deeplink")
+@login_required
+def api_pm_deeplink(case_id: str):
+    try:
+        init_schema()
+        case = store.get_case(case_id)
+        if not case:
+            return _json_error("Case not found", 404)
+        return jsonify({"success": True, "deeplink": service.pm_deeplink_for_case(case)})
     except Exception as exc:
         return _json_error(exc, 500)
 

@@ -22,6 +22,30 @@ from db.runtime import connect_app, execute_query
 sync_bp = Blueprint('sync', __name__)
 
 
+@sync_bp.before_request
+def _block_etl_mutations_when_disabled():
+    """Hard-stop pull/load/import while NCM_ENABLE_ETL=0 (localhost)."""
+    from core.etl_gate import etl_disabled_reason, etl_enabled
+
+    if etl_enabled():
+        return None
+    path = (request.path or "").rstrip("/")
+    blocked_prefixes = (
+        "/api/sync/trigger",
+        "/api/sync/import_pm_path",
+    )
+    if request.method in ("POST", "PUT", "PATCH", "DELETE") and any(
+        path == p or path.startswith(p + "/") for p in blocked_prefixes
+    ):
+        reason = etl_disabled_reason()
+        return jsonify({
+            "success": False,
+            "error": f"ETL disabled ({reason}). Set NCM_ENABLE_ETL=1 on the server to resume.",
+            "etl_enabled": False,
+        }), 403
+    return None
+
+
 def _log_sync(sync_type: str, technology: str, status: str, rows_affected: int = 0, message: str | None = None) -> None:
     """Write one record into sync_log; never raise to callers."""
     try:

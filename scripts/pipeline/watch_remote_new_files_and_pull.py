@@ -530,6 +530,11 @@ def run_cycle(state_path: Path, prev: dict[str, str]) -> dict[str, str]:
 
 
 def main() -> int:
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return 0
+
     parser = argparse.ArgumentParser(description="Watch remote paths and pull when files change.")
     parser.add_argument("--once", action="store_true", help="Run a single probe/pull cycle then exit.")
     parser.add_argument(

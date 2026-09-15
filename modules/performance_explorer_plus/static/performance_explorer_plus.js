@@ -427,4 +427,68 @@
   loadCounters();
   loadObjects();
   setMode("explore");
+
+  // Shared selection → prefill site/object search
+  (async function applySelectionContext() {
+    const banner = $("pep-selection-banner");
+    if (!window.PrimeNetSelection || !banner) return;
+    let sel = window.PrimeNetSelection.readLocal();
+    try {
+      sel = await window.PrimeNetSelection.fetchServer();
+    } catch (_) { /* local only */ }
+    const cells = (sel && sel.cells) || [];
+    if (!cells.length) return;
+    banner.style.display = "";
+    banner.textContent = `Selection: ${cells.length} cell(s)`
+      + (sel.label ? ` — ${sel.label}` : "")
+      + " (from Cases / map). Prefilling search.";
+    const search = $("cell-search");
+    if (search) {
+      search.value = cells[0];
+      renderObjects(cells[0]);
+    }
+    const site = $("pep-site");
+    if (site && !site.value) site.value = (sel.sites && sel.sites[0]) || "";
+  })();
+
+  $("pep-nl-compile").addEventListener("click", async () => {
+    const text = ($("pep-nl").value || "").trim();
+    const res = await fetch("/api/performance-explorer-plus/nl-filters", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    const data = await res.json();
+    const box = $("pep-nl-chips");
+    const note = $("pep-nl-note");
+    if (!data.success) {
+      note.textContent = data.error || "Compile failed";
+      return;
+    }
+    note.textContent = data.note || "";
+    box.innerHTML = (data.chips || [])
+      .map(
+        (c) =>
+          `<button type="button" class="pep-chip" data-type="${c.type}" data-value="${String(c.value).replace(/"/g, "&quot;")}">${c.label}</button>`
+      )
+      .join("");
+    if (data.formula_hint) {
+      $("pep-formula").value = data.formula_hint;
+    }
+    box.querySelectorAll(".pep-chip").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.type;
+        const value = btn.dataset.value || "";
+        if (type === "site" && $("pep-site")) $("pep-site").value = value;
+        if (type === "cell" && $("cell-search")) {
+          $("cell-search").value = value;
+          renderObjects(value);
+        }
+        if (type === "kpi" && $("pep-formula") && !$("pep-formula").value) {
+          /* keep formula_hint already applied */
+        }
+        btn.classList.toggle("active");
+      });
+    });
+  });
 })();

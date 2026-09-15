@@ -878,3 +878,172 @@ def admin_export_excel():
         return jsonify({'error': str(exc)}), 400
     except Exception as exc:
         return jsonify({'error': str(exc)}), 500
+
+
+# ── PM Plus aggregation rules (Owner) ───────────────────────────────────────
+
+@admin_panel_bp.route('/api/admin/pm-plus/rules/families', methods=['GET'])
+@admin_required
+def api_pm_plus_rules_families():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    try:
+        from core.pm_plus.agg_rules import get_family_rules
+        from core.pm_plus.schema import init_schema
+        init_schema()
+        return jsonify({'success': True, 'families': get_family_rules()})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/pm-plus/rules/families', methods=['POST'])
+@admin_required
+def api_pm_plus_rules_families_save():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    body = request.get_json(silent=True) or {}
+    family = (body.get('family') or '').strip()
+    if not family:
+        return jsonify({'success': False, 'error': 'family required'}), 400
+    try:
+        from core.pm_plus.agg_rules import upsert_family_rule
+        from core.pm_plus.schema import init_schema
+        init_schema()
+        row = upsert_family_rule(
+            family=family,
+            time_agg=body.get('time_agg') or 'SUM',
+            nw_agg=body.get('nw_agg') or 'SUM',
+            ne_type=body.get('ne_type') or '',
+            enabled=bool(body.get('enabled', True)),
+        )
+        return jsonify({'success': True, 'rule': row})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/pm-plus/rules/counters', methods=['GET'])
+@admin_required
+def api_pm_plus_rules_counters():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    q = (request.args.get('q') or '').strip()
+    family = (request.args.get('family') or '').strip()
+    limit = min(2000, max(1, int(request.args.get('limit', 200))))
+    try:
+        from core.pm_plus.db import connect, fetchall
+        from core.pm_plus.schema import init_schema
+        init_schema()
+        params: list = []
+        sql = (
+            "SELECT counter_id, family, display_name, time_agg, nw_agg, "
+            "time_agg_override, nw_agg_override, agg_rule FROM dim_counter WHERE 1=1"
+        )
+        if q:
+            sql += (
+                " AND (counter_id LIKE ? OR COALESCE(display_name,'') LIKE ?"
+                " OR COALESCE(family,'') LIKE ?)"
+            )
+            like = f"%{q}%"
+            params.extend([like, like, like])
+        if family:
+            sql += " AND family = ?"
+            params.append(family)
+        sql += " ORDER BY counter_id LIMIT ?"
+        params.append(limit)
+        with connect() as conn:
+            rows = fetchall(conn, sql, tuple(params))
+        return jsonify({'success': True, 'counters': rows})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/pm-plus/rules/counters', methods=['POST'])
+@admin_required
+def api_pm_plus_rules_counters_save():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    body = request.get_json(silent=True) or {}
+    cid = (body.get('counter_id') or '').strip()
+    if not cid:
+        return jsonify({'success': False, 'error': 'counter_id required'}), 400
+    try:
+        from core.pm_plus.agg_rules import set_counter_override
+        from core.pm_plus.schema import init_schema
+        init_schema()
+        if body.get('clear'):
+            return jsonify({'success': True, **set_counter_override(counter_id=cid, clear=True)})
+        return jsonify({
+            'success': True,
+            **set_counter_override(
+                counter_id=cid,
+                time_agg=body.get('time_agg'),
+                nw_agg=body.get('nw_agg'),
+            ),
+        })
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/pm-plus/catalog/import', methods=['POST'])
+@admin_required
+def api_pm_plus_catalog_import():
+    """Upload Nokia ref_bts xlsx or import from server default path."""
+    from pathlib import Path
+    from werkzeug.utils import secure_filename
+
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    upload = request.files.get('file')
+    if upload and upload.filename:
+        dest = Path('raw/pm_plus/_debug') / secure_filename(upload.filename)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        upload.save(dest)
+        path = dest
+    else:
+        body = request.get_json(silent=True) or {}
+        path = Path(
+            body.get('path')
+            or 'raw/pm_plus/_debug/ref_bts_performance_measurements_24R3_24R2.xlsx'
+        )
+    if not path.exists():
+        return jsonify({'success': False, 'error': f'file not found: {path}'}), 404
+    try:
+        from core.pm_plus.catalog_import import import_nokia_catalog
+        result = import_nokia_catalog(path)
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'pm_plus_catalog_import',
+            f'Imported catalog {path.name}',
+        )
+        return jsonify({'success': True, **result, 'path': str(path)})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/pm-plus/rollup', methods=['POST'])
+@admin_required
+def api_pm_plus_rollup():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    body = request.get_json(silent=True) or {}
+    try:
+        from core.pm_plus.rollup import apply_retention, rollup_all
+        from core.pm_plus.schema import init_schema
+        init_schema()
+        out = {
+            'rollup': rollup_all(
+                ts_from=body.get('ts_from') or body.get('day_from'),
+                ts_to=body.get('ts_to') or body.get('day_to'),
+            )
+        }
+        if body.get('retention'):
+            out['retention'] = apply_retention()
+        return jsonify({'success': True, **out})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500

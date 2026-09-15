@@ -14,6 +14,10 @@ from pipeline.paths import PROJECT_ROOT, ensure_taxonomy_dirs
 
 
 def main() -> int:
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return 0
     ensure_taxonomy_dirs()
     script = os.path.join(PROJECT_ROOT, "scripts", "pipeline", "watch_remote_new_files_and_pull.py")
     proc = subprocess.run([sys.executable, script, "--once"], cwd=PROJECT_ROOT)

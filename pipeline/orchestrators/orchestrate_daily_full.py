@@ -20,6 +20,10 @@ def _run(script_name: str) -> int:
 
 
 def main() -> int:
+    from core.etl_gate import require_etl_enabled
+
+    if not require_etl_enabled():
+        return 0
     ensure_taxonomy_dirs()
     pull_rc = _run(os.path.join("pipeline", "pull", "daily", "pull_all.py"))
     # pull_rc == 2 => partial pull (some vendors failed). Still load whatever

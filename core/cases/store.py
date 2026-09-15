@@ -37,6 +37,7 @@ def _row_to_case(row: dict) -> dict:
         "state": row.get("state") or "open",
         "severity": row.get("severity") or "Medium",
         "score": float(row.get("score") or 0),
+        "impact_score": float(row.get("impact_score") or 0),
         "category": row.get("category") or "",
         "source_module": row.get("source_module") or "",
         "source_issue_id": row.get("source_issue_id") or "",
@@ -45,6 +46,7 @@ def _row_to_case(row: dict) -> dict:
         "technology": row.get("technology") or "",
         "area": row.get("area") or "",
         "site_id": row.get("site_id") or "",
+        "ticket_id": row.get("ticket_id") or "",
         "owner": row.get("owner") or "",
         "created_by": row.get("created_by") or "",
         "recommendation": row.get("recommendation") or "",
@@ -55,6 +57,7 @@ def _row_to_case(row: dict) -> dict:
         "cells": _loads(row.get("cells_json"), []),
         "selection": _loads(row.get("selection_json"), {}),
         "scorecard": _loads(row.get("scorecard_json"), {}),
+        "checklist": _loads(row.get("checklist_json"), {}),
         "created_at": row.get("created_at"),
         "updated_at": row.get("updated_at"),
         "closed_at": row.get("closed_at"),
@@ -91,6 +94,7 @@ def create_case(payload: dict, *, actor: str = "") -> dict:
         "state": state,
         "severity": str(payload.get("severity") or "Medium"),
         "score": float(payload.get("score") or 0),
+        "impact_score": float(payload.get("impact_score") or 0),
         "category": str(payload.get("category") or ""),
         "source_module": str(payload.get("source_module") or ""),
         "source_issue_id": str(payload.get("source_issue_id") or ""),
@@ -99,6 +103,7 @@ def create_case(payload: dict, *, actor: str = "") -> dict:
         "technology": str(payload.get("technology") or ""),
         "area": str(payload.get("area") or ""),
         "site_id": str(payload.get("site_id") or ""),
+        "ticket_id": str(payload.get("ticket_id") or ""),
         "owner": str(payload.get("owner") or actor or ""),
         "created_by": str(payload.get("created_by") or actor or ""),
         "recommendation": str(payload.get("recommendation") or ""),
@@ -109,6 +114,7 @@ def create_case(payload: dict, *, actor: str = "") -> dict:
         "cells_json": _dumps(list(cells)),
         "selection_json": _dumps(payload.get("selection") or {}),
         "scorecard_json": _dumps(payload.get("scorecard") or {}),
+        "checklist_json": _dumps(payload.get("checklist") or {}),
         "created_at": now,
         "updated_at": now,
         "closed_at": None,
@@ -119,17 +125,17 @@ def create_case(payload: dict, *, actor: str = "") -> dict:
             conn,
             """
             INSERT INTO opt_cases (
-                case_id, title, summary, state, severity, score, category,
+                case_id, title, summary, state, severity, score, impact_score, category,
                 source_module, source_issue_id, source_url, vendor, technology,
-                area, site_id, owner, created_by, recommendation, proposed_change,
+                area, site_id, ticket_id, owner, created_by, recommendation, proposed_change,
                 execution_ref, narrative, evidence_json, cells_json, selection_json,
-                scorecard_json, created_at, updated_at, closed_at
+                scorecard_json, checklist_json, created_at, updated_at, closed_at
             ) VALUES (
-                :case_id, :title, :summary, :state, :severity, :score, :category,
+                :case_id, :title, :summary, :state, :severity, :score, :impact_score, :category,
                 :source_module, :source_issue_id, :source_url, :vendor, :technology,
-                :area, :site_id, :owner, :created_by, :recommendation, :proposed_change,
+                :area, :site_id, :ticket_id, :owner, :created_by, :recommendation, :proposed_change,
                 :execution_ref, :narrative, :evidence_json, :cells_json, :selection_json,
-                :scorecard_json, :created_at, :updated_at, :closed_at
+                :scorecard_json, :checklist_json, :created_at, :updated_at, :closed_at
             )
             """,
             row,
@@ -171,7 +177,7 @@ def list_cases(
     with connect() as conn:
         rows = fetchall(
             conn,
-            f"SELECT * FROM opt_cases {where} ORDER BY updated_at DESC LIMIT ?",
+            f"SELECT * FROM opt_cases {where} ORDER BY impact_score DESC, updated_at DESC LIMIT ?",
             params,
         )
     return [_row_to_case(r) for r in rows]
@@ -217,11 +223,13 @@ def update_case(case_id: str, patch: dict, *, actor: str = "") -> dict:
         "summary",
         "severity",
         "score",
+        "impact_score",
         "category",
         "vendor",
         "technology",
         "area",
         "site_id",
+        "ticket_id",
         "owner",
         "recommendation",
         "proposed_change",
@@ -231,13 +239,14 @@ def update_case(case_id: str, patch: dict, *, actor: str = "") -> dict:
         "cells",
         "selection",
         "scorecard",
+        "checklist",
         "source_url",
     }
     fields: dict[str, Any] = {}
     for key, value in (patch or {}).items():
         if key not in allowed:
             continue
-        if key in ("evidence", "selection", "scorecard"):
+        if key in ("evidence", "selection", "scorecard", "checklist"):
             fields[f"{key}_json"] = _dumps(value or {})
         elif key == "cells":
             cells = value or []
@@ -260,7 +269,14 @@ def update_case(case_id: str, patch: dict, *, actor: str = "") -> dict:
     return get_case(case_id)  # type: ignore[return-value]
 
 
-def transition_case(case_id: str, new_state: str, *, actor: str = "", note: str = "") -> dict:
+def transition_case(
+    case_id: str,
+    new_state: str,
+    *,
+    actor: str = "",
+    note: str = "",
+    override_note: str = "",
+) -> dict:
     init_schema()
     current = get_case(case_id)
     if not current:
@@ -272,6 +288,11 @@ def transition_case(case_id: str, new_state: str, *, actor: str = "", note: str 
     allowed = config.TRANSITIONS.get(old, frozenset())
     if new_state not in allowed:
         raise CaseError(f"Cannot transition {old} → {new_state}")
+
+    if new_state == "approved":
+        from core.cases.gates import assert_can_approve
+
+        assert_can_approve(current, override_note=override_note or note)
 
     now = utc_now_iso()
     closed_at = now if new_state in ("closed", "rejected") else None
@@ -290,14 +311,122 @@ def transition_case(case_id: str, new_state: str, *, actor: str = "", note: str 
             case_id,
             "transition",
             actor=actor,
-            detail={"from": old, "to": new_state, "note": note or ""},
+            detail={
+                "from": old,
+                "to": new_state,
+                "note": note or "",
+                "override_note": override_note or "",
+            },
         )
         conn.commit()
-    return get_case(case_id)  # type: ignore[return-value]
+    case = get_case(case_id)
+    if case and new_state in ("verifying", "closed") and (case.get("scorecard") or {}).get("verdict"):
+        try:
+            from core.cases import treatments
+
+            treatments.record_outcome(
+                title=case.get("recommendation") or case.get("title") or "",
+                category=case.get("category") or "",
+                verdict=str((case.get("scorecard") or {}).get("verdict") or ""),
+                meta={"case_id": case_id},
+            )
+        except Exception:
+            pass
+    return case  # type: ignore[return-value]
 
 
 def set_scorecard(case_id: str, scorecard: dict, *, actor: str = "") -> dict:
     return update_case(case_id, {"scorecard": scorecard}, actor=actor)
+
+
+def find_by_source_issue(source_issue_id: str, *, within_days: int = 7) -> dict | None:
+    """Most recent case with this source_issue_id within N days (dedupe helper)."""
+    init_schema()
+    sid = str(source_issue_id or "").strip()
+    if not sid:
+        return None
+    with connect() as conn:
+        row = fetchone(
+            conn,
+            """
+            SELECT * FROM opt_cases
+            WHERE source_issue_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (sid,),
+        )
+    if not row:
+        return None
+    case = _row_to_case(row)
+    created = case.get("created_at") or ""
+    try:
+        from datetime import datetime, timedelta, timezone
+
+        text = created.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(text)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        if datetime.now(timezone.utc) - dt.astimezone(timezone.utc) > timedelta(days=max(1, within_days)):
+            return None
+    except ValueError:
+        pass
+    return case
+
+
+def find_related_by_cells(
+    cells: list[str],
+    *,
+    exclude_case_id: str = "",
+    within_days: int = 30,
+    limit: int = 20,
+) -> list[dict]:
+    """Other cases sharing any cell alias in the last N days."""
+    from datetime import datetime, timedelta, timezone
+
+    from core.cases import identity
+
+    init_schema()
+    targets: set[str] = set()
+    for c in cells or []:
+        targets |= identity.cell_aliases(c)
+    if not targets:
+        return []
+    rows = list_cases(limit=300)
+    out: list[dict] = []
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max(1, within_days))
+    for case in rows:
+        if exclude_case_id and case.get("case_id") == exclude_case_id:
+            continue
+        if case.get("updated_at"):
+            try:
+                text = str(case["updated_at"]).replace("Z", "+00:00")
+                dt = datetime.fromisoformat(text)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                if dt.astimezone(timezone.utc) < cutoff:
+                    continue
+            except Exception:
+                pass
+        overlap = False
+        for oc in case.get("cells") or []:
+            if identity.cell_aliases(oc) & targets:
+                overlap = True
+                break
+        if overlap:
+            out.append(
+                {
+                    "case_id": case.get("case_id"),
+                    "title": case.get("title"),
+                    "state": case.get("state"),
+                    "severity": case.get("severity"),
+                    "updated_at": case.get("updated_at"),
+                    "source_module": case.get("source_module"),
+                }
+            )
+        if len(out) >= limit:
+            break
+    return out
 
 
 def case_stats() -> dict:

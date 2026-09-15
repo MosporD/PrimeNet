@@ -18,7 +18,9 @@ def _env_true(key: str, default: bool = False) -> bool:
 
 
 def should_start_scheduler() -> bool:
-    if _env_true("NCM_DISABLE_SCHEDULER"):
+    from core.etl_gate import etl_enabled
+
+    if not etl_enabled():
         return False
     if _env_true("NCM_RUN_SCHEDULER"):
         return True
@@ -60,8 +62,14 @@ def run_bootstrap(*, start_scheduler: bool | None = None) -> None:
     if start_scheduler is None:
         start_scheduler = should_start_scheduler()
     if not start_scheduler:
-        if _env_true("NCM_DISABLE_SCHEDULER"):
+        from core.etl_gate import etl_disabled_reason, etl_enabled
+
+        if not etl_enabled():
+            print(f"[INFO] Sync scheduler disabled ({etl_disabled_reason()})")
+        elif _env_true("NCM_DISABLE_SCHEDULER"):
             print("[INFO] Sync scheduler disabled (NCM_DISABLE_SCHEDULER=1)")
+        else:
+            print("[INFO] Sync scheduler not started in this process")
         return
 
     from modules.sync.scheduler import start_scheduler as _start

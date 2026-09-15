@@ -21,9 +21,11 @@ SFTP pull of Nokia/Huawei PM, metadata, groups, neighbors; load into canonical D
 - Writes: `open_db(db_path)` so Postgres domains work when enabled.
 - Prefer orchestrators (`orchestrate_hourly_full.py`, daily, watcher) over one-off scripts.
 - Huawei daily raw stages in `raw/huawei/{cells,groups}/all/daily` then RAT-split.
+- Master switch: `NCM_ENABLE_ETL=0` on laptop (no pull/load/scheduler); `NCM_ENABLE_ETL=1` on server. See `core/etl_gate.py`. Local wipe: `python scripts/clear_local_etl_data.py --yes`.
 
 ## History
 
+- 2026-09-11: `NCM_ENABLE_ETL` gate + local ETL data cleanup script.
 - 2026-08-02: scheduler RAM isolation.
 - 2026-08-31: ingest paths wired through `open_db` for optional Postgres.
 

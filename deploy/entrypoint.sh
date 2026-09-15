@@ -49,6 +49,7 @@ case "${cmd}" in
   scheduler)
     export NCM_BOOTSTRAP_ON_IMPORT=0
     export NCM_RUN_SCHEDULER=1
+    export NCM_ENABLE_ETL="${NCM_ENABLE_ETL:-1}"
     export NCM_DISABLE_SCHEDULER=0
     if id primenet >/dev/null 2>&1; then
       exec runuser -u primenet -- python deploy/run_scheduler.py

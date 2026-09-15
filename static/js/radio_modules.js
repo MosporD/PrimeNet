@@ -1,6 +1,7 @@
 (function () {
     const body = document.body;
     const apiUrl = body.dataset.apiUrl;
+    const moduleKind = body.dataset.moduleKind || '';
     const defaultTechnology = body.dataset.defaultTechnology || 'all';
     const FETCH_TIMEOUT_MS = 120000;
     let currentRows = [];
@@ -100,7 +101,10 @@
             <h3>Recommended Action</h3>
             <p>${escapeHtml(row.recommendation || 'Review the issue evidence and source module before action.')}</p>
             <div class="radio-detail-actions">
-                <button type="button" class="btn-primary" id="radio-open-case-btn">Open Optimization Case</button>
+                <button type="button" class="btn-primary" id="radio-open-case-btn">${
+                    moduleKind === 'sleeping-cells' ? 'Open energy Case' : 'Open Optimization Case'
+                }</button>
+                ${moduleKind === 'radio-morning-report' ? '<button type="button" class="btn-secondary" id="radio-bulk-cases-btn">Open Critical/High as Cases</button>' : ''}
                 ${sourceLink}
             </div>
             <h3>Evidence</h3>
@@ -110,9 +114,13 @@
         if (openBtn) {
             openBtn.addEventListener('click', async () => {
                 openBtn.disabled = true;
+                const defaultLabel = moduleKind === 'sleeping-cells' ? 'Open energy Case' : 'Open Optimization Case';
                 openBtn.textContent = 'Opening…';
                 try {
-                    const res = await fetch('/api/optimization-cases/from-issue', {
+                    const endpoint = moduleKind === 'sleeping-cells'
+                        ? '/api/optimization-cases/energy'
+                        : '/api/optimization-cases/from-issue';
+                    const res = await fetch(endpoint, {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
@@ -126,8 +134,38 @@
                     window.location.href = url;
                 } catch (err) {
                     openBtn.disabled = false;
-                    openBtn.textContent = 'Open Optimization Case';
+                    openBtn.textContent = defaultLabel;
                     alert(err.message || 'Failed to open case');
+                }
+            });
+        }
+        const bulkBtn = document.getElementById('radio-bulk-cases-btn');
+        if (bulkBtn) {
+            bulkBtn.addEventListener('click', async () => {
+                if (!confirm('Open Critical/High Morning Report issues as draft Cases (deduped 7d)?')) return;
+                bulkBtn.disabled = true;
+                bulkBtn.textContent = 'Opening…';
+                try {
+                    const res = await fetch('/api/optimization-cases/from-morning-report', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            issues: currentRows,
+                            area: document.getElementById('radio-area').value,
+                            vendor: document.getElementById('radio-vendor').value,
+                            technology: document.getElementById('radio-technology').value,
+                            max_cases: 25,
+                        }),
+                    });
+                    const data = await res.json();
+                    if (!data.success) throw new Error(data.error || 'Bulk open failed');
+                    alert(`Created ${data.created_count || 0} case(s); skipped ${data.skipped_count || 0}.`);
+                    window.location.href = '/optimization-cases';
+                } catch (err) {
+                    bulkBtn.disabled = false;
+                    bulkBtn.textContent = 'Open Critical/High as Cases';
+                    alert(err.message || 'Bulk open failed');
                 }
             });
         }

@@ -12,6 +12,7 @@ Users, roles, feature-access grants.
 ## Purpose
 
 Create/disable users, reset password, **feature_access** matrix (`core/feature_access.py`).
+Owner also manages Data Sync, API connections, and **PM Plus Rules** (Nokia catalog import + aggregation overrides for Performance Explorer Plus).
 
 ## Approach
 
@@ -20,6 +21,7 @@ Visibility defaults: `core/module_access.py`. Overrides stored in app DB. Admin 
 ## History
 
 Activity log / feature grants evolved with the radio pack (2026-08).
+2026-09-11: PM Plus Rules tab — family/counter agg + catalog import under `/api/admin/pm-plus/*`.
 
 ## Plans
 

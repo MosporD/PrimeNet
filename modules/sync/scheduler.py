@@ -224,7 +224,12 @@ def _log_loader_row_deltas(before: dict[str, dict[str, int]], after: dict[str, d
 
 def run_full_sync_cycle():
     """End-to-end cycle via canonical hourly orchestrator."""
+    from core.etl_gate import etl_disabled_reason, etl_enabled
     from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, NOKIA_GROUPS_DB, HUAWEI_GROUPS_DB, METADATA_DB
+
+    if not etl_enabled():
+        logger.info('Hourly sync skipped — %s', etl_disabled_reason())
+        return
 
     project_root = _PROJECT_ROOT
     orchestrator = os.path.join(project_root, 'pipeline', 'orchestrators', 'orchestrate_hourly_full.py')
@@ -294,6 +299,12 @@ def run_full_sync_cycle():
 
 def run_neighbor_sync_cycle():
     """Neighbor-only pull + full-replace SQLite load (separate from PM pipeline)."""
+    from core.etl_gate import etl_disabled_reason, etl_enabled
+
+    if not etl_enabled():
+        logger.info('Neighbor sync skipped — %s', etl_disabled_reason())
+        return
+
     project_root = _PROJECT_ROOT
     orchestrator = os.path.join(project_root, 'pipeline', 'orchestrators', 'orchestrate_neighbor_sync.py')
 
@@ -345,6 +356,12 @@ def run_neighbor_sync_cycle():
 
 def run_daily_sync_cycle():
     """End-to-end DAILY cycle: daily raw pull + daily DB load."""
+    from core.etl_gate import etl_disabled_reason, etl_enabled
+
+    if not etl_enabled():
+        logger.info('Daily sync skipped — %s', etl_disabled_reason())
+        return
+
     project_root = _PROJECT_ROOT
     script = os.path.join(project_root, 'pipeline', 'orchestrators', 'orchestrate_daily_full.py')
     if not os.path.isfile(script):
@@ -890,6 +907,12 @@ def run_remote_pull_watcher_once():
     One cycle of watcher orchestrator (--once): probe remotes,
     pull+load only when signatures change (state in databases/admin/pull_watch_state.json).
     """
+    from core.etl_gate import etl_disabled_reason, etl_enabled
+
+    if not etl_enabled():
+        logger.info('Remote pull watcher skipped — %s', etl_disabled_reason())
+        return
+
     root = _PROJECT_ROOT
     script = os.path.join(root, 'pipeline', 'orchestrators', 'orchestrate_watcher_cycle.py')
     if not os.path.isfile(script):
@@ -1168,12 +1191,17 @@ def _compute_scheduler_flags() -> dict:
     else:
         mode = 'scheduled-only'
 
+    from core.etl_gate import etl_disabled_reason, etl_enabled
+
+    enabled = etl_enabled()
     return {
-        'mode': mode,
-        'watcher_primary': bool(watcher_primary),
-        'legacy_enabled': bool(legacy_enabled),
-        'watcher_enabled': bool(watcher_enabled),
-        'scheduled_ingest_enabled': bool(scheduled_ingest_enabled),
+        'mode': mode if enabled else 'disabled',
+        'etl_enabled': bool(enabled),
+        'etl_disabled_reason': etl_disabled_reason(),
+        'watcher_primary': bool(watcher_primary) if enabled else False,
+        'legacy_enabled': bool(legacy_enabled) if enabled else False,
+        'watcher_enabled': bool(watcher_enabled) if enabled else False,
+        'scheduled_ingest_enabled': bool(scheduled_ingest_enabled) if enabled else False,
         'raw_pull_interval_hours': int(RAW_PULL_INTERVAL_HOURS),
         'daily_pull_hour': int(DAILY_PULL_HOUR),
         'neighbor_pull_interval_hours': int(NEIGHBOR_PULL_INTERVAL_HOURS),
@@ -1187,8 +1215,22 @@ def start_scheduler():
     global _scheduler_mode_summary
 
     from core.activation_gate import require_activation
+    from core.etl_gate import etl_disabled_reason, etl_enabled
 
     require_activation()
+
+    if not etl_enabled():
+        logger.info('Scheduler not started — %s', etl_disabled_reason())
+        _scheduler_mode_summary = {
+            'mode': 'disabled',
+            'etl_enabled': False,
+            'etl_disabled_reason': etl_disabled_reason(),
+            'watcher_primary': False,
+            'legacy_enabled': False,
+            'watcher_enabled': False,
+            'scheduled_ingest_enabled': False,
+        }
+        return
 
     try:
         run_migrations()

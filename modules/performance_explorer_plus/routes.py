@@ -260,3 +260,17 @@ def api_rollup():
     if body.get("retention"):
         out["retention"] = apply_retention()
     return jsonify({"success": True, **out})
+
+
+@performance_explorer_plus_bp.route("/api/performance-explorer-plus/nl-filters", methods=["POST"])
+@login_required
+def api_nl_filters():
+    """Compile NL text to editable filter chips — never executes SQL."""
+    body = request.get_json(silent=True) or {}
+    text = body.get("text") or body.get("query") or ""
+    try:
+        from core.pm_plus.nl_filters import compile_nl_to_filters
+
+        return jsonify({"success": True, **compile_nl_to_filters(text)})
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"success": False, "error": str(exc)}), 500

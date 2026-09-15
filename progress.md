@@ -2,11 +2,29 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Optimization Cases V1 (A–C: Case + scorecard + correlator + selection).
+**Current track:** Cases uplift roadmap (Phases 1–4) on Optimization Cases loop.
 
-**Parked:** Dark-mode contrast browser verify; SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus live SFTP (needs `NCM_ENABLE_ETL=1` on server). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
+**Parked:** Dark-mode contrast browser verify; SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
-**NEXT:** Browser click `/optimization-cases`; open a case from Change Impact / Alarm Impact; map polygon → Use as selection → Open case from selection. Then optional post-KPI scorecard fill.
+**NEXT:** Browser smoke — Morning Report bulk Cases; set `execution_ref` → refresh scorecard; approve with conflict/golden override; Performance Plus NL chips + selection prefill; optional `CASES_DIGEST_WEBHOOK_URL` dry-run.
+
+## 2026-09-14 (Cases uplift Phases 1–4)
+
+- Done: Real post-KPI scorecard (schema v2) + verdict on `execution_ref`.
+- Done: `core/cases/identity.py` lite for correlator/scorecard joins only.
+- Done: Morning Report `from-morning-report` API + bulk button; 7d `source_issue_id` dedupe.
+- Done: Same-cell case history (30d) in Case detail.
+- Done: Phase 2 packs — PM deeplink, neighbor/overshoot facts, complaint intake, cluster checklist.
+- Done: Phase 3 — Impact Score (PM), conflict + golden gates, energy Cases, trusted treatments (+ SON prefer).
+- Done: Phase 4 — selection consume in Performance/Plus; NL→chips (no SQL); digest script.
+- Tests: expand `core.cases.test_cases` (scorecard post, identity, morning dedupe, conflict, impact/treatments, NL).
+
+## 2026-09-14 (PM Plus Admin Rules + sample ingest)
+
+- Done: Agg Rules live on Admin → **PM Plus Rules** (`/admin-panel?section=pm-plus-rules`); removed from Explorer Plus. Smoke `scripts/_smoke_pm_plus_admin.py` — page 200, families/counters APIs OK, old PEP rules API 404.
+- Done: Re-imported Nokia catalog (453 families / ~32k counters / 2831 KPIs).
+- Done: Local hour sample ingest `run_hour_ingest.py --buckets 2 --max-files 30` — 30/30 ok, ~3.87M fact_15m / ~3.82M fact_hour; SFTP host 10.119.219.24 reachable (~75s discover). Day rollup not run this pass.
+- Fixed: `core/cases/__init__.py` import mismatch (`open_complaint_case`) that briefly broke `app` import.
 
 ## 2026-09-14 (Optimization Cases A–C)
 
