@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ portal_domain }}{% endblock %} — {{ portal_name }}</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon-nexuscore.png?v=1" data-page-favicon>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portals.css') }}?v=2.1">
+    <link rel="stylesheet" href="{{ url_for('marketing_portal.static', filename='css/marketing.css') }}?v=1.0">
+</head>
+<body class="portal-page no-constellation-bg mkt-page">
+<div class="hud-overlay" aria-hidden="true"></div>
+
+<header class="mkt-topbar">
+    <a class="mkt-brand" href="{{ url_for('marketing_portal.overview') }}">
+        <img src="/static/images/nexuscore-logo.png?v=1" alt="" class="mkt-brand-logo">
+        <span class="mkt-brand-text">
+            <span class="mkt-brand-name">NexusCore · {{ portal_domain }}</span>
+            <span class="mkt-brand-portal">{{ portal_name }}</span>
+        </span>
+    </a>
+    <div class="mkt-topbar-actions">
+        {% if user %}
+        <span class="mkt-user">
+            <span class="mkt-user-name">{{ user.username }}</span>
+            <span class="mkt-role-chip" title="{{ cfg.ROLES[user.role].description }}">{{ user.role_label }}</span>
+        </span>
+        {% endif %}
+        <a class="portal-btn portal-btn-ghost" href="/portals">All portals</a>
+        <button type="button" class="portal-btn portal-btn-ghost" id="mkt-logout">Logout</button>
+        <div class="portal-theme-mount mkt-theme-mount" aria-label="Theme controls"></div>
+    </div>
+</header>
+
+<div class="mkt-layout">
+    <nav class="mkt-sidebar" aria-label="Marketing portal sections">
+        {% for item in nav %}
+        <a class="mkt-nav-link {% if item.key == active_nav %}is-active{% endif %}"
+           href="{{ url_for(item.endpoint) }}">
+            <span class="mkt-nav-icon" aria-hidden="true">{% include 'marketing/_icons.html' %}</span>
+            <span>{{ item.label }}</span>
+        </a>
+        {% endfor %}
+    </nav>
+
+    <main class="mkt-main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mkt-flashes">
+            {% for category, message in messages %}
+            <div class="mkt-flash mkt-flash-{{ category }}" role="status">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="mkt-page-head">
+            <div>
+                <h1 class="mkt-page-title">{% block page_title %}{% endblock %}</h1>
+                {% block page_sub %}{% endblock %}
+            </div>
+            <div class="mkt-page-actions">{% block page_actions %}{% endblock %}</div>
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
+<script src="{{ url_for('marketing_portal.static', filename='js/marketing.js') }}?v=1.0"></script>
+<script>
+    document.getElementById('mkt-logout')?.addEventListener('click', async () => {
+        if (!confirm('Logout?')) return;
+        try { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
+        window.location.href = '/login';
+    });
+</script>
+</body>
+</html>

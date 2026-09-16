@@ -101,6 +101,7 @@ from modules.alarm_impact import alarm_impact_bp
 from modules.group_health import group_health_bp
 from modules.irat_border import irat_border_bp
 from modules.optimization_cases import optimization_cases_bp
+from portals.marketing import create_marketing_portal
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(activation_bp)
@@ -151,6 +152,13 @@ app.register_blueprint(alarm_impact_bp)
 app.register_blueprint(group_health_bp)
 app.register_blueprint(irat_border_bp)
 app.register_blueprint(optimization_cases_bp)
+
+# NexusCore portals. These are separate portal applications, not PrimeNet
+# modules — they own their own data stores and import nothing from modules/.
+# Mounting them here keeps a single process for now; each can be split into its
+# own service by calling its factory against a standalone Flask app instead.
+# See docs/NEXUSCORE_VISION.md.
+create_marketing_portal(app)
 
 
 @app.route("/amle-optimizer")

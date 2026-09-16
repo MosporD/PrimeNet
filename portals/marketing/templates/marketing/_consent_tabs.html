@@ -1,0 +1,14 @@
+<div class="mkt-tabs">
+    <a class="mkt-tab {% if tab == 'consent' %}is-active{% endif %}" href="{{ url_for('marketing_portal.consent_home') }}">Consent records</a>
+    <a class="mkt-tab {% if tab == 'suppression' %}is-active{% endif %}" href="{{ url_for('marketing_portal.suppression_list') }}">Suppression list</a>
+    <a class="mkt-tab {% if tab == 'policies' %}is-active{% endif %}" href="{{ url_for('marketing_portal.policy_list') }}">Contact policies</a>
+    <a class="mkt-tab {% if tab == 'lookup' %}is-active{% endif %}" href="{{ url_for('marketing_portal.contactability_lookup') }}">Contactability lookup</a>
+</div>
+{% if not normalisation_active %}
+<div class="mkt-notice" style="margin-bottom:16px">
+    <div><strong>Number matching is literal.</strong>
+        No country code is set, so <span class="mkt-mono">0791234567</span> and <span class="mkt-mono">962791234567</span>
+        are stored as two different subscribers. Set <span class="mkt-mono">NEXUS_MARKETING_MSISDN_CC</span>
+        before loading consent or do-not-call data, or blocks recorded in one format will not stop sends addressed in the other.</div>
+</div>
+{% endif %}

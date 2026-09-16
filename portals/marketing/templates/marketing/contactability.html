@@ -1,0 +1,100 @@
+{% extends "marketing/base.html" %}
+{% block title %}Contactability{% endblock %}
+{% block page_title %}Contactability lookup{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Answers “can we contact this subscriber, and why not?” — the same verdict an execution connector will read before sending.</p>
+{% endblock %}
+
+{% block content %}
+{% set tab = 'lookup' %}
+{% include 'marketing/_consent_tabs.html' %}
+
+<div class="mkt-card">
+    <form class="mkt-filters" method="get" style="margin-bottom:0">
+        <div class="mkt-field">
+            <label for="identifier_type">Identifier type</label>
+            <select class="mkt-select" id="identifier_type" name="identifier_type">
+                {% for key, label in cfg.IDENTIFIER_TYPES.items() %}
+                <option value="{{ key }}" {% if identifier_type == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mkt-field" style="min-width:240px">
+            <label for="identifier">Identifier</label>
+            <input class="mkt-input" id="identifier" name="identifier" value="{{ identifier }}" required>
+        </div>
+        <button class="mkt-btn mkt-btn-primary" type="submit">Look up</button>
+    </form>
+</div>
+
+{% if error %}
+<div class="mkt-card"><div class="mkt-notice"><div><strong>Cannot look that up.</strong> {{ error }}</div></div></div>
+{% elif result %}
+<div class="mkt-grid mkt-grid-2">
+    <div class="mkt-card">
+        <div class="mkt-card-title">Verdict per channel</div>
+        <p class="mkt-muted" style="font-size:0.82rem;margin-bottom:12px">
+            Matched as <span class="mkt-mono">{{ result.identifier }}</span>
+            {% if country_code and result.identifier_type == 'msisdn' %}(normalised to country code {{ country_code }}){% endif %}
+        </p>
+        <table class="mkt-table">
+            <thead><tr><th>Channel</th><th>Contactable</th><th>Reason</th></tr></thead>
+            <tbody>
+            {% for verdict in result.channels %}
+            <tr>
+                <td>{{ verdict.channel_label }}</td>
+                <td><span class="mkt-chip {{ 'mkt-chip-ok' if verdict.contactable else ('mkt-chip-bad' if verdict.blocking else 'mkt-chip-warn') }}">{{ 'Yes' if verdict.contactable else 'No' }}</span></td>
+                <td class="mkt-muted">{{ verdict.reason }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <div class="mkt-card">
+            <div class="mkt-card-title">Active blocks</div>
+            {% if result.suppression %}
+            <table class="mkt-table">
+                <tbody>
+                {% for entry in result.suppression %}
+                <tr>
+                    <td>{{ entry.reason_label }}<div class="mkt-muted" style="font-size:0.76rem">{{ entry.scope_label }}{% if entry.scope_ref %} · {{ entry.scope_ref }}{% endif %}</div></td>
+                    <td class="mkt-num mkt-muted">{{ entry.added_at[:10] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="mkt-muted">No suppression entries for this identifier.</p>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Consent on record</div>
+            {% if result.consent_records %}
+            <table class="mkt-table">
+                <thead><tr><th>Channel</th><th>Status</th><th>Captured</th><th>Evidence</th></tr></thead>
+                <tbody>
+                {% for record in result.consent_records %}
+                <tr>
+                    <td>{{ record.channel_label }}</td>
+                    <td><span class="mkt-chip {{ 'mkt-chip-ok' if record.contactable else 'mkt-chip-bad' }}">{{ record.status_label }}</span></td>
+                    <td class="mkt-muted">{{ record.captured_at }}</td>
+                    <td class="mkt-mono mkt-muted">{{ record.evidence_ref or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="mkt-muted">Nothing on record — every channel reads as “no consent”.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="mkt-card">
+    <div class="mkt-empty">Enter an identifier to see its per-channel contactability.</div>
+</div>
+{% endif %}
+{% endblock %}

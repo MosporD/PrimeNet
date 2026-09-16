@@ -1,0 +1,216 @@
+{% extends "marketing/base.html" %}
+{% block title %}{{ campaign.name }}{% endblock %}
+{% block page_title %}{{ campaign.name }}{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub"><span class="mkt-mono">{{ campaign.code }}</span> · {{ campaign.objective_label }}
+<span class="mkt-chip mkt-chip-{{ campaign.state_tone }}" style="margin-left:6px">{{ campaign.state_label }}</span></p>
+{% endblock %}
+{% block page_actions %}
+<a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_list') }}">Back to campaigns</a>
+{% if user.can(cfg.P_CAMPAIGN_EDIT) and campaign.editable %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.campaign_edit', campaign_id=campaign.id) }}">Edit</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="mkt-grid mkt-grid-2">
+    <div>
+        <div class="mkt-card">
+            <div class="mkt-card-title">Readiness</div>
+            {% if readiness.ready %}
+            <div class="mkt-notice mkt-notice-info" style="margin-bottom:12px">
+                <div><strong>Ready to submit.</strong> Every blocking requirement is satisfied.</div>
+            </div>
+            {% endif %}
+            {% for check in readiness.checks %}
+            <div class="mkt-check {{ 'mkt-check-ok' if check.ok else ('mkt-check-open' if check.blocking else 'mkt-check-advisory') }}">
+                <svg class="mkt-check-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    {% if check.ok %}<path d="M4 12.5l5 5L20 6.5"/>{% else %}<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.4h.01"/>{% endif %}
+                </svg>
+                <div>
+                    <div class="mkt-check-label">{{ check.label }}
+                        {% if not check.ok and not check.blocking %}<span class="mkt-chip mkt-chip-warn" style="margin-left:6px">Advisory</span>{% endif %}
+                    </div>
+                    {% if not check.ok %}<div class="mkt-check-detail">{{ check.detail }}</div>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Channel mix</div>
+            {% if user.can(cfg.P_CAMPAIGN_EDIT) and campaign.editable %}
+            <form method="post" action="{{ url_for('marketing_portal.campaign_channels', campaign_id=campaign.id) }}">
+                {% for key, meta in cfg.CHANNELS.items() %}
+                {% set existing = (campaign.channels | selectattr('channel', 'equalto', key) | list | first) %}
+                <div style="padding:9px 0;border-bottom:1px solid var(--mkt-line)">
+                    <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+                        <input type="checkbox" name="channel" value="{{ key }}" data-channel-toggle
+                               {% if existing %}checked{% endif %}>
+                        <span style="font-weight:600">{{ meta.label }}</span>
+                        <span class="mkt-muted" style="font-size:0.76rem">addressed by {{ meta.addressable }}</span>
+                    </label>
+                    <div id="channel-detail-{{ key }}" class="mkt-field-row" style="margin-top:8px" hidden>
+                        <div class="mkt-field">
+                            <label for="tpl-{{ key }}">Creative / template reference</label>
+                            <input class="mkt-input" id="tpl-{{ key }}" name="template_ref__{{ key }}"
+                                   value="{{ existing.template_ref if existing else '' }}">
+                        </div>
+                        <div class="mkt-field">
+                            <label for="win-{{ key }}">Send window</label>
+                            <input class="mkt-input" id="win-{{ key }}" name="send_window__{{ key }}"
+                                   placeholder="e.g. 10:00–18:00 working days"
+                                   value="{{ existing.send_window if existing else '' }}">
+                        </div>
+                        <div class="mkt-field">
+                            <label for="note-{{ key }}">Notes</label>
+                            <input class="mkt-input" id="note-{{ key }}" name="notes__{{ key }}"
+                                   value="{{ existing.notes if existing else '' }}">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="mkt-form-actions" style="margin-top:12px">
+                    <button class="mkt-btn mkt-btn-primary" type="submit">Save channel mix</button>
+                </div>
+            </form>
+            {% elif campaign.channels %}
+            <table class="mkt-table">
+                <thead><tr><th>Channel</th><th>Template</th><th>Send window</th></tr></thead>
+                <tbody>
+                {% for ch in campaign.channels %}
+                <tr><td>{{ ch.channel_label }}</td><td class="mkt-mono">{{ ch.template_ref or '—' }}</td><td class="mkt-muted">{{ ch.send_window or '—' }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="mkt-muted">No channels configured.</p>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Offers promoted</div>
+            {% if user.can(cfg.P_CAMPAIGN_EDIT) and campaign.editable %}
+                {% if offer_options %}
+                <form method="post" action="{{ url_for('marketing_portal.campaign_offers', campaign_id=campaign.id) }}">
+                    {% set attached = campaign.offers | map(attribute='id') | list %}
+                    {% for offer in offer_options %}
+                    <label style="display:flex;align-items:center;gap:9px;padding:7px 0;cursor:pointer">
+                        <input type="checkbox" name="offer_id" value="{{ offer.id }}" {% if offer.id in attached %}checked{% endif %}>
+                        <span style="font-weight:600">{{ offer.name }}</span>
+                        <span class="mkt-mono mkt-muted" style="font-size:0.78rem">{{ offer.code }}</span>
+                        <span class="mkt-chip mkt-chip-{{ offer.state_tone }}">{{ offer.state_label }}</span>
+                    </label>
+                    {% endfor %}
+                    <div class="mkt-form-actions" style="margin-top:12px">
+                        <button class="mkt-btn mkt-btn-primary" type="submit">Save offers</button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="mkt-empty">No approved or live offers exist yet. A campaign can only promote offers that have cleared catalog approval.</div>
+                {% endif %}
+            {% elif campaign.offers %}
+            <ul class="mkt-rule-list">
+                {% for offer in campaign.offers %}
+                <li><a href="{{ url_for('marketing_portal.offer_detail', offer_id=offer.id) }}">{{ offer.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="mkt-muted">No offers attached.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="mkt-card">
+            <div class="mkt-card-title">Campaign</div>
+            <dl class="mkt-kv">
+                <dt>Window</dt><dd>{% if campaign.starts_on %}{{ campaign.starts_on }} → {{ campaign.ends_on }}{% else %}<span class="mkt-muted">Not scheduled</span>{% endif %}</dd>
+                <dt>Budget</dt><dd>{% if campaign.budget_amount is not none %}{{ '%.2f'|format(campaign.budget_amount) }} {{ campaign.budget_currency or '' }}{% else %}<span class="mkt-muted">Not set</span>{% endif %}</dd>
+                <dt>Holdout</dt><dd>{{ '%.1f'|format(campaign.holdout_pct or 0) }}%</dd>
+                <dt>Owner</dt><dd>{{ campaign.owner or '—' }}</dd>
+                <dt>Updated</dt><dd class="mkt-muted">{{ campaign.updated_at|replace('T', ' ') }} by {{ campaign.updated_by or '—' }}</dd>
+            </dl>
+            {% if campaign.description %}<p style="margin-top:12px;white-space:pre-wrap">{{ campaign.description }}</p>{% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Audience</div>
+            {% if segment %}
+            <p><a href="{{ url_for('marketing_portal.segment_detail', segment_id=segment.id) }}">{{ segment.name }}</a></p>
+            <ul class="mkt-rule-list" style="margin-top:10px">
+                {% for line in segment.rule_text %}<li>{{ line }}</li>{% endfor %}
+            </ul>
+            <div style="margin-top:12px">
+                {% if estimate and estimate.available %}
+                <div class="mkt-stat"><span class="mkt-stat-value">{{ estimate.value }}</span><span class="mkt-stat-label">subscribers match</span></div>
+                {% else %}
+                <div class="mkt-notice"><div><strong>Size unavailable.</strong> {{ estimate.reason if estimate else '' }}</div></div>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="mkt-muted">No segment attached.</p>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Contact policies in force</div>
+            {% if readiness.policies %}
+            <table class="mkt-table">
+                <tbody>
+                {% for policy in readiness.policies %}
+                <tr>
+                    <td>{{ policy.name }}<div class="mkt-muted" style="font-size:0.78rem">{{ policy.channel_label }}</div></td>
+                    <td class="mkt-num mkt-muted">{{ policy.cap_text }}{% if policy.quiet_hours %}<div>quiet {{ policy.quiet_hours }}</div>{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="mkt-muted">No active policy covers this channel mix.</p>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Results</div>
+            {% if metrics.available %}
+            <pre class="mkt-mono">{{ metrics.value }}</pre>
+            {% else %}
+            <div class="mkt-notice"><div><strong>No results yet.</strong> {{ metrics.reason }}</div></div>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Lifecycle</div>
+            {% if transitions %}
+            <div style="display:flex;flex-direction:column;gap:10px">
+                {% for t in transitions %}
+                <form method="post" action="{{ url_for('marketing_portal.campaign_transition', campaign_id=campaign.id) }}"
+                      style="display:flex;gap:8px;align-items:center">
+                    <input type="hidden" name="to_state" value="{{ t.to }}">
+                    <input class="mkt-input" name="note" placeholder="Note (optional)" style="flex:1">
+                    <button class="mkt-btn" type="submit">{{ t.label }}</button>
+                </form>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="mkt-muted">No status change is available to you from “{{ campaign.state_label }}”.</p>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">History</div>
+            {% if history %}
+            <div class="mkt-timeline">
+                {% for event in history %}
+                <div class="mkt-timeline-item">
+                    <div class="mkt-timeline-when">{{ event.occurred_at|replace('T', ' ') }}</div>
+                    <div><div>{{ event.summary }}</div><div class="mkt-timeline-who">{{ event.actor }}</div></div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}<p class="mkt-muted">No recorded activity.</p>{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

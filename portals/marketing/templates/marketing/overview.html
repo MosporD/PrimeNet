@@ -1,0 +1,135 @@
+{% extends "marketing/base.html" %}
+{% block title %}Overview{% endblock %}
+{% block page_title %}Marketing overview{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">What is in flight, what is waiting on you, and which upstream data sources are still to be connected.</p>
+{% endblock %}
+{% block page_actions %}
+{% if user.can(cfg.P_CAMPAIGN_EDIT) %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.campaign_new') }}">New campaign</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="mkt-grid mkt-grid-3">
+    <div class="mkt-card mkt-stat">
+        <span class="mkt-stat-value">{{ stats.campaigns_running }}</span>
+        <span class="mkt-stat-label">Campaigns running</span>
+        <span class="mkt-muted" style="font-size:0.8rem">{{ stats.campaigns_total }} total · {{ stats.campaigns_draft }} draft</span>
+    </div>
+    <div class="mkt-card mkt-stat">
+        <span class="mkt-stat-value">{{ stats.offers_live }}</span>
+        <span class="mkt-stat-label">Offers live</span>
+        <span class="mkt-muted" style="font-size:0.8rem">{{ stats.offers_total }} in the catalog</span>
+    </div>
+    <div class="mkt-card mkt-stat">
+        <span class="mkt-stat-value">{{ stats.segments }}</span>
+        <span class="mkt-stat-label">Audience segments</span>
+    </div>
+    <div class="mkt-card mkt-stat">
+        <span class="mkt-stat-value">{{ stats.suppressed }}</span>
+        <span class="mkt-stat-label">Active suppressions</span>
+        <span class="mkt-muted" style="font-size:0.8rem">{{ stats.policies }} active contact polic{{ 'y' if stats.policies == 1 else 'ies' }}</span>
+    </div>
+</div>
+
+{% if not msisdn_normalised %}
+<div class="mkt-card">
+    <div class="mkt-notice">
+        <div>
+            <strong>Phone-number matching is literal.</strong>
+            No country code is configured, so <span class="mkt-mono">0791234567</span> and
+            <span class="mkt-mono">962791234567</span> are treated as two different subscribers — a
+            do-not-call entry recorded against one will not stop a send to the other.
+            Set <span class="mkt-mono">NEXUS_MARKETING_MSISDN_CC</span> before loading any consent data.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="mkt-grid mkt-grid-2" style="margin-top:16px">
+    <div class="mkt-card">
+        <div class="mkt-card-title">Waiting for approval</div>
+        {% if awaiting or offers_awaiting %}
+        <table class="mkt-table">
+            <tbody>
+            {% for c in awaiting %}
+            <tr>
+                <td><a href="{{ url_for('marketing_portal.campaign_detail', campaign_id=c.id) }}">{{ c.name }}</a>
+                    <div class="mkt-muted" style="font-size:0.78rem">Campaign · {{ c.objective_label }}</div></td>
+                <td class="mkt-num"><span class="mkt-chip mkt-chip-pending">In review</span></td>
+            </tr>
+            {% endfor %}
+            {% for o in offers_awaiting %}
+            <tr>
+                <td><a href="{{ url_for('marketing_portal.offer_detail', offer_id=o.id) }}">{{ o.name }}</a>
+                    <div class="mkt-muted" style="font-size:0.78rem">Offer · {{ o.family_label }}</div></td>
+                <td class="mkt-num"><span class="mkt-chip mkt-chip-pending">In review</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="mkt-empty">Nothing is waiting for approval.</div>
+        {% endif %}
+    </div>
+
+    <div class="mkt-card">
+        <div class="mkt-card-title">Next 30 days</div>
+        {% if upcoming %}
+        <table class="mkt-table">
+            <tbody>
+            {% for c in upcoming %}
+            <tr>
+                <td><a href="{{ url_for('marketing_portal.campaign_detail', campaign_id=c.id) }}">{{ c.name }}</a>
+                    <div class="mkt-muted" style="font-size:0.78rem">{{ c.starts_on }} → {{ c.ends_on }}</div></td>
+                <td class="mkt-num"><span class="mkt-chip mkt-chip-{{ c.state_tone }}">{{ c.state_label }}</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="mkt-empty">No campaigns are scheduled in the next 30 days.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% if blocked %}
+<div class="mkt-card">
+    <div class="mkt-card-title">Drafts that cannot be submitted yet ({{ blocked_total }})</div>
+    <table class="mkt-table">
+        <thead><tr><th>Campaign</th><th>Outstanding</th></tr></thead>
+        <tbody>
+        {% for row in blocked %}
+        <tr>
+            <td><a href="{{ url_for('marketing_portal.campaign_detail', campaign_id=row.campaign.id) }}">{{ row.campaign.name }}</a></td>
+            <td>{% for item in row.missing %}<span class="mkt-chip mkt-chip-bad" style="margin:2px 4px 2px 0">{{ item.label }}</span>{% endfor %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="mkt-card">
+    <div class="mkt-card-title">Upstream data sources</div>
+    <div class="mkt-notice mkt-notice-info" style="margin-bottom:14px">
+        <div><strong>No data sources are connected yet.</strong>
+        Audience sizes, campaign results, and network-aware targeting stay unavailable until these are wired up.
+        Everything you author here — offers, campaigns, audiences, consent — is stored and stays valid when they are.</div>
+    </div>
+    <table class="mkt-table">
+        <thead><tr><th>Provider</th><th>Needs</th><th>Configured by</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for p in provider_status %}
+        <tr>
+            <td>{{ p.name }}</td>
+            <td class="mkt-muted">{{ p.requires }}</td>
+            <td class="mkt-mono mkt-muted">{{ p.configured_by }}</td>
+            <td><span class="mkt-chip {{ 'mkt-chip-ok' if p.available else 'mkt-chip-warn' }}">{{ 'Connected' if p.available else 'Not connected' }}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "marketing/base.html" %}
+{% block title %}{{ 'New campaign' if mode == 'new' else 'Edit campaign' }}{% endblock %}
+{% block page_title %}{{ 'New campaign' if mode == 'new' else 'Edit ' + (campaign.name or 'campaign') }}{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Create the campaign first, then attach its channel mix and offers on the detail page.</p>
+{% endblock %}
+
+{% block content %}
+<form class="mkt-card mkt-form" method="post">
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="code">Campaign code</label>
+            <input class="mkt-input mkt-mono" id="code" name="code" required maxlength="32"
+                   value="{{ campaign.code or '' }}" placeholder="Q4-FTTH-UPSELL">
+        </div>
+        <div class="mkt-field">
+            <label for="name">Name</label>
+            <input class="mkt-input" id="name" name="name" required value="{{ campaign.name or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="objective">Objective</label>
+            <select class="mkt-select" id="objective" name="objective" required>
+                <option value="">Choose…</option>
+                {% for key, label in cfg.CAMPAIGN_OBJECTIVES.items() %}
+                <option value="{{ key }}" {% if campaign.objective == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="mkt-field">
+        <label for="description">Description</label>
+        <textarea class="mkt-textarea" id="description" name="description">{{ campaign.description or '' }}</textarea>
+    </div>
+
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="segment_id">Audience segment</label>
+            <select class="mkt-select" id="segment_id" name="segment_id">
+                <option value="">Not selected</option>
+                {% for s in segment_options %}
+                <option value="{{ s.id }}" {% if campaign.segment_id|string == s.id|string %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+            {% if not segment_options %}<span class="mkt-hint">No segments exist yet — build one under Audiences.</span>{% endif %}
+        </div>
+        <div class="mkt-field">
+            <label for="holdout_pct">Holdout / control group (%)</label>
+            <input class="mkt-input" id="holdout_pct" name="holdout_pct" type="number" step="0.5" min="0" max="50"
+                   value="{{ campaign.holdout_pct if campaign.holdout_pct is not none else '10' }}">
+            <span class="mkt-hint">Without a holdout you measure response, not uplift.</span>
+        </div>
+    </div>
+
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="starts_on">Starts on</label>
+            <input class="mkt-input" id="starts_on" name="starts_on" type="date" value="{{ campaign.starts_on or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="ends_on">Ends on</label>
+            <input class="mkt-input" id="ends_on" name="ends_on" type="date" value="{{ campaign.ends_on or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="budget_amount">Budget</label>
+            <input class="mkt-input" id="budget_amount" name="budget_amount" type="number" step="0.01" min="0"
+                   value="{{ campaign.budget_amount if campaign.budget_amount is not none else '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="budget_currency">Currency</label>
+            <input class="mkt-input" id="budget_currency" name="budget_currency" maxlength="8" value="{{ campaign.budget_currency or '' }}">
+        </div>
+    </div>
+
+    <div class="mkt-field" style="max-width:320px">
+        <label for="owner">Campaign owner</label>
+        <input class="mkt-input" id="owner" name="owner" value="{{ campaign.owner or '' }}">
+    </div>
+
+    <div class="mkt-form-actions">
+        <button class="mkt-btn mkt-btn-primary" type="submit">{{ 'Create campaign' if mode == 'new' else 'Save changes' }}</button>
+        <a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_detail', campaign_id=campaign.id) if campaign.id else url_for('marketing_portal.campaign_list') }}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

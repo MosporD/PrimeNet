@@ -1,0 +1,50 @@
+{% extends "marketing/base.html" %}
+{% block title %}Contact policies{% endblock %}
+{% block page_title %}Contact policies{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Frequency caps and quiet hours. A campaign cannot be approved unless an active policy covers every channel in its mix.</p>
+{% endblock %}
+{% block page_actions %}
+{% if user.can(cfg.P_POLICY_EDIT) %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.policy_new') }}">New policy</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% set tab = 'policies' %}
+{% include 'marketing/_consent_tabs.html' %}
+
+<div class="mkt-card">
+    {% if policies %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead><tr><th>Policy</th><th>Channel</th><th>Applies to</th><th>Cap</th><th>Quiet hours</th><th>Status</th>{% if user.can(cfg.P_POLICY_EDIT) %}<th></th>{% endif %}</tr></thead>
+        <tbody>
+        {% for policy in policies %}
+        <tr>
+            <td>{{ policy.name }}{% if policy.notes %}<div class="mkt-muted" style="font-size:0.76rem">{{ policy.notes|truncate(70) }}</div>{% endif %}</td>
+            <td>{{ policy.channel_label }}</td>
+            <td class="mkt-muted">{{ policy.applies_label }}</td>
+            <td>{{ policy.cap_text }}</td>
+            <td class="mkt-muted">{{ policy.quiet_hours or '—' }}{% if policy.timezone %}<div style="font-size:0.74rem">{{ policy.timezone }}</div>{% endif %}</td>
+            <td><span class="mkt-chip {{ 'mkt-chip-ok' if policy.active else 'mkt-chip-muted' }}">{{ 'Active' if policy.active else 'Inactive' }}</span></td>
+            {% if user.can(cfg.P_POLICY_EDIT) %}
+            <td class="mkt-num"><a class="mkt-btn mkt-btn-sm" href="{{ url_for('marketing_portal.policy_edit', policy_id=policy.id) }}">Edit</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>No contact policies</strong>
+        Without one, nothing caps how often a subscriber is contacted — and campaigns will stay blocked at the
+        readiness check.
+        {% if user.can(cfg.P_POLICY_EDIT) %}
+        <div style="margin-top:14px"><a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.policy_new') }}">Create the first policy</a></div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

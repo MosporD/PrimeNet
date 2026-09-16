@@ -1,0 +1,49 @@
+{% extends "marketing/base.html" %}
+{% block title %}Calendar{% endblock %}
+{% block page_title %}Campaign calendar{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">{{ month_label }} — scheduled and running campaigns, so overlapping contact on the same audience is visible before it happens.</p>
+{% endblock %}
+{% block page_actions %}
+<a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_calendar', month=prev_month) }}">&larr; Previous</a>
+<a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_calendar') }}">This month</a>
+<a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_calendar', month=next_month) }}">Next &rarr;</a>
+{% endblock %}
+
+{% block content %}
+<div class="mkt-card">
+    {% if entries %}
+    <div class="mkt-table-wrap">
+        <div class="mkt-cal">
+            <div class="mkt-cal-head">
+                <div class="mkt-muted" style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.07em">Campaign</div>
+                <div class="mkt-cal-days" style="grid-template-columns: repeat({{ days }}, minmax(0, 1fr))">
+                    {% for day in range(1, days + 1) %}<div class="mkt-cal-day">{{ day }}</div>{% endfor %}
+                </div>
+            </div>
+            {% for entry in entries %}
+            <div class="mkt-cal-row">
+                <div class="mkt-cal-name">
+                    <a href="{{ url_for('marketing_portal.campaign_detail', campaign_id=entry.id) }}">{{ entry.name }}</a>
+                    <div class="mkt-muted" style="font-size:0.72rem">{{ entry.segment_name or 'No audience' }}</div>
+                </div>
+                <div class="mkt-cal-track" style="grid-template-columns: repeat({{ days }}, minmax(0, 1fr))">
+                    {% for day in range(1, days + 1) %}<div class="mkt-cal-cell" style="grid-column: {{ day }}; grid-row: 1"></div>{% endfor %}
+                    <div class="mkt-cal-bar mkt-cal-bar-{{ entry.state_tone }}"
+                         style="grid-column: {{ entry.bar_start }} / span {{ entry.bar_span }}"
+                         title="{{ entry.starts_on }} → {{ entry.ends_on }} · {{ entry.state_label }}">
+                        {{ '‹' if entry.clipped_left else '' }}{{ entry.state_label }}{{ '›' if entry.clipped_right else '' }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>Nothing scheduled in {{ month_label }}</strong>
+        Campaigns appear here once they have a start and end date.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

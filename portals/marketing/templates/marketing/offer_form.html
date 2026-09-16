@@ -1,0 +1,103 @@
+{% extends "marketing/base.html" %}
+{% block title %}{{ 'New offer' if mode == 'new' else 'Edit offer' }}{% endblock %}
+{% block page_title %}{{ 'New offer' if mode == 'new' else 'Edit ' + (offer.name or 'offer') }}{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Offers start as drafts. They become promotable once reviewed and approved.</p>
+{% endblock %}
+
+{% block content %}
+<form class="mkt-card mkt-form" method="post">
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="code">Offer code</label>
+            <input class="mkt-input mkt-mono" id="code" name="code" required maxlength="32"
+                   value="{{ offer.code or '' }}" placeholder="FTTH-500">
+            <span class="mkt-hint">Short stable identifier other portals will quote.</span>
+        </div>
+        <div class="mkt-field">
+            <label for="name">Name</label>
+            <input class="mkt-input" id="name" name="name" required value="{{ offer.name or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="family">Family</label>
+            <select class="mkt-select" id="family" name="family" required>
+                <option value="">Choose…</option>
+                {% for key, label in cfg.OFFER_FAMILIES.items() %}
+                <option value="{{ key }}" {% if offer.family == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="mkt-field">
+        <label for="description">Description</label>
+        <textarea class="mkt-textarea" id="description" name="description">{{ offer.description or '' }}</textarea>
+    </div>
+
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="price_amount">Standard price</label>
+            <input class="mkt-input" id="price_amount" name="price_amount" type="number" step="0.01" min="0"
+                   value="{{ offer.price_amount if offer.price_amount is not none else '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="price_currency">Currency</label>
+            <input class="mkt-input" id="price_currency" name="price_currency" maxlength="8"
+                   value="{{ offer.price_currency or '' }}" placeholder="JOD">
+        </div>
+        <div class="mkt-field">
+            <label for="price_period">Billing period</label>
+            <input class="mkt-input" id="price_period" name="price_period" maxlength="24"
+                   value="{{ offer.price_period or '' }}" placeholder="month">
+        </div>
+        <div class="mkt-field">
+            <label for="commitment_months">Commitment (months)</label>
+            <input class="mkt-input" id="commitment_months" name="commitment_months" type="number" min="0" max="120"
+                   value="{{ offer.commitment_months if offer.commitment_months is not none else '' }}">
+        </div>
+    </div>
+
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="promo_amount">Promotional price</label>
+            <input class="mkt-input" id="promo_amount" name="promo_amount" type="number" step="0.01" min="0"
+                   value="{{ offer.promo_amount if offer.promo_amount is not none else '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="promo_ends_on">Promotion ends</label>
+            <input class="mkt-input" id="promo_ends_on" name="promo_ends_on" type="date" value="{{ offer.promo_ends_on or '' }}">
+            <span class="mkt-hint">Required whenever a promotional price is set.</span>
+        </div>
+        <div class="mkt-field">
+            <label for="valid_from">Valid from</label>
+            <input class="mkt-input" id="valid_from" name="valid_from" type="date" value="{{ offer.valid_from or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="valid_to">Valid to</label>
+            <input class="mkt-input" id="valid_to" name="valid_to" type="date" value="{{ offer.valid_to or '' }}">
+        </div>
+    </div>
+
+    <div class="mkt-field">
+        <label for="eligibility">Eligibility rules</label>
+        <textarea class="mkt-textarea" id="eligibility" name="eligibility"
+                  placeholder="Who may take this offer — new lines only, upgrade path, region limits, device requirements…">{{ offer.eligibility or '' }}</textarea>
+    </div>
+
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="terms_url">Terms &amp; conditions link</label>
+            <input class="mkt-input" id="terms_url" name="terms_url" value="{{ offer.terms_url or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="owner">Product owner</label>
+            <input class="mkt-input" id="owner" name="owner" value="{{ offer.owner or '' }}">
+        </div>
+    </div>
+
+    <div class="mkt-form-actions">
+        <button class="mkt-btn mkt-btn-primary" type="submit">{{ 'Create offer' if mode == 'new' else 'Save changes' }}</button>
+        <a class="mkt-btn" href="{{ url_for('marketing_portal.offer_detail', offer_id=offer.id) if offer.id else url_for('marketing_portal.offer_list') }}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

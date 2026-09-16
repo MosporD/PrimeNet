@@ -1,0 +1,115 @@
+{% extends "marketing/base.html" %}
+{% block title %}Suppression{% endblock %}
+{% block page_title %}Suppression list{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Hard blocks that override consent — regulator do-not-call entries, complaints, fraud and legal holds. A global block stops every channel.</p>
+{% endblock %}
+
+{% block content %}
+{% set tab = 'suppression' %}
+{% include 'marketing/_consent_tabs.html' %}
+
+{% if user.can(cfg.P_CONSENT_EDIT) %}
+<div class="mkt-card">
+    <div class="mkt-card-title">Add a block</div>
+    <form class="mkt-form" method="post" action="{{ url_for('marketing_portal.suppression_add') }}">
+        <div class="mkt-field-row">
+            <div class="mkt-field">
+                <label for="identifier_type">Identifier type</label>
+                <select class="mkt-select" id="identifier_type" name="identifier_type">
+                    {% for key, label in cfg.IDENTIFIER_TYPES.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="identifier">Identifier</label>
+                <input class="mkt-input" id="identifier" name="identifier" required>
+            </div>
+            <div class="mkt-field">
+                <label for="scope">Scope</label>
+                <select class="mkt-select" id="scope" name="scope">
+                    {% for key, label in cfg.SUPPRESSION_SCOPES.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="scope_ref">Scope reference</label>
+                <input class="mkt-input" id="scope_ref" name="scope_ref" placeholder="Channel key or campaign code">
+                <span class="mkt-hint">Only for a channel or campaign scope.</span>
+            </div>
+        </div>
+        <div class="mkt-field-row">
+            <div class="mkt-field">
+                <label for="reason">Reason</label>
+                <select class="mkt-select" id="reason" name="reason">
+                    {% for key, label in cfg.SUPPRESSION_REASONS.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="expires_at">Expires</label>
+                <input class="mkt-input" id="expires_at" name="expires_at" type="date">
+                <span class="mkt-hint">Leave blank for a permanent block.</span>
+            </div>
+            <div class="mkt-field">
+                <label for="notes">Notes</label>
+                <input class="mkt-input" id="notes" name="notes">
+            </div>
+        </div>
+        <div class="mkt-form-actions">
+            <button class="mkt-btn mkt-btn-primary" type="submit">Add block</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<form class="mkt-filters" method="get">
+    <div class="mkt-field">
+        <label for="f-q">Identifier</label>
+        <input class="mkt-input" id="f-q" name="q" value="{{ filters.q }}">
+    </div>
+    <div class="mkt-field">
+        <label for="f-all">Show</label>
+        <select class="mkt-select" id="f-all" name="all">
+            <option value="">Active blocks only</option>
+            <option value="1" {% if not filters.active_only %}selected{% endif %}>Including released</option>
+        </select>
+    </div>
+    <button class="mkt-btn" type="submit">Filter</button>
+</form>
+
+<div class="mkt-card">
+    {% if entries %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead><tr><th>Identifier</th><th>Scope</th><th>Reason</th><th>Added</th><th>Expires</th><th>Status</th>{% if user.can(cfg.P_CONSENT_EDIT) %}<th></th>{% endif %}</tr></thead>
+        <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td class="mkt-mono">{{ entry.identifier }}<div class="mkt-muted" style="font-size:0.74rem">{{ entry.type_label }}</div></td>
+            <td>{{ entry.scope_label }}{% if entry.scope_ref %}<div class="mkt-muted mkt-mono" style="font-size:0.74rem">{{ entry.scope_ref }}</div>{% endif %}</td>
+            <td>{{ entry.reason_label }}{% if entry.notes %}<div class="mkt-muted" style="font-size:0.76rem">{{ entry.notes|truncate(70) }}</div>{% endif %}</td>
+            <td class="mkt-muted">{{ entry.added_at[:10] }}<div style="font-size:0.74rem">{{ entry.added_by or '' }}</div></td>
+            <td class="mkt-muted">{{ entry.expires_at or 'Never' }}</td>
+            <td><span class="mkt-chip {{ 'mkt-chip-bad' if entry.active else 'mkt-chip-muted' }}">{{ 'Blocking' if entry.active else 'Released' }}</span></td>
+            {% if user.can(cfg.P_CONSENT_EDIT) %}
+            <td class="mkt-num">
+                {% if entry.active %}
+                <form class="mkt-inline-form" method="post" action="{{ url_for('marketing_portal.suppression_release', entry_id=entry.id) }}">
+                    <button class="mkt-btn mkt-btn-sm mkt-btn-danger" type="submit"
+                            onclick="return confirm('Release this block? The subscriber becomes contactable again where consent allows.')">Release</button>
+                </form>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>No suppression entries</strong>
+        Regulator do-not-call registers and complaint-driven blocks belong here. They are checked before consent,
+        so an entry here stops contact even where an opt-in exists.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
