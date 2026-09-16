@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RET Management - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
-    <link rel="stylesheet" href="{{ url_for('ret_management.static', filename='ret_management.css') }}?v=1.3">
+    <link rel="stylesheet" href="{{ url_for('ret_management.static', filename='ret_management.css') }}?v=1.4">
 </head>
 <body class="ret-management-page"
     data-huawei-enabled="{{ 'true' if huawei_enabled else 'false' }}"
@@ -55,9 +55,39 @@
 
             </section>
 
+            <section class="panel holo-panel" id="holo-panel" hidden>
+                <div class="results-head">
+                    <div>
+                        <h2>2. Site hologram <span class="holo-sub">top view · true azimuth</span></h2>
+                        <p class="field-hint" id="holo-site-meta"></p>
+                    </div>
+                    <div class="results-actions holo-actions">
+                        <label class="holo-slider">
+                            <span>3D tilt</span>
+                            <input type="range" id="holo-pitch" min="0" max="70" step="5" value="0"
+                                aria-label="Cosmetic 3D tilt of the hologram">
+                        </label>
+                        <button type="button" class="btn-secondary" id="holo-reset-btn">Reset view</button>
+                    </div>
+                </div>
+                <div class="holo-layout">
+                    <div class="holo-stage">
+                        <canvas id="holo-canvas" role="img"
+                            aria-label="Top view of the selected site showing each sector at its real azimuth"></canvas>
+                        <p class="holo-hint">Drag to rotate · scroll to zoom · click a lobe to filter the table · arrow keys to step sectors</p>
+                    </div>
+                    <aside class="holo-rail">
+                        <p id="holo-status" class="status-text" aria-live="polite"></p>
+                        <div id="holo-sector-chips" class="holo-chips"></div>
+                        <div id="holo-edit-summary" class="holo-edits" hidden></div>
+                        <div id="holo-legend" class="holo-legend"></div>
+                    </aside>
+                </div>
+            </section>
+
             <section class="panel" id="results-panel" hidden>
                 <div class="results-head">
-                    <h2 id="results-title">RET data</h2>
+                    <h2 id="results-title">3. RET data</h2>
                     <div class="results-actions">
                         <button type="button" class="btn-secondary" id="export-excel-btn" disabled>Download Excel</button>
                         <button type="button" class="btn-secondary" id="reload-btn">Reload</button>
@@ -85,6 +115,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
-    <script src="{{ url_for('ret_management.static', filename='ret_management.js') }}?v=1.16"></script>
+    <script src="{{ url_for('ret_management.static', filename='ret_hologram.js') }}?v=1.0"></script>
+    <script src="{{ url_for('ret_management.static', filename='ret_management.js') }}?v=1.17"></script>
 </body>
 </html>

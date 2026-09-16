@@ -22,6 +22,7 @@ from modules.ret_management.credentials import (
     run_nokia_write_with_user_credentials,
 )
 from modules.ret_management.export import build_ret_workbook
+from modules.ret_management.site_layout import fetch_site_layout
 
 ret_management_bp = Blueprint(
     'ret_management',
@@ -159,6 +160,27 @@ def ret_ne_list():
         items = ret_logic.list_network_elements(vendor, query=query, limit=limit)
         return jsonify({'success': True, 'vendor': vendor, 'items': items})
     except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
+
+
+@ret_management_bp.route('/api/ret-management/site-layout', methods=['GET'])
+@login_required
+def ret_site_layout():
+    """Sector geometry (true azimuth, tilts, height) for the site hologram."""
+    try:
+        vendor = _normalize_vendor(request.args.get('vendor', 'nokia'))
+        layout = fetch_site_layout(
+            vendor,
+            site_id=(request.args.get('site_id') or '').strip(),
+            metadata_site_id=(request.args.get('metadata_site_id') or '').strip(),
+            site_name=(request.args.get('site_name') or '').strip(),
+            ne_name=(request.args.get('ne_name') or '').strip(),
+        )
+        return jsonify({'success': True, 'vendor': vendor, **layout})
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        current_app.logger.exception('RET site layout lookup failed')
         return jsonify({'error': str(exc)}), 500
 
 
