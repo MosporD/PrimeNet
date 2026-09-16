@@ -1,0 +1,135 @@
+{% extends "marketing/base.html" %}
+{% block title %}Consent{% endblock %}
+{% block page_title %}Consent &amp; contact policy{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">What each subscriber agreed to, per channel, with the evidence behind it. Suppression entries override consent; contact policies cap how often anyone is contacted.</p>
+{% endblock %}
+
+{% block content %}
+{% set tab = 'consent' %}
+{% include 'marketing/_consent_tabs.html' %}
+
+<div class="mkt-grid mkt-grid-3" style="margin-bottom:16px">
+    {% for key, label in cfg.CONSENT_STATUSES.items() %}
+    <div class="mkt-card mkt-stat">
+        <span class="mkt-stat-value">{{ summary.get(key, 0) }}</span>
+        <span class="mkt-stat-label">{{ label }}</span>
+    </div>
+    {% endfor %}
+</div>
+
+{% if user.can(cfg.P_CONSENT_EDIT) %}
+<div class="mkt-card">
+    <div class="mkt-card-title">Record consent</div>
+    <form class="mkt-form" method="post" action="{{ url_for('marketing_portal.consent_record') }}">
+        <div class="mkt-field-row">
+            <div class="mkt-field">
+                <label for="identifier_type">Identifier type</label>
+                <select class="mkt-select" id="identifier_type" name="identifier_type">
+                    {% for key, label in cfg.IDENTIFIER_TYPES.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="identifier">Identifier</label>
+                <input class="mkt-input" id="identifier" name="identifier" required>
+            </div>
+            <div class="mkt-field">
+                <label for="channel">Channel</label>
+                <select class="mkt-select" id="channel" name="channel">
+                    {% for key, meta in cfg.CHANNELS.items() %}<option value="{{ key }}">{{ meta.label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="status">Status</label>
+                <select class="mkt-select" id="status" name="status">
+                    {% for key, label in cfg.CONSENT_STATUSES.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="mkt-field-row">
+            <div class="mkt-field">
+                <label for="source">Captured through</label>
+                <select class="mkt-select" id="source" name="source">
+                    {% for key, label in cfg.CONSENT_SOURCES.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="captured_at">Captured on</label>
+                <input class="mkt-input" id="captured_at" name="captured_at" type="date" required>
+            </div>
+            <div class="mkt-field">
+                <label for="expires_at">Expires</label>
+                <input class="mkt-input" id="expires_at" name="expires_at" type="date">
+            </div>
+            <div class="mkt-field">
+                <label for="evidence_ref">Evidence reference</label>
+                <input class="mkt-input" id="evidence_ref" name="evidence_ref" placeholder="Form ID, call ID, contract no.">
+                <span class="mkt-hint">Required for an opt-in.</span>
+            </div>
+        </div>
+        <div class="mkt-field">
+            <label for="notes">Notes</label>
+            <input class="mkt-input" id="notes" name="notes">
+        </div>
+        <div class="mkt-form-actions">
+            <button class="mkt-btn mkt-btn-primary" type="submit">Record consent</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<form class="mkt-filters" method="get">
+    <div class="mkt-field">
+        <label for="f-status">Status</label>
+        <select class="mkt-select" id="f-status" name="status">
+            <option value="">All</option>
+            {% for key, label in cfg.CONSENT_STATUSES.items() %}
+            <option value="{{ key }}" {% if filters.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-channel">Channel</label>
+        <select class="mkt-select" id="f-channel" name="channel">
+            <option value="">All</option>
+            {% for key, meta in cfg.CHANNELS.items() %}
+            <option value="{{ key }}" {% if filters.channel == key %}selected{% endif %}>{{ meta.label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-q">Identifier</label>
+        <input class="mkt-input" id="f-q" name="q" value="{{ filters.q }}">
+    </div>
+    <button class="mkt-btn" type="submit">Filter</button>
+</form>
+
+<div class="mkt-card">
+    {% if records %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead><tr><th>Identifier</th><th>Channel</th><th>Status</th><th>Source</th><th>Captured</th><th>Evidence</th><th>Recorded by</th></tr></thead>
+        <tbody>
+        {% for record in records %}
+        <tr>
+            <td class="mkt-mono">{{ record.identifier }}<div class="mkt-muted" style="font-size:0.74rem">{{ record.type_label }}</div></td>
+            <td>{{ record.channel_label }}</td>
+            <td><span class="mkt-chip {{ 'mkt-chip-ok' if record.contactable else 'mkt-chip-bad' }}">{{ record.status_label }}</span></td>
+            <td class="mkt-muted">{{ record.source_label }}</td>
+            <td class="mkt-muted">{{ record.captured_at }}{% if record.expires_at %}<div>expires {{ record.expires_at }}</div>{% endif %}</td>
+            <td class="mkt-mono mkt-muted">{{ record.evidence_ref or '—' }}</td>
+            <td class="mkt-muted">{{ record.recorded_by or '—' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>No consent records</strong>
+        Nothing has been captured or imported yet. Until a record exists for a subscriber and channel,
+        the contactability lookup treats them as “no consent on record”.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

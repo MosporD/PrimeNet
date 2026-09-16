@@ -47,12 +47,12 @@ hardest corner of OSS to build. Everything else is still open.
 The portal tower is the product structure. Each portal owns one or more
 domains:
 
-| Portal | Domains | Notes |
-|---|---|---|
-| **Engineering (PrimeNet)** | Network/OSS, field & workforce seeds | Exists. Keeps the PrimeNet sub-brand. |
-| **Support** | Service assurance, ticketing | First new build — consumes PrimeNet fault/health data. |
-| **Sales** | BSS-customer (CRM, ordering, catalog) | After Support. |
-| **Marketing** | Campaigns, outreach, brand ops | Lightweight; schedule opportunistically. |
+| Portal | Product name | Domains | Notes |
+|---|---|---|---|
+| **Engineering** | **PrimeNet** | Network/OSS, field & workforce seeds | Exists. Keeps the PrimeNet sub-brand. |
+| **Marketing** | **NexPulse** | Campaigns, offers, audiences, consent | Built first as the reference portal: it carries the shared portal scaffold (shell, RBAC, provider seam) the others inherit. |
+| **Support** | **NexResolve** | Service assurance, ticketing | Consumes PrimeNet fault/health data over an API. |
+| **Sales** | **NexArpu** | BSS-customer (CRM, ordering, catalog) | Reads the NexPulse offer catalog rather than declaring its own. |
 | *(future)* **ISP Operations** | Subscriber/CPE/IPAM | Add as a tower level when scoped. |
 | *(future)* **Billing** | BSS-revenue | Last; consider buying/integrating instead of building. |
 
@@ -81,6 +81,12 @@ auditability, and isolation from heavy PM ingestion. The rules:
 
 ## 5. Build order (value per effort)
 
+0. **Marketing Portal (NexPulse) — done first, by decision.** Not the highest-value
+   domain, but the lowest-risk place to settle the portal scaffold every later
+   portal reuses: mount pattern, shell and navigation, portal-local RBAC, entity
+   lifecycles with approval gates, audit trail, and the provider seam that keeps
+   views working before any data source exists. Support and Sales inherit all of
+   it rather than re-deriving it under delivery pressure.
 1. **Support Portal — service assurance.** Smallest leap, biggest integration
    story: auto-create tickets from PrimeNet fault/health signals ("cell X
    degraded → ticket"), manual tickets, assignment, SLA timers, and a simple
@@ -97,5 +103,8 @@ PrimeNet itself keeps evolving in parallel (optimization suite, RNO workflows)
 ## 6. Naming
 
 - **NexusCore** — the platform: login, portal tower, shared services, brand.
-- **PrimeNet** — the Engineering Portal's product name only. New portals get
-  their own names under the NexusCore umbrella.
+- **PrimeNet** — the Engineering Portal's product name only.
+- **NexPulse** — Marketing Portal. **NexArpu** — Sales Portal.
+  **NexResolve** — Customer Support Portal.
+- A portal's tower level keeps the domain label ("Marketing"); the product name
+  is the badge on the card and the brand inside the portal.

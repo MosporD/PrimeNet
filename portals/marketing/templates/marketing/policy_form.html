@@ -1,0 +1,76 @@
+{% extends "marketing/base.html" %}
+{% block title %}{{ 'New policy' if mode == 'new' else 'Edit policy' }}{% endblock %}
+{% block page_title %}{{ 'New contact policy' if mode == 'new' else 'Edit ' + (policy.name or 'policy') }}{% endblock %}
+
+{% block content %}
+{% set tab = 'policies' %}
+{% include 'marketing/_consent_tabs.html' %}
+
+<form class="mkt-card mkt-form" method="post">
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="name">Policy name</label>
+            <input class="mkt-input" id="name" name="name" required value="{{ policy.name or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="channel">Channel</label>
+            <select class="mkt-select" id="channel" name="channel">
+                <option value="all" {% if (policy.channel or 'all') == 'all' %}selected{% endif %}>All channels</option>
+                {% for key, meta in cfg.CHANNELS.items() %}
+                <option value="{{ key }}" {% if policy.channel == key %}selected{% endif %}>{{ meta.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mkt-field">
+            <label for="applies_to">Applies to</label>
+            <select class="mkt-select" id="applies_to" name="applies_to">
+                {% for key, label in scopes.items() %}
+                <option value="{{ key }}" {% if (policy.applies_to or 'all') == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="mkt-field-row">
+        <div class="mkt-field">
+            <label for="max_contacts">Maximum contacts</label>
+            <input class="mkt-input" id="max_contacts" name="max_contacts" type="number" min="0" max="100" required
+                   value="{{ policy.max_contacts if policy.max_contacts is not none else '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="window_days">Per (days)</label>
+            <input class="mkt-input" id="window_days" name="window_days" type="number" min="1" max="365" required
+                   value="{{ policy.window_days or '30' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="quiet_from">Quiet hours from</label>
+            <input class="mkt-input" id="quiet_from" name="quiet_from" placeholder="21:00" value="{{ policy.quiet_from or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="quiet_to">Quiet hours to</label>
+            <input class="mkt-input" id="quiet_to" name="quiet_to" placeholder="09:00" value="{{ policy.quiet_to or '' }}">
+        </div>
+        <div class="mkt-field">
+            <label for="timezone">Timezone</label>
+            <input class="mkt-input" id="timezone" name="timezone" placeholder="Asia/Amman" value="{{ policy.timezone or '' }}">
+        </div>
+    </div>
+
+    <div class="mkt-field">
+        <label for="notes">Notes</label>
+        <textarea class="mkt-textarea" id="notes" name="notes">{{ policy.notes or '' }}</textarea>
+    </div>
+
+    <div class="mkt-field">
+        <label style="display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:0;cursor:pointer">
+            <input type="checkbox" name="active" value="1" {% if policy.active %}checked{% endif %}>
+            <span>Policy is active</span>
+        </label>
+    </div>
+
+    <div class="mkt-form-actions">
+        <button class="mkt-btn mkt-btn-primary" type="submit">{{ 'Create policy' if mode == 'new' else 'Save changes' }}</button>
+        <a class="mkt-btn" href="{{ url_for('marketing_portal.policy_list') }}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

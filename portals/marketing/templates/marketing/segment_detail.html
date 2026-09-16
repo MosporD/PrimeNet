@@ -1,0 +1,80 @@
+{% extends "marketing/base.html" %}
+{% block title %}{{ segment.name }}{% endblock %}
+{% block page_title %}{{ segment.name }}{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">{{ segment.match_label }} · {{ segment.refresh_label }}{% if segment.archived %} · <span class="mkt-chip mkt-chip-muted">Archived</span>{% endif %}</p>
+{% endblock %}
+{% block page_actions %}
+<a class="mkt-btn" href="{{ url_for('marketing_portal.segment_list') }}">Back to audiences</a>
+{% if user.can(cfg.P_SEGMENT_EDIT) %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.segment_edit', segment_id=segment.id) }}">Edit</a>
+<form class="mkt-inline-form" method="post" action="{{ url_for('marketing_portal.segment_archive', segment_id=segment.id) }}">
+    <input type="hidden" name="archived" value="{{ '0' if segment.archived else '1' }}">
+    <button class="mkt-btn mkt-btn-danger" type="submit">{{ 'Restore' if segment.archived else 'Archive' }}</button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="mkt-grid mkt-grid-2">
+    <div>
+        <div class="mkt-card">
+            <div class="mkt-card-title">Targeting rules</div>
+            {% if segment.rule_text %}
+            <ul class="mkt-rule-list">
+                {% for line in segment.rule_text %}<li>{{ line }}</li>{% endfor %}
+            </ul>
+            {% else %}
+            <p class="mkt-muted">This segment has no rules.</p>
+            {% endif %}
+            {% if segment.description %}
+            <div class="mkt-card-title" style="margin-top:16px">Description</div>
+            <p style="white-space:pre-wrap">{{ segment.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="mkt-card">
+            <div class="mkt-card-title">Audience size</div>
+            {% if estimate.available %}
+            <div class="mkt-stat"><span class="mkt-stat-value">{{ estimate.value }}</span><span class="mkt-stat-label">subscribers match</span></div>
+            {% else %}
+            <div class="mkt-notice">
+                <div><strong>Size unavailable.</strong> {{ estimate.reason }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Depends on</div>
+            <table class="mkt-table">
+                <tbody>
+                {% for source in segment.sources %}
+                <tr>
+                    <td>{{ source.label }}</td>
+                    <td class="mkt-num"><span class="mkt-chip {{ 'mkt-chip-ok' if source.connected else 'mkt-chip-warn' }}">{{ 'Connected' if source.connected else 'Not connected' }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td class="mkt-muted">No upstream systems referenced.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">History</div>
+            {% if history %}
+            <div class="mkt-timeline">
+                {% for event in history %}
+                <div class="mkt-timeline-item">
+                    <div class="mkt-timeline-when">{{ event.occurred_at|replace('T', ' ') }}</div>
+                    <div><div>{{ event.summary }}</div><div class="mkt-timeline-who">{{ event.actor }}</div></div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}<p class="mkt-muted">No recorded activity.</p>{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

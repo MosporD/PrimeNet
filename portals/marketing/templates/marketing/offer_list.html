@@ -1,0 +1,79 @@
+{% extends "marketing/base.html" %}
+{% block title %}Offer catalog{% endblock %}
+{% block page_title %}Offer catalog{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">The plans and bundles marketing is allowed to promote. Campaigns can only attach offers that are approved or live.</p>
+{% endblock %}
+{% block page_actions %}
+{% if user.can(cfg.P_CATALOG_EDIT) %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.offer_new') }}">New offer</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form class="mkt-filters" method="get">
+    <div class="mkt-field">
+        <label for="f-state">Status</label>
+        <select class="mkt-select" id="f-state" name="state">
+            <option value="">All</option>
+            {% for key, meta in cfg.OFFER_STATES.items() %}
+            <option value="{{ key }}" {% if filters.state == key %}selected{% endif %}>{{ meta.label }}{% if counts.get(key) %} ({{ counts[key] }}){% endif %}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-family">Family</label>
+        <select class="mkt-select" id="f-family" name="family">
+            <option value="">All</option>
+            {% for key, label in cfg.OFFER_FAMILIES.items() %}
+            <option value="{{ key }}" {% if filters.family == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-q">Search</label>
+        <input class="mkt-input" id="f-q" name="q" value="{{ filters.q }}" placeholder="Name, code, description">
+    </div>
+    <button class="mkt-btn" type="submit">Filter</button>
+    <a class="mkt-btn" href="{{ url_for('marketing_portal.offer_list') }}">Reset</a>
+</form>
+
+<div class="mkt-card">
+    {% if offers %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead>
+        <tr><th>Code</th><th>Offer</th><th>Family</th><th class="mkt-num">Price</th><th>Valid</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        {% for offer in offers %}
+        <tr>
+            <td class="mkt-mono">{{ offer.code }}</td>
+            <td><a href="{{ url_for('marketing_portal.offer_detail', offer_id=offer.id) }}">{{ offer.name }}</a></td>
+            <td class="mkt-muted">{{ offer.family_label }}</td>
+            <td class="mkt-num">
+                {% if offer.price_amount is not none %}
+                    {{ '%.2f'|format(offer.price_amount) }} {{ offer.price_currency or '' }}
+                    {% if offer.price_period %}<span class="mkt-muted">/{{ offer.price_period }}</span>{% endif %}
+                    {% if offer.promo_amount is not none %}<div class="mkt-chip mkt-chip-warn" style="margin-top:4px">Promo {{ '%.2f'|format(offer.promo_amount) }}</div>{% endif %}
+                {% else %}<span class="mkt-muted">—</span>{% endif %}
+            </td>
+            <td class="mkt-muted">{{ offer.valid_from or '—' }}{% if offer.valid_to %} → {{ offer.valid_to }}{% endif %}</td>
+            <td><span class="mkt-chip mkt-chip-{{ offer.state_tone }}">{{ offer.state_label }}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>No offers yet</strong>
+        The catalog is the anchor for everything else — campaigns attach offers from here, and the Sales
+        and Support portals will read the same list.
+        {% if user.can(cfg.P_CATALOG_EDIT) %}
+        <div style="margin-top:14px"><a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.offer_new') }}">Create the first offer</a></div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

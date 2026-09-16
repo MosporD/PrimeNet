@@ -1,0 +1,49 @@
+{% extends "marketing/base.html" %}
+{% block title %}Audit trail{% endblock %}
+{% block page_title %}Audit trail{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Append-only record of every state change, consent capture, and suppression write in this portal.</p>
+{% endblock %}
+
+{% block content %}
+<form class="mkt-filters" method="get">
+    <div class="mkt-field">
+        <label for="f-type">Entity type</label>
+        <select class="mkt-select" id="f-type" name="entity_type">
+            <option value="">All</option>
+            {% for key in ['campaign', 'offer', 'segment', 'consent', 'suppression', 'contact_policy'] %}
+            <option value="{{ key }}" {% if entity_type == key %}selected{% endif %}>{{ key|replace('_', ' ')|title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-id">Entity ID</label>
+        <input class="mkt-input" id="f-id" name="entity_id" value="{{ entity_id }}">
+    </div>
+    <button class="mkt-btn" type="submit">Filter</button>
+    <a class="mkt-btn" href="{{ url_for('marketing_portal.audit_trail') }}">Reset</a>
+</form>
+
+<div class="mkt-card">
+    {% if events %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Summary</th></tr></thead>
+        <tbody>
+        {% for event in events %}
+        <tr>
+            <td class="mkt-muted">{{ event.occurred_at|replace('T', ' ') }}</td>
+            <td>{{ event.actor or '—' }}<div class="mkt-muted" style="font-size:0.74rem">{{ event.actor_role or '' }}</div></td>
+            <td class="mkt-mono">{{ event.action }}</td>
+            <td class="mkt-muted">{{ event.entity_type or '' }}{% if event.entity_id %} #{{ event.entity_id }}{% endif %}</td>
+            <td>{{ event.summary or '' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">No audit events recorded yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

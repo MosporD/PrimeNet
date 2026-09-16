@@ -1,0 +1,75 @@
+{% extends "marketing/base.html" %}
+{% block title %}Campaigns{% endblock %}
+{% block page_title %}Campaigns{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Every campaign carries an audience, an offer, a channel mix, a budget, and a holdout group. It cannot be approved until the essentials are in place.</p>
+{% endblock %}
+{% block page_actions %}
+<a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_calendar') }}">Calendar</a>
+{% if user.can(cfg.P_CAMPAIGN_EDIT) %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.campaign_new') }}">New campaign</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form class="mkt-filters" method="get">
+    <div class="mkt-field">
+        <label for="f-state">Status</label>
+        <select class="mkt-select" id="f-state" name="state">
+            <option value="">All</option>
+            {% for key, meta in cfg.CAMPAIGN_STATES.items() %}
+            <option value="{{ key }}" {% if filters.state == key %}selected{% endif %}>{{ meta.label }}{% if counts.get(key) %} ({{ counts[key] }}){% endif %}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-objective">Objective</label>
+        <select class="mkt-select" id="f-objective" name="objective">
+            <option value="">All</option>
+            {% for key, label in cfg.CAMPAIGN_OBJECTIVES.items() %}
+            <option value="{{ key }}" {% if filters.objective == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mkt-field">
+        <label for="f-q">Search</label>
+        <input class="mkt-input" id="f-q" name="q" value="{{ filters.q }}" placeholder="Name, code, description">
+    </div>
+    <button class="mkt-btn" type="submit">Filter</button>
+    <a class="mkt-btn" href="{{ url_for('marketing_portal.campaign_list') }}">Reset</a>
+</form>
+
+<div class="mkt-card">
+    {% if campaigns %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead>
+        <tr><th>Code</th><th>Campaign</th><th>Objective</th><th>Audience</th><th>Mix</th><th>Window</th><th class="mkt-num">Holdout</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        {% for c in campaigns %}
+        <tr>
+            <td class="mkt-mono">{{ c.code }}</td>
+            <td><a href="{{ url_for('marketing_portal.campaign_detail', campaign_id=c.id) }}">{{ c.name }}</a></td>
+            <td class="mkt-muted">{{ c.objective_label }}</td>
+            <td class="mkt-muted">{{ c.segment_name or '—' }}</td>
+            <td class="mkt-muted">{{ c.channel_count }} ch · {{ c.offer_count }} offer{{ '' if c.offer_count == 1 else 's' }}</td>
+            <td class="mkt-muted">{% if c.starts_on %}{{ c.starts_on }} → {{ c.ends_on }}{% else %}—{% endif %}</td>
+            <td class="mkt-num">{{ '%.0f'|format(c.holdout_pct or 0) }}%</td>
+            <td><span class="mkt-chip mkt-chip-{{ c.state_tone }}">{{ c.state_label }}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>No campaigns yet</strong>
+        A campaign ties an audience to an offer across a channel mix, with an approval trail behind it.
+        {% if user.can(cfg.P_CAMPAIGN_EDIT) %}
+        <div style="margin-top:14px"><a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.campaign_new') }}">Create the first campaign</a></div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

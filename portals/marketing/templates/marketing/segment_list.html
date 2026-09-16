@@ -1,0 +1,65 @@
+{% extends "marketing/base.html" %}
+{% block title %}Audiences{% endblock %}
+{% block page_title %}Audience segments{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Rule-based audience definitions. The rules are stored independently of any query engine, so they stay valid when a subscriber data source is connected.</p>
+{% endblock %}
+{% block page_actions %}
+{% if user.can(cfg.P_SEGMENT_EDIT) %}
+<a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.segment_new') }}">New segment</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form class="mkt-filters" method="get">
+    <div class="mkt-field">
+        <label for="f-q">Search</label>
+        <input class="mkt-input" id="f-q" name="q" value="{{ filters.q }}" placeholder="Name or description">
+    </div>
+    <div class="mkt-field">
+        <label for="f-archived">Archived</label>
+        <select class="mkt-select" id="f-archived" name="archived">
+            <option value="">Hide archived</option>
+            <option value="1" {% if filters.archived %}selected{% endif %}>Show archived</option>
+        </select>
+    </div>
+    <button class="mkt-btn" type="submit">Filter</button>
+</form>
+
+<div class="mkt-card">
+    {% if segments %}
+    <div class="mkt-table-wrap">
+    <table class="mkt-table">
+        <thead><tr><th>Segment</th><th>Rules</th><th>Depends on</th><th>Refresh</th><th>Owner</th></tr></thead>
+        <tbody>
+        {% for segment in segments %}
+        <tr>
+            <td>
+                <a href="{{ url_for('marketing_portal.segment_detail', segment_id=segment.id) }}">{{ segment.name }}</a>
+                {% if segment.archived %}<span class="mkt-chip mkt-chip-muted" style="margin-left:6px">Archived</span>{% endif %}
+                {% if segment.description %}<div class="mkt-muted" style="font-size:0.78rem">{{ segment.description|truncate(90) }}</div>{% endif %}
+            </td>
+            <td>{{ segment.rule_count }} rule{{ '' if segment.rule_count == 1 else 's' }}
+                <div class="mkt-muted" style="font-size:0.78rem">{{ segment.match_label }}</div></td>
+            <td>{% for source in segment.sources %}
+                <span class="mkt-chip {{ 'mkt-chip-ok' if source.connected else 'mkt-chip-warn' }}" style="margin:2px 3px 2px 0">{{ source.label }}</span>
+                {% endfor %}</td>
+            <td class="mkt-muted">{{ segment.refresh_label }}</td>
+            <td class="mkt-muted">{{ segment.owner or '—' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="mkt-empty">
+        <strong>No segments yet</strong>
+        A segment is a saved set of targeting rules — subscriber type, usage, churn risk, and network
+        facts such as whether an address is FTTH-serviceable.
+        {% if user.can(cfg.P_SEGMENT_EDIT) %}
+        <div style="margin-top:14px"><a class="mkt-btn mkt-btn-primary" href="{{ url_for('marketing_portal.segment_new') }}">Build the first segment</a></div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

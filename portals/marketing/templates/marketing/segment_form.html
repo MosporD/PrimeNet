@@ -1,0 +1,70 @@
+{% extends "marketing/base.html" %}
+{% block title %}{{ 'New segment' if mode == 'new' else 'Edit segment' }}{% endblock %}
+{% block page_title %}{{ 'New audience segment' if mode == 'new' else 'Edit ' + (segment.name or 'segment') }}{% endblock %}
+{% block page_sub %}
+<p class="mkt-page-sub">Rules are validated against the attribute catalog as you build them. Sizing stays unavailable until a subscriber source is connected — the definition is still saved and reusable.</p>
+{% endblock %}
+
+{% block content %}
+<form class="mkt-form" method="post">
+    <div class="mkt-card">
+        <div class="mkt-field-row">
+            <div class="mkt-field">
+                <label for="name">Segment name</label>
+                <input class="mkt-input" id="name" name="name" required value="{{ segment.name or '' }}">
+            </div>
+            <div class="mkt-field">
+                <label for="refresh">Refresh</label>
+                <select class="mkt-select" id="refresh" name="refresh">
+                    {% for key, label in refresh_modes.items() %}
+                    <option value="{{ key }}" {% if segment.refresh == key %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mkt-field">
+                <label for="owner">Owner</label>
+                <input class="mkt-input" id="owner" name="owner" value="{{ segment.owner or '' }}">
+            </div>
+        </div>
+        <div class="mkt-field">
+            <label for="description">Description</label>
+            <textarea class="mkt-textarea" id="description" name="description">{{ segment.description or '' }}</textarea>
+        </div>
+    </div>
+
+    <div class="mkt-grid mkt-grid-2">
+        <div class="mkt-card">
+            <div class="mkt-card-title">Rules</div>
+            <div class="mkt-field" style="max-width:260px;margin-bottom:12px">
+                <label for="mkt-match">Match</label>
+                <select class="mkt-select" id="mkt-match" name="match">
+                    {% for key, label in match_modes.items() %}
+                    <option value="{{ key }}" {% if segment.definition.match == key %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="mkt-rule-list"></div>
+            <input type="hidden" id="mkt-definition-json" name="definition_json">
+            <div class="mkt-form-actions" style="margin-top:12px">
+                <button class="mkt-btn" type="button" id="mkt-add-rule">Add rule</button>
+            </div>
+        </div>
+
+        <div class="mkt-card">
+            <div class="mkt-card-title">Preview</div>
+            <div id="mkt-rule-preview"><span class="mkt-muted">Add a rule to see the audience definition.</span></div>
+        </div>
+    </div>
+
+    <div class="mkt-form-actions">
+        <button class="mkt-btn mkt-btn-primary" type="submit">{{ 'Create segment' if mode == 'new' else 'Save changes' }}</button>
+        <a class="mkt-btn" href="{{ url_for('marketing_portal.segment_detail', segment_id=segment.id) if segment.id else url_for('marketing_portal.segment_list') }}">Cancel</a>
+    </div>
+</form>
+
+<script>
+    window.MKT_ATTRIBUTES = {{ attributes|tojson }};
+    window.MKT_OPERATORS = {{ operators|tojson }};
+    window.MKT_DEFINITION = {{ (segment.definition or {'match': 'all', 'rules': []})|tojson }};
+</script>
+{% endblock %}

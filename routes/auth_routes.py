@@ -271,22 +271,26 @@ def register_page():
     """Registration is disabled for internal-only deployment."""
     return redirect(url_for('auth.login_page'))
 
+# Portals that are live get their own application under portals/ and are
+# mounted in app.py. The rest render the Coming soon page.
 _PORTAL_COMING_SOON = {
-    'marketing': {
-        'id': 'marketing',
-        'name': 'Marketing Portal',
-        'blurb': 'Campaigns, outreach, and brand operations.',
-    },
     'sales': {
         'id': 'sales',
-        'name': 'Sales Portal',
-        'blurb': 'Pipeline, accounts, and commercial workflows.',
+        'name': 'NexArpu',
+        'domain': 'Sales',
+        'blurb': 'Pipeline, accounts, product ordering, and commercial workflows.',
     },
     'support': {
         'id': 'support',
-        'name': 'Customer Support Portal',
-        'blurb': 'Tickets, customer care, and service tools.',
+        'name': 'NexResolve',
+        'domain': 'Customer Support',
+        'blurb': 'Tickets, SLA tracking, customer care, and service assurance.',
     },
+}
+
+_PORTAL_LIVE = {
+    'engineering': '/dashboard',
+    'marketing': '/portals/marketing/',
 }
 
 @auth_bp.route('/portals')
@@ -308,8 +312,9 @@ def portal_enter(portal_id):
         return redirect(url_for('auth.login_page'))
 
     key = (portal_id or '').strip().lower()
-    if key == 'engineering':
-        return redirect(url_for('auth.dashboard'))
+    live = _PORTAL_LIVE.get(key)
+    if live:
+        return redirect(live)
 
     portal = _PORTAL_COMING_SOON.get(key)
     if not portal:
