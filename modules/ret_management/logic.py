@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 from typing import Any
 
@@ -28,6 +29,7 @@ from core.cm_extractor.site_catalog import (
     resolve_huawei_ne_names,
     resolve_nokia_netact_site_id,
 )
+from modules.ret_management.site_layout import normalize_sector_key
 
 HUAWEI_MO = 'RETSUBUNIT'
 # Runtime RETU_R holds live angles; writes go to config RETU via configDN.
@@ -536,6 +538,166 @@ def _ret_row_key(row: dict[str, Any]) -> str:
     return f"{_alias_lookup(row, 'Device No.')}:{_alias_lookup(row, 'Subunit No.')}"
 
 
+def _natural_sort_parts(value: Any) -> tuple:
+    """
+    Split a value into number/text chunks so ``RETU-2`` sorts before ``RETU-10``.
+
+    Keeps a total order across mixed types (all chunks compare as
+    ``(is_text, number, text)`` triples), which is what makes the RET table row
+    order reproducible between reloads.
+    """
+    text = str(value if value is not None else '').strip()
+    if not text:
+        return ((1, 0.0, ''),)
+    chunks: list[tuple[int, float, str]] = []
+    for part in re.split(r'(\d+)', text):
+        if not part:
+            continue
+        if part.isdigit():
+            chunks.append((0, float(int(part)), ''))
+        else:
+            chunks.append((1, 0.0, part.lower()))
+    return tuple(chunks) or ((1, 0.0, ''),)
+
+
+def _numeric_sort_value(value: Any) -> tuple[int, float, str]:
+    """
+    Numbers first (ascending), then text, then blanks — never raises.
+
+    NaN/inf are treated as text: a NaN in a sort key makes every comparison
+    false, which would reintroduce the unstable row order this replaces.
+    """
+    text = str(value if value is not None else '').strip()
+    if not text:
+        return (2, 0.0, '')
+    try:
+        number = float(text)
+    except ValueError:
+        return (1, 0.0, text.lower())
+    if not math.isfinite(number):
+        return (1, 0.0, text.lower())
+    return (0, number, '')
+
+
+def sort_huawei_ret_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Stable RETSUBUNIT order: Device No., then Subunit No., then subunit name.
+
+    U2020 does not guarantee report row order, and the LST/DSP merge can append
+    DSP-only rows at the end, so the table would otherwise reshuffle on reload.
+    """
+    return sorted(
+        rows or [],
+        key=lambda row: (
+            _numeric_sort_value(_alias_lookup(row, 'Device No.')),
+            _numeric_sort_value(_alias_lookup(row, 'Subunit No.')),
+            _natural_sort_parts(_alias_lookup(row, 'Subunit Name')),
+            _natural_sort_parts(row.get('NE')),
+        ),
+    )
+
+
+def sort_nokia_retu_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Stable RETU_R order: sectorID, then subunitNumber, then DN.
+
+    NetAct CM returns MO instances in query order, which varies between calls;
+    sorting here keeps the RET table identical across reloads.
+    """
+    return sorted(
+        records or [],
+        key=lambda record: (
+            _numeric_sort_value(record.get('sectorID')),
+            _numeric_sort_value(record.get('subunitNumber')),
+            _natural_sort_parts(record.get('DN') or record.get('dn')),
+            _natural_sort_parts(record.get('runtime_DN')),
+            _natural_sort_parts(record.get('$instance')),
+        ),
+    )
+
+
+# Sector hints inside a Huawei RETSUBUNIT subunit name, e.g. "SEC1", "Sector-2", "A".
+_HUAWEI_SUBUNIT_SECTOR_RE = re.compile(r'(?:SEC(?:TOR)?)[\s_\-]*([0-9]+|[A-Z])', re.IGNORECASE)
+
+
+def huawei_ret_sector_key(row: dict[str, Any]) -> str:
+    """
+    Sector a RETSUBUNIT row belongs to.
+
+    Prefers the NE-reported ``Actual Sector ID``, then a sector hint in the
+    subunit name. Returns '' when U2020 gives neither — the UI lists those rows
+    as unmapped rather than guessing a lobe for them.
+    """
+    for key, value in row.items():
+        norm = _normalize_key(str(key))
+        if 'sector' in norm and 'id' in norm:
+            sector = normalize_sector_key(value)
+            if sector:
+                return sector
+    name = _alias_lookup(row, 'Subunit Name')
+    if name:
+        match = _HUAWEI_SUBUNIT_SECTOR_RE.search(name)
+        if match:
+            return normalize_sector_key(match.group(1))
+        trimmed = name.strip()
+        if len(trimmed) == 1 and trimmed.isalpha():
+            return normalize_sector_key(trimmed)
+    return ''
+
+
+def nokia_ret_sector_key(record: dict[str, Any]) -> str:
+    """Sector a RETU_R row belongs to (``sectorID``, else the subunit number)."""
+    sector = normalize_sector_key(record.get('sectorID'))
+    if sector:
+        return sector
+    return normalize_sector_key(record.get('subunitNumber'))
+
+
+def annotate_ret_rows(rows: list[dict[str, Any]], *, vendor: str) -> list[dict[str, Any]]:
+    """
+    Attach stable per-row metadata consumed by the table and the hologram.
+
+    ``_ret_key``    identity that survives a reload (never a list index)
+    ``_ret_sector`` normalized sector key, '' when the vendor does not report one
+    ``_ret_azimuth`` RET-reported azimuth in degrees (Nokia ``antBearing``)
+    """
+    vendor = (vendor or 'nokia').strip().lower()
+    annotated: list[dict[str, Any]] = []
+    seen: dict[str, int] = {}
+    for position, row in enumerate(rows or []):
+        out = dict(row)
+        if vendor == 'huawei':
+            device = _alias_lookup(out, 'Device No.')
+            subunit = _alias_lookup(out, 'Subunit No.')
+            base = f'{device}:{subunit}' if (device or subunit) else ''
+            sector = huawei_ret_sector_key(out)
+        else:
+            base = str(
+                out.get('DN')
+                or out.get('dn')
+                or out.get('runtime_DN')
+                or out.get('$instance')
+                or ''
+            ).strip()
+            sector = nokia_ret_sector_key(out)
+            bearing = out.get('antBearing')
+            text = str(bearing if bearing is not None else '').strip()
+            if text:
+                try:
+                    out['_ret_azimuth'] = round(float(text) % 360.0, 1)
+                except ValueError:
+                    pass
+        if not base:
+            base = f'{vendor}-row-{position}'
+        count = seen.get(base, 0)
+        seen[base] = count + 1
+        out['_ret_key'] = base if count == 0 else f'{base}#{count + 1}'
+        out['_ret_sector'] = sector
+        annotated.append(out)
+    return annotated
+
+
+
 def _merge_lst_dsp_rows(
     lst_rows: list[dict[str, Any]],
     dsp_rows: list[dict[str, Any]],
@@ -730,7 +892,7 @@ def fetch_huawei_rets(
         )
         warnings.extend(detail_warnings)
 
-    rows = _merge_lst_dsp_rows(lst_rows, detail_rows)
+    rows = sort_huawei_ret_rows(_merge_lst_dsp_rows(lst_rows, detail_rows))
     if rows and _rows_missing_tilt_values(rows):
         if rows_needing:
             warnings.append(
@@ -745,7 +907,7 @@ def fetch_huawei_rets(
             )
     if not rows and lst_errors:
         raise HuaweiCmError('; '.join(lst_errors[:5]))
-    return rows, warnings
+    return annotate_ret_rows(rows, vendor='huawei'), warnings
 
 
 def build_huawei_mod_command(
@@ -1093,7 +1255,7 @@ def fetch_nokia_retu_angles(
         if write_dn:
             record['DN'] = write_dn
 
-    records = _filter_retu_records_for_site(records, site_id)
+    records = sort_nokia_retu_rows(_filter_retu_records_for_site(records, site_id))
     if raw_count and len(records) != raw_count:
         warnings.append(
             f'Scoped RETU_R query returned network-wide data; kept {len(records)} '
@@ -1104,7 +1266,7 @@ def fetch_nokia_retu_angles(
         warnings.append(
             f'No {abbreviation} instances returned for this site ({read_mo_class}).'
         )
-    return records, warnings, write_mo_class
+    return annotate_ret_rows(records, vendor='nokia'), warnings, write_mo_class
 
 
 # Backward-compatible alias during LNCEL → RETU migration.
