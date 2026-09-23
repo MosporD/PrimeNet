@@ -83,7 +83,14 @@ def main() -> int:
             checked += 1
             candidates = [os.path.join('static', filename)]
             if endpoint != 'static':
-                candidates += glob.glob(f'modules/*/static/{filename}')
+                # Blueprint-scoped asset. Ask the blueprint where its static
+                # folder actually is instead of guessing a layout: modules live
+                # under modules/, portals under portals/, and neither is a rule
+                # this check should hard-code.
+                blueprint = flask_app.blueprints.get(endpoint.rsplit('.', 1)[0])
+                folder = getattr(blueprint, 'static_folder', None)
+                if folder:
+                    candidates.append(os.path.join(folder, filename))
             if not any(os.path.exists(c) for c in candidates):
                 missing += 1
                 failures.append(f'missing static asset {filename!r} referenced by {path}')
