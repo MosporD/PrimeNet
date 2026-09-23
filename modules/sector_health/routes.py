@@ -54,10 +54,13 @@ def _sector_health_page_context(*, all_cells: bool) -> dict:
             'page_title': 'Sector Health — All Cells',
             'page_heading': '📡 Sector Health — All Cells',
             'page_subtitle': (
-                'Tech and band coverage across all configured cells, including off-air. '
-                'LTE views exclude L35.'
+                'Tech and band coverage across all configured cells. '
+                'Each layer is marked Active or Inactive. LTE views exclude L35.'
             ),
-            'scope_note': 'Includes every configured cell, whether on-air or off-air.',
+            'scope_note': (
+                'Includes every configured cell. Layer cells show Active (on-air) '
+                'or Inactive (configured but off-air).'
+            ),
             'alt_view_href': '/sector-health',
             'alt_view_label': 'Active cells only',
             'report_href': '/reports',

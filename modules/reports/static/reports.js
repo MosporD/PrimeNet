@@ -2,8 +2,8 @@ const REPORT_META = {
     site_inventory:      { icon: '🏗️', desc: 'All active sites and cells with location, azimuth, PCI, tilt, and band data.' },
     pci_conflicts:       { icon: '⚠️', desc: 'Directional PCI/PSC conflict candidates (conflict_map module): technology, distance, azimuth vs. bearing, strictness.' },
     config_versions:     { icon: '📋', desc: 'Full log of all XML configuration versions uploaded to the version history module.' },
-    sector_health:       { icon: '📡', desc: 'Per-sector matrix of on-air tech/band layers — same data as the Sector Health dashboard (active cells only).' },
-    sector_health_all:   { icon: '📋', desc: 'Per-sector matrix of all configured tech/band layers, including inactive/off-air cells — same data as Sector Health — All Cells.' },
+    sector_health:       { icon: '📡', desc: 'Per-sector FDD layer matrix (L18/L18+/L9/L21). Vendor: Thin / TDD Thin / TDD+Nokia mix labels.' },
+    sector_health_all:   { icon: '📋', desc: 'All configured layers with Active/Inactive; Vendor: Huawei/Nokia Thin, Huawei TDD/Nokia Thin, or Huawei TDD/Nokia.' },
 };
 
 const REPORT_TYPE_LABELS = {

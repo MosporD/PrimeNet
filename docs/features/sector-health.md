@@ -7,11 +7,15 @@ Per-sector rollups. Two pages, one blueprint.
 | Routes | `/sector-health`, `/sector-health-all` |
 | Module | `modules/sector_health/` |
 | Access | all |
-| Version | V1.3 |
+| Version | V1.5 |
 
 ## Purpose
 
 Monitored sectors vs all configured cells. Coverage = metadata (active vs all), **not** Sleeping Cells PM.
+All-cells Excel marks each layer **Active** / **Inactive**. Vendor column uses mix labels:
+**Huawei / Nokia Thin** (FDD split, no Huawei TDD), **Huawei TDD / Nokia Thin** (FDD split + Huawei TDD),
+and **Huawei TDD / Nokia** (Huawei L35 + Nokia, FDD not split).
+FDD completeness remains the four layers L18 / L18+ / L9 / L21.
 
 ## Approach
 

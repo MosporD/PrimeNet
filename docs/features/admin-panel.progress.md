@@ -4,11 +4,15 @@ Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+## 2026-09-23 (No Platform Admin chrome)
+
+- Done: Dropped Platform Admin header link; use NexusCore portals topbar Admin only.
+
 ## 2026-09-23 (Ops-only Engineering Admin)
 
 - Done: Removed User Administration and Feature Access from PrimeNet Admin (moved to NexusCore Platform Admin).
 - Done: Owner-only Engineering Admin; Ops Alerts tab keeps RET/CM accountability panels.
-- Done: Nav/dashboard → Eng Admin (`?section=data-sync`); Platform Admin link to NexusCore.
+- Done: Nav/dashboard → Eng Admin (`?section=data-sync`).
 - NEXT: None parked.
 
 ## 2026-09-20 (Portal allow-list on users)

@@ -4,6 +4,10 @@ Detailed dated log for this blueprint. Brief: [`_platform.md`](_platform.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-23 (No per-module Admin chrome)
+
+- Done: Stopped `common.js` from injecting Admin into every module header; Platform Admin entry remains portals topbar only.
+
 ## 2026-09-23 (Reverse proxy + Platform Admin)
 
 - Done: Docker `proxy` (nginx hostname routing, one public port); process ports internal only.

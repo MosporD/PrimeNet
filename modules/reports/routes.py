@@ -396,6 +396,8 @@ def _generate_sector_health_excel(*, active_only: bool = True):
     hdr_font = Font(color='FFFFFF', bold=True, size=10)
     yes_fill = PatternFill(start_color='27AE60', end_color='27AE60', fill_type='solid')
     yes_font = Font(color='FFFFFF', bold=True, size=10)
+    inactive_fill = PatternFill(start_color='E67E22', end_color='E67E22', fill_type='solid')
+    inactive_font = Font(color='FFFFFF', bold=True, size=10)
     no_fill  = PatternFill(start_color='F2F3F4', end_color='F2F3F4', fill_type='solid')
     no_font  = Font(color='BDC3C7', size=10)
     warn_fill = PatternFill(start_color='FADBD8', end_color='FADBD8', fill_type='solid')
@@ -423,7 +425,8 @@ def _generate_sector_health_excel(*, active_only: bool = True):
     for row_idx, sec in enumerate(sector_list, 2):
         ws.cell(row=row_idx, column=1, value=sec['site_id']).border = thin_border
         ws.cell(row=row_idx, column=2, value=sec['site_name']).border = thin_border
-        ws.cell(row=row_idx, column=3, value=' / '.join(sorted(sec['vendors']))).border = thin_border
+        vendor_label = sec.get('vendor_label') or ' / '.join(sorted(sec.get('vendors') or []))
+        ws.cell(row=row_idx, column=3, value=vendor_label).border = thin_border
         ws.cell(row=row_idx, column=4, value=sec['area']).border = thin_border
         ws.cell(row=row_idx, column=5, value=sec['sector']).border = thin_border
 
@@ -451,14 +454,25 @@ def _generate_sector_health_excel(*, active_only: bool = True):
             cell = ws.cell(row=row_idx, column=band_col_start + tb_idx)
             cell.alignment = Alignment(horizontal='center')
             cell.border = thin_border
-            if tb in sec['tech_bands']:
-                cell.value = 'Yes'
-                cell.fill = yes_fill
-                cell.font = yes_font
-            else:
+            if tb not in sec['tech_bands']:
                 cell.value = '—'
                 cell.fill = no_fill
                 cell.font = no_font
+                continue
+            if active_only:
+                cell.value = 'Yes'
+                cell.fill = yes_fill
+                cell.font = yes_font
+                continue
+            layer_status = (sec.get('tech_band_status') or {}).get(tb, 'Inactive')
+            if layer_status == 'Active':
+                cell.value = 'Active'
+                cell.fill = yes_fill
+                cell.font = yes_font
+            else:
+                cell.value = 'Inactive'
+                cell.fill = inactive_fill
+                cell.font = inactive_font
 
     for col in ws.columns:
         max_len = max((len(str(c.value)) if c.value else 0) for c in col)
@@ -469,8 +483,11 @@ def _generate_sector_health_excel(*, active_only: bool = True):
     summary = wb.create_sheet('Summary')
     summary_hdr_fill = PatternFill(start_color='1A5276', end_color='1A5276', fill_type='solid')
     summary_hdr_font = Font(color='FFFFFF', bold=True)
-    sector_col_label = 'Active Sectors' if active_only else 'Sectors'
-    for ci, h in enumerate(['Tech / Band', sector_col_label, 'Total Sites'], 1):
+    if active_only:
+        summary_headers = ['Tech / Band', 'Active Sectors', 'Total Sites']
+    else:
+        summary_headers = ['Tech / Band', 'Sectors', 'Active', 'Inactive', 'Total Sites']
+    for ci, h in enumerate(summary_headers, 1):
         cell = summary.cell(row=1, column=ci, value=h)
         cell.fill = summary_hdr_fill
         cell.font = summary_hdr_font
@@ -480,8 +497,19 @@ def _generate_sector_health_excel(*, active_only: bool = True):
         sector_count = sum(1 for s in sector_list if tb in s['tech_bands'])
         site_ids = set(s['site_id'] for s in sector_list if tb in s['tech_bands'])
         summary.cell(row=ri, column=1, value=tb)
-        summary.cell(row=ri, column=2, value=sector_count)
-        summary.cell(row=ri, column=3, value=len(site_ids))
+        if active_only:
+            summary.cell(row=ri, column=2, value=sector_count)
+            summary.cell(row=ri, column=3, value=len(site_ids))
+        else:
+            active_count = sum(
+                1 for s in sector_list
+                if (s.get('tech_band_status') or {}).get(tb) == 'Active'
+            )
+            inactive_count = max(0, sector_count - active_count)
+            summary.cell(row=ri, column=2, value=sector_count)
+            summary.cell(row=ri, column=3, value=active_count)
+            summary.cell(row=ri, column=4, value=inactive_count)
+            summary.cell(row=ri, column=5, value=len(site_ids))
 
     for col in summary.columns:
         max_len = max((len(str(c.value)) if c.value else 0) for c in col)

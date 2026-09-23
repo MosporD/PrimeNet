@@ -41,7 +41,6 @@ def _env_true(key: str, default: bool = False) -> bool:
 
 def _prepare_suite_env(public_port: int) -> None:
     """Same-origin env — identical idea to Docker compose + nginx."""
-    os.environ.setdefault("NCM_DISABLE_LIVE_LOGGER_TERMINAL", "1")
     os.environ.setdefault("NCM_DISABLE_AUTO_BROWSER", "1")
     os.environ.setdefault("NCM_SHARED_ACTIVATION", "1")
     os.environ["NEXUS_PUBLIC_URL_FROM_REQUEST"] = "1"

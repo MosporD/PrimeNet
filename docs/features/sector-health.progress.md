@@ -4,6 +4,12 @@ Detailed dated log for this blueprint. Brief: [`sector-health.md`](sector-health
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-23
+
+- Done: Vendor column labels — **Huawei / Nokia Thin** (FDD split), **Huawei TDD / Nokia Thin** (FDD split + Huawei TDD), **Huawei TDD / Nokia** (TDD + Nokia, FDD not split). FDD completeness still L18/L18+/L9/L21.
+- Done: All-cells Sector Health Excel marks each tech/band layer Active (green) or Inactive (orange); Summary splits Active/Inactive counts. Same vendor activity rules as the map (`active_state` / `admin_state`).
+- **NEXT:** Regenerate Sector Health Excel and spot-check Thin vs TDD/Nokia samples.
+
 ## From brief History (migrated 2026-09-17)
 
 - 2026-09-08: Stopped excluding Nokia `2G / GSM 900` (and sparse DCS labels) from the coverage matrix — that zeroed Nokia 2G sector counts. Normalize to `2G / GSM900`. Version V1.3.

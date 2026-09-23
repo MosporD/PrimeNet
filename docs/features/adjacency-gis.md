@@ -1,24 +1,23 @@
 # Adjacency GIS
 
-2G configured NCL GIS auditor — Nokia ADCE + Huawei G2GNCELL.
+2G Network Map fork — sites/sectors from `metadata.db` until CM NCL pipeline is primary.
 
 | | |
 |---|---|
 | Route | `/adjacency-gis` |
 | Module | `modules/adjacency_gis/` |
 | Access | all |
-| Version | V1.1 |
+| Version | V1.2 |
 
 ## Purpose
 
-Visually audit GSM neighbor cell lists from **configuration** (not HO PM). Catch unidirectional links, NCL overflow (>32), long overshoot neighbors, and co-channel clashes.
+Geographic 2G picture (same UX as Network Map) for adjacency / NCL work. Geometry today comes from `metadata.db` `cells_2g`. Configured NCL audits (Nokia ADCE / Huawei G2GNCELL) stay behind Admin ingest until that pipeline is ready to overlay.
 
 ## Approach
 
-- Per-vendor snapshot store + scheduled CM ingest (Nokia NetAct Open API; Huawei U2020 MML).
-- Geometry from `metadata.db` `cells_2g` (lat/long/azimuth) joined by cell name / CI.
-- Nokia: `channel0Type == 4` → BCCH; `initialFrequency`; skip locked `adminState`; edges from **ADCE**.
-- Huawei: `LST GTRX` (`Is Main BCCH TRX` + Frequency + admin/active); `LST GCELL` for names; edges from **G2GNCELL**.
+- UI: copy of Network Map (Leaflet, left filter panel, wedges, search, polygon export) locked to **2G**.
+- Data: Network Map `/api/map/*` against `connect_metadata()`; client forces `tech=2G`.
+- CM snapshot store + ingest (`store.py`, `ingest_job.py`, Admin buttons) retained for future NCL edges — not required to open the map.
 - Separate from Neighbor Analysis (`/neighbor-analysis` HO lines).
 
 ## Progress
@@ -31,4 +30,4 @@ None parked.
 
 ## Watch-outs
 
-NetAct Open API can return empty GSM trees on some BSCs. Huawei BSC NE names must resolve via discovery/metadata. Do not fold into Network Map / Neighbor Analysis without an explicit ask.
+Do not fold into Network Map without an explicit ask. When CM pipeline lands, overlay edges on this UI rather than reverting to the old custom filter panel.

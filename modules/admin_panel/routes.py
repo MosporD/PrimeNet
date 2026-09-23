@@ -140,7 +140,6 @@ def admin_panel_page():
         role_labels=ROLE_LABELS,
         can_manage_sync=True,
         can_manage_access=False,
-        platform_admin_url=platform_admin_entry_url(),
     )
 
 

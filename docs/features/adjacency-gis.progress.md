@@ -2,11 +2,17 @@
 
 ## Current track
 
-Nokia + Huawei scheduled CM snapshots + Leaflet map audits.
+2G Network Map UI fork on `metadata.db` (looks / filters first). CM NCL overlay later.
 
 ## NEXT
 
-Admin → Data Sync → run Nokia / Huawei adjacency ingest against live CM; verify both vendors on `/adjacency-gis`; spot-check dark toggle on filter panel.
+Confirm 2G map look on `/adjacency-gis` (sites, wedges, BCCH band filter). When CM pipeline is ready, overlay ADCE / G2GNCELL edges on this shell.
+
+## 2026-09-23 (UI fork from Network Map)
+
+- Replaced custom snapshot map UI with Network Map copy (template / CSS / JS).
+- Locked to 2G from `metadata.db` via `/api/map/*`; auto-loads on open.
+- Dropped repeaters from this page; CM ingest APIs kept for Admin / future NCL.
 
 ## 2026-09-20 (Dark mode)
 

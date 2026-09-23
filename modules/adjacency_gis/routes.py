@@ -1,4 +1,10 @@
-"""Adjacency GIS UI and APIs — 2G configured NCL map (Nokia ADCE + Huawei G2GNCELL)."""
+"""Adjacency GIS — 2G map UI (Network Map fork) + optional CM snapshot APIs.
+
+UI page loads sites/sectors from metadata.db via Network Map ``/api/map/*``
+endpoints with tech locked to 2G in the client. CM snapshot ingest (Nokia ADCE /
+Huawei G2GNCELL) remains available for Admin until that pipeline is the primary
+data source.
+"""
 
 from __future__ import annotations
 
@@ -78,16 +84,12 @@ def _is_owner(user) -> bool:
 @adjacency_gis_bp.route('/adjacency-gis')
 @login_required
 def adjacency_gis_page():
+    """2G Network Map–style UI; geometry from metadata.db (cells_2g)."""
     user = format_user_data(get_current_user())
-    meta = adj_store.get_build_meta()
-    return render_template(
-        'adjacency_gis.html',
-        user=user,
-        nokia_ready=nokia_configured(),
-        huawei_ready=huawei_configured(),
-        snapshot_ready=bool(meta and int(meta.get('sector_count') or 0) > 0),
-        build_meta=meta,
-    )
+    return render_template('adjacency_gis.html', user=user)
+
+
+# ── CM snapshot APIs (Admin / future NCL overlay) ─────────────────────────────
 
 
 @adjacency_gis_bp.route('/api/adjacency-gis/status')
@@ -100,6 +102,7 @@ def adjacency_gis_status():
         'success': True,
         'nokia_ready': nokia_configured(),
         'huawei_ready': huawei_configured(),
+        'ui_mode': 'metadata_2g_map',
         'snapshot': meta,
         'nokia': adj_store.get_build_meta('nokia'),
         'huawei': adj_store.get_build_meta('huawei'),
@@ -121,8 +124,8 @@ def adjacency_gis_data():
         return jsonify({
             'success': False,
             'error': (
-                'No Adjacency GIS snapshot yet. '
-                'Wait for the daily ingest or trigger a refresh from Admin → Data Sync.'
+                'No Adjacency GIS CM snapshot yet. '
+                'The map UI uses metadata.db (2G). Snapshot ingest remains for NCL audits.'
             ),
             'snapshot': meta,
         }), 404
@@ -182,7 +185,7 @@ def adjacency_gis_data():
 @adjacency_gis_bp.route('/api/adjacency-gis/refresh', methods=['POST'])
 @login_required
 def adjacency_gis_refresh():
-    """Manual snapshot rebuild (owner/admin). Body/query: vendor=nokia|huawei|all."""
+    """Manual CM snapshot rebuild (owner/admin). Body/query: vendor=nokia|huawei|all."""
     user = get_current_user()
     if not _is_owner(user):
         return jsonify({'error': 'Owner access required'}), 403
@@ -197,27 +200,20 @@ def adjacency_gis_refresh():
 
     if vendor in ('nokia', 'all', '*') and not nokia_configured():
         if vendor == 'nokia':
-            return jsonify({'success': False, 'error': 'Nokia NetAct CM is not configured.'}), 400
+            return jsonify({'success': False, 'error': 'Nokia CM is not configured'}), 400
     if vendor in ('huawei', 'all', '*') and not huawei_configured():
         if vendor == 'huawei':
-            return jsonify({'success': False, 'error': 'Huawei U2020 CM is not configured.'}), 400
+            return jsonify({'success': False, 'error': 'Huawei CM is not configured'}), 400
 
-    def _run():
-        from modules.adjacency_gis.ingest_job import run_adjacency_gis_ingest
+    from modules.adjacency_gis.ingest_job import run_adjacency_gis_ingest
 
-        run_adjacency_gis_ingest(trigger_source='manual', vendor=vendor)
-
-    threading.Thread(target=_run, daemon=True).start()
+    threading.Thread(
+        target=run_adjacency_gis_ingest,
+        kwargs={'trigger_source': 'manual', 'vendor': vendor},
+        daemon=True,
+    ).start()
     try:
-        log_activity(
-            _username(user),
-            'adjacency_gis_manual_run',
-            f'Manual Adjacency GIS ingest triggered vendor={vendor}',
-        )
+        log_activity(_username(user), 'adjacency_gis_refresh', f'vendor={vendor}')
     except Exception:
         pass
-    return jsonify({
-        'success': True,
-        'vendor': vendor,
-        'message': f'Adjacency GIS ingest started in background ({vendor}).',
-    })
+    return jsonify({'success': True, 'started': True, 'vendor': vendor})

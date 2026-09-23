@@ -6,7 +6,20 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Admin → Data Sync → Configuration Dashboard ingest; open `/configuration-dashboard` Hardware + WNCELG tabs; spot-check dark toggle there + Adjacency GIS.
+**NEXT:** Open `/adjacency-gis` and confirm 2G Network Map UI look (metadata sites/wedges).
+
+## 2026-09-23 (Sector Health All Cells — layer activity)
+
+- All Cells Excel marks each tech/band Active vs Inactive (same metadata activity rules as the map).
+- Vendor labels: Huawei / Nokia Thin, Huawei TDD / Nokia Thin, Huawei TDD / Nokia.
+
+## 2026-09-23 (Adjacency GIS — Network Map fork)
+
+- Replaced weird custom map with Network Map copy, 2G-only from `metadata.db`.
+
+## 2026-09-23 (Platform Admin entry)
+
+- Platform Admin only from NexusCore portals topbar; removed from PrimeNet dashboard / Eng Admin and stopped common.js per-module Admin inject.
 
 ## 2026-09-23 (Reverse proxy + Platform Admin)
 

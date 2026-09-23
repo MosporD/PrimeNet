@@ -587,23 +587,6 @@ function _ensureHeaderNavCluster() {
     }
 }
 
-function _injectModuleAdminLink(actions) {
-    if (!actions || actions.querySelector('[data-nav="admin"]')) return;
-    const role = String(sessionStorage.getItem(NAV_ROLE_STORAGE_KEY) || '').toLowerCase();
-    if (!['admin', 'noc_sys'].includes(role)) return;
-    const admin = document.createElement('a');
-    admin.href = '/admin-panel?section=user-admin';
-    admin.className = 'btn-header btn-header-admin';
-    admin.dataset.nav = 'admin';
-    admin.textContent = 'Admin';
-    const settings = actions.querySelector('[data-nav="settings"]');
-    if (settings && settings.nextSibling) {
-        actions.insertBefore(admin, settings.nextSibling);
-    } else {
-        actions.appendChild(admin);
-    }
-}
-
 function _ensureModuleHeaderActions() {
     if (_isDashboardPage() || _isPublicAuthPage() || _isPortalPage()) return;
     const headerRight = document.querySelector('header .header-right');
@@ -618,8 +601,6 @@ function _ensureModuleHeaderActions() {
     settings.dataset.nav = 'settings';
     settings.textContent = 'Settings';
     actions.appendChild(settings);
-
-    _injectModuleAdminLink(actions);
 
     const logoutBtn = headerRight.querySelector('.btn-logout');
     if (logoutBtn) {
@@ -649,10 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
     _mountConstellationBackground();
     _showPostLoginIntro();
     if (!_isPublicAuthPage()) {
-        _loadFeatureNavSections().then(() => {
-            const actions = document.querySelector('header .module-header-actions');
-            if (actions) _injectModuleAdminLink(actions);
-        });
+        _loadFeatureNavSections();
     }
 });
 

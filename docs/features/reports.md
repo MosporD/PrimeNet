@@ -7,7 +7,7 @@ Report builder / archive.
 | Route | `/reports` |
 | Module | `modules/reports/` (`routes.py`, `metadata_helpers.py`, `sector_coverage_data.py`) |
 | Access | all |
-| Version | V1.1 |
+| Version | V1.3 |
 
 ## Purpose
 

@@ -3,92 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adjacency GIS - PrimeNet</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.8">
+    <title>PrimeNet - Adjacency GIS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('adjacency_gis.static', filename='adjacency_gis.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ url_for('adjacency_gis.static', filename='adjacency_gis.css') }}?v=2.0">
 </head>
-<body class="adjacency-gis-page">
-<div class="container">
-    <header>
-        <div class="header-content">
-            <div class="header-left">
-                <a href="/dashboard" class="back-link">Dashboard</a>
-                <h1>Adjacency GIS</h1>
-                <p>2G configured NCL audit — sectors, ADCE lines, uni/bi, overshoot, co-channel.</p>
+<body class="map-page adjacency-gis-page">
+    <header class="map-header">
+        <div class="header-left">
+            <button onclick="window.location.href='/dashboard'" class="btn-dashboard">Dashboard</button>
+        </div>
+        <div class="header-center">
+            <h1>Adjacency GIS</h1>
+            <p class="header-subtitle">2G sites &amp; sectors from metadata</p>
+        </div>
+        <div class="header-right" aria-label="Sites on map and user">
+            <div class="header-sites-stat">
+                <span class="header-sites-value" id="sites-count">0</span>
+                <span class="header-sites-label">2G Sites</span>
             </div>
-            <div class="header-right">
-                <span class="user-name">{{ user.username }}</span>
-                <button onclick="logout()" class="btn-logout">Logout</button>
-            </div>
+            <span class="user-name">{{ user.username }}</span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
         </div>
     </header>
 
-    <main class="main-content">
-        <section class="section adjacency-gis-section">
-            <div id="adj-filter-panel" class="adj-filter-panel">
-                <div class="adj-filter-panel-head">
-                    <strong>Adjacency Filters</strong>
-                    <button class="btn-secondary small-btn" type="button" id="adj-panel-toggle">Collapse</button>
+    <div class="map-body">
+        <div class="left-panel-shell" id="left-panel-shell">
+            <button type="button" class="left-panel-tab" id="left-panel-tab"
+                    onclick="toggleMapLeftPanel()" aria-expanded="true" aria-controls="left-panel-drawer"
+                    title="Hide filters panel">
+                <span class="left-panel-tab-icon" aria-hidden="true">‹</span>
+            </button>
+            <div class="left-panel-drawer" id="left-panel-drawer">
+        <div class="left-panel">
+            <div id="tech-filter" class="tech-filter"></div>
+            <div class="map-controls">
+                <input type="text" id="site-search" placeholder="Search sites..." onkeyup="searchSites()">
+                <div class="coord-search-row">
+                    <input type="number" id="coord-lat" placeholder="Lat" step="0.000001">
+                    <input type="number" id="coord-lng" placeholder="Lng" step="0.000001">
+                    <button class="coord-go-btn" onclick="goToCoordinates()" title="Go to coordinates">Go</button>
+                    <button class="coord-go-btn coord-nearest-btn"
+                            onclick="showNearestSitesFromCoordinates()"
+                            title="Show nearest sites to coordinates">
+                        Nearest
+                    </button>
                 </div>
-                <div id="adj-filter-panel-body" class="filter-row">
-                    <label for="adj-vendor">Vendor</label>
-                    <select id="adj-vendor">
-                        <option value="all" selected>All vendors</option>
-                        <option value="nokia">Nokia</option>
-                        <option value="huawei">Huawei</option>
-                    </select>
-                    <label for="adj-bsc">BSC</label>
-                    <select id="adj-bsc">
-                        <option value="all" selected>All BSCs</option>
-                    </select>
-                    <label for="adj-area">Area</label>
-                    <select id="adj-area">
-                        <option value="all" selected>All Areas</option>
-                    </select>
-                    <label for="adj-issue">Issue</label>
-                    <select id="adj-issue">
-                        <option value="all" selected>All links</option>
-                        <option value="unidirectional">Unidirectional</option>
-                        <option value="overshoot">Overshoot</option>
-                        <option value="ncl_overflow">NCL &gt; 32</option>
-                        <option value="co_channel">Co-channel</option>
-                        <option value="ok">OK only</option>
-                    </select>
-                    <label for="adj-overshoot">Overshoot km</label>
-                    <input id="adj-overshoot" type="number" min="1" max="80" step="1" value="15">
-                    <button class="btn-secondary small-btn" type="button" id="adj-query">Query</button>
-                    <button class="btn-secondary small-btn" type="button" id="adj-refresh" title="Owner only — rebuild CM snapshot">Refresh Snapshot</button>
+                <div class="code-search-row">
+                    <input type="number" id="cell-code-search" placeholder="BCCH..."
+                           min="0" oninput="cellCodeSearch()">
+                    <button class="clear-code-btn" onclick="clearCodeSearch()" title="Clear code search">✕</button>
                 </div>
-                <div id="adj-legend" class="adj-legend">
-                    <span><i class="swatch ok"></i> Bidirectional</span>
-                    <span><i class="swatch uni"></i> Unidirectional</span>
-                    <span><i class="swatch over"></i> Overshoot / NCL&gt;32</span>
-                    <span><i class="swatch coch"></i> Co-channel</span>
+                <select id="vendor-filter" onchange="filterByVendor()"
+                        title="Filter sites by vendor">
+                    <option value="all">All Vendors</option>
+                    <option value="Nokia">Nokia</option>
+                    <option value="Huawei">Huawei</option>
+                </select>
+                <select id="area-filter" onchange="filterByArea()">
+                    <option value="all">All Areas</option>
+                </select>
+                <select id="cluster-filter" onchange="filterByCluster()">
+                    <option value="all">All Clusters</option>
+                </select>
+                <select id="tech-specific-filter" onchange="filterByTechSpecific()" style="display:none;">
+                    <option value="all">All</option>
+                </select>
+                <button id="refresh-btn" class="refresh-btn" onclick="refreshMetadata()"
+                        title="Pull latest metadata from server">
+                    ↻ Refresh Data
+                </button>
+                <button id="measure-btn" class="measure-btn" onclick="toggleMeasure()"
+                        title="Click points on the map to measure distance">
+                    📏 Measure Distance
+                </button>
+                <div class="polygon-tool-row">
+                    <button id="polygon-draw-btn" class="polygon-draw-btn" onclick="togglePolygonDraw()"
+                            title="Draw a polygon on the map, then click it to extract sites/cells inside">
+                        ⬠ Draw Polygon
+                    </button>
+                    <select id="polygon-layer-select" class="polygon-layer-select"
+                            title="Layer to extract when clicking the polygon">
+                        <option value="sites">Sites</option>
+                        <option value="cells">Cells</option>
+                    </select>
+                    <button id="polygon-clear-btn" class="polygon-clear-btn" onclick="clearSelectionPolygon()"
+                            title="Remove drawn polygon" style="display:none;">
+                        ✕
+                    </button>
+                    <button id="polygon-extract-btn" class="polygon-extract-btn" onclick="extractFromCurrentPolygon()"
+                            title="Download Excel of sites/cells inside the drawn polygon"
+                            style="display:none;">
+                        Export Excel
+                    </button>
+                    <button id="polygon-selection-btn" class="polygon-extract-btn" onclick="sendPolygonToSelection()"
+                            title="Send cells/sites inside the polygon to shared selection"
+                            style="display:none;">
+                        Use as selection
+                    </button>
                 </div>
+                <button class="export-excel-btn" onclick="exportCurrentView('excel')"
+                        title="Export current filter / search result to Excel">
+                    ⬇ Export Excel
+                </button>
+                <button class="export-kml-btn" onclick="exportCurrentView('kml')"
+                        title="Export current filter / search result to KML for Google Earth">
+                    🌐 Export KML
+                </button>
             </div>
-            <div id="adj-map-stats" class="adj-map-stats">
-                {% if snapshot_ready %}
-                    Snapshot {{ build_meta.built_at or '' }} — select filters and click Query.
-                {% else %}
-                    No snapshot yet. Daily ingest or Admin refresh required.
-                {% endif %}
-            </div>
-            <div id="adjacency-map"></div>
-        </section>
-    </main>
-</div>
 
-<script src="{{ url_for('static', filename='js/common.js') }}?v=2.8"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{ url_for('adjacency_gis.static', filename='adjacency_gis.js') }}?v=1.0"></script>
-<script>
-async function logout() {
-    if (confirm('Logout?')) {
-        await fetch('/api/logout', { method: 'POST' });
-        window.location.href = '/login';
-    }
-}
-</script>
+            <div id="saved-views-mount" class="saved-views-mount"></div>
+
+            <div id="site-info-panel" style="display: none;"></div>
+        </div>
+            </div>
+        </div>
+
+        <div id="network-map"></div>
+    </div>
+
+    <div id="kpi-modal">
+        <div id="kpi-content">
+            <span class="close-modal" onclick="closeKPIModal()">&times;</span>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
+    <script src="{{ url_for('static', filename='js/selection_context.js') }}?v=1.0"></script>
+    <script src="{{ url_for('static', filename='js/saved_views.js') }}?v=1.0"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('adjacency_gis.static', filename='adjacency_gis.js') }}?v=2.0"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMap();
+            if (window.PrimeNetSavedViews && typeof getNetworkMapState === 'function'
+                && typeof applyNetworkMapState === 'function') {
+                window.PrimeNetSavedViews.attach({
+                    module: 'adjacency_gis',
+                    mountSelector: '#saved-views-mount',
+                    getState: getNetworkMapState,
+                    applyState: applyNetworkMapState,
+                });
+            }
+        });
+    </script>
 </body>
 </html>

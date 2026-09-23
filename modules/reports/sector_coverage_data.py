@@ -7,7 +7,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from db.runtime import connect_metadata, execute_query
-from modules.sync.metadata_active_sql import PER_TABLE_ACTIVE_WHERE
+from modules.sync.metadata_active_sql import (
+    LEGACY_CELLS_ACTIVITY_CASE_SQL,
+    PER_TABLE_ACTIVE_WHERE,
+)
 from .metadata_helpers import (
     _metadata_table_columns,
     _pick_col,
@@ -56,6 +59,75 @@ _LTE_LAYER_CATEGORY_BANDS: dict[str, frozenset[str]] = {
     'L9': frozenset({'L9'}),
     'L21': frozenset({'L21'}),
 }
+
+VENDOR_LABEL_THIN = 'Huawei / Nokia Thin'
+VENDOR_LABEL_TDD_THIN = 'Huawei TDD / Nokia Thin'
+VENDOR_LABEL_TDD_NOKIA = 'Huawei TDD / Nokia'
+THIN_LAYER_LABELS = frozenset({VENDOR_LABEL_THIN, VENDOR_LABEL_TDD_THIN})
+
+
+def _normalize_vendor_name(raw) -> str:
+    v = str(raw or '').strip()
+    low = v.lower()
+    if low == 'huawei':
+        return 'Huawei'
+    if low == 'nokia':
+        return 'Nokia'
+    return v
+
+
+def classify_sector_vendor_label(
+    tech_band_vendors: dict[str, set[str]] | None,
+    all_vendors: set[str] | list[str] | None = None,
+) -> str:
+    """
+    Sector Vendor column label.
+
+    - Huawei TDD / Nokia Thin: FDD split across vendors AND Huawei TDD present.
+    - Huawei / Nokia Thin: FDD cells on the same sector span both vendors
+      (typical: L18+ Nokia, L18/L9/L21 Huawei), no Huawei TDD.
+    - Huawei TDD / Nokia: Huawei TDD present with Nokia, and FDD is not split.
+    - Otherwise: sorted unique vendors joined with ' / '.
+    """
+    tb_vendors = tech_band_vendors or {}
+    fdd_vendors: set[str] = set()
+    has_huawei_tdd = False
+    has_nokia = False
+    for tb, vendors in tb_vendors.items():
+        norm = {_normalize_vendor_name(v) for v in (vendors or ()) if str(v or '').strip()}
+        if 'Nokia' in norm:
+            has_nokia = True
+        tech = _tech_of(tb)
+        if tech == '4G-FDD':
+            fdd_vendors |= norm
+        elif tech == '4G-TDD' and 'Huawei' in norm:
+            has_huawei_tdd = True
+
+    fdd_thin = 'Huawei' in fdd_vendors and 'Nokia' in fdd_vendors
+    if fdd_thin and has_huawei_tdd:
+        return VENDOR_LABEL_TDD_THIN
+    if fdd_thin:
+        return VENDOR_LABEL_THIN
+    if has_huawei_tdd and has_nokia:
+        return VENDOR_LABEL_TDD_NOKIA
+
+    names = {
+        _normalize_vendor_name(v)
+        for v in (all_vendors or ())
+        if str(v or '').strip()
+    }
+    if not names:
+        for vendors in tb_vendors.values():
+            for v in vendors or ():
+                if str(v or '').strip():
+                    names.add(_normalize_vendor_name(v))
+    return ' / '.join(sorted(names))
+
+
+def is_thin_layer_sector(tech_band_vendors: dict[str, set[str]] | None) -> bool:
+    """True when FDD layers on the sector are split across Huawei and Nokia."""
+    return classify_sector_vendor_label(tech_band_vendors) in THIN_LAYER_LABELS
+
 
 
 def _meta_conn():
@@ -172,16 +244,17 @@ def compute_health_summary(sectors: list[dict], lte_bands: list[str]) -> dict:
 def load_sector_coverage_rows(conn=None, *, active_only: bool = True) -> tuple[list[dict], list[str]]:
     """
     Returns (sector_list, sorted_tech_bands).
-    Each sector dict: site_id, site_name, vendors (set), area, sector, tech_bands (set).
+    Each sector dict: site_id, site_name, vendors (set), vendor_label, area, sector,
+    tech_bands (set), tech_band_status, tech_band_vendors, is_thin_layer.
 
     When active_only is True (default), only on-air cells per PER_TABLE_ACTIVE_WHERE are included.
-    When False, every configured cell row is included regardless of activity status.
+    When False, every configured cell row is included; tech_band_status marks on-air vs off-air.
     """
     if conn is None:
         from core.radio.section_runner import cached_build
 
         return cached_build(
-            f"sector.rows|{int(bool(active_only))}",
+            f"sector.rows|v4|{int(bool(active_only))}",
             lambda: _load_sector_coverage_rows_uncached(active_only=active_only),
             copy=_clone_sector_bundle,
         )
@@ -195,17 +268,35 @@ def _clone_sector_bundle(payload: tuple[list[dict], list[str]]) -> tuple[list[di
         item = dict(sector)
         item["vendors"] = set(sector.get("vendors") or [])
         item["tech_bands"] = set(sector.get("tech_bands") or [])
+        item["tech_band_status"] = dict(sector.get("tech_band_status") or {})
+        item["tech_band_vendors"] = {
+            tb: set(vs or [])
+            for tb, vs in (sector.get("tech_band_vendors") or {}).items()
+        }
         out.append(item)
     return out, list(bands)
+
+
+def _normalize_activity_status(raw) -> str:
+    status = str(raw or '').strip()
+    return 'Active' if status == 'Active' else 'Inactive'
+
+
+def _merge_layer_status(prev: str | None, new: str) -> str:
+    """If any cell on the layer is on-air, the sector layer counts as Active."""
+    if prev == 'Active' or new == 'Active':
+        return 'Active'
+    return 'Inactive'
 
 
 def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) -> tuple[list[dict], list[str]]:
     """
     Returns (sector_list, sorted_tech_bands).
-    Each sector dict: site_id, site_name, vendors (set), area, sector, tech_bands (set).
+    Each sector dict: site_id, site_name, vendors (set), vendor_label, area, sector,
+    tech_bands (set), tech_band_status, tech_band_vendors, is_thin_layer.
 
     When active_only is True (default), only on-air cells per PER_TABLE_ACTIVE_WHERE are included.
-    When False, every configured cell row is included regardless of activity status.
+    When False, every configured cell row is included; tech_band_status marks on-air vs off-air.
     """
     close_conn = False
     if conn is None:
@@ -235,6 +326,12 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
             active_where = (
                 PER_TABLE_ACTIVE_WHERE.get(table, '1=1') if active_only else '1=1'
             )
+            activity_case = LEGACY_CELLS_ACTIVITY_CASE_SQL.get(table)
+            activity_select = (
+                f"({activity_case}) AS activity_status"
+                if activity_case
+                else "'Active' AS activity_status"
+            )
 
             sql = f"""
                 SELECT
@@ -246,7 +343,8 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
                     {_sql_ident(sec_col) if sec_col else 'NULL'} AS sector,
                     {_sql_ident(az_col) if az_col else 'NULL'} AS azimuth,
                     '{tech}' AS technology,
-                    {_sql_ident(b_col) if b_col else 'NULL'} AS frequency_band
+                    {_sql_ident(b_col) if b_col else 'NULL'} AS frequency_band,
+                    {activity_select}
                 FROM {_sql_ident(table)}
                 WHERE {active_where}
             """
@@ -258,6 +356,7 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
                 if not band_raw:
                     band_raw = 'N/A'
                 rd['tech_band'] = f"{tech} / {band_raw}"
+                rd['activity_status'] = _normalize_activity_status(rd.get('activity_status'))
                 all_rows.append(rd)
 
         for r in all_rows:
@@ -273,7 +372,8 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
             sid = str(r.get('site_id') or 'Unknown')
             sec = str(r.get('sector') or r.get('azimuth') or 'Unknown')
             key = f"{sid}|{sec}"
-            tech_band_set.add(r['tech_band'])
+            tb = r['tech_band']
+            tech_band_set.add(tb)
             if key not in sectors:
                 sectors[key] = {
                     'site_id': sid,
@@ -282,6 +382,8 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
                     'area': r.get('area') or '',
                     'sector': sec,
                     'tech_bands': set(),
+                    'tech_band_status': {},
+                    'tech_band_vendors': {},
                 }
             else:
                 sectors[key]['site_name'] = resolve_site_name(
@@ -289,10 +391,20 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
                     r.get('site_name'),
                     cell_name=r.get('cell_name'),
                 )
-            v = str(r.get('vendor') or '').strip()
+            v = _normalize_vendor_name(r.get('vendor'))
             if v:
                 sectors[key]['vendors'].add(v)
-            sectors[key]['tech_bands'].add(r['tech_band'])
+                sectors[key]['tech_band_vendors'].setdefault(tb, set()).add(v)
+            sectors[key]['tech_bands'].add(tb)
+            sectors[key]['tech_band_status'][tb] = _merge_layer_status(
+                sectors[key]['tech_band_status'].get(tb),
+                r.get('activity_status') or 'Inactive',
+            )
+
+        for sec in sectors.values():
+            tb_vendors = sec.get('tech_band_vendors') or {}
+            sec['vendor_label'] = classify_sector_vendor_label(tb_vendors, sec.get('vendors'))
+            sec['is_thin_layer'] = sec['vendor_label'] in THIN_LAYER_LABELS
 
         sorted_tb = sorted(tech_band_set, key=_sort_key_tb)
         sector_list = sorted(sectors.values(), key=lambda s: (s['area'], s['site_id'], s['sector']))
@@ -305,10 +417,16 @@ def _load_sector_coverage_rows_uncached(conn=None, *, active_only: bool = True) 
 def _sector_to_payload(sec: dict, lte_bands: list[str], *, include_full_coverage: bool = False) -> dict:
     tb_set = sec['tech_bands']
     lte_coverage = {tb: (tb in tb_set) for tb in lte_bands}
+    vendor_label = sec.get('vendor_label') or classify_sector_vendor_label(
+        sec.get('tech_band_vendors'),
+        sec.get('vendors'),
+    )
     row = {
         'site_id': sec['site_id'],
         'site_name': sec['site_name'],
         'vendors': sorted(sec['vendors']),
+        'vendor_label': vendor_label,
+        'is_thin_layer': bool(sec.get('is_thin_layer') or vendor_label in THIN_LAYER_LABELS),
         'area': sec['area'],
         'sector': sec['sector'],
         'has_2g': _has_rat(tb_set, '2G'),

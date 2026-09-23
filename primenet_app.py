@@ -251,36 +251,6 @@ else:
     print("[INFO] Sync bootstrap deferred until operator activation")
 
 
-def _start_live_logger_terminal():
-    """
-    Open a separate terminal window that tails sync_log entries (Windows dev only).
-    Disabled in containers and when NCM_DISABLE_LIVE_LOGGER_TERMINAL=1.
-    """
-    if os.name != 'nt':
-        return
-    if _env_true('NCM_CONTAINER') or _env_true('NCM_DISABLE_LIVE_LOGGER_TERMINAL'):
-        return
-    # Start once from the reloader parent to avoid duplicate windows.
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        return
-    script = os.path.join(os.path.dirname(__file__), 'scripts', 'live_sync_logger.py')
-    if not os.path.isfile(script):
-        print(f"[WARNING] Live logger script not found: {script}")
-        return
-    cmd = f"cd '{os.path.dirname(__file__)}'; python scripts/live_sync_logger.py"
-    try:
-        subprocess.Popen(
-            ['powershell', '-NoExit', '-Command', cmd],
-            creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0),
-        )
-        print('[OK] Live sync logger terminal opened')
-    except Exception as e:
-        print(f"[WARNING] Could not open live logger terminal: {e}")
-
-
-_start_live_logger_terminal()
-
-
 def _open_dashboard_browser():
     """Open the dashboard in the default browser (Windows dev only)."""
     if os.name != 'nt':
