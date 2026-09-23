@@ -62,6 +62,7 @@
                         <button class="btn-sync nokia"  onclick="triggerSync('nokia_pm')">Sync Nokia PM</button>
                         <button class="btn-sync huawei" onclick="triggerSync('huawei_pm')">Sync Huawei PM</button>
                         <button class="btn-sync meta"   onclick="triggerSync('metadata')">Sync Metadata</button>
+                        <button class="btn-sync refresh" onclick="triggerRruInventory()">Run Radio Hardware Inventory</button>
                         <button class="btn-sync refresh" onclick="triggerSync('cells_hourly')">Refresh Cells - Hourly</button>
                         <button class="btn-sync refresh" onclick="triggerSync('cells_daily')">Refresh Cells - Daily</button>
                         <button class="btn-sync refresh" onclick="triggerSync('groups_hourly')">Refresh Groups - Hourly</button>
@@ -69,6 +70,28 @@
                         <button class="btn-sync test"   onclick="testConnectivity()">Test Connectivity</button>
                         <button class="btn-sync inspect" onclick="inspectLocal()">Inspect Column Headers</button>
                         <button class="btn-sync inspect" onclick="loadPmLatestTimestamps()">PM — latest timestamps</button>
+                    </div>
+                    <div class="local-import-box">
+                        <h3 class="section-subtitle">Configuration Dashboard</h3>
+                        <p class="field-hint" id="rru-inventory-status">
+                            Daily NetAct RMOD_R + WNCELG snapshot at 04:00. Manual run uses the shared Nokia service account.
+                        </p>
+                        <div class="local-import-controls">
+                            <button class="btn-sync import" onclick="triggerRruInventory()">Run dashboard ingest now</button>
+                            <button class="btn-sync inspect" onclick="loadRruInventoryStatus()">Refresh status</button>
+                        </div>
+                    </div>
+                    <div class="local-import-box">
+                        <h3 class="section-subtitle">Adjacency GIS (2G NCL)</h3>
+                        <p class="field-hint" id="adjacency-gis-status">
+                            Nokia ADCE daily 04:30 · Huawei GTRX/G2GNCELL daily 04:45. Feeds the Adjacency GIS map.
+                        </p>
+                        <div class="local-import-controls">
+                            <button class="btn-sync import" onclick="triggerAdjacencyGis('nokia')">Run Nokia ingest</button>
+                            <button class="btn-sync import" onclick="triggerAdjacencyGis('huawei')">Run Huawei ingest</button>
+                            <button class="btn-sync import" onclick="triggerAdjacencyGis('all')">Run both</button>
+                            <button class="btn-sync inspect" onclick="loadAdjacencyGisStatus()">Refresh status</button>
+                        </div>
                     </div>
                     <div class="local-import-box">
                         <h3 class="section-subtitle">Import PM From Local Path</h3>
@@ -256,6 +279,13 @@
                     <h3 class="section-subtitle">Filters
                         <input type="search" id="activity-search" placeholder="Filter by user, action or details…"
                                autocomplete="off" oninput="filterActivityLog()">
+                        <select id="activity-action-filter" onchange="filterActivityLog()" title="Action category">
+                            <option value="">All actions</option>
+                            <option value="cm_">CM Extractor</option>
+                            <option value="ret_">RET credentials</option>
+                            <option value="login">Login / logout</option>
+                            <option value="admin_">Admin actions</option>
+                        </select>
                         <select id="activity-limit" onchange="loadActivityLog()" title="Number of records to load">
                             <option value="100">Last 100</option>
                             <option value="200" selected>Last 200</option>
@@ -337,6 +367,30 @@
                     </table>
                 </div>
 
+                <div class="sync-section cm-extract-activity-section">
+                    <h3 class="section-subtitle">CM Extractor Activity</h3>
+                    <p class="api-connections-intro">
+                        Live extract attempts (start / success / failure), async jobs, downloads, and scheduled-job
+                        create/delete from Configuration Data Extractor. Details include vendor, scope, site count, and MO.
+                    </p>
+                    <button type="button" class="btn-user-secondary" onclick="loadCmExtractActivity()">↻ Refresh</button>
+                    <button type="button" class="btn-user-secondary" onclick="exportAdminTable('cm_extract_activity')">Download Excel</button>
+                    <table class="sync-table" style="margin-top:12px;">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>Details</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cm-extract-activity-body">
+                            <tr><td colspan="5" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <div id="add-user-panel" class="add-user-panel" hidden>
                     <h3 class="section-subtitle">Add New User</h3>
                     <form id="add-user-form" class="add-user-form" onsubmit="submitAddUser(event)">
@@ -361,6 +415,13 @@
                                 <option value="admin">{{ role_labels['admin'] }}</option>
                             </select>
                         </label>
+                        <fieldset class="add-user-portals">
+                            <legend>Portal access</legend>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="primenet" checked> Engineering (PrimeNet)</label>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="nexpulse"> Marketing (NexPulse)</label>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="sales"> Sales (NexArpu)</label>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="support"> Support (NexResolve)</label>
+                        </fieldset>
                         <label class="add-user-checkbox">
                             <input type="checkbox" id="new-user-default-password" checked onchange="toggleCustomPasswordField()">
                             Use default password ({{ default_user_password }})
@@ -403,6 +464,7 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Portals</th>
                                 <th>Status</th>
                                 <th>Created</th>
                                 <th>Last Activity</th>
@@ -420,6 +482,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
-    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.5"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.7"></script>
 </body>
 </html>

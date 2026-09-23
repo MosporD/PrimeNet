@@ -1,17 +1,12 @@
 """NexPulse — the NexusCore Marketing Portal.
 
-A self-contained portal application. It owns its own SQLite store, templates,
-static assets, and access rules, and imports nothing from ``modules/`` (the
-Engineering Portal, PrimeNet). The only shared dependency is identity, which
-NexusCore architecture rule 2 puts in one place — see ``access.py``.
+A self-contained portal application. It owns its own SQLite domain store,
+templates, static assets, and (via the NexPulse process) a separate users DB
+and session cookie. It imports nothing from ``modules/`` (PrimeNet).
 
-Today the portal is mounted into the PrimeNet process for convenience::
+Run standalone::
 
-    from portals.marketing import create_marketing_portal
-    create_marketing_portal(app)
-
-Splitting it into its own service means calling the same function against a
-standalone Flask app instead — no view, template, or repository changes.
+    python nexpulse_app.py
 """
 
 from __future__ import annotations

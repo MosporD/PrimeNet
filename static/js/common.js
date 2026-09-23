@@ -236,8 +236,30 @@ function _syncChartTheme(theme) {
     });
 }
 
+function _ensureDarkThemeFinalStylesheet() {
+    if (document.getElementById('pn-theme-dark-final')) return;
+    let href = '/static/css/theme-dark-final.css?v=1.0';
+    try {
+        const scripts = document.querySelectorAll('script[src*="common.js"]');
+        const src = scripts.length ? scripts[scripts.length - 1].getAttribute('src') || '' : '';
+        if (src) {
+            const abs = new URL(src, window.location.href);
+            abs.pathname = abs.pathname.replace(/\/js\/common\.js$/i, '/css/theme-dark-final.css');
+            // Independent cache-bust from common.js so theme fixes ship without template churn.
+            abs.search = '?v=1.0';
+            href = abs.pathname + abs.search;
+        }
+    } catch (_) { /* keep default href */ }
+    const link = document.createElement('link');
+    link.id = 'pn-theme-dark-final';
+    link.rel = 'stylesheet';
+    link.href = href;
+    (document.head || document.documentElement).appendChild(link);
+}
+
 function _applyTheme(theme) {
     const t = theme === 'dark' ? 'dark' : 'light';
+    _ensureDarkThemeFinalStylesheet();
     document.body.classList.toggle('dark-mode', t === 'dark');
     document.documentElement.setAttribute('data-theme', t);
     try {
@@ -635,7 +657,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Apply theme as soon as this file runs (body already exists when common.js is at page end).
+// Also inject theme-dark-final.css so it loads after module CSS (cascade win).
 try {
+    _ensureDarkThemeFinalStylesheet();
     if (document.body) _applyTheme(_preferredTheme());
 } catch (_) { /* ignore */ }
 // Logout function

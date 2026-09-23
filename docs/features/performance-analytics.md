@@ -17,9 +17,10 @@ Studio UI for Huawei PM tables beyond the main Explorer presets.
 
 Reuse Explorer/PM helpers where possible. Do not duplicate Nokia paths here — this tile is Huawei-oriented. Admin-only; keep it that way unless Malek asks.
 
-## History
+## Progress
 
-Shipped as admin studio. No dated rewrite in `progress.md`.
+Dated work log: [`performance-analytics.progress.md`](performance-analytics.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

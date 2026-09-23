@@ -17,9 +17,10 @@ Populate area dropdowns. Not a dashboard card.
 
 Keep it a one-call wrapper. New shared radio metadata endpoints belong in `core/radio/metadata.py` first.
 
-## History
+## Progress
 
-Introduced with the radio filter shell.
+Dated work log: [`radio-api.progress.md`](radio-api.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

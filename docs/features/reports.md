@@ -17,10 +17,10 @@ Build downloadable performance reports from metadata + PM; archive rows live in 
 
 App-table writes go through `connect_app()` / `execute_query` (Postgres-safe). Sector coverage is metadata, not Sleeping Cells overlay.
 
-## History
+## Progress
 
-- 2026-08-19: Sector Health / Excel matrix coverage = metadata only.
-- Last-insert unified for app Postgres (2026-08-31 phase 1).
+Dated work log: [`reports.progress.md`](reports.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

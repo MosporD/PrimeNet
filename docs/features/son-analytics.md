@@ -21,12 +21,10 @@ WoW clusters + optional ML scores (PCA/IF, neighbor-graph topology, spatial DBSC
 - Neighbor graph: `ml/neighbor_agg.py` aggregates vendor 4G export tables (not the map-line 100k sampler). Nokia targets resolve ECI → metadata `cell_name`.
 - Tests: `modules/son_analytics/test_recommendations.py`, `modules/son_analytics/ml/test_neighbor_graph.py`.
 
-## History
+## Progress
 
-- 2026-09-08: Removed READ-ONLY header badge; SON topbar aligned to standard module header.
-- 2026-08-19: ML pipeline + UI categories + thumbs API.
-- 2026-08-30: trust pass — floors, dedupe, HTTP-verified APIs. Topology empty (graph scores 10 under old 8k line cap). First `/api/son/summary` ~13 min, then 1h cache.
-- 2026-09-02: rebuilt graph join. Nokia 4G neighbors loaded (2.35M rows). Huawei SON keys by Cell Name. Topology graph≥55: Nokia 5417, Huawei 3260.
+Dated work log: [`son-analytics.progress.md`](son-analytics.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

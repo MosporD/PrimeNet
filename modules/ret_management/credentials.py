@@ -201,7 +201,18 @@ def run_huawei_with_user_credentials(
     action: str,
     operation: Callable[[HuaweiCmClient], T],
 ) -> tuple[T, dict[str, Any]]:
-    creds = get_user_vendor_credentials(user_id, 'huawei')
+    try:
+        creds = get_user_vendor_credentials(user_id, 'huawei')
+    except ValueError as exc:
+        # Corrupt / wrong-key ciphertext — treat as missing so shared account still works.
+        return _use_shared_without_credentials(
+            user_id,
+            vendor='huawei',
+            prime_username=prime_username,
+            action=f'{action} (personal creds unreadable: {exc})',
+            operation=operation,
+            build_client=build_huawei_client,
+        )
     if not creds:
         return _use_shared_without_credentials(
             user_id,
@@ -250,7 +261,17 @@ def run_nokia_read_with_user_credentials(
     action: str,
     operation: Callable[[NokiaCmClient], T],
 ) -> tuple[T, dict[str, Any]]:
-    creds = get_user_vendor_credentials(user_id, 'nokia')
+    try:
+        creds = get_user_vendor_credentials(user_id, 'nokia')
+    except ValueError as exc:
+        return _use_shared_without_credentials(
+            user_id,
+            vendor='nokia',
+            prime_username=prime_username,
+            action=f'{action} (personal creds unreadable: {exc})',
+            operation=operation,
+            build_client=build_nokia_client,
+        )
     if not creds:
         return _use_shared_without_credentials(
             user_id,
@@ -296,7 +317,17 @@ def run_nokia_write_with_user_credentials(
     action: str,
     operation: Callable[[NokiaOperationsClient], T],
 ) -> tuple[T, dict[str, Any]]:
-    creds = get_user_vendor_credentials(user_id, 'nokia')
+    try:
+        creds = get_user_vendor_credentials(user_id, 'nokia')
+    except ValueError as exc:
+        return _use_shared_without_credentials(
+            user_id,
+            vendor='nokia',
+            prime_username=prime_username,
+            action=f'{action} (personal creds unreadable: {exc})',
+            operation=operation,
+            build_client=build_nokia_operations_client,
+        )
     if not creds:
         return _use_shared_without_credentials(
             user_id,

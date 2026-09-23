@@ -17,9 +17,10 @@ Show recent OSS/FM alarms. Alarm–PM correlation is a **different** tile (`/ala
 
 Do not merge correlator logic into this list UI. Live FM vs sleeping-cell checks live in sleeping-cells / alarm join helpers.
 
-## History
+## Progress
 
-- 2026-08-17: sleeping-cell vs live FM mentioned in the radio pack.
+Dated work log: [`fault-management.progress.md`](fault-management.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

@@ -19,6 +19,7 @@ from sync_config import (
     HUAWEI_PM_DAILY_DB,
     pm_table_name,
 )
+from core.platform.session import get_session_token
 
 
 cell_heatmap_bp = Blueprint(
@@ -478,7 +479,7 @@ def _resolve_kpi_column_in_table(conn: sqlite3.Connection, table_name: str, alia
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        session_token = request.cookies.get("session_token")
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(session_token)
@@ -491,7 +492,7 @@ def login_required(f):
 
 
 def get_current_user():
-    session_token = request.cookies.get("session_token")
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None

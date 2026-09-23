@@ -1139,6 +1139,112 @@ def run_network_balance_ingest():
         _trim_scheduler_memory('network_balance_ingest')
 
 
+def run_rru_inventory_ingest(trigger_source: str = 'scheduled'):
+    """Full-network Nokia RMOD_R + WNCELG snapshots for Configuration Dashboard."""
+    if os.environ.get('NCM_DISABLE_RRU_INVENTORY_INGEST', '').strip().lower() in ('1', 'true', 'yes'):
+        logger.info('Configuration Dashboard ingest skipped (NCM_DISABLE_RRU_INVENTORY_INGEST=1)')
+        return
+    if _defer_pipeline_if_low_memory('rru_inventory_ingest'):
+        return
+    try:
+        from modules.configuration_dashboard.ingest_job import run_config_dashboard_ingest
+
+        summary = run_config_dashboard_ingest(trigger_source=trigger_source)
+        rmod = summary.get('rmod') or {}
+        wncelg = summary.get('wncelg') or {}
+        rows = int(rmod.get('row_count') or summary.get('row_count') or 0)
+        sites = int(wncelg.get('site_count') or 0)
+        status = 'ok' if summary.get('success') else 'error'
+        msg = (
+            f"rmod_rows={rows} wncelg_sites={sites} "
+            f"seconds={summary.get('build_seconds')} "
+            f"trigger={summary.get('trigger_source')}"
+        )
+        if summary.get('error'):
+            msg = f"{msg} error={summary.get('error')}"
+        _log_sync('rru_inventory_ingest', 'nokia', status, rows, msg)
+    except Exception as e:
+        _log_sync('rru_inventory_ingest', 'nokia', 'error', 0, str(e))
+        logger.exception('Configuration Dashboard ingest failed: %s', e)
+    finally:
+        _trim_scheduler_memory('rru_inventory_ingest')
+
+
+def run_adjacency_gis_ingest(trigger_source: str = 'scheduled', vendor: str = 'all'):
+    """Full-network Nokia + Huawei 2G adjacency snapshots for Adjacency GIS."""
+    if os.environ.get('NCM_DISABLE_ADJACENCY_GIS_INGEST', '').strip().lower() in ('1', 'true', 'yes'):
+        logger.info('Adjacency GIS ingest skipped (NCM_DISABLE_ADJACENCY_GIS_INGEST=1)')
+        return
+    if _defer_pipeline_if_low_memory('adjacency_gis_ingest'):
+        return
+    try:
+        from modules.adjacency_gis.ingest_job import run_adjacency_gis_ingest as _run
+
+        summary = _run(trigger_source=trigger_source, vendor=vendor or 'all')
+        sectors = int(summary.get('sector_count') or 0)
+        edges = int(summary.get('edge_count') or 0)
+        status = 'ok' if summary.get('success') else 'error'
+        msg = (
+            f"vendor={summary.get('vendor')} sectors={sectors} edges={edges} "
+            f"seconds={summary.get('build_seconds')} trigger={summary.get('trigger_source')}"
+        )
+        if summary.get('error'):
+            msg = f"{msg} error={summary.get('error')}"
+        _log_sync('adjacency_gis_ingest', str(summary.get('vendor') or 'all'), status, sectors + edges, msg)
+    except Exception as e:
+        _log_sync('adjacency_gis_ingest', 'all', 'error', 0, str(e))
+        logger.exception('Adjacency GIS ingest failed: %s', e)
+    finally:
+        _trim_scheduler_memory('adjacency_gis_ingest')
+
+
+def run_adjacency_gis_nokia_ingest(trigger_source: str = 'scheduled'):
+    run_adjacency_gis_ingest(trigger_source=trigger_source, vendor='nokia')
+
+
+def run_adjacency_gis_huawei_ingest(trigger_source: str = 'scheduled'):
+    if os.environ.get('NCM_DISABLE_ADJACENCY_GIS_HUAWEI_INGEST', '').strip().lower() in ('1', 'true', 'yes'):
+        logger.info('Adjacency GIS Huawei ingest skipped (NCM_DISABLE_ADJACENCY_GIS_HUAWEI_INGEST=1)')
+        return
+    run_adjacency_gis_ingest(trigger_source=trigger_source, vendor='huawei')
+
+
+def _rru_inventory_cron_hour_minute() -> tuple[int, int]:
+    try:
+        hour = int(os.environ.get('RRU_INVENTORY_CRON_HOUR', '4'))
+    except ValueError:
+        hour = 4
+    try:
+        minute = int(os.environ.get('RRU_INVENTORY_CRON_MINUTE', '0'))
+    except ValueError:
+        minute = 0
+    return max(0, min(23, hour)), max(0, min(59, minute))
+
+
+def _adjacency_gis_cron_hour_minute() -> tuple[int, int]:
+    try:
+        hour = int(os.environ.get('ADJACENCY_GIS_CRON_HOUR', '4'))
+    except ValueError:
+        hour = 4
+    try:
+        minute = int(os.environ.get('ADJACENCY_GIS_CRON_MINUTE', '30'))
+    except ValueError:
+        minute = 30
+    return max(0, min(23, hour)), max(0, min(59, minute))
+
+
+def _adjacency_gis_huawei_cron_hour_minute() -> tuple[int, int]:
+    try:
+        hour = int(os.environ.get('ADJACENCY_GIS_HUAWEI_CRON_HOUR', '4'))
+    except ValueError:
+        hour = 4
+    try:
+        minute = int(os.environ.get('ADJACENCY_GIS_HUAWEI_CRON_MINUTE', '45'))
+    except ValueError:
+        minute = 45
+    return max(0, min(23, hour)), max(0, min(59, minute))
+
+
 def _network_balance_ingest_cron_hour() -> int:
     from sync_config import DAILY_PULL_HOUR
     try:
@@ -1387,6 +1493,48 @@ def start_scheduler():
             max_instances=1,
         )
 
+    if os.environ.get('NCM_DISABLE_RRU_INVENTORY_INGEST', '').strip().lower() not in ('1', 'true', 'yes'):
+        rru_hour, rru_minute = _rru_inventory_cron_hour_minute()
+        _scheduler.add_job(
+            run_rru_inventory_ingest,
+            trigger=CronTrigger(hour=rru_hour, minute=rru_minute),
+            id='rru_inventory_ingest_daily',
+            name=f'Configuration Dashboard RMOD_R+WNCELG snapshot (daily {rru_hour:02d}:{rru_minute:02d})',
+            replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+            kwargs={'trigger_source': 'scheduled'},
+        )
+
+    if os.environ.get('NCM_DISABLE_ADJACENCY_GIS_INGEST', '').strip().lower() not in ('1', 'true', 'yes'):
+        adj_hour, adj_minute = _adjacency_gis_cron_hour_minute()
+        _scheduler.add_job(
+            run_adjacency_gis_nokia_ingest,
+            trigger=CronTrigger(hour=adj_hour, minute=adj_minute),
+            id='adjacency_gis_nokia_ingest_daily',
+            name=f'Adjacency GIS Nokia ADCE snapshot (daily {adj_hour:02d}:{adj_minute:02d})',
+            replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+            kwargs={'trigger_source': 'scheduled'},
+        )
+        hw_hour, hw_minute = _adjacency_gis_huawei_cron_hour_minute()
+        if os.environ.get('NCM_DISABLE_ADJACENCY_GIS_HUAWEI_INGEST', '').strip().lower() not in (
+            '1',
+            'true',
+            'yes',
+        ):
+            _scheduler.add_job(
+                run_adjacency_gis_huawei_ingest,
+                trigger=CronTrigger(hour=hw_hour, minute=hw_minute),
+                id='adjacency_gis_huawei_ingest_daily',
+                name=f'Adjacency GIS Huawei G2GNCELL snapshot (daily {hw_hour:02d}:{hw_minute:02d})',
+                replace_existing=True,
+                coalesce=True,
+                max_instances=1,
+                kwargs={'trigger_source': 'scheduled'},
+            )
+
     _scheduler.add_job(
         _trim_scheduler_memory,
         trigger=IntervalTrigger(hours=6),
@@ -1450,3 +1598,7 @@ def trigger_cells_daily_now(): run_manual_category_sync('cells-daily')
 def trigger_groups_daily_now(): run_manual_category_sync('groups-daily')
 def trigger_nokia_cm_inventory_now(): refresh_nokia_cm_inventory()
 def trigger_cm_extractor_jobs_now(): run_cm_extractor_scheduled_jobs()
+def trigger_rru_inventory_now(): run_rru_inventory_ingest(trigger_source='manual')
+def trigger_adjacency_gis_now(): run_adjacency_gis_ingest(trigger_source='manual', vendor='all')
+def trigger_adjacency_gis_nokia_now(): run_adjacency_gis_nokia_ingest(trigger_source='manual')
+def trigger_adjacency_gis_huawei_now(): run_adjacency_gis_huawei_ingest(trigger_source='manual')

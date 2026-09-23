@@ -17,9 +17,10 @@ NE/site management views on PrimeNet metadata.
 
 `connect_metadata()`. Do not confuse with live CM Extractor.
 
-## History
+## Progress
 
-No dated rewrite in `progress.md`.
+Dated work log: [`network-management.progress.md`](network-management.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

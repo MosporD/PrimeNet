@@ -18,9 +18,16 @@ from database_enhanced import (
     get_all_users,
     reset_user_password,
     set_user_force_password_change,
+    update_user_portals as db_update_user_portals,
     update_user_role as db_update_user_role,
     update_user_status as db_update_user_status,
     get_db,
+)
+from core.platform.portal_access import (
+    ALL_PORTAL_KEYS,
+    catalog_for_admin,
+    parse_allowed_portals,
+    PORTAL_LABELS,
 )
 from db.runtime import execute_query
 from core.cm_extractor.config import (
@@ -42,6 +49,7 @@ from sync_config import (
     NOKIA_PM_DAILY_DB,
     NOKIA_PM_DB,
 )
+from core.platform.session import get_session_token
 
 admin_panel_bp = Blueprint(
     'admin_panel', __name__,
@@ -76,7 +84,7 @@ def login_required(f):
     """Decorator to require login"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
 
@@ -93,7 +101,7 @@ def admin_required(f):
     """Decorator to require Owner or NOC SYS role"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
 
@@ -108,7 +116,7 @@ def admin_required(f):
 
 def get_current_user():
     """Get current logged-in user"""
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None
@@ -220,6 +228,7 @@ def get_users():
 
         users_data = []
         for u in users:
+            portals = list(u.get('allowed_portals') or [])
             users_data.append({
                 'id': u['id'],
                 'username': u['username'],
@@ -229,13 +238,16 @@ def get_users():
                 'role': u['role'],
                 'role_label': ROLE_LABELS.get(str(u.get('role', '')).strip().lower(), u.get('role', '')),
                 'last_activity': u['last_login'],
+                'allowed_portals': portals,
+                'portal_labels': [PORTAL_LABELS.get(p, p) for p in portals],
             })
 
         log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'admin_view_users', 'Viewed user list')
 
         return jsonify({
             'success': True,
-            'users': users_data
+            'users': users_data,
+            'portal_catalog': catalog_for_admin(),
         })
 
     except Exception as e:
@@ -258,6 +270,11 @@ def create_user_account():
         role = str(data.get('role') or 'user').strip().lower()
         use_default_password = bool(data.get('use_default_password', True))
         custom_password = str(data.get('password') or '').strip()
+        raw_portals = data.get('allowed_portals')
+        if raw_portals is None:
+            portals = None
+        else:
+            portals = parse_allowed_portals(raw_portals, role=role)
 
         if not username:
             return jsonify({'error': 'Username is required'}), 400
@@ -265,6 +282,8 @@ def create_user_account():
             return jsonify({'error': 'A valid email is required'}), 400
         if role not in ROLE_LABELS:
             return jsonify({'error': 'Invalid role'}), 400
+        if portals is not None and not portals:
+            return jsonify({'error': 'Select at least one portal'}), 400
 
         if use_default_password:
             password = NCM_DEFAULT_USER_PASSWORD
@@ -285,6 +304,7 @@ def create_user_account():
             full_name=full_name,
             department=department,
             role=role,
+            allowed_portals=portals,
         )
         if not success:
             return jsonify({'error': result}), 400
@@ -333,6 +353,39 @@ def reset_user_password_to_default(user_id):
         return jsonify({
             'success': True,
             'message': 'Password reset to default',
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_panel_bp.route('/api/admin/users/<int:user_id>/portals', methods=['PUT'])
+def update_user_portals(user_id):
+    """Update which portals a user may enter (Owner or NOC SYS)."""
+    user = get_current_user()
+    if not _can_access_user_admin(user):
+        return jsonify({'error': 'Owner or NOC SYS access required'}), 403
+
+    try:
+        data = request.get_json() or {}
+        portals = parse_allowed_portals(data.get('allowed_portals') or data.get('portals') or [])
+        if not portals:
+            return jsonify({'error': 'Select at least one portal'}), 400
+        unknown = [p for p in portals if p not in ALL_PORTAL_KEYS]
+        if unknown:
+            return jsonify({'error': f'Unknown portal(s): {", ".join(unknown)}'}), 400
+
+        if not db_update_user_portals(user_id, portals):
+            return jsonify({'error': 'User not found'}), 404
+
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'admin_change_portals',
+            f'Changed user {user_id} portals to {",".join(portals)}',
+        )
+        return jsonify({
+            'success': True,
+            'message': 'Portal access updated',
+            'allowed_portals': portals,
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -770,6 +823,143 @@ def pm_latest_timestamps():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_panel_bp.route('/api/admin/rru-inventory/status', methods=['GET'])
+@admin_panel_bp.route('/api/admin/configuration-dashboard/status', methods=['GET'])
+def rru_inventory_admin_status():
+    """Snapshot meta for Configuration Dashboard (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    try:
+        from modules.configuration_dashboard.ingest_job import last_ingest_result
+        from modules.configuration_dashboard import wncelg_store
+        from modules.rru_inventory import store as rru_store
+
+        rmod_meta = rru_store.get_build_meta() or {}
+        wncelg_meta = wncelg_store.get_build_meta() or {}
+        return jsonify({
+            'success': True,
+            'nokia_ready': nokia_configured(),
+            'snapshot': rmod_meta,
+            'hardware': rmod_meta,
+            'wncelg': wncelg_meta,
+            'last_run': last_ingest_result(),
+            'schedule': 'Daily 04:00 (RRU_INVENTORY_CRON_HOUR/MINUTE) — RMOD_R + WNCELG',
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_panel_bp.route('/api/admin/rru-inventory/run', methods=['POST'])
+@admin_panel_bp.route('/api/admin/configuration-dashboard/run', methods=['POST'])
+def rru_inventory_admin_run():
+    """Manually trigger Configuration Dashboard ingest: RMOD_R + WNCELG (Owner only)."""
+    import threading
+
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    if not nokia_configured():
+        return jsonify({'success': False, 'error': 'Nokia NetAct CM is not configured.'}), 400
+
+    def _run():
+        from modules.configuration_dashboard.ingest_job import run_config_dashboard_ingest
+
+        run_config_dashboard_ingest(trigger_source='manual')
+
+    threading.Thread(target=_run, daemon=True).start()
+    try:
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'configuration_dashboard_manual_run',
+            'Manual Configuration Dashboard ingest triggered (RMOD_R + WNCELG)',
+        )
+    except Exception:
+        pass
+    return jsonify({
+        'success': True,
+        'message': 'Configuration Dashboard ingest started in background (RMOD_R + WNCELG).',
+    })
+
+
+@admin_panel_bp.route('/api/admin/adjacency-gis/status', methods=['GET'])
+def adjacency_gis_admin_status():
+    """Snapshot meta for Adjacency GIS (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+    try:
+        from modules.adjacency_gis import store as adj_store
+        from modules.adjacency_gis.ingest_job import last_ingest_result
+
+        meta = adj_store.get_build_meta() or {}
+        return jsonify({
+            'success': True,
+            'nokia_ready': nokia_configured(),
+            'huawei_ready': huawei_configured(),
+            'snapshot': meta,
+            'nokia': adj_store.get_build_meta('nokia'),
+            'huawei': adj_store.get_build_meta('huawei'),
+            'last_run': last_ingest_result(),
+            'last_run_nokia': last_ingest_result('nokia'),
+            'last_run_huawei': last_ingest_result('huawei'),
+            'schedule': (
+                'Nokia daily 04:30 (ADJACENCY_GIS_CRON_*); '
+                'Huawei daily 04:45 (ADJACENCY_GIS_HUAWEI_CRON_*)'
+            ),
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_panel_bp.route('/api/admin/adjacency-gis/run', methods=['POST'])
+def adjacency_gis_admin_run():
+    """Manually trigger adjacency CM snapshot ingest (Owner only).
+
+    JSON/query ``vendor``: nokia | huawei | all (default all).
+    """
+    import threading
+
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+
+    vendor = str(
+        (request.get_json(silent=True) or {}).get('vendor')
+        or request.args.get('vendor')
+        or 'all'
+    ).strip().lower()
+    if vendor not in ('nokia', 'huawei', 'all', '*'):
+        return jsonify({'success': False, 'error': 'vendor must be nokia, huawei, or all'}), 400
+
+    if vendor in ('nokia', 'all', '*') and not nokia_configured() and vendor == 'nokia':
+        return jsonify({'success': False, 'error': 'Nokia NetAct CM is not configured.'}), 400
+    if vendor in ('huawei', 'all', '*') and not huawei_configured() and vendor == 'huawei':
+        return jsonify({'success': False, 'error': 'Huawei U2020 CM is not configured.'}), 400
+    if vendor in ('all', '*') and not nokia_configured() and not huawei_configured():
+        return jsonify({'success': False, 'error': 'Neither Nokia nor Huawei CM is configured.'}), 400
+
+    def _run():
+        from modules.adjacency_gis.ingest_job import run_adjacency_gis_ingest
+
+        run_adjacency_gis_ingest(trigger_source='manual', vendor=vendor)
+
+    threading.Thread(target=_run, daemon=True).start()
+    try:
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'adjacency_gis_manual_run',
+            f'Manual Adjacency GIS ingest triggered vendor={vendor}',
+        )
+    except Exception:
+        pass
+    return jsonify({
+        'success': True,
+        'vendor': vendor,
+        'message': f'Adjacency GIS ingest started in background ({vendor}).',
+    })
+
+
 @admin_panel_bp.route('/api/admin/ret-credential-fallbacks', methods=['GET'])
 def ret_credential_fallbacks():
     """RET accountability alerts: missing personal credentials or failed credential fallback."""
@@ -787,6 +977,43 @@ def ret_credential_fallbacks():
         ORDER BY a.timestamp DESC
         LIMIT ?
     ''', (limit,)).fetchall()
+    conn.close()
+    return jsonify({
+        'success': True,
+        'items': [dict(row) for row in rows],
+    })
+
+
+_CM_ACTIVITY_ACTIONS = (
+    'cm_extract_start',
+    'cm_extract',
+    'cm_extract_async',
+    'cm_extract_fail',
+    'cm_extract_download',
+    'cm_job_create',
+    'cm_job_delete',
+    'cm_job_download',
+)
+
+
+@admin_panel_bp.route('/api/admin/cm-extract-activity', methods=['GET'])
+def cm_extract_activity():
+    """CM Extractor start/success/fail and job actions for Owner review."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+
+    limit = min(max(int(request.args.get('limit') or 200), 1), 1000)
+    placeholders = ','.join('?' for _ in _CM_ACTIVITY_ACTIONS)
+    conn = get_db()
+    rows = execute_query(conn, f'''
+        SELECT a.timestamp, a.action, a.details, a.ip_address, a.user_id, u.username
+        FROM activity_log a
+        LEFT JOIN users u ON u.id = a.user_id
+        WHERE a.action IN ({placeholders})
+        ORDER BY a.timestamp DESC
+        LIMIT ?
+    ''', (*_CM_ACTIVITY_ACTIONS, limit)).fetchall()
     conn.close()
     return jsonify({
         'success': True,
@@ -821,8 +1048,14 @@ def admin_recent_activity():
     return jsonify({'success': True, 'activity': [dict(row) for row in rows]})
 
 
-_EXPORT_TABLES_OWNER = frozenset({'sync_status', 'sync_history', 'ret_credential_alerts', 'recent_activity'})
-_EXPORT_TABLES_USER_ADMIN = frozenset({'users', 'ret_credential_alerts'})
+_EXPORT_TABLES_OWNER = frozenset({
+    'sync_status',
+    'sync_history',
+    'ret_credential_alerts',
+    'cm_extract_activity',
+    'recent_activity',
+})
+_EXPORT_TABLES_USER_ADMIN = frozenset({'users', 'ret_credential_alerts', 'cm_extract_activity'})
 
 
 @admin_panel_bp.route('/api/admin/export/excel', methods=['POST'])

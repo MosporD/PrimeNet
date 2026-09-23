@@ -17,9 +17,10 @@ Generate vendor XML/Excel. Pre-flight against dictionary, golden rules, and CM s
 
 Keep pre-flight. Do not emit files that skip validation because “it’s just a template”.
 
-## History
+## Progress
 
-- 2026-08-19: pre-flight validation. Version V1.2.
+Dated work log: [`excel-generator.progress.md`](excel-generator.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

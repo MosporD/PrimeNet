@@ -52,7 +52,7 @@ def main() -> int:
     _unlock_password_gate(admin_id)
     token = create_session(admin_id)
     client = app.test_client()
-    client.set_cookie("session_token", token)
+    client.set_cookie("primenet_session", token)
 
     r = client.get("/admin-panel?section=pm-plus-rules")
     html = r.get_data(as_text=True)
@@ -102,7 +102,7 @@ def main() -> int:
     if user:
         ut = create_session(_row_id(user))
         c2 = app.test_client()
-        c2.set_cookie("session_token", ut)
+        c2.set_cookie("primenet_session", ut)
         rb = c2.get("/api/admin/pm-plus/rules/families")
         print("user_families", rb.status_code, (rb.get_json() or {}).get("error") or rb.headers.get("Location"))
 

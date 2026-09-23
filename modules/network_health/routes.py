@@ -21,6 +21,7 @@ from .logic import (
     resolve_precompute_kpis,
 )
 from .precalc_job import build_all, build_vendor_rat
+from core.platform.session import get_session_token
 
 network_health_bp = Blueprint(
     "network_health",
@@ -43,7 +44,7 @@ _VALID_VENDORS = {v["key"] for v in cfg.VENDOR_OPTIONS}
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -56,7 +57,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

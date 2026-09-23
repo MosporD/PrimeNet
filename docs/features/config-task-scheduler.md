@@ -17,9 +17,10 @@ User-facing scheduler for config tasks (`config_scheduler_*` tables in ncm_users
 
 Schema ensure must work on Postgres (`connect_app`, no PRAGMA-only paths). Distinct from `modules/sync/scheduler.py` (PM ETL).
 
-## History
+## Progress
 
-Phase 1 app-DB callers updated (2026-08-31).
+Dated work log: [`config-task-scheduler.progress.md`](config-task-scheduler.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

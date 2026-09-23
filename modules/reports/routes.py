@@ -18,6 +18,7 @@ from db.runtime import connect_app, connect_metadata, execute_query
 from core.elevation import coord_key as _shared_coord_key, elevation_for_points as _shared_elevation_for_points
 from .metadata_helpers import _metadata_table_columns, _pick_col, _sql_ident
 from sync_config import PROJECT_ROOT
+from core.platform.session import get_session_token
 
 reports_bp = Blueprint(
     'reports', __name__,
@@ -33,7 +34,7 @@ os.makedirs(REPORTS_DIR, exist_ok=True)
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -45,7 +46,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

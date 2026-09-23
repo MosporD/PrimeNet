@@ -14,6 +14,7 @@ import sys
 from datetime import datetime
 import threading
 import zipfile
+from core.platform.session import get_session_token
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from database_enhanced import get_user_by_session
@@ -70,7 +71,7 @@ def _shorten(value, max_len: int = 1200) -> str:
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return jsonify({'error': 'Unauthorized'}), 401
         user = get_user_by_session(session_token)

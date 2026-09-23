@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjacency GIS - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('adjacency_gis.static', filename='adjacency_gis.css') }}?v=1.1">
+</head>
+<body class="adjacency-gis-page">
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">Dashboard</a>
+                <h1>Adjacency GIS</h1>
+                <p>2G configured NCL audit — sectors, ADCE lines, uni/bi, overshoot, co-channel.</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="section adjacency-gis-section">
+            <div id="adj-filter-panel" class="adj-filter-panel">
+                <div class="adj-filter-panel-head">
+                    <strong>Adjacency Filters</strong>
+                    <button class="btn-secondary small-btn" type="button" id="adj-panel-toggle">Collapse</button>
+                </div>
+                <div id="adj-filter-panel-body" class="filter-row">
+                    <label for="adj-vendor">Vendor</label>
+                    <select id="adj-vendor">
+                        <option value="all" selected>All vendors</option>
+                        <option value="nokia">Nokia</option>
+                        <option value="huawei">Huawei</option>
+                    </select>
+                    <label for="adj-bsc">BSC</label>
+                    <select id="adj-bsc">
+                        <option value="all" selected>All BSCs</option>
+                    </select>
+                    <label for="adj-area">Area</label>
+                    <select id="adj-area">
+                        <option value="all" selected>All Areas</option>
+                    </select>
+                    <label for="adj-issue">Issue</label>
+                    <select id="adj-issue">
+                        <option value="all" selected>All links</option>
+                        <option value="unidirectional">Unidirectional</option>
+                        <option value="overshoot">Overshoot</option>
+                        <option value="ncl_overflow">NCL &gt; 32</option>
+                        <option value="co_channel">Co-channel</option>
+                        <option value="ok">OK only</option>
+                    </select>
+                    <label for="adj-overshoot">Overshoot km</label>
+                    <input id="adj-overshoot" type="number" min="1" max="80" step="1" value="15">
+                    <button class="btn-secondary small-btn" type="button" id="adj-query">Query</button>
+                    <button class="btn-secondary small-btn" type="button" id="adj-refresh" title="Owner only — rebuild CM snapshot">Refresh Snapshot</button>
+                </div>
+                <div id="adj-legend" class="adj-legend">
+                    <span><i class="swatch ok"></i> Bidirectional</span>
+                    <span><i class="swatch uni"></i> Unidirectional</span>
+                    <span><i class="swatch over"></i> Overshoot / NCL&gt;32</span>
+                    <span><i class="swatch coch"></i> Co-channel</span>
+                </div>
+            </div>
+            <div id="adj-map-stats" class="adj-map-stats">
+                {% if snapshot_ready %}
+                    Snapshot {{ build_meta.built_at or '' }} — select filters and click Query.
+                {% else %}
+                    No snapshot yet. Daily ingest or Admin refresh required.
+                {% endif %}
+            </div>
+            <div id="adjacency-map"></div>
+        </section>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=2.8"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('adjacency_gis.static', filename='adjacency_gis.js') }}?v=1.0"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

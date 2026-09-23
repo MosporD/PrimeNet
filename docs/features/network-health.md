@@ -20,9 +20,10 @@ Category scorecard (retainability, accessibility, mobility, interference, utiliz
 - Precalc DB stays SQLite (not a Postgres domain).
 - Groups panel uses groups DBs; `?refresh=1` busts TTL cache.
 
-## History
+## Progress
 
-- 2026-08-19: operator thresholds, vs-target column, groups panel, cache TTL.
+Dated work log: [`network-health.progress.md`](network-health.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

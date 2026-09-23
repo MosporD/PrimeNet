@@ -1,22 +1,23 @@
-# PrimeNet production stack
+# NexusCore multi-process stack
 # Usage:
 #   cp .env.example .env   # edit secrets and SFTP credentials
 #   docker compose up -d --build
-#   open http://localhost:8000/dashboard
+#   NexusCore lobby:  http://localhost:8000/portals
+#   PrimeNet:         http://localhost:8001/dashboard
+#   NexPulse:         http://localhost:8002/portals/marketing/
 #
 # Local dev (live reload, no rebuild per code change):
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 services:
-  web:
+  nexuscore:
     build: .
     image: primenet:latest
-    container_name: primenet-web
+    container_name: nexuscore-web
     restart: unless-stopped
-    cap_add:
-      - SYS_ADMIN
+    command: ["nexuscore"]
     ports:
-      - "${PRIMENET_HTTP_PORT:-8000}:8000"
+      - "${NEXUSCORE_HTTP_PORT:-8000}:8000"
     env_file:
       - .env
     environment:
@@ -25,20 +26,108 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8000"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://localhost:8000}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://localhost:8001}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://localhost:8002}"
+      GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
+      GUNICORN_THREADS: "${GUNICORN_THREADS:-2}"
+      GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"
+    volumes:
+      - nexuscore-data:/data/nexuscore
+      - primenet-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  primenet:
+    build: .
+    image: primenet:latest
+    container_name: primenet-web
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+    command: ["primenet"]
+    ports:
+      - "${PRIMENET_HTTP_PORT:-8001}:8001"
+    env_file:
+      - .env
+    environment:
+      NCM_DATA_ROOT: /data
+      NCM_CONTAINER: "1"
+      NCM_BOOTSTRAP_ON_IMPORT: "0"
+      NCM_DISABLE_SCHEDULER: "1"
+      FLASK_PORT: "8001"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://localhost:8001}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://localhost:8000}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://localhost:8002}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-2}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-600}"
     volumes:
       - primenet-data:/data
     healthcheck:
-      # Liveness, not readiness: /health returns 503 until an operator activates,
-      # which would leave the container permanently unhealthy on a fresh deploy
-      # and block the scheduler's depends_on below.
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=5)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health/live', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 90s
+
+  # Backward-compatible alias — same image/command as primenet (optional).
+  # Prefer the `primenet` service. Kept for scripts that still expect `web`.
+  web:
+    build: .
+    image: primenet:latest
+    container_name: primenet-web-alias
+    profiles: ["legacy-web"]
+    restart: unless-stopped
+    command: ["primenet"]
+    ports:
+      - "${PRIMENET_HTTP_PORT:-8001}:8001"
+    env_file:
+      - .env
+    environment:
+      NCM_DATA_ROOT: /data
+      NCM_CONTAINER: "1"
+      NCM_BOOTSTRAP_ON_IMPORT: "0"
+      NCM_DISABLE_SCHEDULER: "1"
+      FLASK_PORT: "8001"
+    volumes:
+      - primenet-data:/data
+
+  nexpulse:
+    build: .
+    image: primenet:latest
+    container_name: nexpulse-web
+    restart: unless-stopped
+    command: ["nexpulse"]
+    ports:
+      - "${NEXPULSE_HTTP_PORT:-8002}:8002"
+    env_file:
+      - .env
+    environment:
+      NCM_DATA_ROOT: /data
+      NCM_CONTAINER: "1"
+      NCM_BOOTSTRAP_ON_IMPORT: "0"
+      NCM_DISABLE_SCHEDULER: "1"
+      FLASK_PORT: "8002"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://localhost:8002}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://localhost:8000}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://localhost:8001}"
+      GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
+      GUNICORN_THREADS: "${GUNICORN_THREADS:-2}"
+      GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"
+    volumes:
+      - nexpulse-data:/data/portals
+      - primenet-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health/live', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
 
   scheduler:
     build: .
@@ -58,7 +147,7 @@ services:
     volumes:
       - primenet-data:/data
     depends_on:
-      web:
+      primenet:
         condition: service_healthy
     healthcheck:
       disable: true
@@ -71,13 +160,8 @@ services:
     environment:
       POSTGRES_DB: ${NCM_APP_POSTGRES_DB:-primenet}
       POSTGRES_USER: ${NCM_APP_POSTGRES_USER:-primenet}
-      # Required — no default. `docker compose up` fails fast rather than
-      # starting a database with a well-known password.
       POSTGRES_PASSWORD: ${NCM_APP_POSTGRES_PASSWORD:?set NCM_APP_POSTGRES_PASSWORD in .env}
     ports:
-      # Loopback only. The app reaches Postgres over the compose network, so this
-      # mapping exists for local psql access — it must not expose the database
-      # on every host interface. Override the host side deliberately if needed.
       - "127.0.0.1:${NCM_APP_POSTGRES_PORT:-5432}:5432"
     volumes:
       - primenet-postgres:/var/lib/postgresql/data
@@ -89,6 +173,10 @@ services:
 
 volumes:
   primenet-data:
+    driver: local
+  nexuscore-data:
+    driver: local
+  nexpulse-data:
     driver: local
   primenet-postgres:
     driver: local

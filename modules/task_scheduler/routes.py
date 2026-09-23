@@ -15,6 +15,7 @@ from werkzeug.utils import secure_filename
 from database_enhanced import get_db, get_user_by_session, log_activity
 from db.runtime import adapt_placeholders
 from sync_config import PROJECT_ROOT
+from core.platform.session import get_session_token
 
 task_scheduler_bp = Blueprint(
     'task_scheduler',
@@ -103,7 +104,7 @@ def _ensure_tables():
 
 
 def _current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

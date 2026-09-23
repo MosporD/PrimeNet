@@ -7,6 +7,7 @@ from functools import wraps
 from flask import jsonify, redirect, request, url_for
 
 from database_enhanced import get_user_by_session
+from core.platform.session import get_session_token
 
 
 def _role(user) -> str:
@@ -27,7 +28,7 @@ def _deny():
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -49,7 +50,7 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -72,7 +73,7 @@ def admin_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

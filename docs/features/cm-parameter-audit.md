@@ -18,11 +18,10 @@ Rules with band/area scope, version, approval/baseline. Detector honors the same
 
 Rules persist in the CM snapshot DB (`cm_store`). Approve/baseline is part of the product — do not silently change a rule’s expected value without going through upsert/approve.
 
-## History
+## Progress
 
-- 2026-09-02: entire-MO list/structured skip notes stay in Excel only; empty parameters remain in the consistency table.
-- 2026-09-02: golden-rules panel admin-only; non-admin scan status is `Querying...`.
-- 2026-08-19: golden rules scope + detector honors it.
+Dated work log: [`cm-parameter-audit.progress.md`](cm-parameter-audit.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

@@ -20,6 +20,7 @@ from core.huawei_pm.counter_catalog import (
     subset_ids_for_counters,
 )
 from database_enhanced import get_user_by_session, log_activity
+from core.platform.session import get_session_token
 
 TECH_NE_TYPE = {
     '2G': 'BSC6900 GSM',
@@ -46,7 +47,7 @@ def _guard_performance_analytics_access():
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -59,7 +60,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

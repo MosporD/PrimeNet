@@ -6,7 +6,7 @@
     <title>Conflict Map - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('conflict_map.static', filename='conflict_map.css') }}?v=1.4">
+    <link rel="stylesheet" href="{{ url_for('conflict_map.static', filename='conflict_map.css') }}?v=1.5">
 </head>
 <body class="conflict-map-page">
 <div class="container">
@@ -15,7 +15,7 @@
             <div class="header-left">
                 <a href="/dashboard" class="back-link">Dashboard</a>
                 <h1>🛰️ Conflict Map</h1>
-                <p>Visualize PCI reuse risk by distance, azimuth vs. bearing, strictness, area, band, and technology.</p>
+                <p>Find PCI reuse risks between nearby cells that point toward each other.</p>
             </div>
             <div class="header-right">
                 <span class="user-name">{{ user.username }}</span>
@@ -40,7 +40,7 @@
                         <option value="5G">5G</option>
                     </select>
                     <label for="conf-strictness">Strictness</label>
-                    <select id="conf-strictness" title="Controls max distance and how tightly cell azimuth must match geographic bearing toward the neighbor. Tune presets in modules/conflict_map/logic.py → CONFLICT_STRICTNESS_PROFILES.">
+                    <select id="conf-strictness" title="How tightly distance and antenna direction must match to count as a conflict.">
                         <option value="" selected disabled>Select strictness</option>
                         <option value="strict">Strict</option>
                         <option value="standard">Standard</option>
@@ -66,11 +66,6 @@
                     <button class="btn-secondary small-btn" type="button" id="conf-refresh-cache">Refresh Data</button>
                     <button class="btn-secondary small-btn" type="button" id="conf-export-kml">Export KML</button>
                 </div>
-                <details class="conf-strictness-help">
-                    <summary>How strictness &amp; risk work</summary>
-                    <p><strong>Strictness</strong> sets three thresholds (see API field <code>filters.strictness_profiles</code> for values): max link length (<code>dist_max_km</code>), distance cap for <strong>High</strong> when both cells are aligned (<code>dist_high_km</code>), and the max azimuth–bearing difference in degrees to count as aligned (<code>az_near_deg</code>).</p>
-                    <p><strong>Risk</strong> filters which tier to draw: High / Medium / Low, derived from those rules. To change what each strictness level shows, edit <code>CONFLICT_STRICTNESS_PROFILES</code> in <code>modules/conflict_map/logic.py</code> and refresh the conflict cache.</p>
-                </details>
             </div>
             <div id="conf-map-stats" class="conf-map-stats">Select all filters then click Query.</div>
             <div id="conflict-map"></div>

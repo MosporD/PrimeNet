@@ -2,11 +2,95 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Cases uplift roadmap (Phases 1–4) on Optimization Cases loop.
+**Current track:** Configuration Dashboard V1.0 (Hardware + WNCELG shared ingest).
 
-**Parked:** Dark-mode contrast browser verify; SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
+**Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Browser smoke — Morning Report bulk Cases; set `execution_ref` → refresh scorecard; approve with conflict/golden override; Performance Plus NL chips + selection prefill; optional `CASES_DIGEST_WEBHOOK_URL` dry-run.
+**NEXT:** Admin → Data Sync → Configuration Dashboard ingest; open `/configuration-dashboard` Hardware + WNCELG tabs; spot-check dark toggle there + Adjacency GIS.
+
+## 2026-09-20 (Dark mode — cascade safety net)
+
+- Root cause: module CSS after `common.css` beat non-`!important` dark rules; blanket `span` color flattened chips/fonts.
+- Done: `theme-dark-final.css` injected last by `common.js`; button `!important`; span flatten removed; dark blocks on 8 modules that had none; `scripts/audit_dark_mode.py` + cascade simulate.
+
+## 2026-09-20 (Central SSO + portal allow-list)
+
+- One NexusCore login; shared `nexus_session`; Admin portal checkboxes on `ncm_users.db`.
+
+## 2026-09-20 (Adjacency GIS — Huawei CM)
+
+- Huawei GTRX/G2GNCELL ingest + per-vendor snapshots; scheduled 04:45; Admin Nokia/Huawei/both buttons.
+
+## 2026-09-20 (Configuration Dashboard — Hardware + WNCELG)
+
+- Done: New `/configuration-dashboard` (replaces RRU tile); shared daily RMOD_R + WNCELG ingest; WNCELG Sankey Area → Split/No-split → group count.
+
+## 2026-09-20 (Adjacency GIS — Nokia Phase 1)
+
+- New module `/adjacency-gis`: 2G NCL GIS (BTS/TRX BCCH + ADCE), scheduled snapshot, map audits (uni/bi, overshoot, NCL>32, co-channel).
+
+## 2026-09-17 (RMOD list-param fix)
+
+- Root cause: NetAct rejects `@active*CellsList` (scalar required) — StructuredValue/list.
+- Done: Ingest lists DNs via `dn()` / queryMOLites, then `getManagedObjects` for full params incl. cell lists.
+- Tests: managed-object list emptiness + tech mapping.
+
+## 2026-09-17 (Radio Hardware Inventory — daily snapshot)
+
+- Done: SQLite snapshot store; scheduler cron **04:00**; Admin manual run (`/api/admin/rru-inventory/run`).
+- Done: Module UI reads snapshot (not live); Excel download; status pill for last build.
+- Tests: `test_logic` + `test_store` — 9 passed.
+
+## 2026-09-17 (Radio Hardware Inventory Report — RMOD_R)
+
+- Done: New module `/rru-inventory` (display name **Radio Hardware Inventory Report**) — live Nokia `RMOD_R`, Area → Tech → `productName` Sankey (D3 vendored).
+- Tech from `activeGsm/Wcdma/Lte/NrCellsList`; unused (all empty) filterable in UI; multi-RAT fans out per tech.
+- Wired: `primenet_app`, `module_access`, `module_versions`, dashboard card, feature brief.
+- Tests: `modules/rru_inventory/test_logic.py` — 7 passed. Live NetAct not configured on laptop.
+
+## 2026-09-17 (Hologram coverage realism)
+
+- Done: Lobe length from RET downtilt (° below horizon) × band tier (2G/L900 > L1800/L1800+ > L2100/3G).
+- Done: AAU Left/Right → 30° HPBW half-beams at ±15° from sector azimuth.
+- Done: Rectangular site cabin + headframe + panels; N/S/E/W compass; canvas ~+50%.
+- Load RET / table edits rebuild hologram from degrees.
+
+## 2026-09-17 (CM Extract — East Amman neighbor + admin logging)
+
+- Root cause: East Amman Huawei 4G ≈220 eNodeBs; `CELL` is fine area-wide, but `EUTRANINTERFREQNCELL` is high-cardinality and overwhelms U2020 MML / timeouts.
+- Done: Refuse neighbor/relation MOs above 40 NEs with a clear error; smaller MML chunks (10) for those MOs; dictionary MO technology for LTE NE filtering.
+- Done: CM extract activity logging (`cm_extract_start` / success / fail / async / download) + Admin User Admin panel + Activity Log action filter.
+- Tests: `core/cm_extractor/test_huawei_controller_scope.py` extended.
+
+## 2026-09-17 (RET label truth table)
+
+- Done: `infer_ret_tech_from_label` is the only RET→tech mapper (Nokia `sectorID` / Huawei `Subunit Name`).
+- Mapping: 2G; 3G; 4G/4G2→4G; LTE+TDD→4G-TDD; AAU+Left/Right→4G-AAU-*; Capacity→4G-L1800+; F#→3G; Band→4G; Letter+digit layers 1→4G/2→2G/3→3G/4→4G-L1800+; NA→Not Used.
+- Hologram `TECH_COLORS` / `TECH_ORDER` updated for the new keys (metadata 4G-FDD/5G kept as fallback).
+- Tests: 43 passed in ret_management logic/site_layout.
+
+## 2026-09-17 (RET hologram — per-tech toggles + mesh lobes)
+
+- Done: `_ret_tech` from Huawei `Subunit Name` / Nokia `sectorID`.
+- Done: One hologram lobe per sector×tech; rail toggles All/None/per-tech.
+- Done: Wireframe mesh envelope (reference-style) instead of smooth filled surface.
+- Tests: ret_management logic/site_layout.
+
+## 2026-09-16 (RET Management smoke — Nokia 1003 / Huawei 1020)
+
+- Done: Restarted PrimeNet on :8001 with new templates; `scripts/_smoke_ret_management.py` green.
+- UI: page + `three.min.js` + hologram assets OK; pitch default 30°.
+- Nokia site `51003`/`1003`: layout 3 lobes @ 50/150/340; 18 RETU rows → 12 mapped (A/B/C forms), 6 unmapped empty `sectorID`, 0 orphans.
+- Huawei site `1020`: layout 3 lobes @ 60/190/320; 12/12 RETSUBUNIT mapped from `1020_{A|B|C}-…`.
+- Fix: unreadable personal vendor ciphertext now falls back to shared CM account (was hard 400).
+
+## 2026-09-16 (RET Management — sector join + 3D hologram)
+
+- Done: Huawei sector from `Subunit Name` form `{SiteId}_{Sector}-…` only (no Actual Sector ID / subunit fallbacks).
+- Done: Nokia sector from `sectorID` forms `D4-L1800` / `F1_F2-A1-3G-…`; site from `baseStationID`.
+- Done: `normalize_sector_key` treats metadata `1003_A` as sector A→1 (was collapsing whole site).
+- Done: Hologram prefers metadata azimuth; three.js 3D mast + cos^n lobes (60° HPBW), default 30° camera tilt; `three.min.js` vendored.
+- Tests: `modules/ret_management/test_logic.py` + `test_site_layout.py` — 41 passed.
 
 ## 2026-09-14 (Cases uplift Phases 1–4)
 
@@ -25,6 +109,28 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 - Done: Re-imported Nokia catalog (453 families / ~32k counters / 2831 KPIs).
 - Done: Local hour sample ingest `run_hour_ingest.py --buckets 2 --max-files 30` — 30/30 ok, ~3.87M fact_15m / ~3.82M fact_hour; SFTP host 10.119.219.24 reachable (~75s discover). Day rollup not run this pass.
 - Fixed: `core/cases/__init__.py` import mismatch (`open_complaint_case`) that briefly broke `app` import.
+
+## 2026-09-16 (NexPulse Phase 2 — network targeting bridge)
+
+- Done: PrimeNet `modules/portal_api` — Bearer-token endpoints for technology footprint, congested sites (Capacity Hotspots), serviceability (layer coverage).
+- Done: NexPulse `providers_primenet.PrimeNetNetworkFootprint` registered when `NEXUS_PRIMENET_API_URL` + `NEXUS_PORTAL_API_TOKEN` are set (`python app.py` wires local defaults).
+- Done: Campaign readiness blocks approval when the audience uses network attributes but the API is offline; capacity pressure is advisory (soft gate at 25 congested sites).
+- Done: Campaign detail network panel + overview provider status when connected.
+- Tests: `portals/marketing/test_network_bridge.py`.
+- **NEXT:** Phase 2 remaining — campaign performance/holdout reporting, creative library, promo/quota engine.
+
+## 2026-09-16 (Suite launcher + shared activation for testing)
+
+- Done: `python app.py` starts NexusCore (8000) + PrimeNet (8001) + NexPulse (8002).
+- Done: Shared activation gate for testing — unlock once at PrimeNet `/activation`; NexusCore/NexPulse redirect there until unlocked. Per-platform activation later (`NCM_SHARED_ACTIVATION=0`).
+
+## 2026-09-16 (Separate platform processes)
+
+- Done: Three entry apps — `nexuscore_app.py` (lobby), `primenet_app.py` (engineering), `nexpulse_app.py` (marketing).
+- Done: Per-platform users DB + cookies (`nxc_session`, `primenet_session`, `nexpulse_session`); no SSO handoff.
+- Done: `core/platform/` base factory + parameterized identity; marketing `access.py` no longer imports `database_enhanced`.
+- Done: Docker Compose services `nexuscore` / `primenet` / `nexpulse`; `app.py` shim → PrimeNet.
+- Tests: `core/platform/test_platform.py`; marketing architecture test updated.
 
 ## 2026-09-16 (NexPulse — Marketing Portal)
 

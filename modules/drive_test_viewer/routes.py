@@ -19,6 +19,7 @@ from werkzeug.utils import secure_filename
 from database_enhanced import get_user_by_session
 from sync_config import PROJECT_ROOT
 from utils.xml_safety import parse_xml_file
+from core.platform.session import get_session_token
 
 drive_test_viewer_bp = Blueprint(
     'drive_test_viewer',
@@ -46,7 +47,7 @@ def _ensure_upload_dir():
 
 
 def _current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

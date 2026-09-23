@@ -17,9 +17,10 @@ Browse recorded CM changes (snapshot/audit trail).
 
 Backed by CM snapshot store / app tables — check `routes.py` before assuming a new DB. Change Impact is the **KPI correlation** tile, not this timeline.
 
-## History
+## Progress
 
-No dated rewrite in `progress.md`.
+Dated work log: [`config-history.progress.md`](config-history.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

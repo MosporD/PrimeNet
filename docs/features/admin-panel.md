@@ -1,27 +1,29 @@
 # Admin Panel
 
-Users, roles, feature-access grants.
+Users, roles, portal allow-list, feature-access grants.
 
 | | |
 |---|---|
-| Route | `/admin-panel` (often `?section=user-admin`) |
-| Module | `modules/admin_panel/routes.py` |
+| Route | /admin-panel (often ?section=user-admin) |
+| Module | modules/admin_panel/routes.py |
 | Access | admin_or_noc |
 | Version | V1.0 |
 
 ## Purpose
 
-Create/disable users, reset password, **feature_access** matrix (`core/feature_access.py`).
+Create/disable users, reset password, **portal checkboxes** (llowed_portals), **feature_access** matrix (core/feature_access.py).
 Owner also manages Data Sync, API connections, and **PM Plus Rules** (Nokia catalog import + aggregation overrides for Performance Explorer Plus).
 
 ## Approach
 
-Visibility defaults: `core/module_access.py`. Overrides stored in app DB. Admin always sees everything. Do not hide tiles only in `dashboard.html` — the access layer will fight you.
+Visibility defaults: core/module_access.py. Overrides stored in app DB. Admin always sees everything. Do not hide tiles only in dashboard.html — the access layer will fight you.
+Portal keys: primenet, 
+expulse, sales, support — gates tower entry, not in-portal RBAC.
 
-## History
+## Progress
 
-Activity log / feature grants evolved with the radio pack (2026-08).
-2026-09-11: PM Plus Rules tab — family/counter agg + catalog import under `/api/admin/pm-plus/*`.
+Dated work log: [dmin-panel.progress.md](admin-panel.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

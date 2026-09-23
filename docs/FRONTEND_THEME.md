@@ -6,7 +6,15 @@ How light/dark mode works across the UI, and how to build or fix module pages so
 
 ## Mandatory for every new module
 
-Dark mode is **not automatic** for new modules. `common.css` covers shared primitives (header, inputs, `.panel`, `.card`, tables), but **module-specific CSS almost always needs explicit dark rules**. Shipping a module without them is a known regression pattern.
+Dark mode is **mostly automatic** for shared primitives, but **module-specific CSS still needs explicit dark rules**. Shipping a module with hardcoded `#fff` / `#2c3e50` and no `body.dark-mode` block is a known regression (buttons + fonts look stuck on light).
+
+Safety net (always on when `common.js` loads):
+
+| Piece | Role |
+|-------|------|
+| `static/css/common.css` | Baseline `body.dark-mode` tokens + panels/inputs/buttons |
+| `static/css/theme-dark-final.css` | Injected **last** by `common.js` so it wins over module CSS |
+| `scripts/audit_dark_mode.py` | Terminal audit — run before shipping a new module |
 
 Before marking a module done:
 
@@ -14,7 +22,7 @@ Before marking a module done:
 2. Add `<body class="your-module-page">` for scoped overrides.
 3. In module CSS, define light tokens on `:root` and override them under `body.dark-mode.your-module-page` (see [Recommended patterns](#recommended-patterns-for-new-module-css)).
 4. Run the [Checklist — new module page](#checklist--new-module-page) in **both** light and dark.
-5. Run the [Quick audit command](#quick-audit-command) on your new CSS file — zero hits for naked `#fff` / `#ffffff` without a dark path.
+5. Run `python scripts/audit_dark_mode.py --strict` (and the [Quick audit command](#quick-audit-command) on new CSS).
 
 **Do not merge** a new module if cards, toolbars, or custom widgets stay white in dark mode.
 
@@ -30,10 +38,13 @@ Before marking a module done:
 | Legacy key | `localStorage` key `darkMode` | Still written for older pages (`true` / `false`) |
 | Toggle UI | `#dark-mode-btn` | Injected by `static/js/common.js` into the header |
 | Init | `common.js` → `_applyTheme(_preferredTheme())` on `DOMContentLoaded` | Applies saved theme on every page load |
+| Cascade safety net | `theme-dark-final.css` via `_ensureDarkThemeFinalStylesheet()` | Appended to `<head>` **after** module CSS so dark `!important` rules win |
 | Chart sync | `_syncChartTheme()` in `common.js` | Updates Chart.js defaults and live instances |
 | Custom event | `primenet:theme-change` | `{ detail: { theme: 'dark' \| 'light' } }` — listen in module JS |
 
-**Rule:** Never implement a separate dark-mode toggle in a module. Always load `common.js` so the global toggle and persistence work.
+**Rule:** Never implement a separate dark-mode toggle in a module. Always load `common.js` so the global toggle, persistence, and `theme-dark-final.css` injection work.
+
+**Do not** add a blanket `body.dark-mode span { color: … !important }` — it flattens chips/pills/badges to one ink color.
 
 ---
 
@@ -315,16 +326,24 @@ Do not copy constellation colors into normal module pages.
 | File | When |
 |------|------|
 | `static/css/common.css` | Global tokens, new shared panel class names, header/button/table baselines |
+| `static/css/theme-dark-final.css` | New recurring widget class that still stays light after module CSS (safety net) |
 | `static/js/common.js` | Theme engine only (avoid per-module hacks here) |
 | `modules/<module>/static/*.css` | Module-specific dark fixes (primary work) |
 | `modules/<module>/templates/*.html` | Load order, `body` page class, header structure |
 | `static/css/dashboard.css` | Dashboard-only dark rules |
 | `static/css/constellation.css` | Radar deck (always dark) |
 | `static/css/radio_modules.css` | Shared radio module shell dark rules |
+| `scripts/audit_dark_mode.py` | Extend audit when new failure modes appear |
 
 ---
 
 ## Quick audit command
+
+Run the full terminal audit (preferred):
+
+```bash
+python scripts/audit_dark_mode.py --strict
+```
 
 Find hardcoded light surfaces in module CSS (candidates for dark fixes):
 
@@ -341,4 +360,4 @@ rg -L "dark-mode" modules/*/static/*.css
 
 ---
 
-*Last updated: 2026-07-22 — mandatory module checklist; Power BI token pattern added.*
+*Last updated: 2026-09-20 — theme-dark-final.css safety net; span flatten fix; audit_dark_mode.py.*

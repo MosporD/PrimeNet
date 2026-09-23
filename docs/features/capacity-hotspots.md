@@ -22,9 +22,10 @@ Rank cells that breach utilization `threshold_bad` (default 80%).
 
 KPI recipes live in `core/radio/pm.py`. Do not hardcode 80 in the thin module.
 
-## History
+## Progress
 
-- 2026-08-17 / 2026-08-19: pack + operator targets.
+Dated work log: [`capacity-hotspots.progress.md`](capacity-hotspots.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

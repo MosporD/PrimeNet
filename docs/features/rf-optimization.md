@@ -22,9 +22,10 @@ Workbench feed: several detectors composed, not a new data source.
 
 Prefer fixing the underlying detector over special-casing this page.
 
-## History
+## Progress
 
-- 2026-08-17: added. 2026-08-19: vs operator targets.
+Dated work log: [`rf-optimization.progress.md`](rf-optimization.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

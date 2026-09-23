@@ -17,9 +17,10 @@ KPIs for femto/home cells. Separate DBs under `databases/cells/` (`femto_pm_cell
 
 Keep femto SQLite even after PM Postgres cutover. Do not route these paths through `pg_domains`.
 
-## History
+## Progress
 
-Inventory (2026-08-31): ~5.8 GB femto PM — keep SQLite.
+Dated work log: [`femto-pm.progress.md`](femto-pm.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

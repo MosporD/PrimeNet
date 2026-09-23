@@ -17,9 +17,10 @@ User row + `user_vendor_credentials` + preferences. Password change satisfies `f
 
 `connect_app()` / `table_columns` — Postgres-safe. Credentials are per-user for NetAct/U2020; do not log secrets.
 
-## History
+## Progress
 
-Phase 1 app-DB callers (2026-08-31). Vendor creds module `core/user_vendor_credentials.py`.
+Dated work log: [`user-profile.progress.md`](user-profile.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

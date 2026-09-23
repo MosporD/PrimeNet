@@ -16,9 +16,10 @@ Serve `docs/course/`, `docs/ARCHITECTURE.md`, and graphify HTML (`graph.html`, c
 
 New human docs: add to the catalog. Graphify maps: run `python -m graphify update .` after code edits. Do not dump `graphify-out/cache/` into explanations.
 
-## History
+## Progress
 
-- 2026-08-17: graphify embedded (Overview → Graph / Code map / Call flow). Lesson 12 removed.
+Dated work log: [`documentation.progress.md`](documentation.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

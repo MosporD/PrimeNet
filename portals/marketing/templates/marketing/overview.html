@@ -113,11 +113,19 @@
 
 <div class="mkt-card">
     <div class="mkt-card-title">Upstream data sources</div>
+    {% set any_connected = provider_status | selectattr('available') | list %}
+    {% if any_connected %}
+    <div class="mkt-notice mkt-notice-info" style="margin-bottom:14px">
+        <div><strong>{{ any_connected | length }} provider(s) connected.</strong>
+        Unconnected sources still show explicit empty states — NexPulse never invents numbers.</div>
+    </div>
+    {% else %}
     <div class="mkt-notice mkt-notice-info" style="margin-bottom:14px">
         <div><strong>No data sources are connected yet.</strong>
         Audience sizes, campaign results, and network-aware targeting stay unavailable until these are wired up.
         Everything you author here — offers, campaigns, audiences, consent — is stored and stays valid when they are.</div>
     </div>
+    {% endif %}
     <table class="mkt-table">
         <thead><tr><th>Provider</th><th>Needs</th><th>Configured by</th><th>Status</th></tr></thead>
         <tbody>

@@ -1,10 +1,7 @@
-"""Identity bridge and portal access control.
+"""Identity and portal access control for NexPulse.
 
-NexusCore architecture rule 2: one identity service owns users and sessions
-and every portal trusts it. Today that service is PrimeNet's login, so the
-bridge below is the *only* place in this portal that reaches into it. When
-identity is extracted into a standalone service, this file is the single
-thing that changes.
+Resolves the shared ``nexus_session`` against the PrimeNet users database.
+Does not own a separate login store.
 """
 
 from __future__ import annotations
@@ -13,62 +10,42 @@ from datetime import datetime, timezone
 from functools import wraps
 from typing import Callable
 
-from flask import abort, g, redirect, request, url_for
+from flask import abort, g, redirect, request
+
+from core.platform.identity.routes import nexuscore_login_url
+from core.platform.portal_access import PORTAL_NEXPULSE, user_can_access_portal
+from core.platform.session import get_session_token
 
 from . import config
 from .db import cursor
 
-SESSION_COOKIE = "session_token"
-
-
-# ---------------------------------------------------------------------------
-# Identity bridge
-# ---------------------------------------------------------------------------
 
 def _resolve_session(token: str) -> dict | None:
-    """Ask the shared identity service who owns this session token."""
-    try:
-        from database_enhanced import get_user_by_session
-    except Exception:
-        return None
-    try:
-        user = get_user_by_session(token)
-    except Exception:
-        return None
+    from database_enhanced import get_user_by_session, init_db
+
+    init_db()
+    user = get_user_by_session(token)
     if not user:
         return None
-    if isinstance(user, dict):
-        return {
-            "id": str(user.get("id") or ""),
-            "username": user.get("username") or "",
-            "email": user.get("email") or "",
-            "identity_role": str(user.get("role") or "").strip().lower(),
-        }
-    # Tuple-shaped rows from the legacy user store.
-    try:
-        return {
-            "id": str(user[0]),
-            "username": user[1],
-            "email": user[2] if len(user) > 2 else "",
-            "identity_role": str(user[6]).strip().lower() if len(user) > 6 else "",
-        }
-    except Exception:
+    if not user_can_access_portal(user, PORTAL_NEXPULSE):
         return None
+    return {
+        "id": str(user.get("id") or ""),
+        "username": user.get("username") or "",
+        "email": user.get("email") or "",
+        "identity_role": str(user.get("role") or "").strip().lower(),
+    }
 
 
 def current_identity() -> dict | None:
     cached = getattr(g, "_mkt_identity", None)
     if cached is not None:
         return cached or None
-    token = request.cookies.get(SESSION_COOKIE)
+    token = get_session_token()
     identity = _resolve_session(token) if token else None
     g._mkt_identity = identity or {}
     return identity
 
-
-# ---------------------------------------------------------------------------
-# Portal role resolution
-# ---------------------------------------------------------------------------
 
 def _stored_role(identity_user_id: str) -> str | None:
     if not identity_user_id:
@@ -85,7 +62,7 @@ def _stored_role(identity_user_id: str) -> str | None:
 
 
 def portal_role(identity: dict | None) -> str:
-    """Explicit portal assignment wins; otherwise map the identity role."""
+    """Explicit portal assignment wins; otherwise map the central user role."""
     if not identity:
         return config.DEFAULT_ROLE
     stored = _stored_role(identity.get("id") or "")
@@ -156,14 +133,15 @@ def current_user() -> PortalUser | None:
     return user
 
 
-# ---------------------------------------------------------------------------
-# Decorators
-# ---------------------------------------------------------------------------
-
 def _wants_json() -> bool:
     if request.path.startswith(f"{config.URL_PREFIX}/api/"):
         return True
     return request.accept_mimetypes.best == "application/json"
+
+
+def _login_redirect():
+    next_url = request.url
+    return redirect(nexuscore_login_url(next_url=next_url))
 
 
 def login_required(view: Callable) -> Callable:
@@ -173,7 +151,7 @@ def login_required(view: Callable) -> Callable:
         if not user:
             if _wants_json():
                 abort(401)
-            return redirect(url_for("auth.login_page"))
+            return _login_redirect()
         return view(*args, **kwargs)
 
     return wrapped
@@ -187,7 +165,7 @@ def require_permission(permission: str) -> Callable:
             if not user:
                 if _wants_json():
                     abort(401)
-                return redirect(url_for("auth.login_page"))
+                return _login_redirect()
             if not user.can(permission):
                 abort(403)
             return view(*args, **kwargs)

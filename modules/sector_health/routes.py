@@ -7,6 +7,7 @@ from functools import wraps
 
 from database_enhanced import get_user_by_session
 from modules.reports.sector_coverage_data import build_sector_health_api_response
+from core.platform.session import get_session_token
 
 sector_health_bp = Blueprint(
     'sector_health',
@@ -20,7 +21,7 @@ sector_health_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -38,7 +39,7 @@ def format_user(user):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 
@@ -53,10 +54,10 @@ def _sector_health_page_context(*, all_cells: bool) -> dict:
             'page_title': 'Sector Health — All Cells',
             'page_heading': '📡 Sector Health — All Cells',
             'page_subtitle': (
-                'Configured tech/band layers from CM metadata — includes inactive and off-air cells. '
-                'LTE pies exclude L35.'
+                'Tech and band coverage across all configured cells, including off-air. '
+                'LTE views exclude L35.'
             ),
-            'scope_note': 'Includes all configured cells regardless of activity status (admin_state / active_state).',
+            'scope_note': 'Includes every configured cell, whether on-air or off-air.',
             'alt_view_href': '/sector-health',
             'alt_view_label': 'Active cells only',
             'report_href': '/reports',
@@ -67,10 +68,10 @@ def _sector_health_page_context(*, all_cells: bool) -> dict:
         'page_title': 'Sector Health',
         'page_heading': '📡 Sector Health',
         'page_subtitle': (
-            '2G / 3G / 5G sector counts; LTE pies (% of LTE sectors in view, excluding L35). '
-            'Active cells only, from metadata.db.'
+            '2G / 3G / 5G sector counts and LTE band mix for on-air cells. '
+            'LTE views exclude L35.'
         ),
-        'scope_note': 'Only on-air cells per vendor activity rules (admin_state / active_state) in metadata.db.',
+        'scope_note': 'On-air cells only.',
         'alt_view_href': '/sector-health-all',
         'alt_view_label': 'All configured cells',
         'report_href': '/reports',

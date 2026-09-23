@@ -63,3 +63,57 @@ def test_mo_scope_filter():
     assert not mo_matches_huawei_scope(gcell, 'RNC')
     assert mo_matches_huawei_scope(gcell, 'BSC')
     assert not mo_matches_huawei_scope(cell, 'BSC')
+
+
+def test_dictionary_mo_technology_and_high_cardinality():
+    from core.cm_extractor.huawei_semantics import (
+        MML_HIGH_CARDINALITY_CHUNK,
+        MML_HIGH_CARDINALITY_NE_LIMIT,
+        MML_SINGLE_NE_LIMIT,
+        _mo_technology,
+        is_high_cardinality_mo,
+        mml_chunk_size_for_mo,
+    )
+
+    assert _mo_technology('CELL') == '4G'
+    assert _mo_technology('EUTRANINTERFREQNCELL') == '4G'
+    assert is_high_cardinality_mo('EutranInterFreqNcell')
+    assert is_high_cardinality_mo('EUTRANINTERFREQNCELL')
+    assert not is_high_cardinality_mo('CELL')
+    assert mml_chunk_size_for_mo('EUTRANINTERFREQNCELL') == MML_HIGH_CARDINALITY_CHUNK
+    assert mml_chunk_size_for_mo('CELL') == MML_SINGLE_NE_LIMIT
+    assert MML_HIGH_CARDINALITY_NE_LIMIT == 40
+
+
+def test_high_cardinality_ne_limit_raises():
+    import core.cm_extractor.huawei_semantics as sem
+    from core.cm_extractor.huawei_client import HuaweiCmClient
+
+    class _StubClient(HuaweiCmClient):
+        def __init__(self):
+            pass
+
+        def _record_skipped_mml_nes(self, ne_names, *, reason):
+            return None
+
+        def run_mml_chunked(self, command, ne_names, *, chunk_size=100, alternates_by_ne=None):
+            raise AssertionError('should refuse before MML call')
+
+        def consume_mml_errors(self):
+            return []
+
+    nes = [f'{1300 + i}-Site_{i}_TASC_O' for i in range(41)]
+    original = sem._partition_ne_names_for_mo
+    sem._partition_ne_names_for_mo = lambda names, mo_id: (list(names), [])
+    try:
+        sem._selection_rows(
+            _StubClient(),
+            nes,
+            {'mo_id': 'EUTRANINTERFREQNCELL', 'export_all': True},
+        )
+        raise AssertionError('expected ValueError for oversized neighbor extract')
+    except ValueError as exc:
+        assert 'high-cardinality' in str(exc).lower()
+        assert '40' in str(exc)
+    finally:
+        sem._partition_ne_names_for_mo = original

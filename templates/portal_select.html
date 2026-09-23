@@ -58,7 +58,8 @@
         </section>
 
         <section class="tower-stop" data-side="right" data-label="ENGINEERING" aria-label="Engineering Portal">
-            <a class="tower-card" href="/dashboard">
+            {% if can_engineering %}
+            <a class="tower-card" href="{{ url_for('nexuscore.portal_enter', portal_id='engineering') }}">
                 <div class="tower-card-top">
                     <span class="tower-card-level">LV4 · 104 m</span>
                     <span class="tower-card-chip tower-chip-live">Active</span>
@@ -76,10 +77,21 @@
                     <span class="tower-card-enter">Enter portal &rarr;</span>
                 </div>
             </a>
+            {% else %}
+            <div class="tower-card tower-card-locked" aria-disabled="true">
+                <div class="tower-card-top">
+                    <span class="tower-card-level">LV4 · 104 m</span>
+                    <span class="tower-card-chip">No access</span>
+                </div>
+                <h2 class="tower-card-title">Engineering Portal</h2>
+                <p class="tower-card-blurb">Your account is not granted Engineering (PrimeNet) access. Contact an administrator.</p>
+            </div>
+            {% endif %}
         </section>
 
         <section class="tower-stop" data-side="left" data-label="MARKETING" aria-label="Marketing Portal">
-            <a class="tower-card" href="/portals/marketing">
+            {% if can_marketing %}
+            <a class="tower-card" href="{{ url_for('nexuscore.portal_enter', portal_id='marketing') }}">
                 <div class="tower-card-top">
                     <span class="tower-card-level">LV3 · 78 m</span>
                     <span class="tower-card-chip tower-chip-live">Active</span>
@@ -97,13 +109,27 @@
                     <span class="tower-card-enter">Enter portal &rarr;</span>
                 </div>
             </a>
+            {% else %}
+            <div class="tower-card tower-card-locked" aria-disabled="true">
+                <div class="tower-card-top">
+                    <span class="tower-card-level">LV3 · 78 m</span>
+                    <span class="tower-card-chip">No access</span>
+                </div>
+                <h2 class="tower-card-title">Marketing Portal</h2>
+                <p class="tower-card-blurb">Your account is not granted Marketing (NexPulse) access. Contact an administrator.</p>
+            </div>
+            {% endif %}
         </section>
 
         <section class="tower-stop" data-side="right" data-label="SALES" aria-label="Sales Portal">
+            {% if can_sales %}
             <a class="tower-card" href="/portals/sales">
+            {% else %}
+            <div class="tower-card tower-card-locked" aria-disabled="true">
+            {% endif %}
                 <div class="tower-card-top">
                     <span class="tower-card-level">LV2 · 52 m</span>
-                    <span class="tower-card-chip">Coming soon</span>
+                    <span class="tower-card-chip">{% if can_sales %}Coming soon{% else %}No access{% endif %}</span>
                 </div>
                 <div class="tower-card-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -114,16 +140,20 @@
                 <p class="tower-card-blurb">Pipeline, accounts, product ordering, and commercial workflows.</p>
                 <div class="tower-card-foot">
                     <span class="tower-card-badge">NexArpu</span>
-                    <span class="tower-card-enter">Preview &rarr;</span>
+                    <span class="tower-card-enter">{% if can_sales %}Preview &rarr;{% else %}Locked{% endif %}</span>
                 </div>
-            </a>
+            {% if can_sales %}</a>{% else %}</div>{% endif %}
         </section>
 
         <section class="tower-stop" data-side="left" data-label="SUPPORT" aria-label="Customer Support Portal">
+            {% if can_support %}
             <a class="tower-card" href="/portals/support">
+            {% else %}
+            <div class="tower-card tower-card-locked" aria-disabled="true">
+            {% endif %}
                 <div class="tower-card-top">
                     <span class="tower-card-level">LV1 · 26 m</span>
-                    <span class="tower-card-chip">Coming soon</span>
+                    <span class="tower-card-chip">{% if can_support %}Coming soon{% else %}No access{% endif %}</span>
                 </div>
                 <div class="tower-card-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -137,9 +167,9 @@
                 <p class="tower-card-blurb">Tickets, SLA tracking, customer care, and service assurance.</p>
                 <div class="tower-card-foot">
                     <span class="tower-card-badge">NexResolve</span>
-                    <span class="tower-card-enter">Preview &rarr;</span>
+                    <span class="tower-card-enter">{% if can_support %}Preview &rarr;{% else %}Locked{% endif %}</span>
                 </div>
-            </a>
+            {% if can_support %}</a>{% else %}</div>{% endif %}
         </section>
 
         <section class="tower-base" id="tower-base" aria-label="Ground level">

@@ -17,10 +17,10 @@ Upload/parse XML, save/load profiles, validate MO vs dictionary / golden rules.
 
 Use `utils/xml_safety.py` (defusedxml). DOCTYPE is allowed via that path — do not switch to raw `xml.etree` for untrusted uploads. Profiles live in the app DB.
 
-## History
+## Progress
 
-- 2026-07-28: DOCTYPE via defusedxml.
-- 2026-08-19: Save/Load Profile were 404 — fixed; MO/golden-rule validation on upload.
+Dated work log: [`xml-parser.progress.md`](xml-parser.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

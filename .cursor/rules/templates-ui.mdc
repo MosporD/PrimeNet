@@ -11,8 +11,16 @@ alwaysApply: false
 1. `static/css/common.css` — base resets and shared components
 2. Page or module CSS (`dashboard.css`, `radio_modules.css`, or module `static/*.css`)
 3. `constellation.css` — only on dashboard / pages using constellation background
+4. `theme-dark-final.css` — **injected last by `common.js`** (do not link manually); dark cascade safety net
 
 Use `url_for('static', filename='css/...')` with cache-bust `?v=X.X`.
+
+## Dark mode (required)
+
+- Every standalone page must load `static/js/common.js` (theme toggle + injects `theme-dark-final.css`).
+- Module CSS that hardcodes `#fff` / `#2c3e50` must add `body.dark-mode…` overrides (see `docs/FRONTEND_THEME.md`).
+- Before shipping a new module: `python scripts/audit_dark_mode.py --strict`
+- Do **not** add `body.dark-mode span { color: … !important }` — it flattens chips/pills to one ink color.
 
 ## Dashboard
 

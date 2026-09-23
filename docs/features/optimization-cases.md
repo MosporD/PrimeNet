@@ -29,10 +29,10 @@ Turn detector/SON issues into owned cases with correlated PM/CM/FM evidence, nar
 - Complaint intake / cluster checklist / energy Cases / PM deeplinks in Cases UI.
 - Phase 4: Performance + Plus consume selection; Plus NL→chips (no SQL); `scripts/cases_morning_digest.py` webhook.
 
-## History
+## Progress
 
-- 2026-09-14: V1 Case object, scorecard, correlator, selection context, workspace UI, Open Case from radio issues + SON, map polygon → selection.
-- 2026-09-14: Cases uplift Phases 1–4 — real post scorecard, identity lite, morning bulk, cell history, evidence packs, governance, multipliers.
+Dated work log: [`optimization-cases.progress.md`](optimization-cases.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

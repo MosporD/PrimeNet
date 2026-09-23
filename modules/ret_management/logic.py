@@ -616,50 +616,224 @@ def sort_nokia_retu_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
 
 
-# Sector hints inside a Huawei RETSUBUNIT subunit name, e.g. "SEC1", "Sector-2", "A".
-_HUAWEI_SUBUNIT_SECTOR_RE = re.compile(r'(?:SEC(?:TOR)?)[\s_\-]*([0-9]+|[A-Z])', re.IGNORECASE)
+# Huawei Subunit Name: ``{SiteId}_{Sector}-{Tech}-…`` e.g. 1020_A-2G-L900, 1020_B-AAU-Left.
+_HUAWEI_SUBUNIT_SITE_SECTOR_RE = re.compile(
+    r'^(\d+)\s*[_\-]\s*([A-Za-z])(?:[-_].*)?$',
+    re.IGNORECASE,
+)
+_HUAWEI_LTE_TDD_SECTOR_RE = re.compile(
+    r'^(\d+)\s*[_\-]\s*LTE\s*[_\-]\s*TDD\s*[_\-]\s*([A-Za-z])\s*$',
+    re.IGNORECASE,
+)
+# Nokia sectorID token ``{SectorLetter}{LocalCell}`` e.g. D4, A1 (not F1_F2).
+_NOKIA_SECTOR_LOCALCELL_RE = re.compile(r'^([A-Za-z])(\d*)$')
+_NOKIA_CAPACITY_SECTOR_RE = re.compile(r'CAPACITY[_-]([A-Za-z])', re.IGNORECASE)
+_LAYER_DIGIT_RE = re.compile(r'^([A-Za-z])([1-4])$')
+_FREQ_CARRIER_RE = re.compile(r'^F[1-4]$', re.IGNORECASE)
+_BAND_TOKEN_RE = re.compile(r'^L\d{3,4}\+?$', re.IGNORECASE)
+
+# Letter+digit layer → band (truth table). Digit also implies a default RAT family
+# when no explicit RAT token is present.
+_LAYER_DIGIT_TO_TECH = {
+    '1': '4G',          # L1800
+    '2': '2G',          # L900
+    '3': '3G',          # L2100
+    '4': '4G-L1800+',   # L1800+
+}
+
+# Hologram / table technology keys produced by the RET label truth table.
+RET_TECH_ORDER: tuple[str, ...] = (
+    '2G',
+    '3G',
+    '4G',
+    '4G-TDD',
+    '4G-AAU-Left',
+    '4G-AAU-Right',
+    '4G-AAU',
+    '4G-L1800+',
+    'Not Used',
+)
+
+
+def _label_tokens(label: str) -> list[str]:
+    return [p for p in re.split(r'[-_/]+', str(label or '').upper()) if p]
+
+
+def infer_ret_tech_from_label(label: Any) -> str:
+    """
+    Map a Nokia ``sectorID`` / Huawei ``Subunit Name`` onto a hologram tech key.
+
+    Truth table (radio team, 2026-09-17):
+      2G              → 2G (& L900)
+      3G              → 3G (& L2100)
+      4G / 4G2        → 4G (L1800)
+      LTE + TDD       → 4G-TDD
+      AAU + Left/Right→ 4G-AAU-Left / 4G-AAU-Right
+      Capacity        → 4G-L1800+
+      F1..F4          → 3G
+      Band (Lxxxx)    → 4G (or 4G-L1800+ when L1800+)
+      Letter+digit    → layer 1=L1800→4G, 2=L900→2G, 3=L2100→3G, 4=L1800+→4G-L1800+
+      NA / Not Used   → Not Used
+    """
+    raw = str(label if label is not None else '').strip()
+    if not raw:
+        return ''
+    upper = re.sub(r'\s+', ' ', raw.upper()).strip()
+    compact = upper.replace(' ', '')
+    if upper in ('NA', 'NOT USED') or compact in ('NA', 'NOTUSED'):
+        return 'Not Used'
+    if 'NOT USED' in upper or compact == 'NOTUSED':
+        return 'Not Used'
+
+    tokens = _label_tokens(upper)
+    token_set = set(tokens)
+
+    has_left = 'LEFT' in token_set
+    has_right = 'RIGHT' in token_set
+    has_aau = 'AAU' in token_set
+    has_lte = 'LTE' in token_set
+    has_tdd = 'TDD' in token_set
+    has_2g = '2G' in token_set
+    has_3g = '3G' in token_set
+    has_4g = '4G' in token_set or '4G2' in token_set
+    has_capacity = 'CAPACITY' in token_set
+    has_f_carrier = any(_FREQ_CARRIER_RE.fullmatch(t) for t in tokens)
+    has_l1800_plus = any(t == 'L1800+' or t.endswith('1800+') for t in tokens)
+    has_band = any(_BAND_TOKEN_RE.fullmatch(t) for t in tokens)
+
+    layer_tech = ''
+    for token in tokens:
+        match = _LAYER_DIGIT_RE.fullmatch(token)
+        if match:
+            layer_tech = _LAYER_DIGIT_TO_TECH.get(match.group(2), '')
+            break
+
+    # Priority: unused → TDD → AAU side → Capacity → explicit RAT → F# → layer → bare band
+    if has_lte and has_tdd:
+        return '4G-TDD'
+    if has_aau and has_left:
+        return '4G-AAU-Left'
+    if has_aau and has_right:
+        return '4G-AAU-Right'
+    if has_aau:
+        return '4G-AAU'
+    if has_capacity:
+        return '4G-L1800+'
+    if has_2g:
+        return '2G'
+    if has_3g or has_f_carrier:
+        return '3G'
+    if has_4g:
+        return '4G'
+    if layer_tech:
+        return layer_tech
+    if has_l1800_plus:
+        return '4G-L1800+'
+    if has_band:
+        return '4G'
+    return ''
+
+
+def parse_huawei_ret_tech(name: Any) -> str:
+    """Technology from Huawei ``Subunit Name`` via the RET label truth table."""
+    return infer_ret_tech_from_label(name)
+
+
+def parse_nokia_ret_tech(sector_id: Any) -> str:
+    """Technology from Nokia ``sectorID`` via the RET label truth table."""
+    return infer_ret_tech_from_label(sector_id)
+
+
+def parse_huawei_subunit_name(name: Any) -> tuple[str, str]:
+    """
+    Return ``(site_id, sector_key)`` from a Huawei ``Subunit Name``.
+
+    Forms:
+    - ``1020_A-2G-L900`` / ``1020_B-AAU-Left``
+    - ``1005_LTE-TDD-A``
+    """
+    text = str(name if name is not None else '').strip()
+    if not text:
+        return '', ''
+    lte = _HUAWEI_LTE_TDD_SECTOR_RE.match(text)
+    if lte:
+        return lte.group(1), normalize_sector_key(lte.group(2))
+    match = _HUAWEI_SUBUNIT_SITE_SECTOR_RE.match(text)
+    if not match:
+        return '', ''
+    # Reject ``1005_LTE-…`` false positives where the letter is the start of LTE.
+    sector_letter = match.group(2)
+    rest_after_letter = text[match.end(2):]
+    if rest_after_letter and rest_after_letter[0].isalpha():
+        return '', ''
+    return match.group(1), normalize_sector_key(sector_letter)
 
 
 def huawei_ret_sector_key(row: dict[str, Any]) -> str:
-    """
-    Sector a RETSUBUNIT row belongs to.
+    """Sector a RETSUBUNIT row belongs to — from ``Subunit Name`` only."""
+    _site, sector = parse_huawei_subunit_name(_alias_lookup(row, 'Subunit Name'))
+    return sector
 
-    Prefers the NE-reported ``Actual Sector ID``, then a sector hint in the
-    subunit name. Returns '' when U2020 gives neither — the UI lists those rows
-    as unmapped rather than guessing a lobe for them.
+
+def huawei_ret_site_id(row: dict[str, Any]) -> str:
+    """Site id embedded in Huawei ``Subunit Name`` (``1020`` from ``1020_A-…``)."""
+    site, _sector = parse_huawei_subunit_name(_alias_lookup(row, 'Subunit Name'))
+    return site
+
+
+def parse_nokia_sector_id(sector_id: Any) -> str:
     """
-    for key, value in row.items():
-        norm = _normalize_key(str(key))
-        if 'sector' in norm and 'id' in norm:
-            sector = normalize_sector_key(value)
-            if sector:
-                return sector
-    name = _alias_lookup(row, 'Subunit Name')
-    if name:
-        match = _HUAWEI_SUBUNIT_SECTOR_RE.search(name)
+    Sector key from Nokia ``RETU_R.sectorID``.
+
+    Forms:
+    - ``D4-L1800`` — sector letter + local cell / layer digit, then tech
+    - ``F1_F2-A1-3G-L1800-L2100`` — prefix, then sector+layer, then techs
+    - ``Capacity_A_Left`` — capacity lobe named by sector letter
+    - plain ``1`` / ``3`` when NetAct already stores a numeric sector
+    """
+    text = str(sector_id if sector_id is not None else '').strip()
+    if not text:
+        return ''
+    if re.fullmatch(r'\d+(?:\.0)?', text):
+        return normalize_sector_key(text)
+    capacity = _NOKIA_CAPACITY_SECTOR_RE.search(text)
+    if capacity:
+        return normalize_sector_key(capacity.group(1))
+    for part in text.split('-'):
+        token = part.strip()
+        if not token or '_' in token:
+            continue
+        match = _NOKIA_SECTOR_LOCALCELL_RE.fullmatch(token)
         if match:
             return normalize_sector_key(match.group(1))
-        trimmed = name.strip()
-        if len(trimmed) == 1 and trimmed.isalpha():
-            return normalize_sector_key(trimmed)
     return ''
 
 
 def nokia_ret_sector_key(record: dict[str, Any]) -> str:
-    """Sector a RETU_R row belongs to (``sectorID``, else the subunit number)."""
-    sector = normalize_sector_key(record.get('sectorID'))
-    if sector:
-        return sector
-    return normalize_sector_key(record.get('subunitNumber'))
+    """Sector a RETU_R row belongs to — from ``sectorID`` only (no subunit fallback)."""
+    return parse_nokia_sector_id(record.get('sectorID'))
+
+
+def nokia_ret_site_id(record: dict[str, Any]) -> str:
+    """Site id from Nokia ``baseStationID`` when present."""
+    text = str(record.get('baseStationID') if record.get('baseStationID') is not None else '').strip()
+    if not text or text.lower() in ('none', 'null', 'nan', '?', '-'):
+        return ''
+    if text.endswith('.0') and text[:-2].isdigit():
+        text = text[:-2]
+    digits = re.search(r'(\d+)', text)
+    return digits.group(1) if digits else text
 
 
 def annotate_ret_rows(rows: list[dict[str, Any]], *, vendor: str) -> list[dict[str, Any]]:
     """
     Attach stable per-row metadata consumed by the table and the hologram.
 
-    ``_ret_key``    identity that survives a reload (never a list index)
-    ``_ret_sector`` normalized sector key, '' when the vendor does not report one
-    ``_ret_azimuth`` RET-reported azimuth in degrees (Nokia ``antBearing``)
+    ``_ret_key``     identity that survives a reload (never a list index)
+    ``_ret_sector``  normalized sector key, '' when the vendor name/id does not parse
+    ``_ret_tech``    technology from CM name truth table (2G / 3G / 4G / 4G-TDD / …)
+    ``_ret_site_id`` site id from Huawei Subunit Name / Nokia baseStationID
+    ``_ret_azimuth`` RET-reported azimuth in degrees (Nokia ``antBearing`` only)
     """
     vendor = (vendor or 'nokia').strip().lower()
     annotated: list[dict[str, Any]] = []
@@ -671,6 +845,8 @@ def annotate_ret_rows(rows: list[dict[str, Any]], *, vendor: str) -> list[dict[s
             subunit = _alias_lookup(out, 'Subunit No.')
             base = f'{device}:{subunit}' if (device or subunit) else ''
             sector = huawei_ret_sector_key(out)
+            site_id = huawei_ret_site_id(out)
+            tech = parse_huawei_ret_tech(_alias_lookup(out, 'Subunit Name'))
         else:
             base = str(
                 out.get('DN')
@@ -680,6 +856,8 @@ def annotate_ret_rows(rows: list[dict[str, Any]], *, vendor: str) -> list[dict[s
                 or ''
             ).strip()
             sector = nokia_ret_sector_key(out)
+            site_id = nokia_ret_site_id(out)
+            tech = parse_nokia_ret_tech(out.get('sectorID'))
             bearing = out.get('antBearing')
             text = str(bearing if bearing is not None else '').strip()
             if text:
@@ -693,6 +871,10 @@ def annotate_ret_rows(rows: list[dict[str, Any]], *, vendor: str) -> list[dict[s
         seen[base] = count + 1
         out['_ret_key'] = base if count == 0 else f'{base}#{count + 1}'
         out['_ret_sector'] = sector
+        if tech:
+            out['_ret_tech'] = tech
+        if site_id:
+            out['_ret_site_id'] = site_id
         annotated.append(out)
     return annotated
 

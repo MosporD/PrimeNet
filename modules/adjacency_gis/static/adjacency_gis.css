@@ -1,0 +1,171 @@
+/* Full-page map layout under body { zoom: var(--ui-zoom) }.
+   Do not use position:fixed + 100vh/100vw — that breaks Leaflet tiles. */
+
+.adjacency-gis-page {
+    height: var(--ui-vh, 100vh);
+    width: var(--ui-vw, 100%);
+    max-width: none;
+    overflow: hidden;
+    background: #89aeca;
+}
+
+.adjacency-gis-page .container {
+    height: var(--ui-vh, 100vh);
+    width: 100%;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+}
+
+.adjacency-gis-page header {
+    flex-shrink: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+.adjacency-gis-page .main-content {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.adjacency-gis-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+}
+
+.adj-filter-panel {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1200;
+    width: min(1180px, calc(var(--ui-vw, 100vw) - 24px));
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid #d7e0ea;
+    border-radius: 12px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+    padding: 10px 12px;
+    backdrop-filter: blur(2px);
+}
+
+.adj-filter-panel.collapsed #adj-filter-panel-body,
+.adj-filter-panel.collapsed #adj-legend {
+    display: none;
+}
+
+.adj-filter-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.adj-filter-panel.collapsed .adj-filter-panel-head {
+    margin-bottom: 0;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+}
+
+.filter-row label {
+    font-size: 12px;
+    color: #334155;
+    font-weight: 600;
+}
+
+.filter-row select,
+.filter-row input[type="number"] {
+    min-width: 110px;
+    padding: 4px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.adj-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #475569;
+}
+
+.adj-legend .swatch {
+    display: inline-block;
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.adj-legend .swatch.ok { background: #2980b9; }
+.adj-legend .swatch.uni { background: #f39c12; }
+.adj-legend .swatch.over { background: #c0392b; }
+.adj-legend .swatch.coch { background: #8e44ad; }
+
+.adj-map-stats {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+    width: min(1180px, calc(var(--ui-vw, 100vw) - 24px));
+    padding: 6px 10px;
+    background: rgba(15, 23, 42, 0.78);
+    color: #f8fafc;
+    border-radius: 8px;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+#adjacency-map {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    z-index: 1;
+}
+
+.small-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+
+/* ---- Dark mode ---- */
+body.dark-mode.adjacency-gis-page {
+    background: #1a2838;
+}
+
+body.dark-mode.adjacency-gis-page .adj-filter-panel {
+    background: rgba(24, 34, 48, 0.97);
+    border-color: var(--dm-border, #304258);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode.adjacency-gis-page .filter-row label,
+body.dark-mode.adjacency-gis-page .adj-legend {
+    color: var(--dm-muted, #a9b7c9);
+}
+
+body.dark-mode.adjacency-gis-page .filter-row select,
+body.dark-mode.adjacency-gis-page .filter-row input[type="number"] {
+    background: var(--dm-input, #101b28);
+    color: var(--dm-text, #e8eef7);
+    border-color: var(--dm-border, #304258);
+}

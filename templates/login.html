@@ -171,10 +171,12 @@
             };
 
             try {
+                const nextParam = new URLSearchParams(window.location.search).get('next')
+                    || {{ (next_url or '')|tojson }};
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password, next: nextParam || undefined })
                 });
 
                 const data = await response.json();
@@ -199,7 +201,8 @@
                     if (data.must_change_password) {
                         setTimeout(() => { window.location.href = '/profile?force_password_change=1'; }, 2800);
                     } else {
-                        setTimeout(() => { window.location.href = '/portals'; }, 2800);
+                        const dest = (data.redirect && String(data.redirect).trim()) || '/';
+                        setTimeout(() => { window.location.href = dest; }, 2800);
                     }
                 } else {
                     fail(data.error || 'Login failed');

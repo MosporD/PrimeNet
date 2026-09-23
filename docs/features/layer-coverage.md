@@ -22,9 +22,10 @@ Sites missing an expected layer (e.g. no 4G where 3G exists). Metadata-driven.
 
 Do not require PM. Area filter is supported on this builder.
 
-## History
+## Progress
 
-- 2026-08-17 / 2026-08-19: pack + targets.
+Dated work log: [`layer-coverage.progress.md`](layer-coverage.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

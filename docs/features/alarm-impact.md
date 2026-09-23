@@ -22,9 +22,10 @@ Show which poor-KPI cells also have live/recent alarms.
 
 Alarm fetch is best-effort per vendor. Empty alarm source → issues without alarm enrichment, not a 500.
 
-## History
+## Progress
 
-- 2026-08-17: added.
+Dated work log: [`alarm-impact.progress.md`](alarm-impact.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

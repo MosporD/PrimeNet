@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Dashboard - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.8">
+    <link rel="stylesheet" href="{{ url_for('configuration_dashboard.static', filename='configuration_dashboard.css') }}?v=1.2">
+</head>
+<body class="configuration-dashboard-page"
+    data-active-tab="{{ active_tab }}"
+    data-nokia-ready="{{ 'true' if nokia_ready else 'false' }}"
+    data-snapshot-ready="{{ 'true' if hardware_snapshot_ready else 'false' }}"
+    data-snapshot-built-at="{{ hardware_built_at or '' }}"
+    data-wncelg-snapshot-ready="{{ 'true' if wncelg_snapshot_ready else 'false' }}"
+    data-wncelg-built-at="{{ wncelg_built_at or '' }}"
+    data-username="{{ user.username }}">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">Dashboard</a>
+                    <h1>Configuration Dashboard</h1>
+                    <p>Nokia hardware inventory (<code>RMOD_R</code>) and WCDMA cell-group split (<code>WNCELG</code>) from the shared daily snapshot.</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <nav class="cd-tabs" role="tablist" aria-label="Configuration Dashboard views">
+                <button type="button" class="cd-tab{% if active_tab == 'hardware' %} active{% endif %}"
+                    role="tab" id="tab-hardware" data-tab="hardware"
+                    aria-selected="{{ 'true' if active_tab == 'hardware' else 'false' }}"
+                    aria-controls="panel-hardware">Hardware</button>
+                <button type="button" class="cd-tab{% if active_tab == 'wncelg' %} active{% endif %}"
+                    role="tab" id="tab-wncelg" data-tab="wncelg"
+                    aria-selected="{{ 'true' if active_tab == 'wncelg' else 'false' }}"
+                    aria-controls="panel-wncelg">WNCELG</button>
+            </nav>
+
+            <div id="panel-hardware" class="cd-tab-panel" role="tabpanel" aria-labelledby="tab-hardware"
+                {% if active_tab != 'hardware' %}hidden{% endif %}>
+                <section class="panel">
+                    <div class="connection-bar">
+                        <span id="cm-config-status" class="connection-pill">Checking snapshot…</span>
+                        <span id="snapshot-status" class="connection-pill muted">Snapshot: …</span>
+                    </div>
+
+                    <div class="workflow-step">
+                        <h2>1. Load hardware snapshot</h2>
+                        <div class="picker-row">
+                            <label class="field-label" for="area-select">Start in area</label>
+                            <select id="area-select" aria-label="Initial area focus">
+                                <option value="all">All areas</option>
+                            </select>
+                            <div class="picker-actions">
+                                <button type="button" class="btn-primary" id="load-btn">Load report</button>
+                                <button type="button" class="btn-secondary" id="export-btn" disabled>Download Excel</button>
+                                <span id="load-status" class="status-text" aria-live="polite"></span>
+                            </div>
+                        </div>
+                        <p class="field-hint">
+                            Load pulls the local <code>RMOD_R</code> snapshot once (no NetAct). Switch areas in the results filter bar without reloading.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="panel" id="results-panel" hidden>
+                    <div class="results-head">
+                        <h2>2. Hardware flow</h2>
+                        <div class="results-actions">
+                            <button type="button" class="btn-secondary" id="reload-btn">Reload</button>
+                            <button type="button" class="btn-secondary" id="export-btn-results">Download Excel</button>
+                        </div>
+                    </div>
+
+                    <div id="summary-strip" class="summary-strip" aria-live="polite"></div>
+                    <div id="results-warnings" class="warnings-box" hidden></div>
+
+                    <div class="filter-bar">
+                        <label class="table-filter area-filter">
+                            <span>Area</span>
+                            <select id="area-filter" aria-label="Filter by area">
+                                <option value="all">All areas</option>
+                            </select>
+                        </label>
+                        <label class="filter-check">
+                            <input type="checkbox" id="show-unused" checked>
+                            Show unused
+                        </label>
+                        <div class="layer-toggles" role="group" aria-label="Sankey layers">
+                            <span class="layer-label">Sankey</span>
+                            <label class="filter-check">
+                                <input type="checkbox" id="sankey-area" checked>
+                                Area
+                            </label>
+                            <label class="filter-check">
+                                <input type="checkbox" id="sankey-tech" checked>
+                                Tech
+                            </label>
+                            <label class="filter-check">
+                                <input type="checkbox" id="sankey-band" checked>
+                                Band
+                            </label>
+                        </div>
+                        <div class="tech-filters" id="tech-filters" role="group" aria-label="Technology filters"></div>
+                        <label class="table-filter">
+                            <span>RRU type</span>
+                            <input type="search" id="product-filter" placeholder="Filter productName…" autocomplete="off">
+                        </label>
+                    </div>
+
+                    <div id="sankey-wrap" class="sankey-wrap">
+                        <svg id="sankey-svg" role="img" aria-label="Sankey diagram of Area to Technology to RRU type"></svg>
+                        <p id="sankey-empty" class="status-text" hidden>No flows match the current filters.</p>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="data-table" id="rru-table">
+                            <thead>
+                                <tr>
+                                    <th>Area</th>
+                                    <th>Site</th>
+                                    <th>productName</th>
+                                    <th>Tech</th>
+                                    <th>State</th>
+                                    <th>DN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rru-tbody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="panel-wncelg" class="cd-tab-panel" role="tabpanel" aria-labelledby="tab-wncelg"
+                {% if active_tab != 'wncelg' %}hidden{% endif %}>
+                <section class="panel">
+                    <div class="connection-bar">
+                        <span id="wncelg-config-status" class="connection-pill">Checking snapshot…</span>
+                        <span id="wncelg-snapshot-status" class="connection-pill muted">Snapshot: …</span>
+                    </div>
+
+                    <div class="workflow-step">
+                        <h2>1. Load WNCELG snapshot</h2>
+                        <div class="picker-row">
+                            <label class="field-label" for="wncelg-area-select">Start in area</label>
+                            <select id="wncelg-area-select" aria-label="Initial WNCELG area focus">
+                                <option value="all">All areas</option>
+                            </select>
+                            <div class="picker-actions">
+                                <button type="button" class="btn-primary" id="wncelg-load-btn">Load report</button>
+                                <button type="button" class="btn-secondary" id="wncelg-export-btn" disabled>Download Excel</button>
+                                <span id="wncelg-load-status" class="status-text" aria-live="polite"></span>
+                            </div>
+                        </div>
+                        <p class="field-hint">
+                            Sankey: Area → Split / No split → group count. Split = more than one <code>WNCELG</code> under the same MRBTS/site. Snapshot only — no live NetAct on Load.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="panel" id="wncelg-results-panel" hidden>
+                    <div class="results-head">
+                        <h2>2. WNCELG split flow</h2>
+                        <div class="results-actions">
+                            <button type="button" class="btn-secondary" id="wncelg-reload-btn">Reload</button>
+                            <button type="button" class="btn-secondary" id="wncelg-export-btn-results">Download Excel</button>
+                        </div>
+                    </div>
+
+                    <div id="wncelg-summary-strip" class="summary-strip" aria-live="polite"></div>
+                    <div id="wncelg-results-warnings" class="warnings-box" hidden></div>
+
+                    <div class="filter-bar">
+                        <label class="table-filter area-filter">
+                            <span>Area</span>
+                            <select id="wncelg-area-filter" aria-label="Filter WNCELG by area">
+                                <option value="all">All areas</option>
+                            </select>
+                        </label>
+                        <div class="layer-toggles" role="group" aria-label="Sankey layers">
+                            <span class="layer-label">Sankey</span>
+                            <label class="filter-check">
+                                <input type="checkbox" id="wncelg-sankey-area" checked>
+                                Area
+                            </label>
+                            <label class="filter-check">
+                                <input type="checkbox" id="wncelg-sankey-status" checked>
+                                Status
+                            </label>
+                            <label class="filter-check">
+                                <input type="checkbox" id="wncelg-sankey-groups" checked>
+                                Groups
+                            </label>
+                        </div>
+                        <div class="tech-filters" id="wncelg-status-filters" role="group" aria-label="Split status filters"></div>
+                        <label class="table-filter">
+                            <span>Site</span>
+                            <input type="search" id="wncelg-site-filter" placeholder="Filter site id / name…" autocomplete="off">
+                        </label>
+                    </div>
+
+                    <div id="wncelg-sankey-wrap" class="sankey-wrap">
+                        <svg id="wncelg-sankey-svg" role="img" aria-label="Sankey diagram of Area to Split status to WNCELG group count"></svg>
+                        <p id="wncelg-sankey-empty" class="status-text" hidden>No flows match the current filters.</p>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="data-table" id="wncelg-table">
+                            <thead>
+                                <tr>
+                                    <th>Area</th>
+                                    <th>Site</th>
+                                    <th>Status</th>
+                                    <th>WNCELG count</th>
+                                    <th>Instances</th>
+                                    <th>DNs</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wncelg-tbody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.5"></script>
+    <script src="{{ url_for('rru_inventory.static', filename='vendor/d3.min.js') }}?v=7.9.0"></script>
+    <script src="{{ url_for('rru_inventory.static', filename='vendor/d3-sankey.min.js') }}?v=0.12.3"></script>
+    <script src="{{ url_for('configuration_dashboard.static', filename='tabs.js') }}?v=1.0"></script>
+    <script src="{{ url_for('configuration_dashboard.static', filename='hardware.js') }}?v=1.0"></script>
+    <script src="{{ url_for('configuration_dashboard.static', filename='wncelg.js') }}?v=1.1"></script>
+</body>
+</html>

@@ -23,9 +23,10 @@ Correlate configuration snapshots with PM across RATs.
 
 Snapshot pipeline is CM extract → `cm_store`. Do not require a live OSS pull inside the issues request.
 
-## History
+## Progress
 
-- 2026-08-17: PM across RATs.
+Dated work log: [`change-impact.progress.md`](change-impact.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

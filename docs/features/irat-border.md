@@ -21,9 +21,10 @@ Flag IRAT / inter-vendor mobility problems.
 
 Same engine as Mobility Explorer (`mobility.py`). Keep recipes in core.
 
-## History
+## Progress
 
-- 2026-08-17: added.
+Dated work log: [`irat-border.progress.md`](irat-border.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

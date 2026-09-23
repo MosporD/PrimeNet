@@ -23,11 +23,10 @@ SFTP pull of Nokia/Huawei PM, metadata, groups, neighbors; load into canonical D
 - Huawei daily raw stages in `raw/huawei/{cells,groups}/all/daily` then RAT-split.
 - Master switch: `NCM_ENABLE_ETL=0` on laptop (no pull/load/scheduler); `NCM_ENABLE_ETL=1` on server. See `core/etl_gate.py`. Local wipe: `python scripts/clear_local_etl_data.py --yes`.
 
-## History
+## Progress
 
-- 2026-09-11: `NCM_ENABLE_ETL` gate + local ETL data cleanup script.
-- 2026-08-02: scheduler RAM isolation.
-- 2026-08-31: ingest paths wired through `open_db` for optional Postgres.
+Dated work log: [`sync.progress.md`](sync.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

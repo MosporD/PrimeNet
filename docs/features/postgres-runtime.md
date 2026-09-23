@@ -21,9 +21,10 @@ Optional cutover of canonical SQLite files to one Postgres server, **per domain*
 - Femto, SON ML, KPI headers, CM snapshots stay SQLite on purpose.
 - New PM/metadata readers: `open_db(path)` + `store_available(path)`, not raw `sqlite3.connect` + `os.path.isfile`.
 
-## History
+## Progress
 
-- 2026-08-31: phase 0 inventory; phase 1 app DB adapter; phases 2–4 plumbing + migrate scripts. Tests 16/16 on SQLite. No live PG here.
+Dated work log: [`postgres-runtime.progress.md`](postgres-runtime.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

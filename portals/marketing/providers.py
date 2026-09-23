@@ -66,7 +66,7 @@ class NetworkFootprintProvider:
     """Coverage, serviceability, and capacity facts from the Engineering Portal.
 
     Architecture rule 4: this must call a PrimeNet HTTP API. It must never open
-    a PrimeNet database file, even though both run in the same process today.
+    a PrimeNet database file, even though both can run on the same laptop.
     """
 
     name = "network-footprint"
@@ -80,6 +80,32 @@ class NetworkFootprintProvider:
 
     def congested_sites(self) -> ProviderResult:
         raise NotImplementedError
+
+    def serviceability(self, region: str | None = None) -> ProviderResult:
+        raise NotImplementedError
+
+    def footprint_bundle(self, region: str | None = None) -> ProviderResult:
+        """Convenience round-trip; default composes the three calls."""
+        tech = self.technology_footprint(region)
+        if not tech.available:
+            return tech
+        congested = self.congested_sites()
+        service = self.serviceability(region)
+        return ProviderResult(
+            available=True,
+            value={
+                "as_of": tech.as_of,
+                "technology_footprint": tech.value,
+                "congested": congested.value if congested.available else None,
+                "serviceability": service.value if service.available else None,
+            },
+            source=tech.source,
+            as_of=tech.as_of,
+            detail={
+                "congested_ok": congested.available,
+                "serviceability_ok": service.available,
+            },
+        )
 
 
 class _NullSegmentSize(SegmentSizeProvider):
@@ -105,6 +131,11 @@ class _NullNetworkFootprint(NetworkFootprintProvider):
     def congested_sites(self) -> ProviderResult:
         return ProviderResult.unavailable(
             "The Engineering Portal API is not configured, so capacity data is unavailable."
+        )
+
+    def serviceability(self, region: str | None = None) -> ProviderResult:
+        return ProviderResult.unavailable(
+            "The Engineering Portal API is not configured, so serviceability data is unavailable."
         )
 
 
@@ -148,7 +179,7 @@ def status() -> list[dict]:
 _ENV_HINTS = {
     "segment_size": "NEXUS_MARKETING_SUBSCRIBER_API",
     "campaign_metrics": "NEXUS_MARKETING_DELIVERY_API",
-    "network_footprint": "NEXUS_PRIMENET_API_URL",
+    "network_footprint": "NEXUS_PRIMENET_API_URL + NEXUS_PORTAL_API_TOKEN",
 }
 
 

@@ -8,6 +8,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, url_fo
 
 from database_enhanced import get_user_by_session
 from .logic import reports_for_role
+from core.platform.session import get_session_token
 
 power_bi_bp = Blueprint(
     "power_bi",
@@ -26,7 +27,7 @@ def _guard_power_bi_access():
 
 
 def _current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

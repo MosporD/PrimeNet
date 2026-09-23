@@ -15,16 +15,20 @@ NexusCore should start from this page.
 
 ## 1. Where we are today
 
-PrimeNet is a deep, working slice of one domain: a RAN-focused OSS.
+PrimeNet is a deep, working slice of one domain: a RAN-focused OSS, now a
+**separate process** from the NexusCore lobby and from NexPulse.
 
 - PM (performance) and CM (configuration) ingestion for **Nokia and Huawei**,
   radio technologies **2G–5G**, stored in SQLite.
-- ~40 modules behind one login: performance analytics, fault management,
+- ~40 modules behind PrimeNet login: performance analytics, fault management,
   SON/optimization detectors (sleeping cells, overshooting, capacity hotspots,
   neighbor quality, …), config extraction/audit/history, RET management,
   network maps, dashboards, and reporting.
-- Shared shell already in place: NexusCore login, portal-tower selector, roles
-  and feature-access model, theming, activation/licensing.
+- Shared shell: NexusCore lobby (`nexuscore_app.py`) hosts the portal-tower
+  selector; operators log in once there. Identity is the PrimeNet users database
+  (`ncm_users.db`) with a shared `nexus_session` cookie (optional
+  `NEXUS_COOKIE_DOMAIN` for subdomains). Each user has a portal allow-list
+  (Admin Panel → Portals). In-portal RBAC stays inside each portal.
 
 In industry terms (TM Forum eTOM/ODA): PrimeNet covers **network performance
 management, configuration management, and part of fault management** — the
@@ -58,17 +62,21 @@ domains:
 
 ## 4. Architecture rules
 
-The single-app Flask + SQLite design is excellent for PrimeNet and stops there.
-BSS workloads (billing, subscribers, tickets) need transactional integrity,
-auditability, and isolation from heavy PM ingestion. The rules:
+PrimeNet's single-app Flask + SQLite design is excellent for the Engineering
+Portal and stops there. BSS workloads need isolation from heavy PM ingestion.
+The rules:
 
 1. **NexusCore is the umbrella, not a monolith.** Each portal is a separately
-   deployable application. PrimeNet is not the host for other domains — new
-   portals do not become PrimeNet blueprints.
-2. **Shared identity.** One auth/SSO service owns users, roles, and sessions;
-   every portal trusts it. Today PrimeNet's login plays this role; extracting
-   it into a standalone service is the first piece of technical work for any
-   second portal.
+   deployable application (own process / Docker service). Entry points:
+   `nexuscore_app.py`, `primenet_app.py`, `nexpulse_app.py`. New portals do
+   **not** become PrimeNet blueprints.
+2. **Central identity + portal allow-list.** Operators authenticate once at
+   NexusCore against the PrimeNet users database (`ncm_users.db` /
+   `database_enhanced`). All platforms share the `nexus_session` cookie
+   (set `NEXUS_COOKIE_DOMAIN=.your.domain` for cross-subdomain SSO; leave empty
+   on localhost). Each user has an `allowed_portals` list (`primenet`,
+   `nexpulse`, …) managed in Admin Panel. Portals do **not** own separate login
+   accounts. Domain data stores remain separate — only identity is shared.
 3. **One design system.** The constellation/tower theme, NexusCore branding,
    and shared UI conventions (`docs/FRONTEND_THEME.md`) apply to every portal.
    PrimeNet keeps its own sub-brand inside the Engineering Portal.
@@ -81,12 +89,10 @@ auditability, and isolation from heavy PM ingestion. The rules:
 
 ## 5. Build order (value per effort)
 
-0. **Marketing Portal (NexPulse) — done first, by decision.** Not the highest-value
-   domain, but the lowest-risk place to settle the portal scaffold every later
-   portal reuses: mount pattern, shell and navigation, portal-local RBAC, entity
-   lifecycles with approval gates, audit trail, and the provider seam that keeps
-   views working before any data source exists. Support and Sales inherit all of
-   it rather than re-deriving it under delivery pressure.
+0. **Marketing Portal (NexPulse) — done first, by decision.** Reference portal for
+   shell, portal-local RBAC, entity lifecycles, audit trail, and the provider
+   seam. Runs as `nexpulse_app.py` with its own users DB. Support and Sales
+   inherit the portal scaffold rather than re-deriving it under delivery pressure.
 1. **Support Portal — service assurance.** Smallest leap, biggest integration
    story: auto-create tickets from PrimeNet fault/health signals ("cell X
    degraded → ticket"), manual tickets, assignment, SLA timers, and a simple

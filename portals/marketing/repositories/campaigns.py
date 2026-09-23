@@ -389,6 +389,11 @@ def readiness(campaign: dict) -> dict:
         "Record the budget so cost per acquisition can be reported later.",
     )
 
+    # Network-aware targeting gate (PrimeNet API via NetworkFootprintProvider).
+    network_gate = _network_targeting_gate(campaign)
+    if network_gate is not None:
+        add(**network_gate)
+
     blocking_open = [c for c in checks if c["blocking"] and not c["ok"]]
     return {
         "checks": checks,
@@ -396,7 +401,104 @@ def readiness(campaign: dict) -> dict:
         "blocking_open": blocking_open,
         "advisory_open": [c for c in checks if not c["blocking"] and not c["ok"]],
         "policies": policies,
+        "network": network_gate_context(campaign),
     }
+
+
+def _segment_uses_network(campaign: dict) -> bool:
+    segment = campaign.get("segment")
+    if not segment and campaign.get("segment_id"):
+        from . import segments as segments_repo
+
+        segment = segments_repo.get_segment(int(campaign["segment_id"]))
+    if not segment:
+        return False
+    sources = segment.get("sources") or []
+    return any(s.get("key") == "network" for s in sources)
+
+
+def _network_targeting_gate(campaign: dict) -> dict | None:
+    """Blocking when network rules exist but PrimeNet API is offline; else capacity advisory."""
+    if not _segment_uses_network(campaign):
+        return None
+    footprint = providers.get("network_footprint")
+    if not footprint.available():
+        return {
+            "key": "network_api",
+            "label": "Network targeting requires the PrimeNet footprint API",
+            "ok": False,
+            "blocking": True,
+            "detail": (
+                "This audience uses Engineering Portal attributes "
+                "(coverage / congestion / serviceability). Connect "
+                "NEXUS_PRIMENET_API_URL + NEXUS_PORTAL_API_TOKEN, or remove network rules."
+            ),
+        }
+    congested = footprint.congested_sites()
+    if not congested.available:
+        return {
+            "key": "network_capacity",
+            "label": "Capacity pressure data is available from PrimeNet",
+            "ok": False,
+            "blocking": False,
+            "detail": congested.reason or "Could not load congested sites.",
+        }
+    value = congested.value or {}
+    site_count = int(value.get("site_count") or len(value.get("sites") or []))
+    # Advisory capacity gate: warn when the network is under broad pressure.
+    ok = site_count < 25
+    return {
+        "key": "network_capacity",
+        "label": "Capacity gate — congested sites within policy",
+        "ok": ok,
+        "blocking": False,
+        "detail": (
+            f"{site_count} congested site(s) reported by PrimeNet Capacity Hotspots. "
+            + (
+                "Below the soft gate (25) — OK to proceed with awareness."
+                if ok
+                else "Elevated congestion — prefer non-congested targeting or throttle heavy offers."
+            )
+        ),
+    }
+
+
+def network_gate_context(campaign: dict) -> dict:
+    """Snapshot for campaign detail UI (never invents numbers)."""
+    footprint = providers.get("network_footprint")
+    ctx = {
+        "uses_network_rules": _segment_uses_network(campaign),
+        "provider_available": bool(footprint.available()),
+    }
+    if not footprint.available():
+        ctx["reason"] = (
+            "PrimeNet network API not connected "
+            "(NEXUS_PRIMENET_API_URL / NEXUS_PORTAL_API_TOKEN)."
+        )
+        return ctx
+    bundle = footprint.footprint_bundle()
+    if not bundle.available:
+        ctx["reason"] = bundle.reason
+        return ctx
+    data = bundle.value or {}
+    tech = data.get("technology_footprint") or {}
+    congested = data.get("congested") or {}
+    service = data.get("serviceability") or {}
+    ctx.update(
+        {
+            "as_of": bundle.as_of or data.get("as_of"),
+            "technologies": (tech.get("technologies") if isinstance(tech, dict) else None) or [],
+            "totals": (tech.get("totals") if isinstance(tech, dict) else None) or {},
+            "congested_site_count": (
+                congested.get("site_count") if isinstance(congested, dict) else None
+            ),
+            "serviceability_gap_count": (
+                service.get("gap_count") if isinstance(service, dict) else None
+            ),
+            "source": bundle.source,
+        }
+    )
+    return ctx
 
 
 def available_transitions(campaign: dict, user) -> list[dict]:

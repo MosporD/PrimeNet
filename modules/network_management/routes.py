@@ -9,6 +9,7 @@ import sqlite3
 
 from database_enhanced import get_user_by_session, log_activity
 from db.runtime import connect_metadata, execute_query
+from core.platform.session import get_session_token
 
 network_management_bp = Blueprint(
     'network_management', __name__,
@@ -49,7 +50,7 @@ def _area(site_id):
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -61,7 +62,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

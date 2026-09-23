@@ -23,6 +23,7 @@ from modules.ret_management.credentials import (
 )
 from modules.ret_management.export import build_ret_workbook
 from modules.ret_management.site_layout import fetch_site_layout
+from core.platform.session import get_session_token
 
 ret_management_bp = Blueprint(
     'ret_management',
@@ -36,7 +37,7 @@ ret_management_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(session_token)
@@ -48,7 +49,7 @@ def login_required(f):
 
 
 def get_current_user():
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None

@@ -22,9 +22,10 @@ Score neighbor relations (HO, distance, azimuth, freshness) against operator tar
 
 Change `core/radio/neighbor.py`. Line cap `NEIGHBOR_MAX_LINES` also feeds SON Topology — raising it requires an ML rebuild to show up there.
 
-## History
+## Progress
 
-- 2026-08-17: 5G-5G + azimuth/freshness. 2026-08-19: vs-target scoring.
+Dated work log: [`neighbor-quality.progress.md`](neighbor-quality.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

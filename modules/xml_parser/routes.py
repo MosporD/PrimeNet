@@ -18,6 +18,7 @@ from database_enhanced import get_user_by_session, log_activity, get_db
 from db.runtime import execute_query
 from utils.xml_safety import parse_xml_file
 from core.cm_plan_validate import validate_raml_plan
+from core.platform.session import get_session_token
 
 xml_parser_bp = Blueprint(
     'xml_parser', __name__,
@@ -33,7 +34,7 @@ def login_required(f):
     """Decorator to require login"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
 
@@ -48,7 +49,7 @@ def login_required(f):
 
 def get_current_user():
     """Get current logged-in user"""
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None

@@ -21,9 +21,10 @@ Rank mobility problems from PM HO recipes.
 
 KPI aliases for 2G/3G/5G live with the radio PM helper. Do not special-case one RAT in the thin module.
 
-## History
+## Progress
 
-- 2026-08-17: added with the radio pack.
+Dated work log: [`mobility-explorer.progress.md`](mobility-explorer.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

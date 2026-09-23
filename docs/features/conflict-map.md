@@ -17,9 +17,10 @@ Detect identifier collisions from metadata (and related CM fields).
 
 Logic in `logic.py`. Map UI is local templates/static. Do not fold this into Network Map without an explicit ask.
 
-## History
+## Progress
 
-No dated rewrite in `progress.md` beyond existing map.
+Dated work log: [`conflict-map.progress.md`](conflict-map.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

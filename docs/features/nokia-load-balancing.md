@@ -20,10 +20,10 @@ Admin AMLE workflow on Network Balance sector snapshots. Live CM extract `NOKLTE
 - Balance DB: `connect_network_balance()` (Postgres domain `balance` when enabled).
 - SMB share auto-load: `\\RNO-WAN\Network Balance` (`smb_config.py`).
 
-## History
+## Progress
 
-- 2026-08-03: module + ingest. 2026-08-11: ingest process monitor.
-- 2026-08-17: pipeline verify (rules + RAML dry-run). No auto-push on this host.
+Dated work log: [`nokia-load-balancing.progress.md`](nokia-load-balancing.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

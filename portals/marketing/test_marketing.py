@@ -409,8 +409,8 @@ def test_portal_imports_nothing_from_primenet_modules():
     assert offenders == [], f"portal reached into PrimeNet internals: {offenders}"
 
 
-def test_identity_bridge_is_the_only_primenet_import():
-    """Architecture rule 2: identity comes from one place, and only one file."""
+def test_nexpulse_identity_uses_central_store_only_in_access():
+    """SSO may resolve sessions via database_enhanced; only access.py should import it."""
     import pathlib
 
     root = pathlib.Path(__file__).parent
@@ -418,6 +418,8 @@ def test_identity_bridge_is_the_only_primenet_import():
     for path in root.rglob("*.py"):
         if path.name.startswith("test_"):
             continue
-        if "database_enhanced" in path.read_text(encoding="utf-8"):
-            importers.append(path.name)
+        for line in path.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped.startswith(("import ", "from ")) and "database_enhanced" in stripped:
+                importers.append(path.name)
     assert importers == ["access.py"], importers

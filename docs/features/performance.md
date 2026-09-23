@@ -22,10 +22,10 @@ Cell/site/group KPI trends and tables, Nokia + Huawei, 2G–5G, hourly/daily, CS
 - ATTACH joins: `performance_meta_pm_conn` (SQLite attach vs PG schema alias). Metadata + PM must be the same backend.
 - New KPIs: catalog/mapping + headers DB, not hardcoded SELECT lists.
 
-## History
+## Progress
 
-- 2026-08-05: chart layouts, site-search fix.
-- 2026-08-31: PM opens go through `open_db` for optional Postgres.
+Dated work log: [`performance.progress.md`](performance.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

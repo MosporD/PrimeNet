@@ -8,6 +8,7 @@ from functools import wraps
 from database_enhanced import get_user_by_session
 from .hdx import HDX_DIR, TECH_FILES, get_home_page, read_file, guess_mimetype, patch_hdx_html
 from .navi import get_navi_payload, search_docs, warm_search_index
+from core.platform.session import get_session_token
 
 ran_features_bp = Blueprint(
     "ran_features",
@@ -21,7 +22,7 @@ ran_features_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -33,7 +34,7 @@ def login_required(f):
 
 
 def _current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

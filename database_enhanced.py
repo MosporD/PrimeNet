@@ -88,6 +88,10 @@ def init_db():
         cursor.execute('ALTER TABLE users ADD COLUMN force_password_change BOOLEAN DEFAULT 1')
     except Exception:
         pass
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN allowed_portals TEXT')
+    except Exception:
+        pass
     
     # Sessions table
     cursor.execute('''
@@ -434,19 +438,46 @@ def verify_password(password, password_hash):
 # USER FUNCTIONS
 # ============================================================================
 
-def create_user(username, email, password, full_name=None, department=None, role='user'):
+def create_user(
+    username,
+    email,
+    password,
+    full_name=None,
+    department=None,
+    role='user',
+    allowed_portals=None,
+):
     """Create new user"""
     try:
+        from core.platform.portal_access import default_portals_for_role, serialize_allowed_portals
+
+        init_db()
+        if allowed_portals is None:
+            portals_value = serialize_allowed_portals(default_portals_for_role(role))
+        else:
+            portals_value = serialize_allowed_portals(allowed_portals)
+
         conn = get_db()
         password_hash = hash_password(password)
         user_id = _insert_return_id(
             conn,
             '''
             INSERT INTO users (
-                username, email, password_hash, full_name, department, role, password_changed_at, force_password_change
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                username, email, password_hash, full_name, department, role,
+                password_changed_at, force_password_change, allowed_portals
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''',
-            (username, email, password_hash, full_name, department, role, datetime.now(), True),
+            (
+                username,
+                email,
+                password_hash,
+                full_name,
+                department,
+                role,
+                datetime.now(),
+                True,
+                portals_value,
+            ),
         )
         conn.commit()
         conn.close()
@@ -504,17 +535,43 @@ def authenticate_user(username, password):
 
 def get_all_users():
     """Get all users (for admin)"""
+    from core.platform.portal_access import user_allowed_portals
+
+    init_db()
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''
         SELECT id, username, email, full_name, department, role, 
-               created_at, last_login, is_active 
+               created_at, last_login, is_active, allowed_portals
         FROM users 
         ORDER BY created_at DESC
     ''')
     users = cursor.fetchall()
     conn.close()
-    return [dict(user) for user in users]
+    out = []
+    for user in users:
+        row = dict(user)
+        row['allowed_portals'] = user_allowed_portals(row)
+        out.append(row)
+    return out
+
+
+def update_user_portals(user_id, portals) -> bool:
+    """Replace a user's portal allow-list."""
+    from core.platform.portal_access import serialize_allowed_portals
+
+    init_db()
+    conn = get_db()
+    cursor = conn.cursor()
+    _exec(
+        cursor,
+        'UPDATE users SET allowed_portals = ? WHERE id = ?',
+        (serialize_allowed_portals(portals), user_id),
+    )
+    affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return affected > 0
 
 def update_user_role(user_id, new_role):
     """Update user's role"""

@@ -31,6 +31,7 @@ from core.pm_plus.query import (
 from core.pm_plus.rollup import apply_retention, rollup_all
 from core.pm_plus.schema import init_schema
 from database_enhanced import get_user_by_session, log_activity
+from core.platform.session import get_session_token
 performance_explorer_plus_bp = Blueprint(
     "performance_explorer_plus",
     __name__,
@@ -50,7 +51,7 @@ def _guard_access():
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -63,7 +64,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

@@ -22,10 +22,10 @@ Draw neighbor lines for a drawn cell/site scope. Export the same filtered rows t
 - Loaders: `scripts/load_nokia_neighbor_raw_to_db.py`, `scripts/load_huawei_neighbor_wide_to_db.py`.
 - Do not change Neighbor Quality (`/neighbor-quality`) when the request is this map.
 
-## History
+## Progress
 
-- 2026-08-17: 5G-5G + azimuth/freshness.
-- 2026-08-31: Export Excel on the analysis page; JS `||` for Content-Disposition (not Python `or`).
+Dated work log: [`neighbor-analysis.progress.md`](neighbor-analysis.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

@@ -14,6 +14,7 @@ from database_enhanced import (
 )
 from db.runtime import connect_metadata, execute_query
 from core.module_access import allowed_hrefs_for_role, navigation_sections_for_role
+from core.platform.session import clear_session_cookie, get_session_token, set_session_cookie
 from modules.sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
 
 logger = logging.getLogger(__name__)
@@ -112,11 +113,35 @@ _DEFAULT_SITE_COLUMNS = [
 ]
 
 def get_current_user():
-    """Get current logged-in user"""
-    session_token = request.cookies.get('session_token')
-    if session_token:
-        return get_user_by_session(session_token)
-    return None
+    """Get current logged-in user with Engineering portal grant."""
+    from core.platform.portal_access import PORTAL_PRIMENET, user_can_access_portal
+
+    session_token = get_session_token()
+    if not session_token:
+        return None
+    user = get_user_by_session(session_token)
+    if not user:
+        return None
+    if not user_can_access_portal(user, PORTAL_PRIMENET):
+        return None
+    return user
+
+
+def _sso_login_redirect(*, next_url: str | None = None):
+    """Send unauthenticated operators to NexusCore (shared cookie)."""
+    import os
+    from core.platform.identity.routes import nexuscore_login_url
+    from core.platform.paths import primenet_public_url
+
+    allow_local = (os.getenv('NCM_ALLOW_LOCAL_LOGIN') or '').strip().lower() in (
+        '1', 'true', 'yes', 'on',
+    )
+    target = (next_url or request.args.get('next') or '').strip()
+    if not target:
+        target = f"{primenet_public_url()}/dashboard"
+    if allow_local:
+        return render_template('login.html', next_url=target)
+    return redirect(nexuscore_login_url(next_url=target))
 
 def get_operational_site_stats():
     """
@@ -255,24 +280,24 @@ def format_user_data(user):
 
 @auth_bp.route('/')
 def index():
-    """Redirect to portal picker or login"""
+    """Redirect to dashboard or NexusCore login (portal tower lives on NexusCore)."""
     user = get_current_user()
     if user:
-        return redirect(url_for('auth.portal_select'))
-    return redirect(url_for('auth.login_page'))
+        return redirect(url_for('auth.dashboard'))
+    return _sso_login_redirect()
 
 @auth_bp.route('/login')
 def login_page():
-    """Render login page"""
-    return render_template('login.html')
+    """SSO: NexusCore login by default; local login only when NCM_ALLOW_LOCAL_LOGIN=1."""
+    return _sso_login_redirect()
 
 @auth_bp.route('/register')
 def register_page():
     """Registration is disabled for internal-only deployment."""
     return redirect(url_for('auth.login_page'))
 
-# Portals that are live get their own application under portals/ and are
-# mounted in app.py. The rest render the Coming soon page.
+# Coming-soon placeholders remain reachable from PrimeNet for convenience;
+# live portals are separate processes — tower links use public URLs on NexusCore.
 _PORTAL_COMING_SOON = {
     'sales': {
         'id': 'sales',
@@ -288,21 +313,22 @@ _PORTAL_COMING_SOON = {
     },
 }
 
-_PORTAL_LIVE = {
-    'engineering': '/dashboard',
-    'marketing': '/portals/marketing/',
-}
+def _portal_live_urls():
+    from core.platform.paths import nexpulse_public_url, nexuscore_public_url
+
+    return {
+        'engineering': '/dashboard',
+        'marketing': f'{nexpulse_public_url()}/portals/marketing/',
+        'tower': f'{nexuscore_public_url()}/portals',
+    }
 
 @auth_bp.route('/portals')
 def portal_select():
-    """Post-login portal picker."""
+    """Redirect Engineering users to the NexusCore tower (or dashboard fallback)."""
     user = get_current_user()
     if not user:
         return redirect(url_for('auth.login_page'))
-    return render_template(
-        'portal_select.html',
-        user=format_user_data(user),
-    )
+    return redirect(_portal_live_urls()['tower'])
 
 @auth_bp.route('/portals/<portal_id>')
 def portal_enter(portal_id):
@@ -312,13 +338,13 @@ def portal_enter(portal_id):
         return redirect(url_for('auth.login_page'))
 
     key = (portal_id or '').strip().lower()
-    live = _PORTAL_LIVE.get(key)
+    live = _portal_live_urls().get(key)
     if live:
         return redirect(live)
 
     portal = _PORTAL_COMING_SOON.get(key)
     if not portal:
-        return redirect(url_for('auth.portal_select'))
+        return redirect(url_for('auth.dashboard'))
 
     return render_template(
         'portal_coming_soon.html',
@@ -335,7 +361,7 @@ def dashboard():
     """
     user = get_current_user()
     if not user:
-        return redirect(url_for('auth.login_page'))
+        return _sso_login_redirect(next_url=request.url)
 
     user_data = format_user_data(user)
     return render_template(
@@ -380,6 +406,11 @@ def login():
         success, user = authenticate_user(username, password)
 
         if success and user:
+            from core.platform.portal_access import PORTAL_PRIMENET, user_can_access_portal
+
+            if not user_can_access_portal(user, PORTAL_PRIMENET):
+                return jsonify({'error': 'No access to Engineering portal'}), 403
+
             _clear_login_failures(client_ip, username)
             session_token = create_session((user.get('id') if isinstance(user, dict) else user[0]))
             log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'login', f'User {username} logged in')
@@ -393,6 +424,7 @@ def login():
                 'success': True,
                 'message': 'Login successful',
                 'must_change_password': must_change_password,
+                'redirect': url_for('auth.dashboard'),
                 'user': {
                     'username': (user.get('username') if isinstance(user, dict) else user[1]),
                     'email': (user.get('email') if isinstance(user, dict) else user[2]),
@@ -402,15 +434,7 @@ def login():
                 'allowed_hrefs': allowed_hrefs_for_role(user_role),
             }))
 
-            secure_cookie = (request.headers.get('X-Forwarded-Proto') == 'https') or request.is_secure
-            response.set_cookie(
-                'session_token',
-                session_token,
-                httponly=True,
-                secure=secure_cookie,
-                samesite='Lax',
-                path='/',
-            )
+            set_session_cookie(response, session_token)
             return response
         else:
             _record_login_failure(client_ip, username)
@@ -439,7 +463,7 @@ def navigation_allowed():
 def logout():
     """Logout user and delete session"""
     try:
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
 
         if session_token:
             user = get_user_by_session(session_token)
@@ -449,16 +473,7 @@ def logout():
             delete_session(session_token)
 
         response = make_response(jsonify({'success': True}))
-        secure_cookie = (request.headers.get('X-Forwarded-Proto') == 'https') or request.is_secure
-        response.set_cookie(
-            'session_token',
-            '',
-            expires=0,
-            httponly=True,
-            secure=secure_cookie,
-            samesite='Lax',
-            path='/',
-        )
+        clear_session_cookie(response)
         return response
 
     except Exception:

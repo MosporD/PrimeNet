@@ -5,6 +5,7 @@ from __future__ import annotations
 from urllib.parse import urlparse
 
 from core.module_versions import nav_label
+from core.platform.session import get_session_token
 
 # visibility:
 #   all          — any authenticated user
@@ -26,6 +27,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Sector Health Monitor", "href": "/sector-health", "visibility": "all"},
             {"label": "Sector Health (All Cells)", "href": "/sector-health-all", "visibility": "all"},
             {"label": "Conflict Map", "href": "/conflict-map", "visibility": "all"},
+            {"label": "Adjacency GIS", "href": "/adjacency-gis", "visibility": "all"},
             {"label": "Femto PM", "href": "/femto-pm", "visibility": "all"},
             {"label": "Fault Management", "href": "/fault-management", "visibility": "all"},
         ],
@@ -63,6 +65,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "XML Generator", "href": "/excel-generator", "visibility": "all"},
             {"label": "NE Comparison", "href": "/ne-comparison", "visibility": "all"},
             {"label": "RET Management", "href": "/ret-management", "visibility": "all"},
+            {"label": "Configuration Dashboard", "href": "/configuration-dashboard", "visibility": "all"},
             {"label": "Config Task Scheduler", "href": "/config-task-scheduler", "visibility": "all"},
             {"label": "Config History", "href": "/config-history", "visibility": "all"},
             {"label": "Network Management", "href": "/network-management", "visibility": "all"},
@@ -209,7 +212,7 @@ def module_access_before_request(href: str):
     if request.endpoint and str(request.endpoint).endswith(".static"):
         return None
 
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     if not token:
         return redirect(url_for("auth.login_page"))
     user = get_user_by_session(token)

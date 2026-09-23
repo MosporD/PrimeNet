@@ -20,9 +20,10 @@ Geographic network picture from `metadata.db` (sites/cells) plus optional PM ove
 - Metadata queries: `connect_metadata()`. Heavy polygon/site queries already exist — extend, don’t clone.
 - Cache-bust `map.js` / `network_map.css` only when those files change.
 
-## History
+## Progress
 
-Map is a long-lived heavy module (Lesson 08). Neighbor Excel (2026-08-31) is on the analysis page, not this one.
+Dated work log: [`network-map.progress.md`](network-map.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

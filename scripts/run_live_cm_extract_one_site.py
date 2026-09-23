@@ -52,7 +52,7 @@ def _session(jar: CookieJar) -> None:
 
     token = create_session(user_id)
     jar.set_cookie(Cookie(
-        version=0, name='session_token', value=token,
+        version=0, name='primenet_session', value=token,
         port=None, port_specified=False,
         domain='127.0.0.1', domain_specified=True, domain_initial_dot=False,
         path='/', path_specified=True, secure=False,

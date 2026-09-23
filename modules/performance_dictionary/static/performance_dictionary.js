@@ -104,7 +104,8 @@ function updateSourceLabel() {
     const el = document.getElementById('perf-source-label');
     if (!el) return;
     const sources = Array.isArray(perfMeta.source) ? perfMeta.source : [];
-    el.textContent = sources.length ? `Source: ${sources.join(', ')}` : '';
+    // Keep filenames in the data model; never dump vendor workbook names in the UI.
+    el.textContent = sources.length ? 'Nokia vendor reference' : '';
 }
 
 function switchEntity(entity) {
@@ -505,8 +506,8 @@ async function loadHuaweiCatalog() {
         setText('stat-counters', configured.reduce((sum, t) => sum + (t.total_counters || 0), 0));
         setText('stat-kpis', 0);
         setText('perf-source-label', configured.length
-            ? 'Source: Huawei MAE counter catalog'
-            : 'Huawei CSVs not installed under data/huawei_pm_counters');
+            ? 'Huawei counter catalog'
+            : 'Huawei counter catalog not installed');
         perfActiveId = '';
         await fetchHuaweiTable();
     } catch (err) {

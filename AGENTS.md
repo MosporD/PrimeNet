@@ -1,7 +1,13 @@
 # PrimeNet
 
 Flask telecom platform for radio network performance and configuration management.
-Entry point: `app.py`. Vendors: Nokia, Huawei. RATs: 2G–5G.
+Entry points (separate processes):
+- `python app.py` — local suite launcher (starts all three; shared activation for testing)
+- `nexuscore_app.py` — lobby / portal tower
+- `primenet_app.py` — Engineering Portal (PrimeNet)
+- `nexpulse_app.py` — Marketing Portal (NexPulse)
+
+Vendors: Nokia, Huawei. RATs: 2G–5G.
 
 ## Architecture
 
@@ -15,11 +21,11 @@ Entry point: `app.py`. Vendors: Nokia, Huawei. RATs: 2G–5G.
 
 ## Conventions
 
-- Register every new blueprint in `app.py` (import + `app.register_blueprint`).
+- Register every new engineering blueprint in `primenet_app.py` (import + `app.register_blueprint`).
 - Module blueprints use `template_folder="templates"` and module-local `static_folder` when needed.
-- Auth: copy `login_required` decorator pattern from existing modules; session via `session_token` cookie.
+- Auth: copy `login_required` decorator pattern from existing modules; session via shared `nexus_session` cookie (`get_session_token()`).
 - PM data: SQLite via `db/runtime.py` and `sync_config.py` path constants.
-- Module access control: `core/module_access.py`.
+- Module access control: `core/module_access.py`. Portal entry: `core/platform/portal_access.py`.
 
 ## Do not edit
 
@@ -45,9 +51,17 @@ Code map lives in `graphify-out/` (AST extract, no API). The CLI is `python -m g
 
 ## Feature briefs
 
-Per-blueprint agent context lives in `docs/features/` (index `docs/features/README.md`).
-Read the matching brief **before** changing that module. Radio wrappers also read `_radio-engine.md`.
+Master catalog: `docs/feature.md`.
+Per-blueprint brief: `docs/features/<slug>.md`.
+Per-blueprint progress (dated log + module NEXT): `docs/features/<slug>.progress.md`.
+Index: `docs/features/README.md`.
+
+Read the catalog entry, brief, and progress file **before** changing that module.
+Radio wrappers also read `_radio-engine.md`. Portals (e.g. NexPulse) live under
+`portals/`, not `modules/` — see `docs/features/nexpulse.md` + `nexpulse.progress.md`.
 
 ## Session handoff
 
-Read `progress.md` for current work and the NEXT pointer. Scope is defined in `checklist.md`.
+Root `progress.md` is a **brief daily journal** (topic bullets only). Scope/checklist
+still in `checklist.md`. Detailed work and per-module NEXT live in the matching
+`docs/features/<slug>.progress.md`.

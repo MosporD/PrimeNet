@@ -1,16 +1,19 @@
 ---
-description: Read docs/features briefs before changing a PrimeNet module
-globs: modules/**/*,templates/dashboard.html,templates/radio_module.html,core/radio/**/*,db/**/*,pipeline/**/*,routes/**/*
+description: Read docs/features briefs + progress before changing a PrimeNet module
+globs: modules/**/*,portals/**/*,templates/dashboard.html,templates/radio_module.html,core/radio/**/*,db/**/*,pipeline/**/*,routes/**/*
 alwaysApply: false
 ---
 
-# Feature briefs
+# Feature briefs + blueprint progress
 
 These are **agent implementation notes**, not user manuals. Index: `docs/features/README.md`.
+Catalog: `docs/feature.md`.
 
 1. `python -m graphify query "<feature>"`
-2. Open `docs/features/<slug>.md` where `<slug>` is the dashboard `data-module-id` (or href id).
-3. Radio-optimization wrappers: also read `docs/features/_radio-engine.md`.
-4. After a real change: add one dated **History** line; move **Plans** if the next step changed. Bump `core/module_versions.py` only when the UI version label should change.
+2. Open `docs/features/<slug>.md` where `<slug>` is the dashboard `data-module-id` (or href id / portal slug like `nexpulse`).
+3. Open `docs/features/<slug>.progress.md` for dated work, Current track, and module **NEXT**.
+4. Radio-optimization wrappers: also read `docs/features/_radio-engine.md`.
+5. After a real change: append a dated section to `<slug>.progress.md`; move **Plans** on the brief and **NEXT** on the progress file if the next step changed. Add one short topic bullet to root `progress.md` (journal only — not details). Bump `core/module_versions.py` only when the UI version label should change.
+6. **Dark mode:** every new/changed module page must load `common.js` (injects `theme-dark-final.css`), ship `body.dark-mode` rules in module CSS (or CSS variables), and pass `python scripts/audit_dark_mode.py --strict`. See `docs/FRONTEND_THEME.md`.
 
-Do not invent roadmap items. Dated session work still belongs in `progress.md`.
+Do not invent roadmap items. Do not put long session detail in root `progress.md`.

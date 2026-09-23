@@ -21,9 +21,10 @@ Silent outages: cell still configured Active, payload gone vs baseline. Optional
 
 This is the **one** radio tile with real module-local logic. Tune `detect_sleeping_cells` here, not by copying into Sector Health.
 
-## History
+## Progress
 
-- 2026-08-17: vs live FM. 2026-08-19: V1.1; Sector Health no longer overlays this.
+Dated work log: [`sleeping-cells.progress.md`](sleeping-cells.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

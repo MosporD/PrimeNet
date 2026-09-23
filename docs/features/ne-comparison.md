@@ -17,9 +17,10 @@ Side-by-side / delta of MO parameters between two NEs.
 
 Diff engine is in this module (large `routes.py`). Do not pull live OSS inside a compare unless the UI already does — prefer extracted files/snapshots.
 
-## History
+## Progress
 
-No dated rewrite in `progress.md`.
+Dated work log: [`ne-comparison.progress.md`](ne-comparison.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

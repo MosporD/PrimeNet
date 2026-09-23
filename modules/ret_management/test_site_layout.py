@@ -52,8 +52,15 @@ def test_sector_label_adds_letter_alias():
 
 def test_default_beamwidth_by_sector_count():
     assert default_beamwidth(1) == 360.0
-    assert default_beamwidth(3) == 65.0
-    assert default_beamwidth(6) < 65.0
+    assert default_beamwidth(3) == 60.0
+    assert default_beamwidth(6) < 60.0
+
+
+def test_normalize_sector_key_from_inventory_site_letter():
+    """Metadata stores ``{siteId}_{Letter}`` — letter is the sector, not the site digits."""
+    assert normalize_sector_key('1003_A') == '1'
+    assert normalize_sector_key('601_C') == '3'
+    assert normalize_sector_key('1003-B') == '2'
 
 
 def _cell(sector, azimuth, *, tech='4G-FDD', etilt=4.0, height=25.0, name='C', band='L18'):

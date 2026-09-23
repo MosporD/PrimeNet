@@ -17,9 +17,10 @@ Browse vendor feature documentation / activation state.
 
 HedEx in-page TOC links were fixed 2026-08-05 — preserve them. Do not scrape new HedEx trees into git.
 
-## History
+## Progress
 
-- 2026-08-05: Huawei HedEx TOC links.
+Dated work log: [`ran-features.progress.md`](ran-features.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

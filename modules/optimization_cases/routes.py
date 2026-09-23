@@ -10,6 +10,7 @@ from core.cases import selection, service, store
 from core.cases.config import STATES, TRANSITIONS
 from core.cases.schema import init_schema
 from database_enhanced import get_user_by_session, log_activity
+from core.platform.session import get_session_token
 
 optimization_cases_bp = Blueprint(
     "optimization_cases",
@@ -30,7 +31,7 @@ def _guard_access():
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -43,7 +44,7 @@ def login_required(f):
 
 
 def _user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

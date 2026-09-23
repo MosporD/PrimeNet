@@ -18,9 +18,10 @@ Map points colored by a selected KPI for the current vendor/RAT/time.
 
 PM opens already go through `connect_pm_db` (Postgres-ready). Column discovery uses `PRAGMA table_info` (adapted on PG). Missing tables should stay empty results, not 500s.
 
-## History
+## Progress
 
-No major dated rewrite beyond shared PM/open_db plumbing (2026-08-31).
+Dated work log: [`cell-heatmap.progress.md`](cell-heatmap.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

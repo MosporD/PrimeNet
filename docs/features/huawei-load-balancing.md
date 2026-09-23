@@ -18,9 +18,10 @@ NOK Huawei sectors → CellMLB propose → Excel/MML. **No U2020 push.**
 
 Reuse Nokia ingest/snapshots (`vendor="Huawei"`). Do not invent a second balance DB. Do not add U2020 write unless Malek asks (and then confirmation-gate like Nokia).
 
-## History
+## Progress
 
-- 2026-08-17: Huawei LB on Network Balance SQLite (propose → Excel/MML). No U2020 push.
+Dated work log: [`huawei-load-balancing.progress.md`](huawei-load-balancing.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

@@ -37,6 +37,55 @@
             {% endfor %}
         </div>
 
+        {% set net = readiness.network or {} %}
+        {% if net.uses_network_rules or net.provider_available %}
+        <div class="mkt-card">
+            <div class="mkt-card-title">Network-aware targeting</div>
+            {% if not net.provider_available %}
+            <div class="mkt-notice mkt-notice-info">
+                <div>{{ net.reason or 'PrimeNet network API is not connected.' }}</div>
+            </div>
+            {% else %}
+            <p class="mkt-muted" style="margin:0 0 10px;font-size:0.82rem">
+                Live from PrimeNet{% if net.as_of %} · as of {{ net.as_of }}{% endif %}
+                {% if net.source %} · {{ net.source }}{% endif %}
+            </p>
+            <div class="mkt-field-row">
+                <div class="mkt-field">
+                    <div class="mkt-muted" style="font-size:0.75rem">Active cells</div>
+                    <div style="font-size:1.25rem;font-weight:650">{{ net.totals.cells if net.totals else '—' }}</div>
+                </div>
+                <div class="mkt-field">
+                    <div class="mkt-muted" style="font-size:0.75rem">Sites</div>
+                    <div style="font-size:1.25rem;font-weight:650">{{ net.totals.sites if net.totals else '—' }}</div>
+                </div>
+                <div class="mkt-field">
+                    <div class="mkt-muted" style="font-size:0.75rem">Congested sites</div>
+                    <div style="font-size:1.25rem;font-weight:650">{{ net.congested_site_count if net.congested_site_count is not none else '—' }}</div>
+                </div>
+                <div class="mkt-field">
+                    <div class="mkt-muted" style="font-size:0.75rem">Coverage gaps</div>
+                    <div style="font-size:1.25rem;font-weight:650">{{ net.serviceability_gap_count if net.serviceability_gap_count is not none else '—' }}</div>
+                </div>
+            </div>
+            {% if net.technologies %}
+            <table class="mkt-table" style="margin-top:12px">
+                <thead><tr><th>Technology</th><th class="mkt-num">Cells</th><th class="mkt-num">Sites</th></tr></thead>
+                <tbody>
+                {% for t in net.technologies %}
+                <tr>
+                    <td>{{ t.technology }}</td>
+                    <td class="mkt-num">{{ t.cell_count }}</td>
+                    <td class="mkt-num">{{ t.site_count }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+
         <div class="mkt-card">
             <div class="mkt-card-title">Channel mix</div>
             {% if user.can(cfg.P_CAMPAIGN_EDIT) and campaign.editable %}

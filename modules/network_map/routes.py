@@ -13,6 +13,7 @@ import sqlite3
 import os
 import sys
 import re
+from core.platform.session import get_session_token
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from sync_config import (
@@ -613,7 +614,7 @@ def login_required(f):
     """Decorator to require login"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
 
@@ -628,7 +629,7 @@ def login_required(f):
 
 def get_current_user():
     """Get current logged-in user"""
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None

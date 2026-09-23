@@ -10,10 +10,17 @@ from modules.ret_management.logic import (
     build_huawei_mod_command,
     config_retu_dist_name,
     huawei_ret_sector_key,
+    huawei_ret_site_id,
+    infer_ret_tech_from_label,
     mml_tilt_to_degrees_display,
     nokia_ret_sector_key,
+    nokia_ret_site_id,
     normalize_huawei_ret_rows,
     normalize_mml_tilt_input,
+    parse_huawei_ret_tech,
+    parse_huawei_subunit_name,
+    parse_nokia_ret_tech,
+    parse_nokia_sector_id,
     resolve_nokia_retu_read_mo_class,
     resolve_nokia_retu_write_mo_class,
     sort_huawei_ret_rows,
@@ -136,50 +143,90 @@ def test_sort_nokia_retu_rows_natural_dn_order():
     assert [r['DN'] for r in sort_nokia_retu_rows(rows)] == ['x/RETU-2', 'x/RETU-10']
 
 
-def test_huawei_ret_sector_key_prefers_actual_sector_id():
+def test_huawei_ret_sector_key_from_subunit_name_site_sector_form():
+    assert huawei_ret_sector_key({'Subunit Name': '1020_A-2G-L900'}) == '1'
+    assert huawei_ret_sector_key({'Subunit Name': '1020_B-AAU-Left'}) == '2'
+    assert huawei_ret_site_id({'Subunit Name': '1020_A-2G-L900'}) == '1020'
+    assert parse_huawei_subunit_name('1020_C-4G-L1800') == ('1020', '3')
+
+
+def test_parse_huawei_ret_tech_from_subunit_name():
+    assert parse_huawei_ret_tech('1020_A-2G-L900') == '2G'
+    assert parse_huawei_ret_tech('1020_B-AAU-Left') == '4G-AAU-Left'
+    assert parse_huawei_ret_tech('1020_C-AAU-Right') == '4G-AAU-Right'
+    assert parse_huawei_ret_tech('1020_C-4G-L1800') == '4G'
+    assert parse_huawei_ret_tech('1020_A-3G-L2100') == '3G'
+    assert parse_huawei_ret_tech('1005_LTE-TDD-A') == '4G-TDD'
+    assert parse_huawei_ret_tech('1009_A-4G') == '4G'
+    assert parse_huawei_subunit_name('1005_LTE-TDD-A') == ('1005', '1')
+
+
+def test_parse_nokia_ret_tech_from_sector_id():
+    assert parse_nokia_ret_tech('A-2G-L900-H') == '2G'
+    assert parse_nokia_ret_tech('A4-L1800') == '4G-L1800+'  # layer digit 4
+    assert parse_nokia_ret_tech('A1-Left-L1800') == '4G'     # layer digit 1
+    assert parse_nokia_ret_tech('F1_F2-A1-3G-L1800-L2100') == '3G'
+    assert parse_nokia_ret_tech('D4-L1800') == '4G-L1800+'
+    assert parse_nokia_ret_tech('F3_F4-A-3G-4G') == '3G'     # F# / 3G beat bare 4G
+    assert parse_nokia_ret_tech('Capacity_A_Left') == '4G-L1800+'
+    assert parse_nokia_ret_tech('NA') == 'Not Used'
+    assert parse_nokia_ret_tech('NOT USED') == 'Not Used'
+    assert parse_nokia_sector_id('Capacity_B_Right') == '2'
+    assert infer_ret_tech_from_label('B4-L1800-L2100') == '4G-L1800+'
+
+
+def test_huawei_ret_sector_key_ignores_actual_sector_id_and_sec_aliases():
+    """Sector comes only from Subunit Name site_sector form — no fallbacks."""
     assert huawei_ret_sector_key({
         'Device No.': '21', 'Subunit No.': '1',
         'Subunit Name': 'SEC3', 'Actual Sector ID': '2',
-    }) == '2'
-
-
-def test_huawei_ret_sector_key_from_subunit_name():
-    assert huawei_ret_sector_key({'Subunit Name': 'SEC3'}) == '3'
-    assert huawei_ret_sector_key({'Subunit Name': 'Sector-2'}) == '2'
-    assert huawei_ret_sector_key({'Subunit Name': 'B'}) == '2'
-
-
-def test_huawei_ret_sector_key_unknown_stays_empty():
-    assert huawei_ret_sector_key({'Subunit Name': 'spare'}) == ''
+    }) == ''
+    assert huawei_ret_sector_key({'Subunit Name': 'B'}) == ''
     assert huawei_ret_sector_key({'Device No.': '21', 'Subunit No.': '4'}) == ''
 
 
-def test_nokia_ret_sector_key_falls_back_to_subunit_number():
+def test_nokia_ret_sector_key_from_sector_id_forms():
+    assert nokia_ret_sector_key({'sectorID': 'D4-L1800'}) == '4'
+    assert nokia_ret_sector_key({'sectorID': 'F1_F2-A1-3G-L1800-L2100'}) == '1'
     assert nokia_ret_sector_key({'sectorID': '3'}) == '3'
-    assert nokia_ret_sector_key({'sectorID': '', 'subunitNumber': '2'}) == '2'
+    assert parse_nokia_sector_id('C2-L2100') == '3'
+
+
+def test_nokia_ret_sector_key_no_subunit_fallback():
+    assert nokia_ret_sector_key({'sectorID': '', 'subunitNumber': '2'}) == ''
     assert nokia_ret_sector_key({'sectorID': '', 'subunitNumber': ''}) == ''
+
+
+def test_nokia_ret_site_id_from_basestation():
+    assert nokia_ret_site_id({'baseStationID': '1021'}) == '1021'
+    assert nokia_ret_site_id({'baseStationID': '51021'}) == '51021'
 
 
 def test_annotate_ret_rows_huawei_keys_and_sectors():
     rows = annotate_ret_rows(
-        [{'Device No.': '21', 'Subunit No.': '1', 'Actual Sector ID': '1', 'Tilt': '40'}],
+        [{'Device No.': '21', 'Subunit No.': '1', 'Subunit Name': '1020_A-2G-L900', 'Tilt': '40'}],
         vendor='huawei',
     )
     assert rows[0]['_ret_key'] == '21:1'
     assert rows[0]['_ret_sector'] == '1'
+    assert rows[0]['_ret_site_id'] == '1020'
+    assert rows[0]['_ret_tech'] == '2G'
 
 
 def test_annotate_ret_rows_nokia_keys_sector_and_bearing():
     rows = annotate_ret_rows(
         [{
             'DN': 'PLMN-PLMN/MRBTS-51021/EQM-1/APEQM-1/ALD-1/RETU-1',
-            'sectorID': '1',
+            'sectorID': 'D4-L1800',
+            'baseStationID': '1021',
             'antBearing': '370.5',
         }],
         vendor='nokia',
     )
     assert rows[0]['_ret_key'].endswith('/RETU-1')
-    assert rows[0]['_ret_sector'] == '1'
+    assert rows[0]['_ret_sector'] == '4'
+    assert rows[0]['_ret_site_id'] == '1021'
+    assert rows[0]['_ret_tech'] == '4G-L1800+'
     assert rows[0]['_ret_azimuth'] == 10.5
 
 

@@ -1,14 +1,14 @@
 /**
- * RET Management site hologram — azimuth-true top view of one site.
+ * RET Management site hologram — three.js 3D view.
  *
- * Pure Canvas 2D (no CDN dependency, works on the intranet). The default view is
- * a true top view: screen-up is geographic north and a sector lobe is drawn at
- * its real azimuth from the PrimeNet inventory (or the RET's own reported
- * bearing when the vendor gives one). The optional 3D tilt is cosmetic only and
- * is off by default so bearings stay readable off the screen.
+ * Default camera is a top-down view tilted 30° so the mast sits in the centre
+ * with lobes readable in perspective. Each sector is a 3D power lobe (cos^n
+ * pattern). Electrical RET tilt is degrees below the sector horizon plane —
+ * lobe pointing and ground reach both follow that value. Coverage length is
+ * further scaled by band (L900/2G > L1800 > L2100/3G). AAU Left/Right use
+ * 30° HPBW half-beams. Azimuth comes from PrimeNet metadata.
  *
- * Lobe radius shrinks as downtilt grows; when a sector has an unapplied tilt
- * edit the committed lobe stays as a dashed ghost behind the new one.
+ * three.min.js is vendored under static/vendor/ for intranet use (no CDN).
  */
 (function (global) {
     'use strict';
@@ -16,23 +16,87 @@
     const TECH_COLORS = {
         '2G': [242, 177, 52],
         '3G': [167, 119, 227],
-        '4G-FDD': [58, 190, 232],
+        '4G': [58, 190, 232],
+        '4G-FDD': [58, 190, 232],   // metadata inventory fallback
         '4G-TDD': [46, 204, 175],
-        '5G': [236, 100, 190],
+        '4G-AAU-Left': [80, 170, 255],
+        '4G-AAU-Right': [40, 140, 230],
+        '4G-AAU': [60, 155, 245],
+        '4G-L1800+': [30, 120, 200],
+        'Not Used': [120, 120, 130],
+        '5G': [236, 100, 190],      // metadata inventory only
     };
-    const TECH_RANK = ['5G', '4G-TDD', '4G-FDD', '3G', '2G'];
+    const TECH_RANK = [
+        '4G-AAU-Left', '4G-AAU-Right', '4G-AAU', '4G-L1800+',
+        '4G-TDD', '4G', '4G-FDD', '5G', '3G', '2G', 'Not Used',
+    ];
+    /** Relative coverage reach by tech / band (L900 largest → L2100 smallest). */
+    const BAND_COVERAGE = {
+        '2G': 1.0,            // L900
+        '4G': 0.72,           // L1800
+        '4G-FDD': 0.72,
+        '4G-L1800+': 0.78,    // capacity L1800+
+        '4G-TDD': 0.70,
+        '4G-AAU-Left': 0.70,
+        '4G-AAU-Right': 0.70,
+        '4G-AAU': 0.70,
+        '3G': 0.50,           // L2100
+        '5G': 0.48,
+        'Not Used': 0.32,
+    };
     const DEFAULT_COLOR = [110, 196, 240];
     const EDIT_COLOR = [247, 181, 56];
+    const HPBW_DEG = 60;
+    const AAU_HPBW_DEG = 30;
+    const DEFAULT_PITCH_DEG = 30;
     const MIN_TILT_FOR_DISTANCE = 0.5;
-    const MAX_GROUND_DISTANCE_M = 5000;
-    const TILT_FULL_RANGE_DEG = 12;
+    const DEFAULT_TILT_DEG = 4;
+    /**
+     * Working ground-reach window for the hologram (metres).
+     * Geometry is still h/tan(tilt); result is clamped here until a future
+     * performance/TA pipeline can supply measured cell distance.
+     */
+    const MIN_GROUND_DISTANCE_M = 100;
+    const MAX_GROUND_DISTANCE_M = 1000;
+    /** Scene length at the 100 m / 1000 m ends of that window (before band factor). */
+    const SCENE_LENGTH_AT_MIN_M = 55;
+    const SCENE_LENGTH_AT_MAX_M = 260;
+    const CAMERA_BASE_DIST = 330;
+    /**
+     * Self-supporting lattice tower (same language as portal_tower.js):
+     * tapered 4-leg lattice + pipe mast + antenna panels + ground shelter.
+     */
+    const LATTICE_H = 36;
+    const LATTICE_SEGMENTS = 9;
+    const MAST_PIPE_TOP = LATTICE_H + 14;
+    const BEACON_Y = MAST_PIPE_TOP + 1.2;
+    /** Antenna panel box — lobes originate at the outward face midpoint. */
+    const PANEL_WIDTH = 3.2;
+    const PANEL_HEIGHT = 12;
+    const PANEL_DEPTH = 1.2;
+    const PANEL_MOUNT_RADIUS = 4.2;
+    const PANEL_CENTER_Y = LATTICE_H + 7;
+    const PANEL_FACE_RADIUS = PANEL_MOUNT_RADIUS + PANEL_DEPTH / 2;
+    /** @deprecated alias kept for any leftover references */
+    const MAST_TOP_Y = PANEL_CENTER_Y;
+    /** Mechanical downtilt weight vs RET (metadata mtilt is 3× as effective). */
+    const MECH_TILT_WEIGHT = 3;
+    /**
+     * Analytical pattern detail (reference polar plot ratios):
+     * main = 1.0, back ≈ 0.55 @ 180°, two sides ≈ 0.20 @ ±90°.
+     */
+    const BACK_LOBE_REL_LENGTH = 0.55;
+    const SIDE_LOBE_REL_LENGTH = 0.20;
+    const SIDE_LOBE_AZ_OFFSET = 90;
+    const BACK_LOBE_AZ_OFFSET = 180;
+
+    function latticeHalfW(y) {
+        const t = Math.max(0, 1 - y / LATTICE_H);
+        return 2.0 + 10.5 * Math.pow(t, 1.18);
+    }
 
     function clamp(value, min, max) {
         return Math.min(max, Math.max(min, value));
-    }
-
-    function rgba(color, alpha) {
-        return `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
     }
 
     function techColor(technologies) {
@@ -43,26 +107,54 @@
         return DEFAULT_COLOR;
     }
 
+    function primaryTech(sector) {
+        if (sector && sector.technology && sector.technology !== 'Unknown') {
+            return sector.technology;
+        }
+        const list = (sector && sector.technologies) || [];
+        return list[0] || '';
+    }
+
+    function bandCoverageFactor(tech) {
+        if (tech && Object.prototype.hasOwnProperty.call(BAND_COVERAGE, tech)) {
+            return BAND_COVERAGE[tech];
+        }
+        return 0.7;
+    }
+
     function toRadians(deg) {
         return (deg * Math.PI) / 180;
     }
 
-    /** Main-lobe ground distance h / tan(total tilt), bounded for display. */
+    /**
+     * Combined downtilt for pointing / reach: RET + 3 × mechanical (metadata).
+     */
+    function effectiveTiltDeg(retTilt, mechTilt) {
+        const ret = Number.isFinite(retTilt) ? Math.abs(retTilt) : DEFAULT_TILT_DEG;
+        const mech = Number.isFinite(mechTilt) ? mechTilt : 0;
+        return Math.max(MIN_TILT_FOR_DISTANCE, ret + MECH_TILT_WEIGHT * mech);
+    }
+
+    /** Ground reach (m) for electrical downtilt under the horizon plane. */
     function groundDistance(heightM, tiltDeg) {
         const height = Number.isFinite(heightM) && heightM > 0 ? heightM : 25;
-        const tilt = Math.max(MIN_TILT_FOR_DISTANCE, Number.isFinite(tiltDeg) ? tiltDeg : 0);
+        const raw = Number.isFinite(tiltDeg) ? Math.abs(tiltDeg) : DEFAULT_TILT_DEG;
+        const tilt = Math.max(MIN_TILT_FOR_DISTANCE, raw);
         const distance = height / Math.tan(toRadians(tilt));
-        return clamp(distance, 20, MAX_GROUND_DISTANCE_M);
+        return clamp(distance, MIN_GROUND_DISTANCE_M, MAX_GROUND_DISTANCE_M);
     }
 
     /**
-     * Monotonic lobe length: 0° tilt fills the canvas, 12°+ draws the short lobe.
-     * Kept linear on purpose so a 1° edit is a visible, comparable step; the real
-     * h/tan(tilt) distance is in the tooltip and the ring legend.
+     * Map clamped reach [100, 1000] m linearly into scene units, then apply
+     * band coverage so L900 stays longer than L2100 inside that window.
      */
-    function lobeFactor(tiltDeg) {
-        const tilt = Number.isFinite(tiltDeg) ? Math.max(0, tiltDeg) : 0;
-        return clamp(1 - (tilt / TILT_FULL_RANGE_DEG) * 0.68, 0.3, 1);
+    function lobeLength(heightM, tiltDeg, tech) {
+        const reachM = groundDistance(heightM, tiltDeg);
+        const t = (reachM - MIN_GROUND_DISTANCE_M)
+            / (MAX_GROUND_DISTANCE_M - MIN_GROUND_DISTANCE_M);
+        const base = SCENE_LENGTH_AT_MIN_M
+            + clamp(t, 0, 1) * (SCENE_LENGTH_AT_MAX_M - SCENE_LENGTH_AT_MIN_M);
+        return base * bandCoverageFactor(tech);
     }
 
     function formatDegrees(value) {
@@ -77,7 +169,6 @@
         return `${Math.round(metres)} m`;
     }
 
-    /** Sector ids, bands and layer names come from the inventory DB, never trusted as markup. */
     function escapeHtml(value) {
         return String(value === undefined || value === null ? '' : value).replace(
             /[&<>"']/g,
@@ -85,17 +176,87 @@
         );
     }
 
+    function rgbFloat(color) {
+        return [color[0] / 255, color[1] / 255, color[2] / 255];
+    }
+
+    /** cos^n exponent for a given half-power beamwidth (same in theta and phi). */
+    function patternExponent(hpbwDeg) {
+        const half = toRadians((hpbwDeg || HPBW_DEG) / 2);
+        const cosHalf = Math.cos(half);
+        if (cosHalf <= 0) return 2;
+        return Math.log(0.5) / Math.log(cosHalf);
+    }
+
+    /**
+     * Parametric 3D lobe along +Z: r(theta,phi) = R * cos(theta)^n.
+     * Surface stops at a low-gain contour (not the origin) so the wireframe
+     * does not grow a solid cone of spokes back into the antenna.
+     */
+    function buildLobeGeometry(THREE, length, hpbwDeg) {
+        const n = patternExponent(hpbwDeg);
+        const thetaSteps = 16;
+        const phiSteps = 28;
+        const minGain = 0.08;
+        const thetaMax = Math.min(Math.PI / 2 - 0.02, Math.acos(Math.pow(minGain, 1 / Math.max(n, 1e-6))));
+        const positions = [];
+        const indices = [];
+
+        // Boresight tip — single vertex, not a fan collapsed at the mast.
+        positions.push(0, 0, length);
+
+        for (let ti = 1; ti <= thetaSteps; ti += 1) {
+            const theta = (ti / thetaSteps) * thetaMax;
+            const gain = Math.pow(Math.max(0, Math.cos(theta)), n);
+            const r = length * gain;
+            for (let pi = 0; pi < phiSteps; pi += 1) {
+                const phi = (pi / phiSteps) * Math.PI * 2;
+                positions.push(
+                    r * Math.sin(theta) * Math.cos(phi),
+                    r * Math.sin(theta) * Math.sin(phi),
+                    r * Math.cos(theta),
+                );
+            }
+        }
+
+        for (let pi = 0; pi < phiSteps; pi += 1) {
+            indices.push(0, 1 + pi, 1 + ((pi + 1) % phiSteps));
+        }
+        for (let ti = 1; ti < thetaSteps; ti += 1) {
+            const ring = 1 + (ti - 1) * phiSteps;
+            const next = 1 + ti * phiSteps;
+            for (let pi = 0; pi < phiSteps; pi += 1) {
+                const a = ring + pi;
+                const b = ring + ((pi + 1) % phiSteps);
+                const c = next + pi;
+                const d = next + ((pi + 1) % phiSteps);
+                indices.push(a, c, b);
+                indices.push(b, c, d);
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setIndex(indices);
+        geometry.computeVertexNormals();
+        return geometry;
+    }
+
     function create(canvas, options) {
         const opts = options || {};
-        const ctx = canvas.getContext('2d');
+        const THREE = global.THREE;
+        if (!THREE) {
+            throw new Error('three.js is required for the RET hologram (load vendor/three.min.js first)');
+        }
+
         const wrapper = canvas.parentElement;
         const state = {
             site: {},
             sectors: [],
             selected: null,
             hovered: null,
-            rotation: 0,
-            pitch: 0,
+            yaw: 0,
+            pitch: DEFAULT_PITCH_DEG,
             zoom: 1,
             width: 0,
             height: 0,
@@ -103,7 +264,10 @@
             animating: false,
             phase: 0,
             drag: null,
-            hitAreas: [],
+            lobeMeshes: [],
+            ghostMeshes: [],
+            lobeRoots: [],
+            patternDetail: false,
         };
 
         const tooltip = document.createElement('div');
@@ -111,407 +275,667 @@
         tooltip.hidden = true;
         if (wrapper) wrapper.appendChild(tooltip);
 
-        function centre() {
-            return { x: state.width / 2, y: state.height / 2 };
-        }
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: 'low-power',
+        });
+        renderer.setClearColor(0x000000, 0);
+        renderer.setPixelRatio(Math.min(global.devicePixelRatio || 1, 2));
 
-        function baseRadius() {
-            return (Math.min(state.width, state.height) / 2 - 34) * state.zoom;
-        }
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(42, 1, 0.5, 4000);
+        const root = new THREE.Group();
+        scene.add(root);
 
-        /** Screen point for a bearing/radius, honouring view rotation and cosmetic pitch. */
-        function project(bearingDeg, radius) {
-            const { x, y } = centre();
-            const angle = toRadians(bearingDeg + state.rotation - 90);
-            const squash = 1 - state.pitch * 0.55;
-            return {
-                x: x + Math.cos(angle) * radius,
-                y: y + Math.sin(angle) * radius * squash,
-            };
-        }
+        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+        const key = new THREE.DirectionalLight(0xffffff, 0.55);
+        key.position.set(60, 120, 45);
+        scene.add(ambient, key);
 
-        function resize() {
-            const dpr = global.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            const width = Math.max(240, Math.round(rect.width));
-            const height = Math.max(240, Math.round(rect.height || width));
-            state.width = width;
-            state.height = height;
-            canvas.width = Math.round(width * dpr);
-            canvas.height = Math.round(height * dpr);
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            draw();
-        }
+        const ground = new THREE.Mesh(
+            new THREE.CircleGeometry(180, 64),
+            new THREE.MeshBasicMaterial({
+                color: 0x1a2433,
+                transparent: true,
+                opacity: 0.45,
+                depthWrite: false,
+            }),
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.05;
+        root.add(ground);
 
-        function drawBackdrop() {
-            const { x, y } = centre();
-            const radius = baseRadius();
-            ctx.save();
-            const backdrop = ctx.createRadialGradient(x, y, 0, x, y, Math.max(radius, 1) * 1.5);
-            backdrop.addColorStop(0, '#0d2136');
-            backdrop.addColorStop(0.55, '#081726');
-            backdrop.addColorStop(1, '#050d16');
-            ctx.fillStyle = backdrop;
-            ctx.fillRect(0, 0, state.width, state.height);
+        const ringMat = new THREE.LineBasicMaterial({ color: 0x4a627a, transparent: true, opacity: 0.55 });
+        [60, 105, 150].forEach((radius) => {
+            const pts = [];
+            for (let i = 0; i <= 64; i += 1) {
+                const a = (i / 64) * Math.PI * 2;
+                pts.push(new THREE.Vector3(Math.cos(a) * radius, 0.02, Math.sin(a) * radius));
+            }
+            root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), ringMat));
+        });
 
-            // Range rings, labelled with the ground distance they represent.
-            const rings = [0.25, 0.5, 0.75, 1];
-            ctx.lineWidth = 1;
-            rings.forEach((fraction) => {
-                ctx.beginPath();
-                ctx.strokeStyle = fraction === 1
-                    ? 'rgba(96, 186, 232, 0.35)'
-                    : 'rgba(96, 186, 232, 0.16)';
-                for (let deg = 0; deg <= 360; deg += 4) {
-                    const point = project(deg, radius * fraction);
-                    if (deg === 0) ctx.moveTo(point.x, point.y);
-                    else ctx.lineTo(point.x, point.y);
-                }
-                ctx.closePath();
-                ctx.stroke();
-            });
-
-            // Compass spokes every 30°, cardinal labels at the rim.
-            ctx.font = '600 11px system-ui, -apple-system, "Segoe UI", sans-serif';
+        function makeCompassLabel(text, colorHex) {
+            const c = document.createElement('canvas');
+            c.width = 128;
+            c.height = 128;
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 128, 128);
+            ctx.font = 'bold 72px Segoe UI, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            for (let deg = 0; deg < 360; deg += 30) {
-                const cardinal = deg % 90 === 0;
-                const inner = project(deg, radius * (cardinal ? 0.06 : 0.9));
-                const outer = project(deg, radius);
-                ctx.beginPath();
-                ctx.strokeStyle = cardinal ? 'rgba(120, 200, 240, 0.3)' : 'rgba(120, 200, 240, 0.14)';
-                ctx.moveTo(inner.x, inner.y);
-                ctx.lineTo(outer.x, outer.y);
-                ctx.stroke();
-                if (cardinal) {
-                    const label = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' }[deg];
-                    const at = project(deg, radius + 16);
-                    ctx.fillStyle = deg === 0 ? '#7fe3ff' : 'rgba(150, 197, 226, 0.75)';
-                    ctx.fillText(label, at.x, at.y);
-                }
-            }
-            ctx.restore();
-        }
-
-        function drawScaleLegend() {
-            const radius = baseRadius();
-            const maxDistance = state.sectors.reduce((acc, sector) => {
-                const distance = groundDistance(sector.height || state.site.antenna_height, sector.tiltDeg);
-                return Math.max(acc, distance);
-            }, 0);
-            if (!maxDistance || !radius) return;
-            ctx.save();
-            ctx.font = '500 10px system-ui, -apple-system, "Segoe UI", sans-serif';
-            ctx.fillStyle = 'rgba(150, 197, 226, 0.7)';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(
-                `outer ring ≈ ${formatDistance(maxDistance)} main-lobe distance · h/tan(tilt)`,
-                12,
-                state.height - 10,
-            );
-            ctx.restore();
-        }
-
-        function drawMast() {
-            const { x, y } = centre();
-            ctx.save();
-            const glow = ctx.createRadialGradient(x, y, 0, x, y, 26);
-            glow.addColorStop(0, 'rgba(127, 227, 255, 0.85)');
-            glow.addColorStop(1, 'rgba(127, 227, 255, 0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, 26, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.fillStyle = '#d6f4ff';
-            ctx.arc(x, y, 4.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-
-        function wedgePath(sector, radius) {
-            const half = clamp((sector.beamwidth || 65) / 2, 5, 180);
-            const start = sector.azimuth - half;
-            const end = sector.azimuth + half;
-            const { x, y } = centre();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            for (let deg = start; deg <= end; deg += 1.5) {
-                const point = project(deg, radius);
-                ctx.lineTo(point.x, point.y);
-            }
-            const last = project(end, radius);
-            ctx.lineTo(last.x, last.y);
-            ctx.closePath();
-        }
-
-        function drawSector(sector) {
-            const radius = baseRadius();
-            const colour = sector.edited ? EDIT_COLOR : techColor(sector.technologies);
-            const isSelected = state.selected === sector.key;
-            const isHovered = state.hovered === sector.key;
-            const lobe = radius * lobeFactor(sector.tiltDeg);
-
-            // Ghost of the committed tilt while an edit is pending.
-            if (sector.edited && Number.isFinite(sector.baselineTiltDeg)) {
-                const ghost = radius * lobeFactor(sector.baselineTiltDeg);
-                ctx.save();
-                ctx.setLineDash([5, 5]);
-                ctx.lineWidth = 1.4;
-                ctx.strokeStyle = 'rgba(247, 181, 56, 0.55)';
-                wedgePath(sector, ghost);
-                ctx.stroke();
-                ctx.restore();
-            }
-
-            ctx.save();
-            const { x, y } = centre();
-            const fill = ctx.createRadialGradient(x, y, 0, x, y, Math.max(lobe, 1));
-            fill.addColorStop(0, rgba(colour, isSelected ? 0.62 : 0.44));
-            fill.addColorStop(0.65, rgba(colour, isSelected ? 0.3 : 0.2));
-            fill.addColorStop(1, rgba(colour, 0.02));
-            ctx.fillStyle = fill;
-            wedgePath(sector, lobe);
-            ctx.fill();
-
-            ctx.lineWidth = sector.edited ? 2.4 : (isSelected || isHovered ? 2 : 1.2);
-            ctx.strokeStyle = rgba(colour, sector.edited ? 0.95 : (isSelected || isHovered ? 0.9 : 0.55));
-            if (sector.edited) {
-                const pulse = 0.55 + 0.45 * Math.sin(state.phase * 2.2);
-                ctx.shadowColor = rgba(EDIT_COLOR, pulse);
-                ctx.shadowBlur = 14;
-            }
-            ctx.stroke();
-            ctx.restore();
-
-            // Boresight and label.
-            const tip = project(sector.azimuth, lobe);
-            ctx.save();
-            ctx.beginPath();
-            ctx.strokeStyle = rgba(colour, 0.85);
-            ctx.lineWidth = 1.5;
-            ctx.moveTo(x, y);
-            ctx.lineTo(tip.x, tip.y);
-            ctx.stroke();
-
-            const labelAt = project(sector.azimuth, lobe + 18);
-            ctx.font = '600 12px system-ui, -apple-system, "Segoe UI", sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = sector.edited ? '#ffd483' : rgba(colour, 0.98);
-            const tiltText = Number.isFinite(sector.tiltDeg) ? formatDegrees(sector.tiltDeg) : '—';
-            ctx.fillText(`S${sector.label}`, labelAt.x, labelAt.y - 7);
-            ctx.font = '500 11px system-ui, -apple-system, "Segoe UI", sans-serif';
-            ctx.fillStyle = sector.edited ? '#ffd483' : 'rgba(198, 226, 244, 0.85)';
-            const tiltPart = sector.edited && Number.isFinite(sector.baselineTiltDeg)
-                ? `${formatDegrees(sector.baselineTiltDeg)}→${tiltText}`
-                : tiltText;
-            ctx.fillText(
-                `az ${formatDegrees(sector.azimuth)} · tilt ${tiltPart}`,
-                labelAt.x,
-                labelAt.y + 7,
-            );
-            ctx.restore();
-        }
-
-        function draw() {
-            if (!state.width || !state.height) return;
-            drawBackdrop();
-            const ordered = state.sectors.slice().sort((a, b) => {
-                const aActive = (state.selected === a.key ? 2 : 0) + (a.edited ? 1 : 0);
-                const bActive = (state.selected === b.key ? 2 : 0) + (b.edited ? 1 : 0);
-                return aActive - bActive;
+            ctx.fillStyle = colorHex;
+            ctx.fillText(text, 64, 64);
+            const tex = new THREE.CanvasTexture(c);
+            tex.needsUpdate = true;
+            const mat = new THREE.SpriteMaterial({
+                map: tex,
+                transparent: true,
+                depthTest: false,
+                depthWrite: false,
             });
-            ordered.forEach(drawSector);
-            drawMast();
-            drawScaleLegend();
-            rebuildHitAreas();
+            const sprite = new THREE.Sprite(mat);
+            sprite.scale.set(18, 18, 1);
+            return sprite;
         }
 
-        function rebuildHitAreas() {
-            const radius = baseRadius();
-            state.hitAreas = state.sectors.map((sector) => ({
-                key: sector.key,
-                azimuth: sector.azimuth,
-                half: clamp((sector.beamwidth || 65) / 2, 5, 180),
-                radius: radius * lobeFactor(sector.tiltDeg),
-            }));
+        // Cardinal axes — +Z is South in world (lookAt convention); North is −Z.
+        const compassRadius = 165;
+        const compassGroup = new THREE.Group();
+        const axisMatN = new THREE.LineBasicMaterial({ color: 0x7eb6ff, transparent: true, opacity: 0.85 });
+        const axisMat = new THREE.LineBasicMaterial({ color: 0x5a7a94, transparent: true, opacity: 0.55 });
+        [
+            { label: 'N', x: 0, z: -compassRadius, color: '#7eb6ff', mat: axisMatN },
+            { label: 'S', x: 0, z: compassRadius, color: '#9bb4c8', mat: axisMat },
+            { label: 'E', x: compassRadius, z: 0, color: '#9bb4c8', mat: axisMat },
+            { label: 'W', x: -compassRadius, z: 0, color: '#9bb4c8', mat: axisMat },
+        ].forEach((card) => {
+            const line = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, 0.08, 0),
+                    new THREE.Vector3(card.x, 0.08, card.z),
+                ]),
+                card.mat,
+            );
+            compassGroup.add(line);
+            const marker = new THREE.Mesh(
+                new THREE.BoxGeometry(card.label === 'N' || card.label === 'S' ? 3.5 : 2.2, 1.2, card.label === 'E' || card.label === 'W' ? 3.5 : 2.2),
+                new THREE.MeshBasicMaterial({ color: card.label === 'N' ? 0x7eb6ff : 0x5a7a94 }),
+            );
+            marker.position.set(card.x * 0.92, 0.7, card.z * 0.92);
+            compassGroup.add(marker);
+            const sprite = makeCompassLabel(card.label, card.color);
+            sprite.position.set(card.x, 14, card.z);
+            compassGroup.add(sprite);
+        });
+        root.add(compassGroup);
+
+        // —— Self-supporting lattice tower (portal_tower language, three.js) ——
+        const towerGroup = new THREE.Group();
+        root.add(towerGroup);
+
+        const steelMat = new THREE.LineBasicMaterial({
+            color: 0x9eb4c8,
+            transparent: true,
+            opacity: 0.92,
+        });
+        const steelDimMat = new THREE.LineBasicMaterial({
+            color: 0x6a8298,
+            transparent: true,
+            opacity: 0.55,
+        });
+        const steelBraceMat = new THREE.LineBasicMaterial({
+            color: 0x7a94aa,
+            transparent: true,
+            opacity: 0.4,
+        });
+
+        function addLine(group, ax, ay, az, bx, by, bz, mat) {
+            const geom = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(ax, ay, az),
+                new THREE.Vector3(bx, by, bz),
+            ]);
+            group.add(new THREE.Line(geom, mat));
         }
 
-        function needsAnimation() {
-            return state.sectors.some((sector) => sector.edited);
+        const LEG_SX = [1, 1, -1, -1];
+        const LEG_SZ = [1, -1, -1, 1];
+        function legPoint(leg, y) {
+            const w = latticeHalfW(y);
+            return { x: w * LEG_SX[leg], y, z: w * LEG_SZ[leg] };
         }
 
-        function tick() {
-            state.phase += 0.05;
-            draw();
-            if (needsAnimation()) {
-                state.frame = global.requestAnimationFrame(tick);
-            } else {
-                state.frame = null;
-                state.animating = false;
+        const latticeLines = new THREE.Group();
+        const segH = LATTICE_H / LATTICE_SEGMENTS;
+        for (let leg = 0; leg < 4; leg += 1) {
+            for (let i = 0; i < LATTICE_SEGMENTS; i += 1) {
+                const y0 = i * segH;
+                const y1 = y0 + segH;
+                const a = legPoint(leg, y0);
+                const b = legPoint(leg, y1);
+                addLine(latticeLines, a.x, a.y, a.z, b.x, b.y, b.z, steelMat);
+            }
+        }
+        for (let i = 0; i <= LATTICE_SEGMENTS; i += 1) {
+            const y0 = i * segH;
+            for (let leg = 0; leg < 4; leg += 1) {
+                const nleg = (leg + 1) % 4;
+                const a = legPoint(leg, y0);
+                const c = legPoint(nleg, y0);
+                addLine(latticeLines, a.x, a.y, a.z, c.x, c.y, c.z, steelDimMat);
+                if (i < LATTICE_SEGMENTS) {
+                    const y1 = y0 + segH;
+                    const b = legPoint(leg, y1);
+                    const d = legPoint(nleg, y1);
+                    addLine(latticeLines, a.x, a.y, a.z, d.x, d.y, d.z, steelBraceMat);
+                    addLine(latticeLines, c.x, c.y, c.z, b.x, b.y, b.z, steelBraceMat);
+                }
+            }
+        }
+        towerGroup.add(latticeLines);
+
+        // Top work platform (octagon ring + posts) near antenna level.
+        const platformY = LATTICE_H - 1.5;
+        const platformR = latticeHalfW(platformY) + 3.2;
+        const platPts = [];
+        for (let i = 0; i <= 8; i += 1) {
+            const az = Math.PI / 8 + (i / 8) * Math.PI * 2;
+            platPts.push(new THREE.Vector3(
+                Math.cos(az) * platformR,
+                platformY,
+                Math.sin(az) * platformR,
+            ));
+        }
+        towerGroup.add(new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(platPts),
+            steelMat,
+        ));
+        const railPts = platPts.map((p) => new THREE.Vector3(p.x, platformY + 2.2, p.z));
+        towerGroup.add(new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(railPts),
+            steelDimMat,
+        ));
+        for (let i = 0; i < 8; i += 1) {
+            addLine(
+                towerGroup,
+                platPts[i].x, platformY, platPts[i].z,
+                railPts[i].x, platformY + 2.2, railPts[i].z,
+                steelBraceMat,
+            );
+        }
+        for (let leg = 0; leg < 4; leg += 1) {
+            const lp = legPoint(leg, platformY - 3);
+            const az = Math.atan2(LEG_SZ[leg], LEG_SX[leg]);
+            addLine(
+                towerGroup,
+                lp.x, lp.y, lp.z,
+                Math.cos(az) * platformR, platformY, Math.sin(az) * platformR,
+                steelDimMat,
+            );
+        }
+
+        // Pipe mast above the lattice (antenna mount).
+        const pipe = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.55, 0.85, MAST_PIPE_TOP - LATTICE_H, 10),
+            new THREE.MeshStandardMaterial({
+                color: 0xb8c6d4,
+                metalness: 0.55,
+                roughness: 0.35,
+            }),
+        );
+        pipe.position.y = (LATTICE_H + MAST_PIPE_TOP) / 2;
+        towerGroup.add(pipe);
+
+        // Aviation beacon.
+        const beacon = new THREE.Mesh(
+            new THREE.SphereGeometry(0.85, 12, 10),
+            new THREE.MeshStandardMaterial({
+                color: 0xff4455,
+                emissive: 0xaa2233,
+                emissiveIntensity: 0.7,
+                metalness: 0.2,
+                roughness: 0.4,
+            }),
+        );
+        beacon.position.y = BEACON_Y;
+        towerGroup.add(beacon);
+
+        // Ground equipment shelter (portal-style cabin beside the base).
+        const shelterMat = new THREE.MeshStandardMaterial({
+            color: 0x5c6b7c,
+            metalness: 0.25,
+            roughness: 0.7,
+        });
+        const shelter = new THREE.Mesh(new THREE.BoxGeometry(14, 7, 10), shelterMat);
+        shelter.position.set(22, 3.5, 14);
+        towerGroup.add(shelter);
+        const shelterRoof = new THREE.Mesh(
+            new THREE.BoxGeometry(15.5, 0.8, 11.5),
+            new THREE.MeshStandardMaterial({ color: 0x3d4a58, metalness: 0.15, roughness: 0.8 }),
+        );
+        shelterRoof.position.set(22, 7.3, 14);
+        towerGroup.add(shelterRoof);
+        // Cable run shelter → tower base.
+        addLine(towerGroup, 15, 0.5, 14, latticeHalfW(0) * 0.75, 0.5, latticeHalfW(0) * 0.75, steelDimMat);
+
+        // One rectangular antenna panel per sector, rebuilt from inventory azimuths.
+        const panelMat = new THREE.MeshStandardMaterial({
+            color: 0xd7e0ea,
+            metalness: 0.3,
+            roughness: 0.35,
+        });
+        const antennaGroup = new THREE.Group();
+        root.add(antennaGroup);
+        state.antennaFacings = [];
+
+        const lobeGroup = new THREE.Group();
+        root.add(lobeGroup);
+
+        const raycaster = new THREE.Raycaster();
+        // LineSegments need a threshold for picking.
+        raycaster.params.Line = { threshold: 2.5 };
+        const pointer = new THREE.Vector2();
+
+        function cameraDistance() {
+            return CAMERA_BASE_DIST / state.zoom;
+        }
+
+        function placeCamera() {
+            const dist = cameraDistance();
+            const polar = toRadians(clamp(state.pitch, 0, 80));
+            const yaw = toRadians(state.yaw);
+            camera.position.set(
+                Math.sin(polar) * Math.sin(yaw) * dist,
+                Math.cos(polar) * dist,
+                Math.sin(polar) * Math.cos(yaw) * dist,
+            );
+            camera.lookAt(0, PANEL_CENTER_Y * 0.45, 0);
+            camera.updateProjectionMatrix();
+        }
+
+        function disposeObject(obj) {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) {
+                if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
+                else obj.material.dispose();
             }
         }
 
-        function schedule() {
-            if (needsAnimation()) {
-                if (!state.animating) {
-                    state.animating = true;
-                    state.frame = global.requestAnimationFrame(tick);
-                }
-            } else {
-                if (state.frame) global.cancelAnimationFrame(state.frame);
-                state.frame = null;
-                state.animating = false;
-                draw();
-            }
-        }
-
-        function sectorAtPoint(clientX, clientY) {
-            const rect = canvas.getBoundingClientRect();
-            const px = clientX - rect.left;
-            const py = clientY - rect.top;
-            const { x, y } = centre();
-            const squash = 1 - state.pitch * 0.55;
-            const dx = px - x;
-            const dy = (py - y) / (squash || 1);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            let bearing = (Math.atan2(dy, dx) * 180) / Math.PI + 90 - state.rotation;
-            bearing = ((bearing % 360) + 360) % 360;
-            let best = null;
-            state.hitAreas.forEach((area) => {
-                if (distance > area.radius + 16) return;
-                const delta = Math.abs(((bearing - area.azimuth + 180) % 360) - 180);
-                if (delta <= area.half + 2 && (!best || delta < best.delta)) {
-                    best = { key: area.key, delta };
-                }
+        function clearLobes() {
+            state.lobeRoots.forEach((group) => {
+                lobeGroup.remove(group);
+                group.traverse(disposeObject);
             });
-            return best ? best.key : null;
+            state.lobeMeshes = [];
+            state.ghostMeshes = [];
+            state.lobeRoots = [];
         }
 
-        function tooltipHtml(sector) {
-            const height = sector.height || state.site.antenna_height;
-            const rows = [
-                ['Azimuth', `${formatDegrees(sector.azimuth)}${sector.azimuthSource && sector.azimuthSource !== 'metadata' ? ` (${sector.azimuthSource})` : ''}`],
-                ['Electrical tilt', Number.isFinite(sector.tiltDeg) ? formatDegrees(sector.tiltDeg) : 'not reported'],
-            ];
-            if (sector.edited && Number.isFinite(sector.baselineTiltDeg)) {
-                rows.push(['Pending edit', `${formatDegrees(sector.baselineTiltDeg)} → ${formatDegrees(sector.tiltDeg)}`]);
-            }
-            if (Array.isArray(sector.tiltSpread)) {
-                rows.push([
-                    'Tilt spread',
-                    `${formatDegrees(sector.tiltSpread[0])}–${formatDegrees(sector.tiltSpread[1])} `
-                    + `over ${sector.retCount} RETs`,
+        function clearAntennas() {
+            antennaGroup.children.slice().forEach((child) => {
+                antennaGroup.remove(child);
+                if (child.geometry) child.geometry.dispose();
+            });
+        }
+
+        /**
+         * Place one panel per sector face. Azimuth 0° = North (−Z), panel faces
+         * outward along that bearing — count matches real sectors, not a fixed 3.
+         */
+        function rebuildAntennas() {
+            clearAntennas();
+            (state.antennaFacings || []).forEach((face) => {
+                if (!Number.isFinite(face.azimuth)) return;
+                const az = toRadians(face.azimuth);
+                const panel = new THREE.Mesh(
+                    new THREE.BoxGeometry(PANEL_WIDTH, PANEL_HEIGHT, PANEL_DEPTH),
+                    panelMat,
+                );
+                const px = Math.sin(az) * PANEL_MOUNT_RADIUS;
+                const pz = -Math.cos(az) * PANEL_MOUNT_RADIUS;
+                panel.position.set(px, PANEL_CENTER_Y, pz);
+                panel.rotation.y = -az;
+                panel.userData = { sectorKey: face.key || '', label: face.label || '' };
+                antennaGroup.add(panel);
+
+                // Standoff struts from pipe mast to panel (portal_tower style).
+                const strutMat = steelDimMat;
+                const geomLo = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, PANEL_CENTER_Y - PANEL_HEIGHT * 0.35, 0),
+                    new THREE.Vector3(px * 0.95, PANEL_CENTER_Y - PANEL_HEIGHT * 0.3, pz * 0.95),
                 ]);
-            }
-            if (Number.isFinite(sector.mechanicalTilt)) {
-                rows.push(['Mechanical tilt', formatDegrees(sector.mechanicalTilt)]);
-            }
-            rows.push(['Antenna height', Number.isFinite(height) ? `${Math.round(height)} m` : '—']);
-            rows.push(['Main lobe ≈', formatDistance(groundDistance(height, sector.tiltDeg))]);
-            if (sector.technologies && sector.technologies.length) {
-                rows.push(['Layers', sector.technologies.join(', ')]);
-            }
-            if (sector.bands && sector.bands.length) {
-                rows.push(['Bands', sector.bands.join(', ')]);
-            }
-            rows.push(['Cells / RETs', `${sector.cellCount || 0} / ${sector.retCount || 0}`]);
-            const body = rows
-                .map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`)
-                .join('');
-            return `<strong>Sector ${escapeHtml(sector.label)}</strong><dl>${body}</dl>`
-                + '<em>Click to filter the RET table</em>';
+                const geomHi = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, PANEL_CENTER_Y + PANEL_HEIGHT * 0.35, 0),
+                    new THREE.Vector3(px * 0.95, PANEL_CENTER_Y + PANEL_HEIGHT * 0.3, pz * 0.95),
+                ]);
+                antennaGroup.add(new THREE.Line(geomLo, strutMat));
+                antennaGroup.add(new THREE.Line(geomHi, strutMat));
+            });
         }
 
-        function showTooltip(key, clientX, clientY) {
-            const sector = state.sectors.find((item) => item.key === key);
-            if (!sector || !wrapper) {
+        /** Sector-centre azimuth for the physical panel (undo AAU half-beam offset). */
+        function facingAzimuthDeg(sector) {
+            const key = sector.sectorKey || String(sector.key || '').split('::')[0];
+            const face = (state.antennaFacings || []).find((f) => f.key === key);
+            if (face && Number.isFinite(face.azimuth)) return face.azimuth;
+            let az = Number(sector.azimuth) || 0;
+            const tech = primaryTech(sector);
+            if (tech === '4G-AAU-Left') az = (az + 15 + 360) % 360;
+            else if (tech === '4G-AAU-Right') az = (az - 15 + 360) % 360;
+            return ((az % 360) + 360) % 360;
+        }
+
+        function orientLobe(obj, sector, tiltDeg, techIndex, azimuthOverride) {
+            // Beam direction uses lobe azimuth (AAU Left/Right already offset).
+            // Origin sits on the panel's outward face midpoint (sector facing).
+            const beamAzDeg = Number.isFinite(azimuthOverride) ? azimuthOverride : Number(sector.azimuth) || 0;
+            const beamAz = toRadians(beamAzDeg);
+            const faceAz = toRadians(facingAzimuthDeg(sector));
+            const downtilt = Number.isFinite(tiltDeg) ? Math.abs(tiltDeg) : DEFAULT_TILT_DEG;
+            const elev = toRadians(-downtilt);
+            const dir = new THREE.Vector3(
+                Math.sin(beamAz) * Math.cos(elev),
+                Math.sin(elev),
+                -Math.cos(beamAz) * Math.cos(elev),
+            ).normalize();
+            obj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir);
+            // Slight vertical stack when several techs share one panel face.
+            const lift = PANEL_CENTER_Y + (Number(techIndex) || 0) * 1.1;
+            obj.position.set(
+                Math.sin(faceAz) * PANEL_FACE_RADIUS,
+                lift,
+                -Math.cos(faceAz) * PANEL_FACE_RADIUS,
+            );
+        }
+
+        function makeWireEnvelope(length, hpbw, colorRgb, opacity, userData) {
+            const geometry = buildLobeGeometry(THREE, length, hpbw);
+            const wireGeom = new THREE.WireframeGeometry(geometry);
+            geometry.dispose();
+            const wire = new THREE.LineSegments(
+                wireGeom,
+                new THREE.LineBasicMaterial({
+                    color: new THREE.Color(colorRgb[0], colorRgb[1], colorRgb[2]),
+                    transparent: true,
+                    opacity,
+                    depthWrite: false,
+                }),
+            );
+            wire.userData = userData;
+            return wire;
+        }
+
+        function addOrientedEnvelope(parent, sector, azimuthDeg, tiltDeg, techIndex, length, hpbw, colorRgb, opacity, userData) {
+            const sub = new THREE.Group();
+            sub.userData = userData;
+            sub.add(makeWireEnvelope(length, hpbw, colorRgb, opacity, userData));
+            orientLobe(sub, sector, tiltDeg, techIndex, azimuthDeg);
+            parent.add(sub);
+            return sub;
+        }
+
+        function makeLobeMesh(sector, ghost) {
+            const color = sector.edited && !ghost ? EDIT_COLOR : techColor(sector.technologies);
+            const [r, g, b] = rgbFloat(color);
+            const tech = primaryTech(sector);
+            const retTilt = ghost ? sector.baselineTiltDeg : sector.tiltDeg;
+            const effTilt = effectiveTiltDeg(retTilt, sector.mechanicalTilt);
+            const height = sector.height || state.site.antenna_height;
+            const length = lobeLength(height, effTilt, tech);
+            const hpbw = Number.isFinite(sector.beamwidth) ? sector.beamwidth : HPBW_DEG;
+            const sectorKey = sector.sectorKey || String(sector.key || '').split('::')[0];
+            const selected = state.selected && state.selected === sectorKey;
+            const dimmed = Boolean(state.selected && !selected);
+            const mainOpacity = ghost ? 0.2 : (dimmed ? 0.28 : 0.92);
+            const baseAz = Number(sector.azimuth) || 0;
+
+            const group = new THREE.Group();
+            const userData = {
+                key: sector.key,
+                sectorKey,
+                sector,
+                ghost: Boolean(ghost),
+            };
+            group.userData = userData;
+
+            // Main beam
+            addOrientedEnvelope(
+                group, sector, baseAz, effTilt, sector.techIndex,
+                length, hpbw, [r, g, b], mainOpacity, userData,
+            );
+
+            // Analytical pattern: back lobe + two side lobes (reference size ratios).
+            if (state.patternDetail && !ghost) {
+                const backRgb = [
+                    clamp(r * 0.65 + 0.2, 0, 1),
+                    clamp(g * 0.65 + 0.2, 0, 1),
+                    clamp(b * 0.65 + 0.22, 0, 1),
+                ];
+                // Side lobes tint cooler (blue) like the reference plot.
+                const sideRgb = [
+                    clamp(r * 0.35 + 0.12, 0, 1),
+                    clamp(g * 0.55 + 0.28, 0, 1),
+                    clamp(b * 0.35 + 0.72, 0, 1),
+                ];
+                const backOpacity = dimmed ? 0.22 : 0.78;
+                const sideOpacity = dimmed ? 0.2 : 0.88;
+                const backHpbw = Math.min(90, hpbw * 1.15);  // slightly fatter back
+                const sideHpbw = Math.max(22, hpbw * 0.55);  // narrower petals
+
+                addOrientedEnvelope(
+                    group, sector, baseAz + BACK_LOBE_AZ_OFFSET, effTilt, sector.techIndex,
+                    length * BACK_LOBE_REL_LENGTH, backHpbw, backRgb, backOpacity, userData,
+                );
+                [-1, 1].forEach((sign) => {
+                    addOrientedEnvelope(
+                        group, sector, baseAz + sign * SIDE_LOBE_AZ_OFFSET, effTilt, sector.techIndex,
+                        length * SIDE_LOBE_REL_LENGTH, sideHpbw, sideRgb, sideOpacity, userData,
+                    );
+                });
+            }
+
+            return group;
+        }
+
+        function rebuildLobes() {
+            clearLobes();
+            (state.sectors || []).forEach((sector) => {
+                if (!Number.isFinite(sector.azimuth)) return;
+                const live = makeLobeMesh(sector, false);
+                lobeGroup.add(live);
+                state.lobeRoots.push(live);
+                state.lobeMeshes.push(live);
+                live.traverse((child) => {
+                    if (child.isMesh || child.isLineSegments || child.isLine) {
+                        state.lobeMeshes.push(child);
+                    }
+                });
+                if (
+                    sector.edited
+                    && Number.isFinite(sector.baselineTiltDeg)
+                    && sector.baselineTiltDeg !== sector.tiltDeg
+                ) {
+                    const ghost = makeLobeMesh(sector, true);
+                    lobeGroup.add(ghost);
+                    state.lobeRoots.push(ghost);
+                    state.ghostMeshes.push(ghost);
+                    ghost.traverse((child) => {
+                        if (child.isMesh || child.isLineSegments || child.isLine) {
+                            state.ghostMeshes.push(child);
+                        }
+                    });
+                }
+            });
+        }
+
+        function showTooltip(sector, clientX, clientY) {
+            if (!sector) {
                 tooltip.hidden = true;
                 return;
             }
-            const rect = wrapper.getBoundingClientRect();
-            const canvasRect = canvas.getBoundingClientRect();
-            tooltip.innerHTML = tooltipHtml(sector);
+            const eff = effectiveTiltDeg(sector.tiltDeg, sector.mechanicalTilt);
+            const reach = groundDistance(sector.height || state.site.antenna_height, eff);
+            const tiltPart = Number.isFinite(sector.tiltDeg) ? formatDegrees(sector.tiltDeg) : '—';
+            const mechPart = Number.isFinite(sector.mechanicalTilt)
+                ? formatDegrees(sector.mechanicalTilt)
+                : '—';
+            const azSrc = sector.azimuthSource && sector.azimuthSource !== 'metadata'
+                ? ` (${escapeHtml(sector.azimuthSource)})`
+                : '';
+            const tech = sector.technology || (sector.technologies && sector.technologies[0]) || '';
+            const bandPct = Math.round(bandCoverageFactor(tech) * 100);
+            tooltip.innerHTML = [
+                `<strong>${escapeHtml(sector.label || sector.key)}</strong>`,
+                tech ? `Technology ${escapeHtml(tech)} · band reach ${bandPct}%` : '',
+                `Azimuth ${formatDegrees(sector.azimuth)}${azSrc}`,
+                `RET ${tiltPart} + mech ${mechPart} ×${MECH_TILT_WEIGHT} → effective ${formatDegrees(eff)}`,
+                `HPBW ${formatDegrees(sector.beamwidth || HPBW_DEG)}`
+                    + (state.patternDetail
+                        ? ' · pattern: main + 2 sides (±90°) + back (180°)'
+                        : ''),
+                `Ground reach ~${formatDistance(reach)}`,
+            ].filter(Boolean).join('<br>');
             tooltip.hidden = false;
-            const maxLeft = canvasRect.right - rect.left - tooltip.offsetWidth - 8;
-            const maxTop = canvasRect.bottom - rect.top - tooltip.offsetHeight - 8;
-            const left = clamp(clientX - rect.left + 14, 8, Math.max(8, maxLeft));
-            const top = clamp(clientY - rect.top + 14, 8, Math.max(8, maxTop));
-            tooltip.style.left = `${left}px`;
-            tooltip.style.top = `${top}px`;
+            const rect = (wrapper || canvas).getBoundingClientRect();
+            tooltip.style.left = `${clamp(clientX - rect.left + 12, 8, rect.width - 180)}px`;
+            tooltip.style.top = `${clamp(clientY - rect.top + 12, 8, rect.height - 80)}px`;
+        }
+
+        function pickSector(event) {
+            const rect = canvas.getBoundingClientRect();
+            pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+            const hits = raycaster.intersectObjects(state.lobeMeshes, false);
+            if (!hits.length) return null;
+            return hits[0].object.userData.sector || null;
+        }
+
+        function draw() {
+            placeCamera();
+            renderer.render(scene, camera);
+        }
+
+        function schedule() {
+            if (state.frame) return;
+            state.animating = true;
+            const tick = () => {
+                state.phase += 0.016;
+                state.frame = null;
+                state.lobeRoots.forEach((group) => {
+                    if (group.userData.ghost) return;
+                    const sectorKey = group.userData.sectorKey;
+                    const selected = state.selected && state.selected === sectorKey;
+                    const dimmed = Boolean(state.selected && !selected);
+                    // Pulse main envelope only (first child); side lobes stay steady.
+                    const mainGroup = group.children[0];
+                    if (!mainGroup) return;
+                    mainGroup.traverse((child) => {
+                        if (!child.material || !child.isLineSegments) return;
+                        const base = dimmed ? 0.28 : 0.92;
+                        child.material.opacity = selected
+                            ? base + 0.06 * Math.sin(state.phase * 2.2)
+                            : base;
+                    });
+                });
+                draw();
+                if (state.animating) {
+                    state.frame = global.requestAnimationFrame(tick);
+                }
+            };
+            state.frame = global.requestAnimationFrame(tick);
+        }
+
+        function resize() {
+            const rect = (wrapper || canvas).getBoundingClientRect();
+            state.width = Math.max(320, Math.floor(rect.width) || canvas.clientWidth || 640);
+            state.height = Math.max(280, Math.floor(rect.height) || canvas.clientHeight || 420);
+            renderer.setSize(state.width, state.height, false);
+            camera.aspect = state.width / state.height;
+            camera.updateProjectionMatrix();
+            draw();
         }
 
         function onPointerMove(event) {
             if (state.drag) {
                 const dx = event.clientX - state.drag.x;
-                state.rotation = state.drag.rotation + dx * 0.4;
-                state.drag.moved = state.drag.moved || Math.abs(dx) > 3;
+                const dy = event.clientY - state.drag.y;
+                state.yaw = state.drag.yaw - dx * 0.35;
+                state.pitch = clamp(state.drag.pitch + dy * 0.25, 5, 80);
+                state.drag.x = event.clientX;
+                state.drag.y = event.clientY;
+                state.drag.yaw = state.yaw;
+                state.drag.pitch = state.pitch;
                 draw();
                 return;
             }
-            const key = sectorAtPoint(event.clientX, event.clientY);
-            if (key !== state.hovered) {
-                state.hovered = key;
-                canvas.style.cursor = key ? 'pointer' : 'grab';
-                draw();
-                if (typeof opts.onHoverSector === 'function') opts.onHoverSector(key);
-            }
-            if (key) showTooltip(key, event.clientX, event.clientY);
-            else tooltip.hidden = true;
+            const sector = pickSector(event);
+            state.hovered = sector ? (sector.sectorKey || sector.key) : null;
+            canvas.style.cursor = sector ? 'pointer' : 'grab';
+            showTooltip(sector, event.clientX, event.clientY);
         }
 
         function onPointerDown(event) {
-            state.drag = { x: event.clientX, rotation: state.rotation, moved: false };
-            canvas.setPointerCapture?.(event.pointerId);
+            state.drag = {
+                x: event.clientX,
+                y: event.clientY,
+                yaw: state.yaw,
+                pitch: state.pitch,
+                moved: false,
+            };
+            canvas.setPointerCapture(event.pointerId);
         }
 
         function onPointerUp(event) {
-            const wasDrag = state.drag && state.drag.moved;
+            const wasDrag = state.drag;
             state.drag = null;
-            canvas.releasePointerCapture?.(event.pointerId);
-            if (wasDrag) return;
-            const key = sectorAtPoint(event.clientX, event.clientY);
-            api.setSelected(state.selected === key ? null : key);
-            if (typeof opts.onSelectSector === 'function') {
-                opts.onSelectSector(state.selected);
-            }
+            if (!wasDrag) return;
+            const moved = Math.hypot(event.clientX - wasDrag.x, event.clientY - wasDrag.y) > 4
+                || Math.abs(state.yaw - wasDrag.yaw) > 0.5;
+            if (moved) return;
+            const sector = pickSector(event);
+            const sectorKey = sector ? (sector.sectorKey || String(sector.key || '').split('::')[0]) : null;
+            const next = sectorKey && state.selected !== sectorKey ? sectorKey : null;
+            state.selected = next;
+            rebuildLobes();
+            schedule();
+            if (typeof opts.onSelectSector === 'function') opts.onSelectSector(next);
         }
 
         function onPointerLeave() {
-            state.drag = null;
-            if (state.hovered) {
-                state.hovered = null;
-                draw();
-            }
+            state.hovered = null;
             tooltip.hidden = true;
+            canvas.style.cursor = 'grab';
         }
 
         function onWheel(event) {
             event.preventDefault();
             const factor = event.deltaY > 0 ? 0.92 : 1.08;
-            state.zoom = clamp(state.zoom * factor, 0.55, 2.6);
+            state.zoom = clamp(state.zoom * factor, 0.55, 2.4);
             draw();
         }
 
         function onKeyDown(event) {
-            if (!state.sectors.length) return;
-            const keys = state.sectors.map((sector) => sector.key);
-            const current = keys.indexOf(state.selected);
-            if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-                event.preventDefault();
-                api.setSelected(keys[(current + 1 + keys.length) % keys.length]);
-                if (typeof opts.onSelectSector === 'function') opts.onSelectSector(state.selected);
-            } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-                event.preventDefault();
-                api.setSelected(keys[(current - 1 + keys.length) % keys.length]);
-                if (typeof opts.onSelectSector === 'function') opts.onSelectSector(state.selected);
-            } else if (event.key === 'Escape') {
-                api.setSelected(null);
-                if (typeof opts.onSelectSector === 'function') opts.onSelectSector(null);
-            }
+            const sectorKeys = [];
+            (state.sectors || []).forEach((s) => {
+                if (!Number.isFinite(s.azimuth)) return;
+                const key = s.sectorKey || String(s.key || '').split('::')[0];
+                if (key && !sectorKeys.includes(key)) sectorKeys.push(key);
+            });
+            if (!sectorKeys.length) return;
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            event.preventDefault();
+            let idx = sectorKeys.indexOf(state.selected);
+            if (idx < 0) idx = 0;
+            else idx = event.key === 'ArrowRight'
+                ? (idx + 1) % sectorKeys.length
+                : (idx - 1 + sectorKeys.length) % sectorKeys.length;
+            state.selected = sectorKeys[idx];
+            rebuildLobes();
+            schedule();
+            if (typeof opts.onSelectSector === 'function') opts.onSelectSector(state.selected);
         }
 
         canvas.addEventListener('pointermove', onPointerMove);
@@ -524,9 +948,9 @@
         canvas.style.cursor = 'grab';
 
         let observer = null;
-        if (typeof ResizeObserver === 'function') {
+        if (typeof ResizeObserver !== 'undefined' && wrapper) {
             observer = new ResizeObserver(() => resize());
-            observer.observe(canvas);
+            observer.observe(wrapper);
         } else {
             global.addEventListener('resize', resize);
         }
@@ -536,35 +960,75 @@
                 state.site = site || {};
                 draw();
             },
+            /**
+             * Inventory sector faces — one rectangular antenna per entry, aimed
+             * at that sector's true azimuth. Call with site_layout.sectors.
+             */
+            setAntennaFacings(facings) {
+                const list = Array.isArray(facings) ? facings : [];
+                const byKey = new Map();
+                list.forEach((face) => {
+                    if (!face || !Number.isFinite(face.azimuth)) return;
+                    const key = String(face.key || face.sectorKey || '').trim();
+                    if (!key || byKey.has(key)) return;
+                    byKey.set(key, {
+                        key,
+                        azimuth: ((Number(face.azimuth) % 360) + 360) % 360,
+                        label: face.label || key,
+                    });
+                });
+                state.antennaFacings = Array.from(byKey.values()).sort((a, b) => {
+                    const aNum = /^\d+$/.test(a.key) ? Number(a.key) : Number.MAX_SAFE_INTEGER;
+                    const bNum = /^\d+$/.test(b.key) ? Number(b.key) : Number.MAX_SAFE_INTEGER;
+                    return aNum - bNum || a.key.localeCompare(b.key);
+                });
+                rebuildAntennas();
+                draw();
+            },
             setSectors(sectors) {
                 state.sectors = Array.isArray(sectors) ? sectors : [];
-                if (state.selected && !state.sectors.some((s) => s.key === state.selected)) {
-                    state.selected = null;
+                if (state.selected) {
+                    const still = state.sectors.some(
+                        (s) => (s.sectorKey || String(s.key || '').split('::')[0]) === state.selected,
+                    );
+                    if (!still) state.selected = null;
                 }
+                rebuildLobes();
                 schedule();
             },
             setSelected(key) {
                 state.selected = key || null;
+                rebuildLobes();
                 draw();
             },
             getSelected() {
                 return state.selected;
             },
-            setPitch(pitch) {
-                state.pitch = clamp(Number(pitch) || 0, 0, 0.8);
+            setPatternDetail(enabled) {
+                state.patternDetail = Boolean(enabled);
+                rebuildLobes();
+                schedule();
+            },
+            getPatternDetail() {
+                return Boolean(state.patternDetail);
+            },
+            setPitch(pitchDeg) {
+                state.pitch = clamp(Number(pitchDeg) || 0, 0, 80);
                 draw();
             },
             setRotation(deg) {
-                state.rotation = Number(deg) || 0;
+                state.yaw = Number(deg) || 0;
                 draw();
             },
             reset() {
-                state.rotation = 0;
+                state.yaw = 0;
+                state.pitch = DEFAULT_PITCH_DEG;
                 state.zoom = 1;
                 draw();
             },
             resize,
             destroy() {
+                state.animating = false;
                 if (state.frame) global.cancelAnimationFrame(state.frame);
                 if (observer) observer.disconnect();
                 else global.removeEventListener('resize', resize);
@@ -574,13 +1038,33 @@
                 canvas.removeEventListener('pointerleave', onPointerLeave);
                 canvas.removeEventListener('wheel', onWheel);
                 canvas.removeEventListener('keydown', onKeyDown);
+                clearLobes();
+                clearAntennas();
+                renderer.dispose();
                 tooltip.remove();
             },
         };
 
         resize();
+        placeCamera();
+        schedule();
         return api;
     }
 
-    global.RetHologram = { create, groundDistance, formatDegrees, formatDistance, TECH_COLORS };
+    global.RetHologram = {
+        create,
+        groundDistance,
+        lobeLength,
+        effectiveTiltDeg,
+        formatDegrees,
+        formatDistance,
+        TECH_COLORS,
+        BAND_COVERAGE,
+        HPBW_DEG,
+        AAU_HPBW_DEG,
+        DEFAULT_PITCH_DEG,
+        MIN_GROUND_DISTANCE_M,
+        MAX_GROUND_DISTANCE_M,
+        MECH_TILT_WEIGHT,
+    };
 })(window);

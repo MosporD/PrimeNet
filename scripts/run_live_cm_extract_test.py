@@ -104,7 +104,7 @@ def login(jar: CookieJar) -> str:
     token = create_session(user_id)
     jar.set_cookie(Cookie(
         version=0,
-        name='session_token',
+        name='primenet_session',
         value=token,
         port=None,
         port_specified=False,

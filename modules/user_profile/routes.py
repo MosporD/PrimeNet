@@ -26,6 +26,7 @@ from core.user_vendor_credentials import (
 )
 from db.runtime import execute_query, table_columns
 from sync_config import PROJECT_ROOT
+from core.platform.session import get_session_token
 
 user_profile_bp = Blueprint(
     'user_profile', __name__,
@@ -38,7 +39,7 @@ user_profile_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -50,7 +51,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

@@ -21,9 +21,10 @@ Scan vendor group DBs for degraded controller/group KPIs.
 
 Builder may **not** take `area` (aggregates span areas) — `make_radio_module` already handles that. Group ingest is currently disabled in reset mode (`group_processor.process_group_file`).
 
-## History
+## Progress
 
-- 2026-08-17: groups API on Network Health + this module. 2026-08-19: vs-target.
+Dated work log: [`group-health.progress.md`](group-health.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

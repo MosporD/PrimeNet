@@ -18,9 +18,10 @@ Height samples for radio geometry. Not a dashboard constellation tile.
 
 Cache aggressively. `databases/geo/elevation_cache.db` stays SQLite (not a PG domain). App-table cache is `elevation_cache` via `connect_app()`.
 
-## History
+## Progress
 
-Backfill script `scripts/backfill_jordan_elevations.py` exists.
+Dated work log: [`elevation.progress.md`](elevation.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

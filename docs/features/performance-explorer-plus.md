@@ -22,10 +22,10 @@ Ingest Nokia NBI 15‑minute `.gz` (TS 32.435) into a warehouse, roll up to hour
 - KPI formulas evaluated at query time (`core/pm_plus/kpi_compiler.py`).
 - Huawei later via `VendorAdapter` in `core/pm_plus/adapter.py` (stub only).
 
-## History
+## Progress
 
-- 2026-09-11: V1 shipped — pilot, ingest worker, rollup, Explorer/Builder/Health UI, dashboard tile.
-- 2026-09-11: Grain keys (gp/ne_type/stream); rule-aware cascade hour←ROP, day←ROP, week←day, month←week, year←month; NONE→SUM. Agg rules / catalog import live on **Admin Panel → PM Plus Rules** (not this UI).
+Dated work log: [`performance-explorer-plus.progress.md`](performance-explorer-plus.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

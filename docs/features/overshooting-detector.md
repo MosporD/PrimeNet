@@ -22,9 +22,10 @@ Cells serving too far (HO SR / distance / elevation helpers).
 
 Elevation lookups: `core/elevation.py` / `/elevation`. Do not pull new DEM formats without asking.
 
-## History
+## Progress
 
-- 2026-08-17: HO SR overshooting. 2026-08-19: vs-target.
+Dated work log: [`overshooting-detector.progress.md`](overshooting-detector.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

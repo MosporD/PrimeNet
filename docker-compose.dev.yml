@@ -1,26 +1,47 @@
-# PrimeNet local development stack (live code mount + auto-reload)
+# NexusCore / PrimeNet / NexPulse local development (live code mount + auto-reload)
 #
-# First time (or after requirements.txt / Dockerfile changes):
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 #
-# Day-to-day (code/templates/static only — no rebuild):
-#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-#
-# Optional: include scheduler
-#   docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile with-scheduler up
-#
-# Production (unchanged):
+# Production:
 #   docker compose up -d --build
 
 services:
-  web:
-    container_name: primenet-web-dev
+  nexuscore:
+    container_name: nexuscore-web-dev
     restart: "no"
-    command: ["dev"]
+    command: ["dev-nexuscore"]
     environment:
       FLASK_DEBUG: "1"
       FLASK_PORT: "8000"
     volumes:
+      - nexuscore-data:/data/nexuscore
+      - primenet-data:/data
+      - .:/app
+    healthcheck:
+      disable: true
+
+  primenet:
+    container_name: primenet-web-dev
+    restart: "no"
+    command: ["dev-primenet"]
+    environment:
+      FLASK_DEBUG: "1"
+      FLASK_PORT: "8001"
+    volumes:
+      - primenet-data:/data
+      - .:/app
+    healthcheck:
+      disable: true
+
+  nexpulse:
+    container_name: nexpulse-web-dev
+    restart: "no"
+    command: ["dev-nexpulse"]
+    environment:
+      FLASK_DEBUG: "1"
+      FLASK_PORT: "8002"
+    volumes:
+      - nexpulse-data:/data/portals
       - primenet-data:/data
       - .:/app
     healthcheck:

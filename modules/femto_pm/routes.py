@@ -12,6 +12,7 @@ import time as _time
 
 from database_enhanced import get_user_by_session
 from sync_config import DATABASES_ROOT
+from core.platform.session import get_session_token
 from modules.femto_pm.kpi_store import (
     FEMTO_USER_KPI_DB,
     create_user_kpi,
@@ -38,7 +39,7 @@ femto_pm_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -51,7 +52,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

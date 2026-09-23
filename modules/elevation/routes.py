@@ -8,6 +8,7 @@ from flask import Blueprint, jsonify, request, redirect, url_for
 
 from core.elevation import coord_key, elevation_for_point, elevation_for_points, is_in_jordan, normalize_coord
 from database_enhanced import get_user_by_session
+from core.platform.session import get_session_token
 
 elevation_bp = Blueprint("elevation", __name__)
 
@@ -15,7 +16,7 @@ elevation_bp = Blueprint("elevation", __name__)
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)

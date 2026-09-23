@@ -73,7 +73,8 @@ TECH_SPECS: tuple[tuple[str, str, tuple[str, ...], tuple[str, ...], tuple[str, .
 
 TECH_ORDER = ('2G', '3G', '4G-FDD', '4G-TDD', '5G')
 DEFAULT_ANTENNA_HEIGHT_M = 25.0
-DEFAULT_BEAMWIDTH_DEG = 65.0
+# Half-power beamwidth used for hologram lobes (theta and phi).
+DEFAULT_BEAMWIDTH_DEG = 60.0
 
 
 def _as_float(value: Any) -> float | None:
@@ -102,12 +103,17 @@ def normalize_azimuth(value: Any) -> float | None:
     return round(deg, 1)
 
 
+# Inventory sector labels look like ``1003_A`` / ``601-C`` — letter is the lobe,
+# leading digits are the site id and must not become the sector key.
+_SITE_LETTER_SECTOR_RE = re.compile(r'^\d+[_\-]([A-Fa-f])(?:\d+)?$', re.IGNORECASE)
+
+
 def normalize_sector_key(value: Any, *, cell_name: str = '') -> str:
     """
     Canonical sector key shared by metadata, Nokia ``sectorID`` and Huawei subunits.
 
-    Letters map onto numbers (A → 1, B → 2, C → 3) so ``AMMAN1_A2`` and
-    ``sectorID=1`` land on the same sector.
+    Letters map onto numbers (A → 1, B → 2, C → 3) so ``1003_A``, Huawei
+    ``1020_A-2G-L900``, and Nokia ``D4-L1800`` land on the same sector.
     """
     text = _as_text(value).upper()
     if not text and cell_name:
@@ -118,14 +124,19 @@ def normalize_sector_key(value: Any, *, cell_name: str = '') -> str:
         return ''
     if text.endswith('.0') and text[:-2].isdigit():
         text = text[:-2]
+    site_letter = _SITE_LETTER_SECTOR_RE.match(text)
+    if site_letter:
+        return str(ord(site_letter.group(1).upper()) - 64)
     if len(text) == 1 and text.isalpha():
         return str(ord(text) - 64)
     digits = _DIGITS_RE.search(text)
-    if digits:
+    if digits and not re.search(r'[A-Z]', text):
         return str(int(digits.group(1)))
     letters = re.sub(r'[^A-Z]', '', text)
     if len(letters) == 1:
         return str(ord(letters) - 64)
+    if digits:
+        return str(int(digits.group(1)))
     return text
 
 

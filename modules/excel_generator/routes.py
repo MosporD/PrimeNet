@@ -13,6 +13,7 @@ from functools import wraps
 from ncm_core import ExcelToXMLConverter
 from database_enhanced import get_user_by_session, log_activity
 from core.cm_plan_validate import validate_raml_plan
+from core.platform.session import get_session_token
 
 excel_generator_bp = Blueprint(
     'excel_generator', __name__,
@@ -27,7 +28,7 @@ def login_required(f):
     """Decorator to require login"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
 
@@ -42,7 +43,7 @@ def login_required(f):
 
 def get_current_user():
     """Get current logged-in user"""
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None

@@ -1,3 +1,55 @@
+/* Match what browser 150% looks like under the global 0.67 --ui-zoom
+   (0.67 × 1.5 ≈ 1). RET is a 3D workspace — use real viewport size. */
+body.ret-management-page {
+    --ui-zoom: 1;
+    --ui-vw: 100vw;
+    --ui-vh: 100vh;
+    zoom: 1;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Full-width workspace — don't sit in the shared 1400px content column. */
+body.ret-management-page .main-content {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 16px 22px 28px;
+    box-sizing: border-box;
+}
+
+body.ret-management-page .panel {
+    padding: 20px 24px;
+}
+
+body.ret-management-page .vendor-tabs {
+    margin-bottom: 16px;
+}
+
+@media (min-width: 1200px) {
+    body.ret-management-page .main-content {
+        padding: 20px 36px 36px;
+    }
+
+    body.ret-management-page .picker-row {
+        grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 14px;
+    }
+
+    body.ret-management-page #ne-select {
+        min-height: 160px;
+        max-height: 220px;
+    }
+
+    body.ret-management-page .picker-actions {
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 160px;
+        padding-top: 2px;
+    }
+}
+
 .vendor-tabs {
     display: flex;
     gap: 12px;
@@ -319,7 +371,7 @@
 #holo-canvas {
     display: block;
     width: 100%;
-    height: 420px;
+    height: 630px;
     border-radius: 14px;
     background: #050d16;
     border: 1px solid #16324a;
@@ -466,10 +518,58 @@
 
 .holo-legend {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
     font-size: 0.76rem;
     color: #7f8c8d;
+}
+
+.holo-tech-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.holo-tech-label {
+    font-weight: 600;
+    color: #5d6d7e;
+    margin-right: 2px;
+}
+
+.holo-tech-toggle,
+.holo-tech-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #c5d0dc;
+    background: #f4f7fa;
+    color: #566573;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.74rem;
+    cursor: pointer;
+    opacity: 0.55;
+}
+
+.holo-tech-toggle.active {
+    opacity: 1;
+    border-color: #3abee8;
+    background: #eaf6fc;
+    color: #1a5276;
+}
+
+.holo-tech-all {
+    opacity: 0.85;
+    font-weight: 600;
+}
+
+.holo-tech-toggle i,
+.holo-legend-item i {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    display: inline-block;
 }
 
 .holo-legend-item {
@@ -478,11 +578,12 @@
     gap: 5px;
 }
 
-.holo-legend-item i {
-    width: 11px;
-    height: 11px;
-    border-radius: 3px;
-    display: inline-block;
+.holo-legend-note {
+    display: block;
+    margin: 8px 0 0;
+    font-size: 0.74rem;
+    color: #6a7f90;
+    line-height: 1.4;
 }
 
 .holo-legend-item i.edited {
@@ -509,12 +610,23 @@
 
 @media (min-width: 1000px) {
     .holo-layout {
-        grid-template-columns: minmax(0, 1.55fr) minmax(240px, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
         align-items: start;
+        gap: 20px;
     }
 
     #holo-canvas {
-        height: 480px;
+        height: min(72vh, 780px);
+    }
+}
+
+@media (min-width: 1400px) {
+    .holo-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    }
+
+    #holo-canvas {
+        height: min(74vh, 860px);
     }
 }
 

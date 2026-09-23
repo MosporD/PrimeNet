@@ -19,6 +19,7 @@ from .nokia_loader import (
     search_nokia_parameters,
 )
 from .mrbts_tree_loader import get_mrbts_tree_payload
+from core.platform.session import get_session_token
 
 parameter_dictionary_bp = Blueprint(
     'parameter_dictionary', __name__,
@@ -31,7 +32,7 @@ def login_required(f):
     """Decorator to require login"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
 
@@ -46,7 +47,7 @@ def login_required(f):
 
 def get_current_user():
     """Get current logged-in user"""
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None

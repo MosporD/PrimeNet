@@ -241,9 +241,14 @@ async function loadSectorHealth() {
         renderSummary(data);
         const gen = data.generated_at ? new Date(data.generated_at).toLocaleString() : '';
         const lteN = (data.health_summary || {}).lte_sector_count ?? 0;
-        const scope = data.active_only === false ? 'all configured cells' : 'active cells only';
+        const scope = data.active_only === false ? 'all cells' : 'on-air only';
         if (status) {
-            status.textContent = `Coverage snapshot${gen ? ` · ${gen}` : ''} · ${(data.filtered_sector_count ?? 0).toLocaleString()} in view · ${lteN.toLocaleString()} LTE (excl. L35) · ${scope}.`;
+            const parts = [];
+            if (gen) parts.push(gen);
+            parts.push(`${(data.filtered_sector_count ?? 0).toLocaleString()} sectors`);
+            parts.push(`${lteN.toLocaleString()} LTE`);
+            parts.push(scope);
+            status.textContent = parts.join(' · ');
         }
     } catch (e) {
         destroyCharts();

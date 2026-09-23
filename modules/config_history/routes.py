@@ -9,6 +9,7 @@ from functools import wraps
 import os, io, difflib
 
 from database_enhanced import get_user_by_session, log_activity, get_db, _exec, _insert_return_id
+from core.platform.session import get_session_token
 
 config_history_bp = Blueprint(
     'config_history', __name__,
@@ -21,7 +22,7 @@ config_history_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -33,7 +34,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

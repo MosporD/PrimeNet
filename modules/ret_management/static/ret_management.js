@@ -46,8 +46,19 @@
     let siteLayout = null;
     let layoutRequestId = 0;
     let hologram = null;
+    /** Technologies currently drawn on the hologram (empty = none). */
+    let activeTechs = new Set();
+    let techFilterInitialized = false;
+    /** Analytical pattern detail — isolates one sector (main + 2 sides + back). */
+    let patternDetailEnabled = false;
     /** Always live network (NetAct conf_id=1). */
     const LIVE_CONF_ID = 1;
+    const TECH_ORDER = [
+        '2G', '3G', '4G', '4G-TDD',
+        '4G-AAU-Left', '4G-AAU-Right', '4G-AAU', '4G-L1800+',
+        'Not Used',
+        '4G-FDD', '5G',  // metadata inventory fallbacks when no RET name
+    ];
 
     const HUAWEI_EDIT_COL = 'Tilt';
     const NOKIA_EDIT_COL = 'angle';
@@ -156,6 +167,9 @@
         if (hologram) {
             hologram.setSelected(null);
             hologram.setSectors([]);
+            if (typeof hologram.setAntennaFacings === 'function') {
+                hologram.setAntennaFacings([]);
+            }
         }
         if (tableFilterInput) tableFilterInput.value = '';
         resultsPanel.hidden = true;
@@ -275,8 +289,8 @@
     const HUAWEI_TILT_UNSET = 32767;
     /**
      * Derived first column, present for both vendors, that names the sector a RET
-     * row drives. Nokia gets it from `sectorID`, Huawei from `Actual Sector ID`
-     * or the subunit name — so an edit can always be traced to a hologram lobe.
+     * row drives. Nokia from `sectorID` (D4-L1800 / F1_F2-A1-…), Huawei from
+     * Subunit Name (`1020_A-2G-L900`) — joined to metadata azimuth by sector key.
      */
     const SECTOR_COLUMN = 'Sector';
 
@@ -334,15 +348,48 @@
         return row.angle ?? '';
     }
 
-    /** Per-sector RET state, merged onto the inventory geometry. */
+    /** AAU Left/Right split a 60° sector into two 30° half-beams. */
+    function techBeamwidth(tech) {
+        if (tech === '4G-AAU-Left' || tech === '4G-AAU-Right') return 30;
+        return 60;
+    }
+
+    /** Offset Left/Right half-beams from the sector centre azimuth (±15°). */
+    function techAzimuthOffset(tech) {
+        if (tech === '4G-AAU-Left') return -15;
+        if (tech === '4G-AAU-Right') return 15;
+        return 0;
+    }
+
+    function applyAzimuthOffset(baseAzimuth, tech) {
+        if (!Number.isFinite(baseAzimuth)) return baseAzimuth;
+        const offset = techAzimuthOffset(tech);
+        if (!offset) return baseAzimuth;
+        return ((baseAzimuth + offset) % 360 + 360) % 360;
+    }
+
+    /** Mean of finite tilt samples — hologram must track the table RET degrees. */
+    function meanTilt(values) {
+        const nums = (values || []).filter((v) => Number.isFinite(v));
+        if (!nums.length) return NaN;
+        return nums.reduce((sum, v) => sum + v, 0) / nums.length;
+    }
+
+    /** Per-sector × technology RET state, merged onto inventory geometry. */
     function computeSectors() {
         const scale = vendor === 'nokia' ? nokiaAngleScale(currentRows) : 1;
-        const perSector = new Map();
+        const perLobe = new Map();
         let unmappedCount = 0;
         let unmappedEdits = 0;
 
+        function lobeBucket(sectorKey, tech) {
+            const techKey = tech || 'Unknown';
+            return `${sectorKey}::${techKey}`;
+        }
+
         currentRows.forEach((row, index) => {
             const key = rowSector(row);
+            const tech = String(row._ret_tech || '').trim();
             const pending = pendingChanges.get(rowKey(row, index));
             const committed = tiltToDegrees(committedTiltRaw(row), scale);
             const current = pending ? tiltToDegrees(pending.value, scale) : committed;
@@ -352,11 +399,19 @@
                 if (edited) unmappedEdits += 1;
                 return;
             }
-            if (!perSector.has(key)) {
-                perSector.set(key, { retCount: 0, current: [], committed: [], edited: false, azimuths: [] });
+            const bucket = lobeBucket(key, tech);
+            if (!perLobe.has(bucket)) {
+                perLobe.set(bucket, {
+                    sectorKey: key,
+                    tech: tech || '',
+                    retCount: 0,
+                    current: [],
+                    committed: [],
+                    edited: false,
+                    azimuths: [],
+                });
             }
-
-            const entry = perSector.get(key);
+            const entry = perLobe.get(bucket);
             entry.retCount += 1;
             if (Number.isFinite(current)) entry.current.push(current);
             if (Number.isFinite(committed)) entry.committed.push(committed);
@@ -366,62 +421,94 @@
         });
 
         const layoutSectors = siteLayout?.sectors || [];
-        const sectors = layoutSectors.map((sector) => {
-            const ret = perSector.get(sector.key);
-            const retAzimuth = ret && ret.azimuths.length ? ret.azimuths[0] : null;
-            // A sector can carry several RETs (one per band). The lobe is drawn at
-            // the deepest downtilt (shortest reach) and the spread goes to the
-            // tooltip, so a 2°/8° pair is never read as a single 8° sector.
-            const tiltDeg = ret && ret.current.length
-                ? Math.max(...ret.current)
-                : (Number.isFinite(sector.electrical_tilt) ? sector.electrical_tilt : NaN);
-            const baseline = ret && ret.committed.length ? Math.max(...ret.committed) : NaN;
-            const tiltSpread = ret && ret.current.length > 1
-                ? [Math.min(...ret.current), Math.max(...ret.current)]
-                : null;
-            return {
-                key: sector.key,
-                label: sector.label,
-                azimuth: Number.isFinite(retAzimuth) ? retAzimuth : sector.azimuth,
-                azimuthSource: Number.isFinite(retAzimuth) ? 'RET antBearing' : sector.azimuth_source,
-                beamwidth: sector.beamwidth,
-                height: sector.height,
-                mechanicalTilt: sector.mechanical_tilt,
-                technologies: sector.technologies || [],
-                bands: sector.bands || [],
-                cellCount: sector.cell_count || 0,
-                retCount: ret ? ret.retCount : 0,
-                tiltDeg,
-                baselineTiltDeg: baseline,
-                tiltSpread: tiltSpread && tiltSpread[0] !== tiltSpread[1] ? tiltSpread : null,
-                edited: Boolean(ret && ret.edited),
-            };
+        const lobes = [];
+        const seen = new Set();
+
+        layoutSectors.forEach((sector) => {
+            const metaTechs = (sector.technologies || []).slice();
+            const retTechs = [];
+            perLobe.forEach((entry) => {
+                if (entry.sectorKey === sector.key && entry.tech && !retTechs.includes(entry.tech)) {
+                    retTechs.push(entry.tech);
+                }
+            });
+            // RET-named techs first; fall back to inventory techs when no RET rows yet.
+            let techs = retTechs.length ? retTechs.slice() : metaTechs.slice();
+            if (!techs.length) techs = [''];
+            techs.sort((a, b) => {
+                const ai = TECH_ORDER.indexOf(a);
+                const bi = TECH_ORDER.indexOf(b);
+                return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || a.localeCompare(b);
+            });
+
+            techs.forEach((tech, techIndex) => {
+                const bucket = lobeBucket(sector.key, tech);
+                seen.add(bucket);
+                const ret = perLobe.get(bucket);
+                const retAzimuth = ret && ret.azimuths.length ? ret.azimuths[0] : null;
+                const hasMetaAz = Number.isFinite(sector.azimuth);
+                const azimuthSource = hasMetaAz
+                    ? (sector.azimuth_source || 'metadata')
+                    : (Number.isFinite(retAzimuth) ? 'RET antBearing' : sector.azimuth_source);
+                const metaEtilt = Number.isFinite(sector.electrical_tilt) ? sector.electrical_tilt : NaN;
+                const tiltDeg = ret && ret.current.length
+                    ? meanTilt(ret.current)
+                    : metaEtilt;
+                const baseline = ret && ret.committed.length ? meanTilt(ret.committed) : NaN;
+                const tiltSpread = ret && ret.current.length > 1
+                    ? [Math.min(...ret.current), Math.max(...ret.current)]
+                    : null;
+                const techLabel = tech || 'Unknown';
+                const baseAzimuth = hasMetaAz ? sector.azimuth : retAzimuth;
+                lobes.push({
+                    key: bucket,
+                    sectorKey: sector.key,
+                    label: `${sector.label} · ${techLabel}`,
+                    technology: techLabel,
+                    technologies: tech ? [tech] : [],
+                    techIndex,
+                    azimuth: applyAzimuthOffset(baseAzimuth, tech),
+                    azimuthSource,
+                    beamwidth: techBeamwidth(tech),
+                    height: sector.height,
+                    mechanicalTilt: sector.mechanical_tilt,
+                    bands: sector.bands || [],
+                    cellCount: (sector.cells || []).filter((c) => !tech || c.technology === tech).length
+                        || (tech ? 0 : (sector.cell_count || 0)),
+                    retCount: ret ? ret.retCount : 0,
+                    tiltDeg,
+                    baselineTiltDeg: baseline,
+                    tiltSpread: tiltSpread && tiltSpread[0] !== tiltSpread[1] ? tiltSpread : null,
+                    edited: Boolean(ret && ret.edited),
+                });
+            });
         });
 
-        // RETs reporting a sector the inventory does not know about: draw them
-        // when the RET itself reports a bearing, otherwise list them as unmapped.
-        const drawn = new Set(sectors.map((sector) => sector.key));
-        perSector.forEach((entry, key) => {
-            if (drawn.has(key)) return;
+        perLobe.forEach((entry, bucket) => {
+            if (seen.has(bucket)) return;
             if (!entry.azimuths.length) {
                 unmappedCount += entry.retCount;
                 if (entry.edited) unmappedEdits += 1;
                 return;
             }
-            sectors.push({
-                key,
-                label: sectorLabelFor(key),
-                azimuth: entry.azimuths[0],
+            const techLabel = entry.tech || 'Unknown';
+            lobes.push({
+                key: bucket,
+                sectorKey: entry.sectorKey,
+                label: `${sectorLabelFor(entry.sectorKey)} · ${techLabel}`,
+                technology: techLabel,
+                technologies: entry.tech ? [entry.tech] : [],
+                techIndex: 0,
+                azimuth: applyAzimuthOffset(entry.azimuths[0], entry.tech),
                 azimuthSource: 'RET antBearing (not in inventory)',
-                beamwidth: 65,
+                beamwidth: techBeamwidth(entry.tech),
                 height: siteLayout?.site?.antenna_height,
                 mechanicalTilt: NaN,
-                technologies: [],
                 bands: [],
                 cellCount: 0,
                 retCount: entry.retCount,
-                tiltDeg: entry.current.length ? Math.max(...entry.current) : NaN,
-                baselineTiltDeg: entry.committed.length ? Math.max(...entry.committed) : NaN,
+                tiltDeg: meanTilt(entry.current),
+                baselineTiltDeg: meanTilt(entry.committed),
                 tiltSpread: entry.current.length > 1
                     && Math.min(...entry.current) !== Math.max(...entry.current)
                     ? [Math.min(...entry.current), Math.max(...entry.current)]
@@ -430,19 +517,54 @@
             });
         });
 
-        sectors.sort((a, b) => {
-            const aNum = /^\d+$/.test(a.key) ? Number(a.key) : Number.MAX_SAFE_INTEGER;
-            const bNum = /^\d+$/.test(b.key) ? Number(b.key) : Number.MAX_SAFE_INTEGER;
-            return aNum - bNum || a.key.localeCompare(b.key);
+        lobes.sort((a, b) => {
+            const aNum = /^\d+$/.test(a.sectorKey) ? Number(a.sectorKey) : Number.MAX_SAFE_INTEGER;
+            const bNum = /^\d+$/.test(b.sectorKey) ? Number(b.sectorKey) : Number.MAX_SAFE_INTEGER;
+            const techA = TECH_ORDER.indexOf(a.technology);
+            const techB = TECH_ORDER.indexOf(b.technology);
+            return aNum - bNum
+                || (techA < 0 ? 99 : techA) - (techB < 0 ? 99 : techB)
+                || a.key.localeCompare(b.key);
         });
-        return { sectors, unmappedCount, unmappedEdits, scale };
+
+        const availableTechs = [];
+        lobes.forEach((lobe) => {
+            const tech = lobe.technology;
+            if (tech && tech !== 'Unknown' && !availableTechs.includes(tech)) availableTechs.push(tech);
+        });
+        availableTechs.sort((a, b) => {
+            const ai = TECH_ORDER.indexOf(a);
+            const bi = TECH_ORDER.indexOf(b);
+            return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || a.localeCompare(b);
+        });
+        if (!techFilterInitialized && availableTechs.length) {
+            activeTechs = new Set(availableTechs);
+            techFilterInitialized = true;
+        } else if (availableTechs.length) {
+            // Drop techs that disappeared; keep user toggles for the rest.
+            const next = new Set();
+            availableTechs.forEach((tech) => {
+                if (activeTechs.has(tech) || !techFilterInitialized) next.add(tech);
+            });
+            // If everything was toggled off after a reload that introduced new techs only,
+            // leave activeTechs as-is (user may have cleared all intentionally).
+            if (next.size || activeTechs.size === 0) activeTechs = next.size ? next : activeTechs;
+        }
+
+        return {
+            sectors: lobes,
+            availableTechs,
+            unmappedCount,
+            unmappedEdits,
+            scale,
+        };
     }
 
     function ensureHologram() {
         if (hologram || !holoCanvas || !window.RetHologram) return hologram;
         hologram = window.RetHologram.create(holoCanvas, {
-            onSelectSector(key) {
-                sectorFilter = key || '';
+            onSelectSector(sectorKey) {
+                sectorFilter = sectorKey || '';
                 renderTable();
                 renderHologramRail();
             },
@@ -454,33 +576,80 @@
         if (!holoChips) return;
         holoChips.innerHTML = '';
         const selected = hologram ? hologram.getSelected() : null;
-        computed.sectors.forEach((sector) => {
+        const bySector = new Map();
+        (computed.sectors || []).forEach((lobe) => {
+            const key = lobe.sectorKey || lobe.key;
+            if (!bySector.has(key)) {
+                bySector.set(key, {
+                    key,
+                    label: sectorLabelFor(key),
+                    azimuth: lobe.azimuth,
+                    tiltDeg: lobe.tiltDeg,
+                    mechanicalTilt: lobe.mechanicalTilt,
+                    retCount: 0,
+                    cellCount: 0,
+                    edited: false,
+                    technologies: [],
+                });
+            }
+            const agg = bySector.get(key);
+            agg.retCount += lobe.retCount || 0;
+            agg.cellCount += lobe.cellCount || 0;
+            if (lobe.edited) agg.edited = true;
+            if (Number.isFinite(lobe.tiltDeg)) {
+                agg.tiltDeg = Number.isFinite(agg.tiltDeg)
+                    ? Math.max(agg.tiltDeg, lobe.tiltDeg)
+                    : lobe.tiltDeg;
+            }
+            if (Number.isFinite(lobe.mechanicalTilt)) {
+                agg.mechanicalTilt = Number.isFinite(agg.mechanicalTilt)
+                    ? Math.max(agg.mechanicalTilt, lobe.mechanicalTilt)
+                    : lobe.mechanicalTilt;
+            }
+            (lobe.technologies || []).forEach((tech) => {
+                if (!agg.technologies.includes(tech)) agg.technologies.push(tech);
+            });
+        });
+        Array.from(bySector.values()).forEach((sector) => {
             const chip = document.createElement('button');
             chip.type = 'button';
             chip.className = 'holo-chip';
             if (sector.edited) chip.classList.add('edited');
             if (selected === sector.key) chip.classList.add('active');
-            const tilt = Number.isFinite(sector.tiltDeg)
+            const retTilt = Number.isFinite(sector.tiltDeg)
                 ? window.RetHologram.formatDegrees(sector.tiltDeg)
+                : '—';
+            const eff = window.RetHologram.effectiveTiltDeg
+                ? window.RetHologram.effectiveTiltDeg(sector.tiltDeg, sector.mechanicalTilt)
+                : sector.tiltDeg;
+            const tiltLabel = Number.isFinite(eff)
+                ? `eff ${window.RetHologram.formatDegrees(eff)}`
                 : 'tilt —';
             [
                 ['holo-chip-key', `S${sector.label}`],
                 ['holo-chip-az', window.RetHologram.formatDegrees(sector.azimuth)],
-                ['holo-chip-tilt', tilt],
+                ['holo-chip-tilt', tiltLabel],
             ].forEach(([className, text]) => {
                 const span = document.createElement('span');
                 span.className = className;
                 span.textContent = text;
                 chip.appendChild(span);
             });
+            const mechLabel = Number.isFinite(sector.mechanicalTilt)
+                ? window.RetHologram.formatDegrees(sector.mechanicalTilt)
+                : '—';
             chip.title = `${sector.retCount} RET row(s), ${sector.cellCount} cell(s)`
-                + (sector.technologies.length ? ` · ${sector.technologies.join(', ')}` : '');
+                + (sector.technologies.length ? ` · ${sector.technologies.join(', ')}` : '')
+                + ` · RET ${retTilt} · mech ${mechLabel} ×3 → ${tiltLabel}`;
             chip.addEventListener('click', () => {
-                const next = selected === sector.key ? null : sector.key;
+                let next = selected === sector.key ? null : sector.key;
+                // Pattern detail isolates one sector — keep a focus sector selected.
+                if (patternDetailEnabled && !next) next = sector.key;
                 if (hologram) hologram.setSelected(next);
                 sectorFilter = next || '';
                 renderTable();
                 renderHologramRail();
+                if (patternDetailEnabled) renderHologram();
             });
             holoChips.appendChild(chip);
         });
@@ -499,8 +668,8 @@
                 chip.appendChild(span);
             });
             chip.title = vendor === 'huawei'
-                ? 'U2020 did not report a sector id for these RETSUBUNITs'
-                : 'These RETU rows carry no sectorID';
+                ? 'Subunit Name did not match {SiteId}_{Sector}-… for these RETSUBUNITs'
+                : 'These RETU rows carry no parseable sectorID';
             chip.addEventListener('click', () => {
                 sectorFilter = sectorFilter === UNMAPPED_SECTOR ? '' : UNMAPPED_SECTOR;
                 if (hologram) hologram.setSelected(null);
@@ -537,16 +706,75 @@
 
     function renderLegend(computed) {
         if (!holoLegend) return;
-        const techs = new Set();
-        computed.sectors.forEach((sector) => (sector.technologies || []).forEach((tech) => techs.add(tech)));
-        const items = Array.from(techs).map((tech) => {
+        const techs = computed.availableTechs || [];
+        const buttons = techs.map((tech) => {
             const colour = window.RetHologram.TECH_COLORS[tech] || [110, 196, 240];
-            return `<span class="holo-legend-item">`
-                + `<i style="background: rgba(${colour[0]}, ${colour[1]}, ${colour[2]}, 0.85)"></i>`
-                + `${escapeHtml(tech)}</span>`;
+            const on = activeTechs.has(tech);
+            return `<button type="button" class="holo-tech-toggle${on ? ' active' : ''}" data-tech="${escapeHtml(tech)}" `
+                + `aria-pressed="${on ? 'true' : 'false'}" title="Toggle ${escapeHtml(tech)} lobes">`
+                + `<i style="background: rgba(${colour[0]}, ${colour[1]}, ${colour[2]}, ${on ? '0.95' : '0.25'})"></i>`
+                + `${escapeHtml(tech)}</button>`;
         });
-        items.push('<span class="holo-legend-item"><i class="edited"></i>edited (dashed ring = current tilt)</span>');
-        holoLegend.innerHTML = items.join('');
+        const actions = techs.length
+            ? '<button type="button" class="holo-tech-all" data-action="all">All</button>'
+                + '<button type="button" class="holo-tech-all" data-action="none">None</button>'
+            : '';
+        holoLegend.innerHTML = [
+            '<div class="holo-tech-bar">',
+            '<span class="holo-tech-label">Technologies</span>',
+            ...buttons,
+            actions,
+            '</div>',
+            `<button type="button" class="holo-tech-toggle holo-pattern-toggle${patternDetailEnabled ? ' active' : ''}" `
+                + `data-action="pattern" aria-pressed="${patternDetailEnabled ? 'true' : 'false'}" `
+                + 'title="Analytical pattern (main + 2 side + back). Isolates the selected sector.">'
+                + 'Pattern detail</button>',
+            '<span class="holo-legend-item"><i class="edited"></i>edited (mesh ghost = committed tilt)</span>',
+            '<p class="holo-legend-note">Pointing uses RET + 3× mechanical (metadata). '
+                + 'Reach clamped 100–1000 m, then band. Pattern detail = main + 2 sides (~20% @ ±90°) '
+                + '+ back (~55% @ 180°) and turns other sectors off — click a sector chip to switch focus; '
+                + 'tech toggles still compare techs on that sector.</p>',
+        ].join('');
+        holoLegend.querySelectorAll('.holo-tech-toggle').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.action === 'pattern') {
+                    patternDetailEnabled = !patternDetailEnabled;
+                    const holo = ensureHologram();
+                    if (patternDetailEnabled) {
+                        // Isolate one sector — pick current selection or first available.
+                        let focus = holo ? holo.getSelected() : null;
+                        if (!focus) {
+                            const first = (computed.sectors || []).find((l) => l.sectorKey);
+                            focus = first ? first.sectorKey : null;
+                        }
+                        if (focus && holo) {
+                            holo.setSelected(focus);
+                            sectorFilter = focus;
+                        }
+                    }
+                    if (holo && typeof holo.setPatternDetail === 'function') {
+                        holo.setPatternDetail(patternDetailEnabled);
+                    }
+                    renderTable();
+                    renderHologram();
+                    return;
+                }
+                const tech = btn.dataset.tech;
+                if (activeTechs.has(tech)) activeTechs.delete(tech);
+                else activeTechs.add(tech);
+                renderHologram();
+            });
+        });
+        holoLegend.querySelectorAll('.holo-tech-all').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.action === 'all') {
+                    activeTechs = new Set(techs);
+                } else {
+                    activeTechs = new Set();
+                }
+                renderHologram();
+            });
+        });
     }
 
     function renderHologramRail() {
@@ -564,7 +792,43 @@
         if (!holo) return;
         const computed = computeSectors();
         holo.setSite(siteLayout?.site || {});
-        holo.setSectors(computed.sectors.filter((sector) => Number.isFinite(sector.azimuth)));
+        const layoutFacings = (siteLayout?.sectors || [])
+            .filter((s) => Number.isFinite(s.azimuth))
+            .map((s) => ({ key: s.key, azimuth: s.azimuth, label: s.label }));
+        // RET-only sectors (no inventory row) still get a panel from their bearing.
+        const facingKeys = new Set(layoutFacings.map((f) => f.key));
+        (computed.sectors || []).forEach((lobe) => {
+            const key = lobe.sectorKey;
+            if (!key || facingKeys.has(key) || !Number.isFinite(lobe.azimuth)) return;
+            let az = lobe.azimuth;
+            // Undo AAU half-beam offset so the panel faces the sector centre.
+            if (lobe.technology === '4G-AAU-Left') az = (az + 15 + 360) % 360;
+            else if (lobe.technology === '4G-AAU-Right') az = (az - 15 + 360) % 360;
+            layoutFacings.push({ key, azimuth: az, label: lobe.label || key });
+            facingKeys.add(key);
+        });
+        if (typeof holo.setAntennaFacings === 'function') {
+            holo.setAntennaFacings(layoutFacings);
+        }
+        if (typeof holo.setPatternDetail === 'function') {
+            holo.setPatternDetail(patternDetailEnabled);
+        }
+        const focusSector = patternDetailEnabled && holo.getSelected
+            ? holo.getSelected()
+            : null;
+        const visible = computed.sectors.filter((lobe) => {
+            if (!Number.isFinite(lobe.azimuth)) return false;
+            if (patternDetailEnabled && focusSector && lobe.sectorKey !== focusSector) {
+                return false;
+            }
+            const tech = lobe.technology;
+            if (!tech || tech === 'Unknown') {
+                return (computed.availableTechs || []).length > 0
+                    && (computed.availableTechs || []).every((t) => activeTechs.has(t));
+            }
+            return activeTechs.has(tech);
+        });
+        holo.setSectors(visible);
         renderSectorChips(computed);
         renderEditSummary(computed);
         renderLegend(computed);
@@ -583,7 +847,9 @@
                     + (site.height_source === 'default' ? ' (assumed)' : ''),
                 );
             }
-            bits.push(`${computed.sectors.length} sector(s)`);
+            const sectorCount = new Set(computed.sectors.map((l) => l.sectorKey)).size;
+            bits.push(`${sectorCount} sector(s)`);
+            bits.push(`${visible.length}/${computed.sectors.length} lobe(s)`);
             holoSiteMeta.textContent = bits.join(' · ');
         }
         if (holoStatus && vendor === 'nokia' && currentRows.length) {
@@ -834,8 +1100,8 @@
             th.textContent = `${label}${marker}`;
             if (col === SECTOR_COLUMN) {
                 th.title = vendor === 'huawei'
-                    ? 'Sector this RETSUBUNIT drives (Actual Sector ID / subunit name). Click to sort.'
-                    : 'Sector this RETU drives (sectorID). Click to sort.';
+                    ? 'Sector from Subunit Name ({SiteId}_{Sector}-…). Click to sort.'
+                    : 'Sector from sectorID (e.g. D4-L1800). Click to sort.';
             } else if (col === editCol && cmWriteAllowed && hasEditColumn) {
                 th.title = vendor === 'huawei'
                     ? 'Editable — U2020 MML 0.1° units (40 = 4.0°). Click header to sort.'
@@ -1143,6 +1409,8 @@
             sortState = { col: null, dir: 1 };
             tableFilter = '';
             sectorFilter = '';
+            techFilterInitialized = false;
+            activeTechs = new Set();
             if (tableFilterInput) tableFilterInput.value = '';
             if (hologram) hologram.setSelected(null);
         }
@@ -1255,6 +1523,8 @@
                 t.setAttribute('aria-selected', active ? 'true' : 'false');
             });
             vendor = tab.dataset.vendor;
+            techFilterInitialized = false;
+            activeTechs = new Set();
             updateVendorUi();
             fetchDefaults();
         });
@@ -1293,13 +1563,14 @@
     if (holoResetBtn) {
         holoResetBtn.addEventListener('click', () => {
             if (hologram) hologram.reset();
-            if (holoPitch) holoPitch.value = '0';
-            if (hologram) hologram.setPitch(0);
+            if (holoPitch) holoPitch.value = String(window.RetHologram.DEFAULT_PITCH_DEG || 30);
+            if (hologram) hologram.setPitch(Number(holoPitch.value));
         });
     }
     if (holoPitch) {
+        holoPitch.value = String(window.RetHologram && window.RetHologram.DEFAULT_PITCH_DEG || 30);
         holoPitch.addEventListener('input', () => {
-            if (hologram) hologram.setPitch(Number(holoPitch.value) / 100);
+            if (hologram) hologram.setPitch(Number(holoPitch.value));
         });
     }
 

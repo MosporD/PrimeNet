@@ -22,9 +22,10 @@ Compose capacity / neighbor / overshooting / sleeping / … into one briefing li
 
 Fix child detectors; this page only composes. Keep `limit` modest (default 100).
 
-## History
+## Progress
 
-- 2026-08-17: composes the new radio outputs.
+Dated work log: [`radio-morning-report.progress.md`](radio-morning-report.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

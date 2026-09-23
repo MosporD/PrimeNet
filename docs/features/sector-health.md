@@ -17,10 +17,10 @@ Monitored sectors vs all configured cells. Coverage = metadata (active vs all), 
 
 Do not overlay sleeping-cell PM on this matrix. Shared radio TTL cache applies to expensive scans (`?refresh=1`).
 
-## History
+## Progress
 
-- 2026-09-08: Stopped excluding Nokia `2G / GSM 900` (and sparse DCS labels) from the coverage matrix — that zeroed Nokia 2G sector counts. Normalize to `2G / GSM900`. Version V1.3.
-- 2026-08-19: Sleeping Cells overlay removed from Sector Health / Excel matrix. Version V1.2.
+Dated work log: [`sector-health.progress.md`](sector-health.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

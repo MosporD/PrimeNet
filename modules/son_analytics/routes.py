@@ -10,6 +10,7 @@ from database_enhanced import get_user_by_session
 
 from .area_helpers import list_areas
 from .logic import build_all_recommendations, filter_recommendations, filtered_summary, get_recommendation_by_id
+from core.platform.session import get_session_token
 
 son_analytics_bp = Blueprint(
     "son_analytics",
@@ -29,7 +30,7 @@ def _guard_son_analytics_access():
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("session_token")
+        token = get_session_token()
         if not token:
             return redirect(url_for("auth.login_page"))
         user = get_user_by_session(token)
@@ -42,7 +43,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get("session_token")
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

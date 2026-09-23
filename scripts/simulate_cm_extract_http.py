@@ -55,7 +55,7 @@ def run_extract(label: str, payload: dict) -> None:
     client = app.test_client()
     auth_headers = {
         'Content-Type': 'application/json',
-        'Cookie': f'session_token={token}',
+        'Cookie': f'primenet_session={token}',
     }
     t0 = time.time()
 
@@ -79,7 +79,7 @@ def run_extract(label: str, payload: dict) -> None:
             time.sleep(2)
             status_resp = client.get(
                 f'/api/cm-extractor/extract-status/{file_id}',
-                headers={'Cookie': f'session_token={token}'},
+                headers={'Cookie': f'primenet_session={token}'},
             )
             status_data = status_resp.get_json(silent=True) or {}
             status = status_data.get('status')

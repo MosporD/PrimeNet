@@ -25,10 +25,10 @@ Sleeping Cells is the exception with real logic in `modules/sleeping_cells/logic
 - Do not overlay Sleeping Cells (PM) onto Sector Health coverage (metadata).
 - Neighbor line scans honor `NEIGHBOR_MAX_LINES` (raised for SON Topology).
 
-## History
+## Progress
 
-- 2026-08-17: radio insight modules + feature-access guards + morning report compose.
-- 2026-08-19: detectors score vs operator targets; TTL cache on expensive scans.
+Dated work log: [`_radio-engine.progress.md`](_radio-engine.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

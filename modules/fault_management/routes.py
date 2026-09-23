@@ -21,6 +21,7 @@ from core.cm_extractor.http_util import build_ssl_context, format_connection_err
 from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.huawei_discovery import fetch_fm_alarms
 from database_enhanced import get_user_by_session
+from core.platform.session import get_session_token
 
 fault_management_bp = Blueprint(
     'fault_management',
@@ -34,7 +35,7 @@ fault_management_bp = Blueprint(
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get('session_token')
+        token = get_session_token()
         if not token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(token)
@@ -46,7 +47,7 @@ def login_required(f):
 
 
 def get_current_user():
-    token = request.cookies.get('session_token')
+    token = get_session_token()
     return get_user_by_session(token) if token else None
 
 

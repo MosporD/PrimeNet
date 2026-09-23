@@ -17,9 +17,10 @@ Catalog of report URLs. Does not proxy Power BI tokens today.
 
 Keep it a catalog. Do not add embed tokens unless the workspace actually has Premium/Fabric and Malek asks.
 
-## History
+## Progress
 
-Integrated with dashboard; course notes embed is blocked on licensing.
+Dated work log: [`power-bi.progress.md`](power-bi.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

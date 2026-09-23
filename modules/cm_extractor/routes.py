@@ -72,6 +72,7 @@ from core.cm_extractor.job_scheduler import (
     set_enabled as cm_set_enabled,
 )
 from database_enhanced import get_user_by_session, log_activity
+from core.platform.session import get_session_token
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +92,50 @@ def _site_id_count(data: dict) -> int:
     if isinstance(site_ids, str):
         site_ids = [s.strip() for s in site_ids.split(',') if s.strip()]
     return len(site_ids)
+
+
+def _cm_selection_mo_ids(data: dict) -> list[str]:
+    mos: list[str] = []
+    for sel in data.get('selections') or []:
+        mo = str(sel.get('mo_id') or sel.get('id') or '').strip()
+        if mo:
+            mos.append(mo)
+    if not mos and (data.get('command') or '').strip():
+        mos.append('CUSTOM')
+    return mos
+
+
+def _cm_activity_details(data: dict, **extra) -> str:
+    vendor = (data.get('vendor') or '').lower() or '?'
+    scope = (data.get('scope_level') or '').strip() or '?'
+    n_sites = _site_id_count(data)
+    mos = _cm_selection_mo_ids(data)
+    parts = [f'vendor={vendor}', f'scope={scope}', f'sites={n_sites}']
+    if mos:
+        shown = ','.join(mos[:8])
+        if len(mos) > 8:
+            shown += f'…(+{len(mos) - 8})'
+        parts.append(f'mo={shown}')
+    for key, value in extra.items():
+        if value is None or value == '':
+            continue
+        text = str(value).replace('\n', ' ').strip()
+        if len(text) > 240:
+            text = text[:237] + '…'
+        parts.append(f'{key}={text}')
+    return ' | '.join(parts)
+
+
+def _log_cm_activity(user, action: str, details: str) -> None:
+    try:
+        log_activity(
+            _user_id(user),
+            action,
+            details,
+            ip_address=getattr(request, 'remote_addr', None),
+        )
+    except Exception:
+        logger.exception('Failed to write CM activity log action=%s', action)
 
 
 def _extract_is_long_running(data: dict) -> bool:
@@ -197,7 +242,6 @@ def _perform_extract(data: dict, output_path: str, user) -> dict:
         raise ValueError('Unknown vendor')
 
     filename = f'{vendor}_cm_extract.xlsx'
-    log_activity(_user_id(user), 'cm_extract', label)
     response = {
         'success': True,
         'file_id': None,  # filled by caller
@@ -210,6 +254,18 @@ def _perform_extract(data: dict, output_path: str, user) -> dict:
         response['extraction_mode'] = mode
     if vendor == 'huawei' and warnings:
         response['warnings'] = warnings
+    _log_cm_activity(
+        user,
+        'cm_extract',
+        _cm_activity_details(
+            data,
+            result='ok',
+            rows=row_count,
+            sheets=len(sheet_names) if vendor in ('nokia', 'huawei') else None,
+            warnings=len(warnings) if warnings else 0,
+            label=label,
+        ),
+    )
     return response
 
 
@@ -229,13 +285,19 @@ def _extract_worker(file_id: str, output_path: str, data: dict, user) -> None:
         )
     except Exception as exc:
         logger.exception('CM extract worker failed file_id=%s', file_id)
-        update_export_record(file_id, status='error', error=str(exc) or 'Extraction failed')
+        err = str(exc) or 'Extraction failed'
+        update_export_record(file_id, status='error', error=err)
+        _log_cm_activity(
+            user,
+            'cm_extract_fail',
+            _cm_activity_details(data, result='error', async_job=1, file_id=file_id, error=err),
+        )
 
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('session_token')
+        session_token = get_session_token()
         if not session_token:
             return redirect(url_for('auth.login_page'))
         user = get_user_by_session(session_token)
@@ -247,7 +309,7 @@ def login_required(f):
 
 
 def get_current_user():
-    session_token = request.cookies.get('session_token')
+    session_token = get_session_token()
     if session_token:
         return get_user_by_session(session_token)
     return None
@@ -1048,6 +1110,14 @@ def extract():
     data = _json_body()
     vendor = (data.get('vendor') or '').lower()
     filename = f'{vendor}_cm_extract.xlsx'
+    _log_cm_activity(
+        user,
+        'cm_extract_start',
+        _cm_activity_details(
+            data,
+            async_candidate=1 if _extract_is_long_running(data) else 0,
+        ),
+    )
 
     try:
         file_id, output_path = create_export_path(
@@ -1063,6 +1133,11 @@ def extract():
                 args=(file_id, str(output_path), data, user),
                 daemon=True,
             ).start()
+            _log_cm_activity(
+                user,
+                'cm_extract_async',
+                _cm_activity_details(data, file_id=file_id, status='running'),
+            )
             return jsonify({
                 'success': True,
                 'async': True,
@@ -1086,15 +1161,40 @@ def extract():
         return jsonify(result)
 
     except PermissionError as exc:
+        _log_cm_activity(
+            user,
+            'cm_extract_fail',
+            _cm_activity_details(data, result='forbidden', error=exc),
+        )
         return jsonify({'error': str(exc)}), 403
     except (NokiaCmError, HuaweiCmError) as exc:
+        _log_cm_activity(
+            user,
+            'cm_extract_fail',
+            _cm_activity_details(data, result='vendor_api', error=exc),
+        )
         return jsonify({'error': str(exc)}), 502
     except ConnectionError as exc:
+        _log_cm_activity(
+            user,
+            'cm_extract_fail',
+            _cm_activity_details(data, result='connection', error=exc),
+        )
         return jsonify({'error': str(exc)}), 502
     except ValueError as exc:
+        _log_cm_activity(
+            user,
+            'cm_extract_fail',
+            _cm_activity_details(data, result='bad_request', error=exc),
+        )
         return jsonify({'error': str(exc)}), 400
     except Exception as exc:
         logger.exception('CM extract failed')
+        _log_cm_activity(
+            user,
+            'cm_extract_fail',
+            _cm_activity_details(data, result='error', error=exc),
+        )
         return jsonify({'error': str(exc) or 'Extraction failed'}), 500
 
 
@@ -1328,7 +1428,12 @@ def download(file_id):
     if status == 'error':
         return jsonify({'error': info.get('error') or 'Extraction failed'}), 500
 
-    log_activity(_user_id(user), 'file_download', f'Downloaded {info["filename"]}')
+    log_activity(
+        _user_id(user),
+        'cm_extract_download',
+        f'Downloaded {info["filename"]} (file_id={file_id})',
+        ip_address=getattr(request, 'remote_addr', None),
+    )
     return send_file(info['path'], as_attachment=True, download_name=info['filename'])
 
 

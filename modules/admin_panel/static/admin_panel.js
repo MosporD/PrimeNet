@@ -4,10 +4,17 @@
 
 let allUsers = [];
 let filteredUsers = [];
+let portalCatalog = [
+    { key: 'primenet', label: 'Engineering (PrimeNet)', live: true },
+    { key: 'nexpulse', label: 'Marketing (NexPulse)', live: true },
+    { key: 'sales', label: 'Sales (NexArpu)', live: false },
+    { key: 'support', label: 'Support (NexResolve)', live: false },
+];
 let syncMsgTimer = null;
 let syncStatusRows = [];
 let syncHistoryRows = [];
 let retFallbackRows = [];
+let cmExtractActivityRows = [];
 let activityRows = [];
 let filteredActivityRows = [];
 let usersPage = 1;
@@ -36,9 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     openAdminPage(defaultPage || 'user-admin');
     loadAllUsers();
     loadRetCredentialFallbacks();
+    loadCmExtractActivity();
     if (document.querySelector('.admin-page-tab[data-page="data-sync"]')) {
         loadSyncStatus();
         loadSyncHistory();
+        loadRruInventoryStatus();
+        loadAdjacencyGisStatus();
         startProgressPolling();
     }
 });
@@ -249,6 +259,7 @@ async function loadAllUsers() {
         }
 
         allUsers = data.users || [];
+        portalCatalog = data.portal_catalog || portalCatalog;
         filteredUsers = [...allUsers];
         usersPage = 1;
         displayUsers(filteredUsers);
@@ -256,7 +267,7 @@ async function loadAllUsers() {
     } catch (error) {
         console.error('Error loading users:', error);
         document.getElementById('users-table-body').innerHTML = `
-            <tr><td colspan="8" style="text-align: center; color: #e74c3c;">
+            <tr><td colspan="9" style="text-align: center; color: #e74c3c;">
                 Error loading users: ${error.message}
             </td></tr>
         `;
@@ -267,7 +278,7 @@ function displayUsers(users) {
     const tbody = document.getElementById('users-table-body');
 
     if (!users || users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No users found</td></tr>';
         renderPagination('users-pagination', 0, USERS_PAGE_SIZE, 1, 'goToUsersPage');
         return;
     }
@@ -280,6 +291,7 @@ function displayUsers(users) {
             <td><strong>${_escapeHtml(user.username)}</strong></td>
             <td>${_escapeHtml(user.email)}</td>
             <td><span class="role-badge ${_escapeHtml(user.role)}">${_escapeHtml(user.role_label || ROLE_LABELS[user.role] || user.role)}</span></td>
+            <td class="portal-cell">${_escapeHtml((user.portal_labels || user.allowed_portals || []).join(', ') || '—')}</td>
             <td><span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
                 ${user.is_active ? 'Active' : 'Inactive'}
             </span></td>
@@ -292,6 +304,9 @@ function displayUsers(users) {
                     </button>
                     <button class="action-btn role" onclick="toggleRole(${Number(user.id)}, '${_escapeHtml(user.role)}')">
                         Change Role
+                    </button>
+                    <button class="action-btn portals" onclick="editUserPortals(${Number(user.id)}, '${_escapeHtml((user.allowed_portals || []).join(','))}')">
+                        Portals
                     </button>
                     <button class="action-btn status" onclick="toggleStatus(${Number(user.id)}, ${!!user.is_active})">
                         ${user.is_active ? 'Deactivate' : 'Activate'}
@@ -346,6 +361,42 @@ async function toggleRole(userId, currentRole) {
         }
     } catch (error) {
         showNotification('Error updating role', 'error');
+    }
+}
+
+async function editUserPortals(userId, currentCsv) {
+    const current = new Set(String(currentCsv || '').split(',').map(s => s.trim()).filter(Boolean));
+    const lines = (portalCatalog || []).map(p => {
+        const mark = current.has(p.key) ? 'x' : ' ';
+        return `[${mark}] ${p.key} — ${p.label}${p.live ? '' : ' (soon)'}`;
+    });
+    const promptText =
+        'Enter portal keys separated by commas.\n' +
+        'Keys: primenet, nexpulse, sales, support\n\n' +
+        lines.join('\n') +
+        `\n\nCurrent: ${currentCsv || '(none)'}`;
+    const raw = prompt(promptText, currentCsv || 'primenet');
+    if (raw === null) return;
+    const portals = raw.split(/[,;\s]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (!portals.length) {
+        showNotification('Select at least one portal', 'error');
+        return;
+    }
+    try {
+        const response = await fetch(`/api/admin/users/${userId}/portals`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ allowed_portals: portals })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+            showNotification(data.message || 'Portal access updated', 'success');
+            loadAllUsers();
+        } else {
+            showNotification(data.error || 'Failed to update portals', 'error');
+        }
+    } catch (error) {
+        showNotification('Error updating portals', 'error');
     }
 }
 
@@ -434,9 +485,15 @@ async function submitAddUser(event) {
     const role = (document.getElementById('new-user-role')?.value || 'user').trim();
     const use_default_password = !!document.getElementById('new-user-default-password')?.checked;
     const password = (document.getElementById('new-user-password')?.value || '').trim();
+    const allowed_portals = Array.from(document.querySelectorAll('input[name="new-user-portal"]:checked'))
+        .map(el => el.value);
 
     if (!username || !email) {
         showNotification('Username and email are required', 'error');
+        return;
+    }
+    if (!allowed_portals.length) {
+        showNotification('Select at least one portal', 'error');
         return;
     }
 
@@ -451,6 +508,7 @@ async function submitAddUser(event) {
                 role,
                 use_default_password,
                 password: use_default_password ? undefined : password,
+                allowed_portals,
             }),
         });
         const data = await response.json();
@@ -757,6 +815,98 @@ async function triggerSync(type) {
         }
     } catch (e) {
         showSyncMsg('Error: ' + e.message, 'error');
+    }
+}
+
+async function triggerRruInventory() {
+    showSyncMsg('Starting Configuration Dashboard ingest (RMOD_R + WNCELG)…', 'info');
+    try {
+        const res = await fetch('/api/admin/configuration-dashboard/run', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            showSyncMsg(data.message || 'Dashboard ingest started.', 'success');
+            setTimeout(loadRruInventoryStatus, 5000);
+            setTimeout(loadSyncHistory, 8000);
+        } else {
+            showSyncMsg(data.error || 'Dashboard ingest trigger failed.', 'error');
+        }
+    } catch (e) {
+        showSyncMsg('Error: ' + e.message, 'error');
+    }
+}
+
+async function loadRruInventoryStatus() {
+    const el = document.getElementById('rru-inventory-status');
+    try {
+        const res = await fetch('/api/admin/configuration-dashboard/status');
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            if (el) el.textContent = data.error || 'Failed to load dashboard status.';
+            return;
+        }
+        const snap = data.hardware || data.snapshot || {};
+        const wncelg = data.wncelg || {};
+        const last = data.last_run || {};
+        const parts = [
+            `Schedule: ${data.schedule || 'Daily 04:00'}`,
+            `Nokia: ${data.nokia_ready ? 'configured' : 'not configured'}`,
+            `Hardware: ${snap.built_at || 'none'} (${snap.status || 'n/a'}, ${snap.row_count || 0} RRUs)`,
+            `WNCELG: ${wncelg.built_at || 'none'} (${wncelg.status || 'n/a'}, ${wncelg.site_count || 0} sites)`,
+        ];
+        if (last.trigger_source) {
+            parts.push(`Last run: ${last.trigger_source} ${last.success === false ? 'FAILED' : 'ok'}`);
+        }
+        if (snap.error) parts.push(`Hardware error: ${snap.error}`);
+        if (wncelg.error) parts.push(`WNCELG error: ${wncelg.error}`);
+        if (el) el.textContent = parts.join(' · ');
+    } catch (e) {
+        if (el) el.textContent = 'Status error: ' + e.message;
+    }
+}
+
+async function triggerAdjacencyGis(vendor = 'all') {
+    showSyncMsg(`Starting Adjacency GIS ingest (${vendor})…`, 'info');
+    try {
+        const res = await fetch('/api/admin/adjacency-gis/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vendor }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSyncMsg(data.message || 'Adjacency GIS ingest started.', 'success');
+            setTimeout(loadAdjacencyGisStatus, 5000);
+            setTimeout(loadSyncHistory, 8000);
+        } else {
+            showSyncMsg(data.error || 'Adjacency GIS trigger failed.', 'error');
+        }
+    } catch (e) {
+        showSyncMsg('Error: ' + e.message, 'error');
+    }
+}
+
+async function loadAdjacencyGisStatus() {
+    const el = document.getElementById('adjacency-gis-status');
+    try {
+        const res = await fetch('/api/admin/adjacency-gis/status');
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            if (el) el.textContent = data.error || 'Failed to load Adjacency GIS status.';
+            return;
+        }
+        const snap = data.snapshot || {};
+        const nok = data.nokia || {};
+        const huw = data.huawei || {};
+        const parts = [
+            `Schedule: ${data.schedule || 'Nokia 04:30 / Huawei 04:45'}`,
+            `Nokia CM: ${data.nokia_ready ? 'ok' : 'n/a'} (${nok.built_at || 'none'}, sec ${nok.sector_count || 0}, edg ${nok.edge_count || 0})`,
+            `Huawei CM: ${data.huawei_ready ? 'ok' : 'n/a'} (${huw.built_at || 'none'}, sec ${huw.sector_count || 0}, edg ${huw.edge_count || 0})`,
+            `Combined: ${snap.sector_count || 0} sectors / ${snap.edge_count || 0} edges`,
+        ];
+        if (snap.error) parts.push(`Error: ${snap.error}`);
+        if (el) el.textContent = parts.join(' · ');
+    } catch (e) {
+        if (el) el.textContent = 'Status error: ' + e.message;
     }
 }
 
@@ -1084,6 +1234,33 @@ function _retAlertTypeLabel(action) {
     return action || '';
 }
 
+async function loadCmExtractActivity() {
+    const body = document.getElementById('cm-extract-activity-body');
+    if (!body) return;
+    try {
+        const res = await fetch('/api/admin/cm-extract-activity?limit=500');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load CM extract activity');
+        cmExtractActivityRows = data.items || [];
+        if (!cmExtractActivityRows.length) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No CM extractor activity recorded yet.</td></tr>';
+            return;
+        }
+        body.innerHTML = cmExtractActivityRows.map((item) => `
+            <tr>
+                <td>${_escapeHtml((item.timestamp || '').slice(0, 19).replace('T', ' '))}</td>
+                <td>${_escapeHtml(_activityActionLabel(item.action))}</td>
+                <td>${_escapeHtml(item.username || ('User #' + (item.user_id || '?')))}</td>
+                <td>${_escapeHtml(item.details || '')}</td>
+                <td>${_escapeHtml(item.ip_address || '')}</td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        cmExtractActivityRows = [];
+        body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#c0392b;">${_escapeHtml(error.message || 'Load failed')}</td></tr>`;
+    }
+}
+
 // ── Activity Log ───────────────────────────────────────────────────────────
 const ACTIVITY_ACTION_LABELS = {
     login: 'Login',
@@ -1102,6 +1279,15 @@ const ACTIVITY_ACTION_LABELS = {
     vendor_credentials_clear: 'Vendor Credentials Cleared',
     ret_credential_fallback: 'RET Credential Fallback',
     ret_missing_credentials: 'RET Missing Credentials',
+    cm_extract_start: 'CM Extract Started',
+    cm_extract: 'CM Extract Success',
+    cm_extract_async: 'CM Extract Async',
+    cm_extract_fail: 'CM Extract Failed',
+    cm_extract_download: 'CM Extract Download',
+    cm_job_create: 'CM Job Created',
+    cm_job_delete: 'CM Job Deleted',
+    cm_job_download: 'CM Job Download',
+    file_download: 'File Download',
 };
 
 function _activityActionLabel(action) {
@@ -1134,7 +1320,15 @@ async function loadActivityLog() {
 
 function filterActivityLog() {
     const term = (document.getElementById('activity-search')?.value || '').trim().toLowerCase();
-    filteredActivityRows = !term ? [...activityRows] : activityRows.filter((item) => {
+    const actionPrefix = (document.getElementById('activity-action-filter')?.value || '').trim().toLowerCase();
+    filteredActivityRows = activityRows.filter((item) => {
+        const action = String(item.action || '').toLowerCase();
+        if (actionPrefix === 'login') {
+            if (action !== 'login' && action !== 'logout') return false;
+        } else if (actionPrefix && !action.startsWith(actionPrefix)) {
+            return false;
+        }
+        if (!term) return true;
         const haystack = [
             _activityUserLabel(item),
             _activityActionLabel(item.action),
@@ -1151,6 +1345,8 @@ function filterActivityLog() {
 function clearActivityFilters() {
     const search = document.getElementById('activity-search');
     if (search) search.value = '';
+    const actionFilter = document.getElementById('activity-action-filter');
+    if (actionFilter) actionFilter.value = '';
     filterActivityLog();
 }
 
@@ -1345,6 +1541,35 @@ async function exportAdminTable(tableKey) {
                     details: item.details || '',
                 })),
             };
+        } else if (tableKey === 'cm_extract_activity') {
+            if (!cmExtractActivityRows.length) {
+                await loadCmExtractActivity();
+            }
+            if (!cmExtractActivityRows.length) {
+                showNotification('No CM extractor activity to export', 'error');
+                return;
+            }
+            payload = {
+                table: 'cm_extract_activity',
+                report_title: 'CM Extractor Activity',
+                sheet_title: 'CM Extract Activity',
+                filename_stem: 'Admin_CM_Extract_Activity',
+                columns: ['timestamp', 'action', 'username', 'details', 'ip_address'],
+                column_labels: {
+                    timestamp: 'When',
+                    action: 'Action',
+                    username: 'User',
+                    details: 'Details',
+                    ip_address: 'IP Address',
+                },
+                rows: cmExtractActivityRows.map((item) => ({
+                    timestamp: (item.timestamp || '').slice(0, 19).replace('T', ' '),
+                    action: _activityActionLabel(item.action),
+                    username: item.username || (`User #${item.user_id || '?'}`),
+                    details: item.details || '',
+                    ip_address: item.ip_address || '',
+                })),
+            };
         } else if (tableKey === 'recent_activity') {
             if (!activityLoaded) {
                 await loadActivityLog();
@@ -1369,6 +1594,7 @@ async function exportAdminTable(tableKey) {
                 rows: filteredActivityRows.map(_activityRowExport),
                 meta: {
                     'Search Filter': document.getElementById('activity-search')?.value?.trim() || '(none)',
+                    'Action Filter': document.getElementById('activity-action-filter')?.value || '(all)',
                     'Records Loaded': `Last ${document.getElementById('activity-limit')?.value || '200'}`,
                 },
             };

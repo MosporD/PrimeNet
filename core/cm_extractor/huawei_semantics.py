@@ -161,6 +161,43 @@ HUAWEI_MO_CATALOG: list[dict[str, Any]] = [
             {'id': 'BTS ID', 'name': 'BTS ID'},
         ],
     },
+    {
+        'id': 'GTRX',
+        'label': 'GSM TRX',
+        'technology': '2G',
+        'command': 'LST GTRX',
+        'group': '2G',
+        'recommended': True,
+        'products': ['BSC6900 GSM', 'BSC6910 GSM'],
+        'parameters': [
+            {'id': 'BSC Name', 'name': 'BSC Name'},
+            {'id': 'Cell Index', 'name': 'Cell Index'},
+            {'id': 'TRX ID', 'name': 'TRX ID'},
+            {'id': 'TRX Name', 'name': 'TRX Name'},
+            {'id': 'Frequency', 'name': 'Frequency'},
+            {'id': 'Is Main BCCH TRX', 'name': 'Is Main BCCH TRX'},
+            {'id': 'TRX No.', 'name': 'TRX No.'},
+            {'id': 'Active Status', 'name': 'Active Status'},
+            {'id': 'Administrative State', 'name': 'Administrative State'},
+        ],
+    },
+    {
+        'id': 'G2GNCELL',
+        'label': 'GSM→GSM Neighbor Cell',
+        'technology': '2G',
+        'command': 'LST G2GNCELL',
+        'group': '2G',
+        'recommended': True,
+        'products': ['BSC6900 GSM', 'BSC6910 GSM'],
+        'parameters': [
+            {'id': 'Cell Index', 'name': 'Cell Index'},
+            {'id': 'NCell Index', 'name': 'NCell Index'},
+            {'id': 'Neighbor Cell Name', 'name': 'Neighbor Cell Name'},
+            {'id': 'NCell CI', 'name': 'NCell CI'},
+            {'id': 'NCell LAC', 'name': 'NCell LAC'},
+            {'id': 'BCCH', 'name': 'BCCH'},
+        ],
+    },
 ]
 
 _MO_ID_ALIASES = {
@@ -172,6 +209,24 @@ _MO_BY_ID = {item['id']: item for item in HUAWEI_MO_CATALOG}
 
 PREVIEW_ROW_LIMIT = 25
 MML_SINGLE_NE_LIMIT = 100
+# Neighbor / relation LST dumps return far more rows per NE than CELL.
+# Large area picks (e.g. East Amman ≈220 eNodeBs) overwhelm U2020 single-command MML.
+MML_HIGH_CARDINALITY_CHUNK = 10
+MML_HIGH_CARDINALITY_NE_LIMIT = 40
+_HIGH_CARDINALITY_MO_MARKERS = (
+    'NCELL',
+    'NEIGHBOR',
+    'NREL',
+    'INTRAFREQ',
+    'INTERFREQ',
+    'EUTRANINTER',
+    'EUTRANINTRA',
+    'UTRANNCELL',
+    'GERANNCELL',
+    'NRNCELL',
+    'NREXTERNAL',
+    'G2GNCELL',
+)
 
 HUAWEI_CM_TECHNOLOGIES = frozenset({'4G', 'Common'})
 HUAWEI_SCOPE_TECHNOLOGIES = {
@@ -182,7 +237,7 @@ HUAWEI_SCOPE_TECHNOLOGIES = {
 _HUAWEI_SCOPE_RECOMMENDED = {
     'ENODEB': frozenset({'CELL', 'ENODEBFUNCTION'}),
     'RNC': frozenset({'UCELL', 'NODEBFUNCTION'}),
-    'BSC': frozenset({'GCELL', 'BTSFUNCTION'}),
+    'BSC': frozenset({'GCELL', 'BTSFUNCTION', 'GTRX', 'G2GNCELL'}),
 }
 
 
@@ -409,9 +464,38 @@ def filter_row_columns(
 
 
 def _mo_technology(mo_id: str) -> str:
-    normalized = _MO_ID_ALIASES.get(mo_id, mo_id)
+    normalized = _MO_ID_ALIASES.get(
+        (mo_id or '').strip().upper(),
+        (mo_id or '').strip().upper(),
+    )
     meta = _MO_BY_ID.get(normalized) or {}
-    return str(meta.get('technology') or '').strip().upper()
+    tech = str(meta.get('technology') or '').strip().upper()
+    if tech:
+        return tech
+    try:
+        from core.cm_extractor.huawei_param_dict import get_mo_entry
+
+        entry = get_mo_entry(normalized)
+        if entry:
+            return str(entry.get('technology') or '').strip().upper()
+    except Exception:
+        pass
+    return ''
+
+
+def is_high_cardinality_mo(mo_id: str) -> bool:
+    """Neighbor/relation MOs produce much larger MML reports than CELL."""
+    token = _MO_ID_ALIASES.get(
+        (mo_id or '').strip().upper(),
+        (mo_id or '').strip().upper(),
+    )
+    return any(marker in token for marker in _HIGH_CARDINALITY_MO_MARKERS)
+
+
+def mml_chunk_size_for_mo(mo_id: str) -> int:
+    if is_high_cardinality_mo(mo_id):
+        return MML_HIGH_CARDINALITY_CHUNK
+    return MML_SINGLE_NE_LIMIT
 
 
 def _partition_ne_names_for_mo(
@@ -455,11 +539,13 @@ def _run_mml_for_nes(
     client: HuaweiCmClient,
     command: str,
     ne_names: list[str],
+    *,
+    chunk_size: int = MML_SINGLE_NE_LIMIT,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     rows = client.run_mml_chunked(
         command,
         ne_names,
-        chunk_size=MML_SINGLE_NE_LIMIT,
+        chunk_size=chunk_size,
     )
     return rows, client.consume_mml_errors()
 
@@ -484,7 +570,20 @@ def _selection_rows(
         client._record_skipped_mml_nes([row['NE name']], reason=row['Reason'])
     if not eligible:
         return [], []
-    raw_rows, errors = _run_mml_for_nes(client, command, eligible)
+    if is_high_cardinality_mo(mo_id) and len(eligible) > MML_HIGH_CARDINALITY_NE_LIMIT:
+        raise ValueError(
+            f'{mo_id} is a high-cardinality neighbor/relation MO. '
+            f'Refusing {len(eligible)} NEs (limit {MML_HIGH_CARDINALITY_NE_LIMIT}). '
+            'Area picks like East Amman (~220 eNodeBs) overwhelm U2020 MML for '
+            'EutranInterFreqNCell — select a smaller site set (≤40), or export CELL '
+            'for the full area and neighbor MOs in batches.'
+        )
+    raw_rows, errors = _run_mml_for_nes(
+        client,
+        command,
+        eligible,
+        chunk_size=mml_chunk_size_for_mo(mo_id),
+    )
     raw_rows = repair_mml_rows(raw_rows)
     if export_all:
         return raw_rows, errors

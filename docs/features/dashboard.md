@@ -20,11 +20,10 @@ Tile deck for every tool. Cards use `data-module-id` (that id **is** the feature
 - Theme tokens: constellation CSS is the source of truth (`checklist.md` UI unification).
 - Visual pulse: `core/network_activity.py` (PM traffic). Cosmetic only.
 
-## History
+## Progress
 
-- 2026-09-06: UI unification pass — auth pages on shared `login.css`; module body classes / logout / dark allowlist; dashboard inline style removed.
-- 2026-09-02: dashboard tiles render `MODULE_VERSIONS` chips in HTML (not JS-only), including CM Parameter Audit **V4.7**.
-- Dashboard constellation, feature-access, load-balancing tiles, radio insight tiles (2026-08).
+Dated work log: [`dashboard.progress.md`](dashboard.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 

@@ -19,10 +19,10 @@ Searchable MO/parameter docs. Huawei pages are **runtime-served scrapes**.
 - List uses an index cache (cold ~4 ms after 2026-08-19). Detail page can show network values vs default via CM store.
 - `ai_service.py` is optional assist — keep it from blocking the dictionary if the model is down.
 
-## History
+## Progress
 
-- 2026-08-19: list index cache + network values vs default.
-- 2026-09-02: Nokia/Huawei workspace uses full viewport (dropped 1400px content cap + nested 68vh table).
+Dated work log: [`parameter-dictionary.progress.md`](parameter-dictionary.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
+
 
 ## Plans
 
