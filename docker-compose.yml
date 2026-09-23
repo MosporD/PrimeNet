@@ -32,12 +32,17 @@ services:
       nexpulse:
         condition: service_healthy
 
+  # Only `primenet` builds the shared image. Other services reuse
+  # `primenet:latest` so parallel `up --build` cannot race on the same tag.
   nexuscore:
-    build: .
     image: primenet:latest
+    pull_policy: never
     container_name: nexuscore-web
     restart: unless-stopped
     command: ["nexuscore"]
+    depends_on:
+      primenet:
+        condition: service_started
     expose:
       - "8000"
     env_file:
@@ -68,6 +73,7 @@ services:
   primenet:
     build: .
     image: primenet:latest
+    pull_policy: build
     container_name: primenet-web
     restart: unless-stopped
     cap_add:
@@ -102,12 +108,15 @@ services:
   # Backward-compatible alias — same image/command as primenet (optional).
   # Prefer the `primenet` service. Kept for scripts that still expect `web`.
   web:
-    build: .
     image: primenet:latest
+    pull_policy: never
     container_name: primenet-web-alias
     profiles: ["legacy-web"]
     restart: unless-stopped
     command: ["primenet"]
+    depends_on:
+      primenet:
+        condition: service_started
     expose:
       - "8001"
     env_file:
@@ -122,11 +131,14 @@ services:
       - primenet-data:/data
 
   nexpulse:
-    build: .
     image: primenet:latest
+    pull_policy: never
     container_name: nexpulse-web
     restart: unless-stopped
     command: ["nexpulse"]
+    depends_on:
+      primenet:
+        condition: service_started
     expose:
       - "8002"
     env_file:
@@ -155,8 +167,8 @@ services:
       start_period: 45s
 
   scheduler:
-    build: .
     image: primenet:latest
+    pull_policy: never
     container_name: primenet-scheduler
     restart: unless-stopped
     cap_add:
