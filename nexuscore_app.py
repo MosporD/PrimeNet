@@ -13,7 +13,7 @@ from flask import Blueprint, abort, redirect, render_template, url_for
 
 from core.platform.base_app import create_base_app, run_dev_server
 from core.platform.identity import create_identity_blueprint
-from core.platform.paths import nexpulse_public_url, primenet_public_url
+from core.platform.paths import nexpulse_entry_url, primenet_entry_url
 from core.platform.portal_access import (
     PORTAL_NEXPULSE,
     PORTAL_PRIMENET,
@@ -76,8 +76,6 @@ def create_app():
         return render_template(
             "portal_select.html",
             user=_user_payload(user),
-            primenet_url=primenet_public_url(),
-            nexpulse_url=nexpulse_public_url(),
             can_engineering=PORTAL_PRIMENET in allowed,
             can_marketing=PORTAL_NEXPULSE in allowed,
             can_sales=PORTAL_SALES in allowed,
@@ -93,11 +91,11 @@ def create_app():
         if key in ("engineering", "primenet"):
             if not user_can_access_portal(user, PORTAL_PRIMENET):
                 abort(403)
-            return redirect(f"{primenet_public_url()}/dashboard")
+            return redirect(primenet_entry_url())
         if key in ("marketing", "nexpulse"):
             if not user_can_access_portal(user, PORTAL_NEXPULSE):
                 abort(403)
-            return redirect(f"{nexpulse_public_url()}/portals/marketing/")
+            return redirect(nexpulse_entry_url())
         coming = {
             "sales": {
                 "id": "sales",

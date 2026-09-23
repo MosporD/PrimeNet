@@ -314,12 +314,15 @@ _PORTAL_COMING_SOON = {
 }
 
 def _portal_live_urls():
-    from core.platform.paths import nexpulse_public_url, nexuscore_public_url
+    from core.platform.paths import (
+        nexpulse_entry_url,
+        nexuscore_entry_url,
+    )
 
     return {
         'engineering': '/dashboard',
-        'marketing': f'{nexpulse_public_url()}/portals/marketing/',
-        'tower': f'{nexuscore_public_url()}/portals',
+        'marketing': nexpulse_entry_url(),
+        'tower': nexuscore_entry_url(),
     }
 
 @auth_bp.route('/portals')
@@ -364,14 +367,15 @@ def dashboard():
         return _sso_login_redirect(next_url=request.url)
 
     user_data = format_user_data(user)
-    from core.platform.paths import nexuscore_public_url
+    from core.platform.paths import platform_admin_entry_url
     return render_template(
         'dashboard.html',
         user=user_data,
         allowed_hrefs=allowed_hrefs_for_role(user_data),
         tech_site_columns=[dict(c) for c in _DEFAULT_SITE_COLUMNS],
         total_sites=0,
-        nexuscore_public_url=nexuscore_public_url(),
+        nexuscore_public_url='',  # unused; prefer platform_admin_url
+        platform_admin_url=platform_admin_entry_url(),
     )
 
 # ============================================================================

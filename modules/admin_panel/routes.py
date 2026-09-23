@@ -26,7 +26,7 @@ from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.huawei_pm.config import build_pm_client, pm_configured
 from core.huawei_pm.client import HuaweiPmError
-from core.platform.paths import nexuscore_public_url
+from core.platform.paths import platform_admin_entry_url
 from modules.admin_panel.export import build_table_workbook
 from sync_config import (
     DATABASES_ROOT,
@@ -122,7 +122,7 @@ def format_user_data(user):
 
 
 def _platform_admin_moved():
-    target = f"{nexuscore_public_url()}/admin"
+    target = platform_admin_entry_url()
     return jsonify({
         'error': 'User and module access administration moved to NexusCore Platform Admin',
         'redirect': target,
@@ -140,7 +140,7 @@ def admin_panel_page():
         role_labels=ROLE_LABELS,
         can_manage_sync=True,
         can_manage_access=False,
-        platform_admin_url=f"{nexuscore_public_url()}/admin",
+        platform_admin_url=platform_admin_entry_url(),
     )
 
 

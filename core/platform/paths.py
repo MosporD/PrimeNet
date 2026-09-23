@@ -75,6 +75,20 @@ def suite_public_url() -> str | None:
         return None
 
 
+def portals_share_origin() -> bool:
+    """True when nginx path-routes all portals on one public host (no :800x)."""
+    if (os.getenv("NEXUS_PUBLIC_URL") or "").strip():
+        return True
+    if _env_true("NEXUS_PUBLIC_URL_FROM_REQUEST"):
+        return True
+    nxc = (os.getenv("NEXUSCORE_PUBLIC_URL") or "").strip().rstrip("/")
+    pn = (os.getenv("PRIMENET_PUBLIC_URL") or "").strip().rstrip("/")
+    np = (os.getenv("NEXPULSE_PUBLIC_URL") or "").strip().rstrip("/")
+    if nxc and pn and np and nxc == pn == np:
+        return True
+    return False
+
+
 def nexuscore_public_url() -> str:
     suite = suite_public_url()
     if suite:
@@ -94,3 +108,29 @@ def nexpulse_public_url() -> str:
     if suite:
         return suite
     return public_url("NEXPULSE_PUBLIC_URL", "http://localhost:8002")
+
+
+def primenet_entry_url() -> str:
+    """Engineering entry — relative when behind the single-host proxy."""
+    if portals_share_origin():
+        return "/dashboard"
+    return f"{primenet_public_url()}/dashboard"
+
+
+def nexpulse_entry_url() -> str:
+    """Marketing entry — relative when behind the single-host proxy."""
+    if portals_share_origin():
+        return "/portals/marketing/"
+    return f"{nexpulse_public_url()}/portals/marketing/"
+
+
+def nexuscore_entry_url() -> str:
+    if portals_share_origin():
+        return "/portals"
+    return f"{nexuscore_public_url()}/portals"
+
+
+def platform_admin_entry_url() -> str:
+    if portals_share_origin():
+        return "/admin"
+    return f"{nexuscore_public_url()}/admin"
