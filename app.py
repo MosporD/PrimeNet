@@ -5,8 +5,8 @@ Usage::
     python app.py
 
 Starts three processes on ports 8000 / 8001 / 8002 for local testing.
-Deployed / network access uses the Docker ``proxy`` service (one public port,
-hostname routing — see ``deploy/nginx.conf``); this launcher does not start nginx.
+This launcher does **not** start nginx. The single-port reverse proxy is only
+used with Docker Compose (``deploy/nginx.conf`` + ``proxy`` service).
 
 Activation is **shared for testing**: unlock once at
 http://localhost:8001/activation and all platforms open. Per-platform activation
@@ -40,15 +40,19 @@ def _env_true(key: str, default: bool = False) -> bool:
 
 
 def _child_env(**overrides: str) -> dict[str, str]:
+    """Env for suite children — always three-port local URLs (not Docker proxy mode)."""
     env = os.environ.copy()
     env.setdefault("NCM_DISABLE_LIVE_LOGGER_TERMINAL", "1")
     env.setdefault("NCM_DISABLE_AUTO_BROWSER", "1")
     env.setdefault("NCM_SHARED_ACTIVATION", "1")
-    env.setdefault("NEXUSCORE_PUBLIC_URL", "http://localhost:8000")
-    env.setdefault("PRIMENET_PUBLIC_URL", "http://localhost:8001")
-    env.setdefault("NEXPULSE_PUBLIC_URL", "http://localhost:8002")
-    # Wire NexPulse → PrimeNet network footprint for local suite testing.
-    env.setdefault("NEXUS_PRIMENET_API_URL", "http://127.0.0.1:8001")
+    # Force multi-port local origins even if .env is set up for Docker proxy.
+    env["NEXUS_PUBLIC_URL_FROM_REQUEST"] = "0"
+    env["NEXUS_PUBLIC_URL"] = ""
+    env["NEXUSCORE_PUBLIC_URL"] = "http://localhost:8000"
+    env["PRIMENET_PUBLIC_URL"] = "http://localhost:8001"
+    env["NEXPULSE_PUBLIC_URL"] = "http://localhost:8002"
+    env["NEXUS_COOKIE_DOMAIN"] = ""
+    env["NEXUS_PRIMENET_API_URL"] = "http://127.0.0.1:8001"
     env.setdefault("NEXUS_PORTAL_API_TOKEN", "local-dev-portal-token")
     env.update(overrides)
     return env
