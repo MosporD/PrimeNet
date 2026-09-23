@@ -101,6 +101,14 @@ def _safe_next_url(raw: str | None, *, fallback: str) -> str:
         urlparse(primenet_public_url()).netloc.lower(),
         urlparse(nexpulse_public_url()).netloc.lower(),
     }
+    try:
+        from flask import has_request_context, request
+
+        if has_request_context() and request.host:
+            allowed_hosts.add(request.host.split(":")[0].lower())
+            allowed_hosts.add(request.host.lower())
+    except Exception:
+        pass
     if parsed.netloc.lower() not in allowed_hosts:
         return fallback
     return value

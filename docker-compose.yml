@@ -3,11 +3,12 @@
 #   cp .env.example .env   # edit secrets and SFTP credentials
 #   docker compose up -d --build
 #
-# Public entry (reverse proxy — one host port):
-#   http://nexus.localhost/portals          (or http://localhost/portals)
-#   http://primenet.localhost/dashboard
-#   http://nexpulse.localhost/portals/marketing/
-# Set NEXUS_COOKIE_DOMAIN=.localhost (or .your.domain) for cross-subdomain SSO.
+# Public entry (reverse proxy — one host port, path routing):
+#   http://<server>/portals
+#   http://<server>/dashboard
+#   http://<server>/portals/marketing/
+# Redirects keep the Host you opened (NEXUS_PUBLIC_URL_FROM_REQUEST=1).
+# Leave NEXUS_COOKIE_DOMAIN empty (same-origin SSO).
 #
 # Direct process ports are not published; use PROXY_HTTP_PORT (default 80).
 # For local suite without Docker: python app.py (ports 8000/8001/8002).
@@ -53,10 +54,12 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8000"
-      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://nexus.localhost}"
-      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://primenet.localhost}"
-      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://nexpulse.localhost}"
-      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-.localhost}"
+      NEXUS_PUBLIC_URL_FROM_REQUEST: "${NEXUS_PUBLIC_URL_FROM_REQUEST:-1}"
+      NEXUS_PUBLIC_URL: "${NEXUS_PUBLIC_URL:-}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-}"
+      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-2}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"
@@ -89,10 +92,12 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8001"
-      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://primenet.localhost}"
-      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://nexus.localhost}"
-      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://nexpulse.localhost}"
-      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-.localhost}"
+      NEXUS_PUBLIC_URL_FROM_REQUEST: "${NEXUS_PUBLIC_URL_FROM_REQUEST:-1}"
+      NEXUS_PUBLIC_URL: "${NEXUS_PUBLIC_URL:-}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-}"
+      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-2}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-600}"
@@ -127,6 +132,8 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8001"
+      NEXUS_PUBLIC_URL_FROM_REQUEST: "${NEXUS_PUBLIC_URL_FROM_REQUEST:-1}"
+      NEXUS_PUBLIC_URL: "${NEXUS_PUBLIC_URL:-}"
     volumes:
       - primenet-data:/data
 
@@ -149,10 +156,12 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8002"
-      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://nexpulse.localhost}"
-      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://nexus.localhost}"
-      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://primenet.localhost}"
-      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-.localhost}"
+      NEXUS_PUBLIC_URL_FROM_REQUEST: "${NEXUS_PUBLIC_URL_FROM_REQUEST:-1}"
+      NEXUS_PUBLIC_URL: "${NEXUS_PUBLIC_URL:-}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-}"
+      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-2}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"
