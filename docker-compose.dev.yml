@@ -6,6 +6,17 @@
 #   docker compose up -d --build
 
 services:
+  proxy:
+    container_name: nexuscore-proxy-dev
+    restart: "no"
+    depends_on:
+      nexuscore:
+        condition: service_started
+      primenet:
+        condition: service_started
+      nexpulse:
+        condition: service_started
+
   nexuscore:
     container_name: nexuscore-web-dev
     restart: "no"

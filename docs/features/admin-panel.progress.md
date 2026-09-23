@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+## 2026-09-23 (Ops-only Engineering Admin)
+
+- Done: Removed User Administration and Feature Access from PrimeNet Admin (moved to NexusCore Platform Admin).
+- Done: Owner-only Engineering Admin; Ops Alerts tab keeps RET/CM accountability panels.
+- Done: Nav/dashboard → Eng Admin (`?section=data-sync`); Platform Admin link to NexusCore.
+- NEXT: None parked.
+
 ## 2026-09-20 (Portal allow-list on users)
 
 - Done: Create-user portal checkboxes; Users table Portals column; PUT /api/admin/users/<id>/portals.

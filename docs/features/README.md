@@ -116,7 +116,8 @@ Cross-cutting platform work (suite launcher, shared activation, etc.) goes in
 
 ### Administration & helpers
 
-- [Admin Panel](admin-panel.md) · [progress](admin-panel.progress.md)
+- [Platform Admin](platform-admin.md) · [progress](platform-admin.progress.md) (NexusCore)
+- [Admin Panel](admin-panel.md) · [progress](admin-panel.progress.md) (PrimeNet engineering ops)
 - [Developer Documentation](documentation.md) · [progress](documentation.progress.md)
 - [User Profile](user-profile.md) · [progress](user-profile.progress.md)
 - [Elevation](elevation.md) · [progress](elevation.progress.md)

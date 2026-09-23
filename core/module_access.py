@@ -77,9 +77,9 @@ NAV_SECTIONS: list[dict] = [
         "title": "Administration",
         "links": [
             {
-                "label": "Admin Panel",
-                "href": "/admin-panel?section=user-admin",
-                "visibility": "admin_or_noc",
+                "label": "Engineering Admin",
+                "href": "/admin-panel?section=data-sync",
+                "visibility": "admin",
             },
             {"label": "Developer Documentation", "href": "/documentation", "visibility": "admin"},
             {"label": "User Profile", "href": "/profile", "visibility": "all"},

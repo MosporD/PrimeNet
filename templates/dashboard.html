@@ -30,7 +30,10 @@
                         <div class="header-actions">
                             <a href="{{ url_for('user_profile.profile_page') }}" class="btn-header">Settings</a>
                             {% if user.role in ['admin', 'noc_sys'] %}
-                            <a href="/admin-panel?section=user-admin" class="btn-header btn-header-admin">Admin</a>
+                            <a href="{{ nexuscore_public_url }}/admin" class="btn-header btn-header-admin">Platform Admin</a>
+                            {% endif %}
+                            {% if user.role == 'admin' %}
+                            <a href="/admin-panel?section=data-sync" class="btn-header btn-header-admin">Eng Admin</a>
                             {% endif %}
                             <button type="button" onclick="logout()" class="btn-header btn-header-outline">Logout</button>
                         </div>

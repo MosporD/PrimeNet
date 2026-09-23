@@ -52,6 +52,10 @@ def create_app():
     )
     app.register_blueprint(auth_bp)
 
+    from modules.platform_admin.routes import platform_admin_bp
+
+    app.register_blueprint(platform_admin_bp)
+
     lobby = Blueprint("nexuscore", __name__)
 
     def _user_payload(user: dict) -> dict:

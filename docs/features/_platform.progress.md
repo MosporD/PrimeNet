@@ -4,6 +4,12 @@ Detailed dated log for this blueprint. Brief: [`_platform.md`](_platform.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-23 (Reverse proxy + Platform Admin)
+
+- Done: Docker `proxy` (nginx hostname routing, one public port); process ports internal only.
+- Done: NexusCore Platform Admin (`/admin`) for users + module access; PrimeNet Admin ops-only.
+- NEXT: Optional TLS termination on the proxy edge for production domains.
+
 ## 2026-09-20 (Shared SSO + portal allow-list)
 
 - Done: Central identity on PrimeNet users DB; shared `nexus_session`; Admin portal checkboxes; tower gated by allow-list.

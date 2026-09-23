@@ -8,6 +8,10 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **NEXT:** Admin → Data Sync → Configuration Dashboard ingest; open `/configuration-dashboard` Hardware + WNCELG tabs; spot-check dark toggle there + Adjacency GIS.
 
+## 2026-09-23 (Reverse proxy + Platform Admin)
+
+- Docker nginx proxy (one public port, hostname routing); users/module access on NexusCore `/admin`; PrimeNet Admin ops-only.
+
 ## 2026-09-20 (Dark mode — cascade safety net)
 
 - Root cause: module CSS after `common.css` beat non-`!important` dark rules; blanket `span` color flattened chips/fonts.

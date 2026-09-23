@@ -1,29 +1,27 @@
 # Admin Panel
 
-Users, roles, portal allow-list, feature-access grants.
+Engineering ops admin on PrimeNet (sync, APIs, PM Plus, activity).
 
 | | |
 |---|---|
-| Route | /admin-panel (often ?section=user-admin) |
+| Route | /admin-panel (default `?section=data-sync`) |
 | Module | modules/admin_panel/routes.py |
-| Access | admin_or_noc |
+| Access | admin (Owner) |
 | Version | V1.0 |
 
 ## Purpose
 
-Create/disable users, reset password, **portal checkboxes** (llowed_portals), **feature_access** matrix (core/feature_access.py).
-Owner also manages Data Sync, API connections, and **PM Plus Rules** (Nokia catalog import + aggregation overrides for Performance Explorer Plus).
+Owner manages Data Sync, API connections, PM Plus Rules, Ops Alerts (RET/CM), and activity.
+**Users, portal allow-list, and module access** live on NexusCore Platform Admin (`/admin`) — see [platform-admin.md](platform-admin.md).
 
 ## Approach
 
-Visibility defaults: core/module_access.py. Overrides stored in app DB. Admin always sees everything. Do not hide tiles only in dashboard.html — the access layer will fight you.
-Portal keys: primenet, 
-expulse, sales, support — gates tower entry, not in-portal RBAC.
+Visibility defaults: core/module_access.py (Module Access matrix on NexusCore). Engineering Admin is Owner-only.
+Legacy `/api/admin/users*` and `/api/admin/feature-access*` return 410 with redirect to NexusCore `/admin`.
 
 ## Progress
 
-Dated work log: [dmin-panel.progress.md](admin-panel.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
-
+Dated work log: [admin-panel.progress.md](admin-panel.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
 
 ## Plans
 
@@ -31,4 +29,4 @@ None parked.
 
 ## Watch-outs
 
-NOC SYS can administer users; it is not a full admin for every radio tile unless granted.
+NOC SYS uses NexusCore Platform Admin for users; they no longer open Engineering Admin.

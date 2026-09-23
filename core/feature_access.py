@@ -3,7 +3,8 @@ Configurable feature access.
 
 Stores, per feature (nav href), which roles may see/use it. Defaults are derived
 from the hardcoded ``visibility`` in ``core.module_access.NAV_SECTIONS`` so the
-system behaves identically until an admin edits something from the admin panel.
+system behaves identically until an Owner edits something from NexusCore
+Platform Admin (Module Access).
 
 Invariants:
 - ``admin`` (Owner) always has access to everything — never stored, never
@@ -11,7 +12,7 @@ Invariants:
 - A small set of core features is LOCKED (dashboard, profile, admin panel) so an
   admin can never lock themselves or NOC out of essentials.
 
-Storage: table ``feature_access`` in ``NCMUSERS_DB`` (app DB). Only overrides that
+Storage: table ``feature_access`` in the PrimeNet app DB. Only overrides that
 differ from defaults are persisted; everything else falls back to defaults.
 """
 

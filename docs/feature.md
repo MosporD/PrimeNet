@@ -1094,23 +1094,41 @@ offer catalog). See `docs/NEXUSCORE_VISION.md` §5.
 
 ## Administration
 
-### Admin Panel
+### Platform Admin (NexusCore)
+
+| | |
+|---|---|
+| Slug | `platform-admin` |
+| Route | `/admin` (NexusCore) |
+| Access | admin_or_noc |
+| Version | V1.0 |
+| Brief | [`features/platform-admin.md`](features/platform-admin.md) |
+| Progress | [`features/platform-admin.progress.md`](features/platform-admin.progress.md) |
+
+**User sees:** Owner/NOC opens Platform Admin from the portal tower for users, portal allow-list, and PrimeNet module access.
+
+**What it does:** Create/disable users, reset password, portal grants, feature_access matrix (`core/feature_access.py`).
+
+**Progress:** [`features/platform-admin.progress.md`](features/platform-admin.progress.md)
+
+**Plan:** None parked.
+
+### Admin Panel (Engineering)
 
 | | |
 |---|---|
 | Slug | `admin-panel` |
-| Route | `/admin-panel` (often `?section=user-admin`) |
-| Access | admin_or_noc |
+| Route | `/admin-panel` (default `?section=data-sync`) |
+| Access | admin (Owner) |
 | Version | V1.0 |
 | Brief | [`features/admin-panel.md`](features/admin-panel.md) |
 | Progress | [`features/admin-panel.progress.md`](features/admin-panel.progress.md) |
 
-**User sees:** Admin/NOC opens Admin Panel for users, feature_access, sync, API connections, PM Plus Rules.
+**User sees:** Owner opens Engineering Admin for sync, API connections, PM Plus Rules, Ops Alerts, activity.
 
-**What it does:** Create/disable users, reset password, feature_access matrix (`core/feature_access.py`). Owner also manages Data Sync, API connections, and PM Plus Rules (Nokia catalog import + aggregation overrides for Performance Expl…
+**What it does:** Data Sync, vendor API tests, PM Plus catalog/rollup, RET/CM accountability, activity log. Identity/module ACL moved to Platform Admin.
 
 **Progress:** [`features/admin-panel.progress.md`](features/admin-panel.progress.md)
-
 
 **Plan:** None parked.
 

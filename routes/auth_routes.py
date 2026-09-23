@@ -364,12 +364,14 @@ def dashboard():
         return _sso_login_redirect(next_url=request.url)
 
     user_data = format_user_data(user)
+    from core.platform.paths import nexuscore_public_url
     return render_template(
         'dashboard.html',
         user=user_data,
         allowed_hrefs=allowed_hrefs_for_role(user_data),
         tech_site_columns=[dict(c) for c in _DEFAULT_SITE_COLUMNS],
         total_sites=0,
+        nexuscore_public_url=nexuscore_public_url(),
     )
 
 # ============================================================================

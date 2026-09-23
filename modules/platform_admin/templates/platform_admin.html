@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Admin - NexusCore</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon-nexuscore.png?v=1" data-page-favicon>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('platform_admin.static', filename='platform_admin.css') }}?v=1.0">
+</head>
+<body class="admin-panel-page platform-admin-page" data-current-user-id="{{ user.id }}"
+      data-can-manage-access="{{ '1' if can_manage_access else '0' }}">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="{{ url_for('nexuscore.portal_select') }}" class="back-link">Portals</a>
+                    <h1>Platform Admin</h1>
+                    <p>Users, portal allow-list, and engineering module access</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-users">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="active-users">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="admin-users">0</div>
+                    <div class="stat-label">Administrators</div>
+                </div>
+            </div>
+
+            <div class="admin-pages-nav" role="tablist" aria-label="Platform admin sections">
+                <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                {% if can_manage_access %}
+                <button class="admin-page-tab" data-page="feature-access" type="button" onclick="openAdminPage('feature-access')">Module Access</button>
+                {% endif %}
+            </div>
+
+            {% if can_manage_access %}
+            <div class="admin-page-panel" data-page="feature-access">
+                <div class="sync-section feature-access-section">
+                    <h2 class="section-title">Module Access</h2>
+                    <p class="feature-access-intro">
+                        Choose which roles can see and open each PrimeNet feature. <strong>Owner</strong> always
+                        has full access. Locked core features (Dashboard, Profile, Admin Panel) can't be
+                        restricted. Changes apply within a few seconds.
+                    </p>
+                    <div class="feature-access-toolbar">
+                        <input type="search" id="feature-access-search" class="feature-access-search"
+                               placeholder="Filter features…" autocomplete="off" oninput="filterFeatureAccess()">
+                        <div class="feature-access-actions">
+                            <span class="feature-access-status" id="feature-access-status"></span>
+                            <button type="button" class="btn-user-secondary" onclick="resetFeatureAccess()">Reset to defaults</button>
+                            <button type="button" class="btn-user-primary" id="feature-access-save-btn" onclick="saveFeatureAccess()">Save changes</button>
+                        </div>
+                    </div>
+                    <div class="feature-access-table-wrap">
+                        <table class="feature-access-table" id="feature-access-table">
+                            <thead id="feature-access-head"></thead>
+                            <tbody id="feature-access-body">
+                                <tr><td class="feature-access-loading">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="admin-page-panel active" data-page="user-admin">
+                <h2 class="section-title user-admin-title">User Administration</h2>
+
+                <div id="add-user-panel" class="add-user-panel" hidden>
+                    <h3 class="section-subtitle">Add New User</h3>
+                    <form id="add-user-form" class="add-user-form" onsubmit="submitAddUser(event)">
+                        <label>
+                            Username
+                            <input type="text" id="new-user-username" required placeholder="First.Last" autocomplete="off">
+                        </label>
+                        <label>
+                            Email
+                            <input type="email" id="new-user-email" required placeholder="name@jo.zain.com" autocomplete="off">
+                        </label>
+                        <label>
+                            Full name
+                            <input type="text" id="new-user-full-name" placeholder="Optional">
+                        </label>
+                        <label>
+                            Role
+                            <select id="new-user-role">
+                                <option value="user">User</option>
+                                <option value="ran_config_user">{{ role_labels['ran_config_user'] }}</option>
+                                <option value="noc_sys">{{ role_labels['noc_sys'] }}</option>
+                                <option value="admin">{{ role_labels['admin'] }}</option>
+                            </select>
+                        </label>
+                        <fieldset class="add-user-portals">
+                            <legend>Portal access</legend>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="primenet" checked> Engineering (PrimeNet)</label>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="nexpulse"> Marketing (NexPulse)</label>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="sales"> Sales (NexArpu)</label>
+                            <label class="add-user-checkbox"><input type="checkbox" name="new-user-portal" value="support"> Support (NexResolve)</label>
+                        </fieldset>
+                        <label class="add-user-checkbox">
+                            <input type="checkbox" id="new-user-default-password" checked onchange="toggleCustomPasswordField()">
+                            Use default password ({{ default_user_password }})
+                        </label>
+                        <label id="new-user-password-wrap" hidden>
+                            Custom password
+                            <input type="password" id="new-user-password" minlength="8" autocomplete="new-password">
+                        </label>
+                        <div class="add-user-actions">
+                            <button type="submit" class="btn-user-primary">Create User</button>
+                            <button type="button" class="btn-user-secondary" onclick="toggleAddUserPanel(false)">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="search-section user-admin-controls">
+                    <button type="button" class="btn-user-primary" id="add-user-btn" onclick="toggleAddUserPanel()">+ Add New User</button>
+                    <input type="text" id="user-search" placeholder="Search users..." onkeyup="searchUsers()">
+                    <select id="role-filter" onchange="filterUsers()">
+                        <option value="">All Roles</option>
+                        <option value="admin">{{ role_labels['admin'] }}</option>
+                        <option value="user">User</option>
+                        <option value="ran_config_user">{{ role_labels['ran_config_user'] }}</option>
+                        <option value="noc_sys">{{ role_labels['noc_sys'] }}</option>
+                    </select>
+                    <select id="status-filter" onchange="filterUsers()">
+                        <option value="">All Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                    <span class="user-admin-hint">Default password: <code id="default-user-password-label">{{ default_user_password }}</code></span>
+                    <button type="button" class="btn-user-secondary" onclick="exportUsersTable()">Download Excel</button>
+                </div>
+
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Portals</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Last Activity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr><td colspan="9" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="users-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.7"></script>
+    <script src="{{ url_for('platform_admin.static', filename='platform_admin.js') }}?v=1.0"></script>
+</body>
+</html>

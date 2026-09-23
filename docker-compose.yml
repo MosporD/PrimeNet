@@ -2,22 +2,44 @@
 # Usage:
 #   cp .env.example .env   # edit secrets and SFTP credentials
 #   docker compose up -d --build
-#   NexusCore lobby:  http://localhost:8000/portals
-#   PrimeNet:         http://localhost:8001/dashboard
-#   NexPulse:         http://localhost:8002/portals/marketing/
+#
+# Public entry (reverse proxy — one host port):
+#   http://nexus.localhost/portals          (or http://localhost/portals)
+#   http://primenet.localhost/dashboard
+#   http://nexpulse.localhost/portals/marketing/
+# Set NEXUS_COOKIE_DOMAIN=.localhost (or .your.domain) for cross-subdomain SSO.
+#
+# Direct process ports are not published; use PROXY_HTTP_PORT (default 80).
+# For local suite without Docker: python app.py (ports 8000/8001/8002).
 #
 # Local dev (live reload, no rebuild per code change):
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 services:
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: nexuscore-proxy
+    restart: unless-stopped
+    ports:
+      - "${PROXY_HTTP_PORT:-80}:80"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      nexuscore:
+        condition: service_healthy
+      primenet:
+        condition: service_healthy
+      nexpulse:
+        condition: service_healthy
+
   nexuscore:
     build: .
     image: primenet:latest
     container_name: nexuscore-web
     restart: unless-stopped
     command: ["nexuscore"]
-    ports:
-      - "${NEXUSCORE_HTTP_PORT:-8000}:8000"
+    expose:
+      - "8000"
     env_file:
       - .env
     environment:
@@ -26,9 +48,10 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8000"
-      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://localhost:8000}"
-      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://localhost:8001}"
-      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://localhost:8002}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://nexus.localhost}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://primenet.localhost}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://nexpulse.localhost}"
+      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-.localhost}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-2}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"
@@ -50,8 +73,8 @@ services:
     cap_add:
       - SYS_ADMIN
     command: ["primenet"]
-    ports:
-      - "${PRIMENET_HTTP_PORT:-8001}:8001"
+    expose:
+      - "8001"
     env_file:
       - .env
     environment:
@@ -60,9 +83,10 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8001"
-      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://localhost:8001}"
-      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://localhost:8000}"
-      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://localhost:8002}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://primenet.localhost}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://nexus.localhost}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://nexpulse.localhost}"
+      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-.localhost}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-2}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-600}"
@@ -84,8 +108,8 @@ services:
     profiles: ["legacy-web"]
     restart: unless-stopped
     command: ["primenet"]
-    ports:
-      - "${PRIMENET_HTTP_PORT:-8001}:8001"
+    expose:
+      - "8001"
     env_file:
       - .env
     environment:
@@ -103,8 +127,8 @@ services:
     container_name: nexpulse-web
     restart: unless-stopped
     command: ["nexpulse"]
-    ports:
-      - "${NEXPULSE_HTTP_PORT:-8002}:8002"
+    expose:
+      - "8002"
     env_file:
       - .env
     environment:
@@ -113,9 +137,10 @@ services:
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
       FLASK_PORT: "8002"
-      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://localhost:8002}"
-      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://localhost:8000}"
-      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://localhost:8001}"
+      NEXPULSE_PUBLIC_URL: "${NEXPULSE_PUBLIC_URL:-http://nexpulse.localhost}"
+      NEXUSCORE_PUBLIC_URL: "${NEXUSCORE_PUBLIC_URL:-http://nexus.localhost}"
+      PRIMENET_PUBLIC_URL: "${PRIMENET_PUBLIC_URL:-http://primenet.localhost}"
+      NEXUS_COOKIE_DOMAIN: "${NEXUS_COOKIE_DOMAIN:-.localhost}"
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-2}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"

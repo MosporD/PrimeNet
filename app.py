@@ -4,10 +4,13 @@ Usage::
 
     python app.py
 
-Starts three processes on ports 8000 / 8001 / 8002. Activation is **shared for
-testing**: unlock once at http://localhost:8001/activation and all platforms
-open. Per-platform activation comes later (``NCM_SHARED_ACTIVATION=0`` to opt a
-process out of the shared gate).
+Starts three processes on ports 8000 / 8001 / 8002 for local testing.
+Deployed / network access uses the Docker ``proxy`` service (one public port,
+hostname routing — see ``deploy/nginx.conf``); this launcher does not start nginx.
+
+Activation is **shared for testing**: unlock once at
+http://localhost:8001/activation and all platforms open. Per-platform activation
+comes later (``NCM_SHARED_ACTIVATION=0`` to opt a process out of the shared gate).
 
 WSGI import (``gunicorn app:app``) still exposes PrimeNet only, for Docker
 compatibility. Prefer ``primenet_app:app`` / ``nexuscore_app:app`` /
