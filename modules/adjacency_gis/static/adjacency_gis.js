@@ -125,7 +125,81 @@ let selectionPolygonLayer  = null;
 let selectionPolygon       = null;
 let _polygonExtractBusy    = false;
 
+/** BCCH co-channel / adjacent-channel highlighter (Adjacency GIS). */
+let bcchOverlayLayer = null;
+let selectedBcch = null;
+let bcchOptionList = [];
+const BCCH_ROLE_COLORS = {
+    selected: '#e74c3c',
+    lower: '#2980b9',
+    upper: '#27ae60',
+};
+
 const LEFT_PANEL_COLLAPSE_KEY = 'networkMapLeftPanelCollapsed';
+const BASEMAP_PREF_KEY = 'adjacency_gis_basemap';
+
+/** Leaflet tile layers keyed by id (roadmap, street, …). */
+let basemapLayers = null;
+/** Currently active base tile layer. */
+let currentBasemapLayer = null;
+/** Active basemap id. */
+let currentBasemapId = 'roadmap';
+
+const BASEMAP_LABELS = {
+    roadmap: 'Roadmap',
+    street: 'Street (OSM)',
+    hot: 'Street (HOT)',
+    topo: 'Topographic',
+    satellite: 'Satellite',
+    terrain: 'Terrain',
+};
+
+function _readSavedBasemapId() {
+    try {
+        const saved = String(localStorage.getItem(BASEMAP_PREF_KEY) || '').trim();
+        if (saved && Object.prototype.hasOwnProperty.call(BASEMAP_LABELS, saved)) {
+            return saved;
+        }
+    } catch (_) { /* storage blocked */ }
+    return ADJACENCY_GIS_MODE ? 'roadmap' : 'street';
+}
+
+function _syncBasemapSelect(id) {
+    const sel = document.getElementById('basemap-select');
+    if (sel && sel.value !== id) sel.value = id;
+}
+
+/**
+ * Switch the Leaflet basemap. Safe to call from the left-panel select or
+ * after init. Persists the choice for Adjacency GIS.
+ */
+function setBasemap(id, { persist = true } = {}) {
+    if (!map || !basemapLayers) return;
+    const nextId = Object.prototype.hasOwnProperty.call(basemapLayers, id) ? id : _readSavedBasemapId();
+    const next = basemapLayers[nextId];
+    if (!next) return;
+
+    if (currentBasemapLayer && map.hasLayer(currentBasemapLayer)) {
+        map.removeLayer(currentBasemapLayer);
+    }
+    if (!map.hasLayer(next)) next.addTo(map);
+    currentBasemapLayer = next;
+    currentBasemapId = nextId;
+    _syncBasemapSelect(nextId);
+
+    if (persist && ADJACENCY_GIS_MODE) {
+        try { localStorage.setItem(BASEMAP_PREF_KEY, nextId); } catch (_) { /* ignore */ }
+    }
+}
+
+function onBasemapSelectChange() {
+    const sel = document.getElementById('basemap-select');
+    if (!sel) return;
+    setBasemap(sel.value);
+}
+
+window.setBasemap = setBasemap;
+window.onBasemapSelectChange = onBasemapSelectChange;
 
 function applySavedLeftPanelState() {
     try {
@@ -170,6 +244,7 @@ function initializeMap() {
     neighborLinesLayer = L.layerGroup().addTo(map);
     repeaterLayer = L.layerGroup();
     selectionPolygonLayer = L.layerGroup().addTo(map);
+    bcchOverlayLayer = L.layerGroup().addTo(map);
     if (NEIGHBOR_ONLY_MODE) {
         mapModule = 'neighbor-explorer';
         neighborEnabled = true;
@@ -180,43 +255,53 @@ function initializeMap() {
         _setNeighborFiltersLocked(true);
     }
 
-    // Base map styles
-    const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19
+    // Base map styles — switchable via left-panel "Map view" and Leaflet control
+    basemapLayers = {
+        roadmap: L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+            { attribution: 'Tiles &copy; Esri', maxZoom: 19 }
+        ),
+        street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }),
+        hot: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team',
+            maxZoom: 19
+        }),
+        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap',
+            maxZoom: 17
+        }),
+        satellite: L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            { attribution: 'Tiles &copy; Esri', maxZoom: 19 }
+        ),
+        terrain: L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
+            { attribution: 'Tiles &copy; Esri', maxZoom: 13 }
+        ),
+    };
+
+    const controlLayers = {};
+    Object.keys(BASEMAP_LABELS).forEach((id) => {
+        controlLayers[BASEMAP_LABELS[id]] = basemapLayers[id];
     });
-    const hot = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team',
-        maxZoom: 19
-    });
-    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap',
-        maxZoom: 17
-    });
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri',
-        maxZoom: 19
-    });
-    const terrain = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri',
-        maxZoom: 13
+    L.control.layers(controlLayers, {}, { collapsed: true }).addTo(map);
+
+    map.on('baselayerchange', (ev) => {
+        if (!basemapLayers || !ev || !ev.layer) return;
+        const matched = Object.keys(basemapLayers).find((id) => basemapLayers[id] === ev.layer);
+        if (!matched) return;
+        currentBasemapLayer = ev.layer;
+        currentBasemapId = matched;
+        _syncBasemapSelect(matched);
+        if (ADJACENCY_GIS_MODE) {
+            try { localStorage.setItem(BASEMAP_PREF_KEY, matched); } catch (_) { /* ignore */ }
+        }
     });
 
-    // Default layer
-    street.addTo(map);
-
-    // Layer control (top-right)
-    L.control.layers(
-        {
-            'Street': street,
-            'Street (HOT)': hot,
-            'Topographic': topo,
-            'Satellite': satellite,
-            'Terrain': terrain
-        },
-        {},
-        { collapsed: false }
-    ).addTo(map);
+    setBasemap(_readSavedBasemapId(), { persist: false });
 
     window.setTimeout(() => { if (map) map.invalidateSize(); }, 200);
 
@@ -227,6 +312,7 @@ function initializeMap() {
         applyDeepLinkFromUrl();
         if (ADJACENCY_GIS_MODE) {
             await setTechFilter('2G');
+            await loadBcchOptions();
         } else {
             _showEmptyState();
         }
@@ -441,6 +527,185 @@ async function setTechFilter(tech) {
     }
     await updateTechSpecificFilter();
     _onFilterChanged(false, true);
+}
+
+// ─── BCCH co-channel / adjacent-channel highlighter ───────────────────────────
+
+function _setBcchUiActive(active) {
+    document.body.classList.toggle('bcch-highlight-active', Boolean(active));
+    const clearBtn = document.getElementById('bcch-clear-btn');
+    const legend = document.getElementById('bcch-legend');
+    if (clearBtn) clearBtn.style.display = active ? '' : 'none';
+    if (legend) legend.setAttribute('aria-hidden', active ? 'false' : 'true');
+}
+
+function _updateBcchStepLabel() {
+    const el = document.getElementById('bcch-step-label');
+    if (!el) return;
+    el.textContent = selectedBcch == null ? '—' : `BCCH ${selectedBcch}`;
+}
+
+function _syncBcchSelectValue() {
+    const sel = document.getElementById('bcch-select');
+    if (!sel) return;
+    const val = selectedBcch == null ? '' : String(selectedBcch);
+    if (val && ![...sel.options].some((o) => o.value === val)) {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        sel.appendChild(opt);
+    }
+    sel.value = val;
+}
+
+async function loadBcchOptions() {
+    if (!ADJACENCY_GIS_MODE) return;
+    const sel = document.getElementById('bcch-select');
+    if (!sel) return;
+    try {
+        const res = await fetch('/api/adjacency-gis/bcch-options', { credentials: 'same-origin' });
+        const data = await res.json();
+        if (!data.success) return;
+        bcchOptionList = (data.bcchs || []).map((n) => Number(n)).filter((n) => Number.isFinite(n));
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">Select BCCH…</option>'
+            + bcchOptionList.map((n) => `<option value="${n}">${n}</option>`).join('');
+        if (prev && bcchOptionList.includes(Number(prev))) sel.value = prev;
+    } catch (e) {
+        console.error('BCCH options error:', e);
+    }
+}
+
+async function onBcchSelectChange() {
+    const sel = document.getElementById('bcch-select');
+    const raw = (sel?.value || '').trim();
+    if (!raw) {
+        clearBcchHighlight();
+        return;
+    }
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return;
+    await setSelectedBcch(n);
+}
+
+async function stepBcch(delta) {
+    const step = Number(delta) || 0;
+    if (!step) return;
+    const base = selectedBcch == null
+        ? (bcchOptionList.length ? bcchOptionList[0] : 0)
+        : selectedBcch;
+    await setSelectedBcch(base + step);
+}
+
+async function setSelectedBcch(bcch) {
+    const n = Number(bcch);
+    if (!Number.isFinite(n)) return;
+    selectedBcch = Math.trunc(n);
+    _syncBcchSelectValue();
+    _updateBcchStepLabel();
+    await refreshBcchOverlay();
+}
+
+function clearBcchHighlight() {
+    selectedBcch = null;
+    _syncBcchSelectValue();
+    _updateBcchStepLabel();
+    if (bcchOverlayLayer) bcchOverlayLayer.clearLayers();
+    _setBcchUiActive(false);
+    const countsEl = document.getElementById('bcch-counts');
+    if (countsEl) countsEl.textContent = '';
+}
+
+async function refreshBcchOverlay() {
+    if (!ADJACENCY_GIS_MODE || !map || !bcchOverlayLayer) return;
+    if (selectedBcch == null) {
+        clearBcchHighlight();
+        return;
+    }
+    bcchOverlayLayer.clearLayers();
+    _setBcchUiActive(true);
+    try {
+        const res = await fetch(
+            `/api/adjacency-gis/bcch-map?bcch=${encodeURIComponent(selectedBcch)}`,
+            { credentials: 'same-origin' }
+        );
+        const data = await res.json();
+        if (!data.success) {
+            showNotification(data.error || 'Failed to load BCCH map', 'error');
+            return;
+        }
+        const counts = data.counts || {};
+        const countsEl = document.getElementById('bcch-counts');
+        if (countsEl) {
+            countsEl.textContent =
+                `Red ${counts.selected || 0} · Blue ${counts.lower || 0} · Green ${counts.upper || 0}`;
+        }
+        const cells = Array.isArray(data.cells) ? data.cells : [];
+        cells.forEach((cell) => drawBcchWedge(cell));
+        if (!cells.length) {
+            showNotification(
+                `No cells on BCCH ${data.selected} / ${data.lower} / ${data.upper}`,
+                'info'
+            );
+        }
+    } catch (e) {
+        console.error('BCCH map error:', e);
+        showNotification('Failed to load BCCH highlight', 'error');
+    }
+}
+
+function drawBcchWedge(cell) {
+    if (!bcchOverlayLayer || cell == null) return;
+    const lat = Number(cell.lat);
+    const lng = Number(cell.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const az = Number(cell.azimuth);
+    const color = BCCH_ROLE_COLORS[cell.role] || '#34495e';
+
+    let pts;
+    if (Number.isFinite(az)) {
+        const half = SECTOR_BEAMWIDTH / 2;
+        const rLat = SECTOR_RADIUS_M / 111320;
+        const rLng = SECTOR_RADIUS_M / (111320 * Math.cos(lat * Math.PI / 180));
+        pts = [[lat, lng]];
+        for (let a = az - half; a <= az + half; a += 3) {
+            const rad = a * Math.PI / 180;
+            pts.push([
+                lat + rLat * Math.cos(rad),
+                lng + rLng * Math.sin(rad)
+            ]);
+        }
+        pts.push([lat, lng]);
+    } else {
+        // No azimuth — small circle at site
+        const marker = L.circleMarker([lat, lng], {
+            radius: 7,
+            color,
+            fillColor: color,
+            fillOpacity: 0.75,
+            weight: 2,
+        }).addTo(bcchOverlayLayer);
+        marker.bindPopup(
+            `<strong>${escapeHtml(cell.cell_name || '—')}</strong><br>`
+            + `BCCH ${escapeHtml(String(cell.bcch))}`
+            + (cell.site_name ? `<br>${escapeHtml(cell.site_name)}` : '')
+        );
+        return;
+    }
+
+    const polygon = L.polygon(pts, {
+        color,
+        fillColor: color,
+        fillOpacity: 0.45,
+        weight: 2,
+    }).addTo(bcchOverlayLayer);
+    polygon.bindPopup(
+        `<strong>${escapeHtml(cell.cell_name || '—')}</strong><br>`
+        + `BCCH ${escapeHtml(String(cell.bcch))}`
+        + ` · ${escapeHtml(String(cell.role || ''))}`
+        + (cell.site_name ? `<br>${escapeHtml(cell.site_name)}` : '')
+        + (cell.vendor ? `<br>${escapeHtml(cell.vendor)}` : '')
+    );
 }
 
 // ─── Cell operational state (`activity_status` from map APIs; `status` is alias) ─
@@ -3386,6 +3651,7 @@ function getNetworkMapState() {
         techSpecific: _val('tech-specific-filter') || 'all',
         showRepeaters: Boolean(document.getElementById('show-repeaters')?.checked),
         selectedSiteId: typeof selectedSiteId !== 'undefined' ? selectedSiteId : null,
+        basemap: currentBasemapId || _readSavedBasemapId(),
     };
     try {
         if (map) {
@@ -3428,6 +3694,10 @@ async function applyNetworkMapState(state /* , opts */) {
     showRepeaters = ADJACENCY_GIS_MODE ? false : Boolean(state.showRepeaters);
     const repCb = document.getElementById('show-repeaters');
     if (repCb) repCb.checked = showRepeaters;
+
+    if (state.basemap) {
+        try { setBasemap(state.basemap); } catch (_) { /* ignore */ }
+    }
 
     // Trigger server reload now that all filters are restored.
     try {

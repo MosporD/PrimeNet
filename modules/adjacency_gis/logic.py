@@ -707,3 +707,118 @@ def build_map_payload(
             'ncl_limit': ncl_limit,
         },
     }
+
+
+def list_bcch_options() -> list[int]:
+    """Distinct integer BCCH (ARFCN) values from metadata.db cells_2g with coordinates."""
+    conn = connect_metadata()
+    try:
+        rows = conn.execute(
+            """
+            SELECT DISTINCT CAST(bcch AS INTEGER) AS bcch
+            FROM cells_2g
+            WHERE bcch IS NOT NULL
+              AND TRIM(CAST(bcch AS TEXT)) <> ''
+              AND lat IS NOT NULL
+              AND long IS NOT NULL
+            ORDER BY CAST(bcch AS INTEGER)
+            """
+        ).fetchall()
+    except Exception:
+        return []
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+    out: list[int] = []
+    seen: set[int] = set()
+    for row in rows:
+        raw = row[0] if not hasattr(row, 'keys') else row['bcch']
+        try:
+            val = int(raw)
+        except (TypeError, ValueError):
+            continue
+        if val in seen:
+            continue
+        seen.add(val)
+        out.append(val)
+    return out
+
+
+def build_bcch_map_payload(selected_bcch: int) -> dict[str, Any]:
+    """Cells on selected BCCH and ±1 adjacent channels for co-channel map overlay."""
+    selected = int(selected_bcch)
+    lower = selected - 1
+    upper = selected + 1
+    roles = {selected: 'selected', lower: 'lower', upper: 'upper'}
+
+    conn = connect_metadata()
+    try:
+        rows = conn.execute(
+            """
+            SELECT
+                cell_name,
+                site_id,
+                site_name,
+                vendor,
+                CAST(bcch AS INTEGER) AS bcch,
+                CAST(lat AS REAL) AS lat,
+                CAST(long AS REAL) AS lng,
+                CAST(azimuth AS REAL) AS azimuth,
+                frequency_band
+            FROM cells_2g
+            WHERE CAST(bcch AS INTEGER) IN (?, ?, ?)
+              AND lat IS NOT NULL
+              AND long IS NOT NULL
+            """,
+            (lower, selected, upper),
+        ).fetchall()
+    except Exception:
+        rows = []
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+    cells: list[dict[str, Any]] = []
+    counts = {'selected': 0, 'lower': 0, 'upper': 0}
+    for row in rows:
+        if hasattr(row, 'keys'):
+            item = {k: row[k] for k in row.keys()}
+        else:
+            continue
+        try:
+            bcch = int(item.get('bcch'))
+        except (TypeError, ValueError):
+            continue
+        role = roles.get(bcch)
+        if not role:
+            continue
+        lat = _safe_float(item.get('lat'))
+        lng = _safe_float(item.get('lng'))
+        if lat is None or lng is None:
+            continue
+        cells.append({
+            'cell_name': str(item.get('cell_name') or '').strip(),
+            'site_id': str(item.get('site_id') or '').strip(),
+            'site_name': str(item.get('site_name') or '').strip(),
+            'vendor': str(item.get('vendor') or '').strip(),
+            'bcch': bcch,
+            'lat': lat,
+            'lng': lng,
+            'azimuth': _safe_float(item.get('azimuth')),
+            'frequency_band': str(item.get('frequency_band') or '').strip(),
+            'role': role,
+        })
+        counts[role] += 1
+
+    return {
+        'selected': selected,
+        'lower': lower,
+        'upper': upper,
+        'cells': cells,
+        'counts': counts,
+    }

@@ -2,11 +2,24 @@
 
 ## Current track
 
-2G Network Map UI fork on `metadata.db` (looks / filters first). CM NCL overlay later.
+BCCH adjacent-channel highlighter on the 2G metadata map. CM NCL overlay later.
 
 ## NEXT
 
-Confirm 2G map look on `/adjacency-gis` (sites, wedges, BCCH band filter). When CM pipeline is ready, overlay ADCE / G2GNCELL edges on this shell.
+Open `/adjacency-gis`, use **Map view** to switch basemaps; pick a BCCH and verify red/blue/green wedges. When CM pipeline is ready, overlay ADCE / G2GNCELL edges.
+
+## 2026-09-24 (Basemap switcher)
+
+- Left-panel **Map view** select: Roadmap (default) / Street / HOT / Topo / Satellite / Terrain.
+- Choice persisted in `localStorage`; synced with Leaflet layers control + saved views.
+- Version bump V1.4.
+
+## 2026-09-24 (BCCH adjacent-channel highlighter)
+
+- APIs: `bcch-options`, `bcch-map` from `cells_2g`.
+- UI: dropdown + Prev/Next; selected red, −1 blue, +1 green wedge overlay.
+- Default basemap Roadmap (Esri World Street Map).
+- Missing neighbors still out of scope.
 
 ## 2026-09-23 (UI fork from Network Map)
 

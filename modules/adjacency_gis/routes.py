@@ -89,6 +89,45 @@ def adjacency_gis_page():
     return render_template('adjacency_gis.html', user=user)
 
 
+# ── BCCH co-channel / adjacent-channel overlay (metadata.db) ──────────────────
+
+
+@adjacency_gis_bp.route('/api/adjacency-gis/bcch-options')
+@login_required
+def adjacency_gis_bcch_options():
+    """Distinct BCCH (ARFCN) values from cells_2g for the highlighter dropdown."""
+    try:
+        bcchs = adj_logic.list_bcch_options()
+        return jsonify({'success': True, 'bcchs': bcchs})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@adjacency_gis_bp.route('/api/adjacency-gis/bcch-map')
+@login_required
+def adjacency_gis_bcch_map():
+    """Cells on selected BCCH (red) and ±1 adjacent channels (blue / green)."""
+    raw = (request.args.get('bcch') or '').strip()
+    try:
+        selected = int(raw)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'error': 'bcch must be an integer'}), 400
+
+    try:
+        payload = adj_logic.build_bcch_map_payload(selected)
+        try:
+            log_activity(
+                _username(get_current_user()),
+                'adjacency_gis_bcch',
+                f"bcch={selected} cells={len(payload.get('cells') or [])}",
+            )
+        except Exception:
+            pass
+        return jsonify({'success': True, **payload})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ── CM snapshot APIs (Admin / future NCL overlay) ─────────────────────────────
 
 

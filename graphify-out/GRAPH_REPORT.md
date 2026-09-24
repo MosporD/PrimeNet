@@ -1,60 +1,60 @@
-# Graph Report - Project  (2026-09-23)
+# Graph Report - Project  (2026-09-24)
 
 ## Corpus Check
-- 664 files · ~18,435,488 words
+- 667 files · ~18,437,849 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 9316 nodes · 23477 edges · 384 communities (358 shown, 26 thin omitted)
+- 9349 nodes · 23544 edges · 381 communities (356 shown, 25 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 327 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a51355c4`
+- Built from commit: `3d7f8a7e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - cm_extractor/routes.py
-- fetch_nokia_retu_angles
-- nokia_load_balancing/rules.py
+- ret_management/logic.py
+- license_client.py
 - site_catalog.py
 - pm_processor.py
 - ne_comparison/routes.py
 - mml_parser.py
-- scheduler.py
+- start_scheduler
 - log_activity
 - performance.js
 - platform_admin.js
-- ret_management/logic.py
+- ret_management/test_logic.py
 - _radio-engine.md
 - admin_panel/routes.py
 - cm_live.py
-- open_db
+- runtime.py
 - nokia_parser.py
 - common.js
 - init_schema
-- parse_balance_filename
+- nokia_load_balancing/logic.py
 - navi.py
-- ret_management/test_logic.py
+- parse_mml_report
 - pm_helpers.py
-- nokia_parse.py
+- adjacency_gis/logic.py
 - wncelg_logic.py
 - precalc_job.py
 - parameter_dictionary/nokia_loader.py
 - renderAllCharts
-- execute_query
+- connect_app
 - map.js
 - sync/routes.py
 - cm_extractor.js
-- scoring.py
+- get_current_user
 - cell_heatmap.js
 - ne_comparison.js
 - require_permission
 - femto_pm.js
 - HuaweiCmClient
-- huawei_semantics.py
-- XMLToExcelConverter
+- ValueError
+- identity/routes.py
 - get_kpi_mapping_payload
 - repeater_loader.py
 - network_health.js
@@ -70,33 +70,33 @@
 - neighbor_raw_linking.py
 - app.js
 - ret_management/routes.py
-- user_profile/routes.py
-- cm_extractor/config.py
+- execute_query
+- nokia_parse.py
 - NokiaOperationsClient
 - parameter_dictionary/routes.py
-- module_access_before_request
-- _fetch_neighbor_lines_payload
-- extraction.py
-- ValueError
+- get_user_by_session
+- excel_writer.py
+- cm_extractor/config.py
+- HuaweiPmClient
 - cases/store.py
 - cell_heatmap/routes.py
 - adjacency_gis/store.py
 - huawei_load_balancing/routes.py
-- cursor
+- ValidationError
 - watch_remote_new_files_and_pull.py
 - nokia_excel_reimport.py
 - connect
-- license_client.py
-- performance/routes.py
-- Connection
+- adapt_sqlite_app_sql
+- parse_gtrx_bcch_row
+- module_access.py
 - ret_management.js
-- get_cell_trend_by_name
+- performance/routes.py
 - fault_management/routes.py
 - parse_pm_datetime
 - cm_parameter_audit.js
-- runtime.py
+- query.py
 - _currentDataScope
-- pm_health.py
+- store_available
 - network.py
 - conflict_map.js
 - drive_test_viewer.js
@@ -104,11 +104,11 @@
 - updateActionState
 - refreshNeighborOverlay
 - load_huawei_neighbor_wide_to_db.py
-- balance_data.py
+- sectors_from_balance
 - performance_dictionary.js
 - applyFilters
 - load_raw_csv_to_databases.py
-- get_current_user
+- adjacency_gis/routes.py
 - parameter_dictionary.js
 - metadata_processor.py
 - task_scheduler.js
@@ -116,8 +116,8 @@
 - documentation/routes.py
 - cross_reference_metadata_pm_cell_names.py
 - performance_analytics.js
-- repositories/segments.py
-- get_session_token
+- cursor
+- database_enhanced.py
 - pm_indexes.py
 - setupScheduler
 - config_history.js
@@ -127,8 +127,8 @@
 - Nokia CM Open API — RNC / BSC extraction reference
 - hardware.js
 - features/README.md
-- get_user_by_session
-- adjacency_gis/logic.py
+- showCellPicker
+- require_activation
 - loadNetworkSites
 - identity/store.py
 - nokia_semantics.py
@@ -138,12 +138,12 @@
 - session.py
 - nokia_load_balancing/routes.py
 - constellation.js
-- HuaweiPmClient
+- _renderOneKpiChartWithOptions
 - network_map/routes.py
 - rru_inventory/store.py
-- query.py
+- knowledge.py
 - neighbor_health.py
-- parse_gtrx_bcch_row
+- elevation/routes.py
 - performance_explorer_plus/routes.py
 - ran_features.js
 - sector_health.js
@@ -155,37 +155,37 @@
 - PrimeNet frontend theme guide
 - load_neighbor_reports.py
 - cm_store.py
-- groups.py
+- repositories/segments.py
 - buildChartsForStyle
 - PrimeNet — Architecture & Onboarding Guide
 - nokia_bulk_export.py
-- elevation/routes.py
+- applyPerfDeepLinkChart
 - rru_inventory/logic.py
-- service.py
+- correlator.py
 - pipeline_ingest_verify.py
-- parse_mml_report
+- task_scheduler/routes.py
 - rollup.py
 - xml_parser.js
 - Huawei U2020 / MAE CM Open API reference
-- son_analytics/routes.py
+- huawei_param_dict.py
 - _stopPolygonDrawMode
 - loadNetworkSites
 - balance_store.py
-- etl_enabled
-- escapeHtml
+- metadata_active_sql.py
+- _stopPolygonDrawMode
 - extract
 - network_management.js
 - huawei_load_balancing.js
 - build_kpi_headers_db.py
 - Auth, sessions, activation
-- sync_reset_mode
+- scheduler.py
 - Network Coverage Heatmap
 - network_health/logic.py
 - escHtml
-- ncm_core.py
+- open_db
 - son_analytics.js
 - nokia_bulk_routing.py
-- knowledge.py
+- pull_huawei_raw_daily.py
 - radio_modules.js
 - rru_inventory/routes.py
 - escapeHtml
@@ -206,15 +206,15 @@
 - xml_parser/routes.py
 - create_session
 - performance_explorer_plus.js
-- nokia_load_balancing/logic.py
-- test_network_bridge.py
+- initializeMap
+- access.py
 - pull_and_load_daily.py
 - displayUsers
 - entrypoint.sh
 - Radio Optimization
 - ml/store.py
-- nokia_configured
-- adjacency_gis/routes.py
+- configuration_dashboard/routes.py
+- get_session_token
 - showSiteDetails
 - load_raw_daily_to_databases.py
 - pull_performance_project_neighbor.py
@@ -238,10 +238,10 @@
 - neighbor_agg.py
 - Lesson 02 — Activation & security
 - PrimeNet — progress log
-- son_analytics/logic.py
+- test_recommendations.py
 - Lesson 03 — Auth, sessions & access control
 - Dashboard
-- get_pm_table
+- set_activation_password.py
 - Configuration
 - 1.2 `app.py` walked top to bottom
 - Lesson 07 — Module reference (all 41)
@@ -267,8 +267,8 @@
 - Femto PM
 - Administration & shared
 - Dashboard & module UI unification
-- activation_period_days
-- huawei_param_dict.py
+- son_analytics/logic.py
+- renderNeighborLines
 - run_logged_subprocess
 - Huawei Load Balancing
 - Pipeline Scripts (Canonical + Compatibility)
@@ -282,7 +282,7 @@
 - Nokia Load Balancing
 - Parameter Dictionary
 - Performance Explorer
-- apply_retention
+- test_network_bridge.py
 - Huawei PM Query Studio
 - Performance Dictionary
 - Postgres runtime (opt-in)
@@ -295,53 +295,47 @@
 - Sync / pipeline (ETL)
 - User Profile
 - XML Parser
-- import_local_files.py
+- group_processor.py
 - adjacency_gis.js
 - metadata.py
 - test_cases.py
-- sleeping_cells/logic.py
+- test_wncelg_store.py
 - group-health.md
 - irat-border.md
 - optimization_cases.js
-- layer_from_lncel
-- extractFromSelectionPolygon
+- parse_balance_filename
+- layer-coverage.md
 - radio-morning-report.md
 - selection.py
 - parse_femto_metadata.py
 - Performance Explorer Plus
-- SFTPClient
+- build_table_workbook
 - escapeHtml
 - selection_context.js
-- verify.py
-- test_rules_hl_pair.py
+- balance_data.py
+- login
 - ret_hologram.js
-- counter_catalog.py
-- network-management.md
+- elevation.md
 - Radio Hardware Inventory Report — progress
-- loadKpiColumns
 - admin_panel.js
 - mobility-explorer.md
-- build_table_workbook
-- NokiaMoSheetBuilder
 - pm_plus/__init__.py
 - Optimization Cases
 - Radio Optimization
 - change-impact.md
 - Administration
 - fix_proxy_env.sh
-- export_sites_kml
+- pm.py
 - ci_check_wiring.py
-- sort_huawei_ret_rows
+- loadKpiColumns
 - require_etl_enabled
 - conftest.py
-- RuntimeError
-- build_audit_workbook
-- get_current_user
+- cm_parameter_audit/routes.py
 - cases_morning_digest.py
 - setTechFilter
-- install_shared_activation
+- RuntimeError
 - performance_dictionary/nokia_loader.py
-- huawei_pm/config.py
+- feature_access.py
 - Configuration
 - Overview & Performance
 - progress.md
@@ -351,146 +345,147 @@
 - overshooting-detector.md
 - NexusCore — Feature catalog (AI context)
 - marketing.js
-- kpi_filter.py
-- get_map_repeaters
+- mrbts_tree_loader.py
 - ran-features.md
-- PortalUser
 - auth_routes.py
 - NexPulse (Marketing Portal)
-- alarm-impact.md
 - Platform shell
 - neighbor-quality.md
 - sleeping-cells.md
 - feature.md
 - displayProfileCards
-- initializeMap
+- getHuaweiScopeLevel
 - run_config_dashboard_ingest
 - wncelg.js
 - portals/__init__.py
-- loadPmTable
+- apply_retention
 - pull_huawei_raw.py
 - raw_path
-- mrbts_tree_loader.py
 - Adjacency GIS — progress
-- login_required
+- groups.py
 - initializeMap
 - audit_dark_mode.py
-- getHuaweiScopeLevel
+- kpi_filter.py
+- _discover_ret_label_vocab.py
 - score_vs_threshold
 - parse
 - simulate_dark_mode_cascade.py
+- clearBcchHighlight
+- escapeHtml
+- service.py
+- inventory_sqlite_databases.py
 
 ## God Nodes (most connected - your core abstractions)
-1. `execute_query()` - 167 edges
+1. `execute_query()` - 168 edges
 2. `get_session_token()` - 115 edges
-3. `log_activity()` - 114 edges
+3. `log_activity()` - 115 edges
 4. `get_user_by_session()` - 112 edges
 5. `open_db()` - 86 edges
 6. `HuaweiCmClient` - 73 edges
 7. `get_db()` - 69 edges
-8. `connect_metadata()` - 66 edges
+8. `connect_metadata()` - 69 edges
 9. `NokiaCmClient` - 65 edges
 10. `init_schema()` - 58 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `run_dev_server()` --indirect_call--> `_open_browser()`  [INFERRED]
   core/platform/base_app.py → app.py
+- `NokiaBulkExportError` --uses--> `XMLToExcelConverter`  [INFERRED]
+  core/cm_extractor/nokia_bulk_export.py → ncm_core.py
 - `create_identity_blueprint()` --indirect_call--> `current_user()`  [INFERRED]
   core/platform/identity/routes.py → portals/marketing/access.py
 - `build_conflict_base_pairs()` --calls--> `_pick_col()`  [INFERRED]
   modules/conflict_map/logic.py → core/radio/groups.py
 - `_select_site_cells()` --calls--> `_pick_col()`  [INFERRED]
   modules/ret_management/site_layout.py → core/radio/groups.py
-- `admin_export_excel()` --calls--> `build_table_workbook()`  [INFERRED]
-  modules/admin_panel/routes.py → core/table_excel_export.py
 
 ## Import Cycles
+- 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/__init__.py`
 - 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/audit_views.py -> portals/marketing/__init__.py`
 - 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/blueprint.py -> portals/marketing/__init__.py`
 - 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/campaigns.py -> portals/marketing/__init__.py`
 - 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/catalog.py -> portals/marketing/__init__.py`
-- 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/__init__.py`
 - 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/home.py -> portals/marketing/__init__.py`
 - 3-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/segments.py -> portals/marketing/__init__.py`
 - 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/audit_views.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/audit_views.py -> portals/marketing/views/blueprint.py -> portals/marketing/__init__.py`
 - 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/blueprint.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
 - 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/campaigns.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/catalog.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/home.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/segments.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/repositories/consent.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/views/blueprint.py -> portals/marketing/__init__.py`
+- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/audit_views.py -> portals/marketing/views/blueprint.py -> portals/marketing/__init__.py`
 - 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/campaigns.py -> portals/marketing/repositories/campaigns.py -> portals/marketing/__init__.py`
 - 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/campaigns.py -> portals/marketing/repositories/catalog.py -> portals/marketing/__init__.py`
 - 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/campaigns.py -> portals/marketing/repositories/segments.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/campaigns.py -> portals/marketing/views/blueprint.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/catalog.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/catalog.py -> portals/marketing/repositories/catalog.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/catalog.py -> portals/marketing/views/blueprint.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/access.py -> portals/marketing/__init__.py`
-- 4-file cycle: `portals/marketing/__init__.py -> portals/marketing/views/__init__.py -> portals/marketing/views/consent.py -> portals/marketing/repositories/consent.py -> portals/marketing/__init__.py`
 
-## Communities (384 total, 26 thin omitted)
+## Communities (381 total, 25 thin omitted)
 
 ### Community 0 - "cm_extractor/routes.py"
-Cohesion: 0.07
-Nodes (83): create_export_path(), delete_export(), get_export_record(), list_user_exports(), _meta_path(), _purge_expired_locked(), Any, Path (+75 more)
+Cohesion: 0.08
+Nodes (79): create_export_path(), delete_export(), get_export_record(), list_user_exports(), _meta_path(), _purge_expired_locked(), Any, Path (+71 more)
 
-### Community 1 - "fetch_nokia_retu_angles"
-Cohesion: 0.11
-Nodes (28): config_retu_dist_name(), fetch_nokia_retu_angles(), _filter_retu_records_for_site(), list_network_elements(), _mrbts_query_element_ids(), Runtime RETU_R — live angle / device status., Config RETU — Provision_Mass_Modification target for angle., Map a runtime RETU_R row to the config RETU distinguished name for writes. (+20 more)
+### Community 1 - "ret_management/logic.py"
+Cohesion: 0.08
+Nodes (63): is_empty_plan_error(), _alias_lookup(), apply_huawei_ret_update(), apply_nokia_angle_changes(), _collect_ret_rows_from_reports(), fetch_huawei_rets(), fetch_nokia_retu_angles(), _fetch_scoped_ret_rows_for_subunits() (+55 more)
 
-### Community 2 - "nokia_load_balancing/rules.py"
-Cohesion: 0.10
-Nodes (34): Map a NetAct MRBTS instance id to the PrimeNet metadata ``site_id``. NetAct NEs…, resolve_nokia_metadata_site_id(), Tests for NetAct ↔ PrimeNet metadata MRBTS site id mapping., 53308 must map to 3308, not the shorter suffix 308., test_resolve_nokia_metadata_site_id_direct(), test_resolve_nokia_metadata_site_id_prefers_longest_suffix(), test_resolve_nokia_metadata_site_id_prefixed_netact(), test_resolve_nokia_metadata_site_id_unknown_prefix_falls_back() (+26 more)
+### Community 2 - "license_client.py"
+Cohesion: 0.17
+Nodes (29): _activation_period_days(), activation_status(), _data_root(), get_instance_id(), _http_json(), is_activated(), is_configured(), license_server_url() (+21 more)
 
 ### Community 3 - "site_catalog.py"
-Cohesion: 0.05
-Nodes (82): _apply_cache(), discover_controllers(), discover_mrbts(), discover_nokia_inventory(), _dn_suffix_id(), _enrich_with_area(), ensure_nokia_inventory_enriched(), get_cached_nokia_inventory() (+74 more)
+Cohesion: 0.04
+Nodes (106): _apply_cache(), discover_controllers(), discover_mrbts(), discover_nokia_inventory(), _dn_suffix_id(), _enrich_with_area(), ensure_nokia_inventory_enriched(), get_cached_nokia_inventory() (+98 more)
 
 ### Community 4 - "pm_processor.py"
-Cohesion: 0.05
-Nodes (69): _cell_col_disambiguation_score(), _clear_huawei_pm_tables_if_full_sync(), _coerce_kpi_cell_value(), _coerce_pm_timestamp(), _collect_pm_files(), _concatenated_kpi_style_headers(), debug_huawei_pm_zip(), _detect_cell_identifier_column() (+61 more)
+Cohesion: 0.04
+Nodes (90): list_pm_partition_tables(), Return monotable + area partitions for ``base_table`` (monotable first if…, _build_pm_union(), _build_pm_union_minimal(), _get_pm_cols(), _is_huawei_pm_db(), Return KPI column names that contain actual numeric data. Scans all per-…, Build UNION ALL subqueries across per-technology tables. Returns (data_sql,… (+82 more)
 
 ### Community 5 - "ne_comparison/routes.py"
 Cohesion: 0.07
-Nodes (71): build_nokia_client(), build_comparison_workbook(), _compare_type(), _format_object_info(), _moc_name(), _ne_label(), Any, BytesIO (+63 more)
+Nodes (72): build_comparison_workbook(), _compare_type(), _format_object_info(), _moc_name(), _ne_label(), Any, BytesIO, Build MAE-style NE comparison Excel reports for Nokia and Huawei. (+64 more)
 
 ### Community 6 - "mml_parser.py"
 Cohesion: 0.09
-Nodes (62): Huawei U2020 / MAE northbound REST client for CM extraction. Supports two Open…, _choose_best_rows(), _drop_misparsed_cell_rows(), _filter_mml_rows(), _generic_row_values(), _infer_canonical_headers(), _is_false_horizontal_header(), _is_garbage_mml_row() (+54 more)
+Nodes (61): _choose_best_rows(), _drop_misparsed_cell_rows(), _filter_mml_rows(), _generic_row_values(), _infer_canonical_headers(), _is_false_horizontal_header(), _is_garbage_mml_row(), _is_garbage_row_key() (+53 more)
 
-### Community 7 - "scheduler.py"
-Cohesion: 0.08
-Nodes (60): _adjacency_gis_cron_hour_minute(), _adjacency_gis_huawei_cron_hour_minute(), _all_table_row_counts(), _defer_pipeline_if_low_memory(), _extract_technology_key(), _log_loader_row_deltas(), _log_sync(), _network_balance_ingest_cron_hour() (+52 more)
+### Community 7 - "start_scheduler"
+Cohesion: 0.06
+Nodes (53): _ensure_dotenv(), _env_flag(), etl_disabled_reason(), etl_enabled(), _falsy(), Master kill switch for ETL / sync / PM-Plus ingest pipelines. Local laptop…, Load project ``.env`` once so CLI scripts see NCM_ENABLE_ETL without a shell…, Return True only when ETL/sync pipelines are allowed to run. (+45 more)
 
 ### Community 8 - "log_activity"
-Cohesion: 0.15
-Nodes (35): feature_catalog(), Flat list of every feature with its configurable access state. Used by the…, catalog_for_admin(), Any, Payload for Admin Panel portal checkboxes., count_active_admins(), delete_user(), get_all_users() (+27 more)
+Cohesion: 0.17
+Nodes (32): feature_catalog(), Flat list of every feature with its configurable access state. Used by the…, catalog_for_admin(), Payload for Admin Panel portal checkboxes., count_active_admins(), delete_user(), get_all_users(), log_activity() (+24 more)
 
 ### Community 9 - "performance.js"
 Cohesion: 0.04
-Nodes (86): _activatePerfTreeCellKey(), activeKpiCategoryByTabId, allAreas, allCellGroups, allCells, allClusters, allSites, applyPerfDeepLinkAfterFilters() (+78 more)
+Nodes (58): activeKpiCategoryByTabId, allAreas, allCellGroups, allCells, allClusters, allSites, applyPerformanceState(), applySelectedPerformanceFilterPreset() (+50 more)
 
 ### Community 10 - "platform_admin.js"
 Cohesion: 0.11
 Nodes (29): allUsers, CURRENT_USER_ID, displayUsers(), editUserPortals(), _escapeHtml(), exportUsersTable(), featureAccessRoles, filteredUsers (+21 more)
 
-### Community 11 - "ret_management/logic.py"
-Cohesion: 0.12
-Nodes (44): is_empty_plan_error(), _alias_lookup(), apply_huawei_ret_update(), apply_nokia_angle_changes(), _collect_ret_rows_from_reports(), fetch_huawei_rets(), _fetch_scoped_ret_rows_for_subunits(), _generic_value_list() (+36 more)
+### Community 11 - "ret_management/test_logic.py"
+Cohesion: 0.05
+Nodes (59): annotate_ret_rows(), build_huawei_mod_command(), config_retu_dist_name(), _format_degrees(), huawei_ret_sector_key(), huawei_ret_site_id(), infer_ret_tech_from_label(), _label_tokens() (+51 more)
 
 ### Community 12 - "_radio-engine.md"
 Cohesion: 0.06
-Nodes (29): Approach, Capacity Hotspots, Progress, Plans, Purpose, Approach, Layer Coverage Gaps, Progress (+21 more)
+Nodes (31): Alarm–PM Correlator, Approach, Progress, Plans, 2026-08-17 (roadmap), Alarm–PM Correlator — progress, From brief History (migrated 2026-09-17), Purpose (+23 more)
 
 ### Community 13 - "admin_panel/routes.py"
 Cohesion: 0.08
 Nodes (60): adjacency_gis_admin_run(), adjacency_gis_admin_status(), admin_export_excel(), admin_panel_page(), admin_recent_activity(), admin_required(), _api_connection_row(), api_pm_plus_catalog_import() (+52 more)
 
 ### Community 14 - "cm_live.py"
-Cohesion: 0.10
-Nodes (52): get_parameters_for_object(), _selection_rows(), _audit_status(), _build_mo_parameter_summaries(), _build_summary(), _display_fields(), _distribution_entries(), _huawei_ne_name_lookup() (+44 more)
+Cohesion: 0.08
+Nodes (68): get_parameters_for_object(), build_mo_path(), extract_nokia_selection(), fetch_parameters_for_classes(), filter_mo_ids_for_site(), filter_queryable_parameters(), _inject_scope_element(), normalize_scope_level() (+60 more)
 
-### Community 15 - "open_db"
-Cohesion: 0.09
-Nodes (32): Connection, Cheap network-activity level from hourly PM traffic (dashboard visuals).…, Return (timestamp_col, traffic_col) or None., Per-vendor level: latest-hour traffic sum vs peak hour in the scan window., _resolve_columns(), _vendor_activity(), _load_vendor_lines(), open_db() (+24 more)
+### Community 15 - "runtime.py"
+Cohesion: 0.05
+Nodes (61): Database runtime: SQLite by default; optional Postgres per domain., attach_alias_for_schema(), canonical_sqlite_paths(), enabled_groups(), enabled_schemas(), is_domain_postgresql(), _norm_path(), pm_schema() (+53 more)
 
 ### Community 16 - "nokia_parser.py"
 Cohesion: 0.08
@@ -504,61 +499,61 @@ Nodes (45): _applyScaleTheme(), _applyTheme(), _bootConstellationBackground(), _
 Cohesion: 0.09
 Nodes (45): _env(), _env_bool(), _env_int(), ftp_hosts(), Configuration for Performance Explorer Plus (Nokia NBI → warehouse)., Ordered host attempts: primary then backup., controller_key_from_dn(), FileMeta (+37 more)
 
-### Community 19 - "parse_balance_filename"
-Cohesion: 0.36
-Nodes (8): detect_date(), detect_vendor(), _make_date(), parse_balance_filename(), date, Path, Detect vendor and date from Network Balance export filenames., Return (vendor, file_date) parsed from a CSV filename stem.
+### Community 19 - "nokia_load_balancing/logic.py"
+Cohesion: 0.05
+Nodes (85): Map a NetAct MRBTS instance id to the PrimeNet metadata ``site_id``. NetAct NEs…, resolve_nokia_metadata_site_id(), Tests for NetAct ↔ PrimeNet metadata MRBTS site id mapping., 53308 must map to 3308, not the shorter suffix 308., test_resolve_nokia_metadata_site_id_direct(), test_resolve_nokia_metadata_site_id_prefers_longest_suffix(), test_resolve_nokia_metadata_site_id_prefixed_netact(), test_resolve_nokia_metadata_site_id_unknown_prefix_falls_back() (+77 more)
 
 ### Community 20 - "navi.py"
 Cohesion: 0.08
 Nodes (48): HTMLParser, get_home_page(), _get_zip(), guess_mimetype(), hdx_base_url(), _hdx_path(), patch_hdx_html(), _path_index() (+40 more)
 
-### Community 21 - "ret_management/test_logic.py"
-Cohesion: 0.06
-Nodes (52): annotate_ret_rows(), build_huawei_mod_command(), _format_degrees(), huawei_ret_sector_key(), huawei_ret_site_id(), infer_ret_tech_from_label(), _label_tokens(), mml_tilt_to_degrees_display() (+44 more)
+### Community 21 - "parse_mml_report"
+Cohesion: 0.13
+Nodes (24): classify_mml_probe(), discover_commands_by_product(), discover_commands_for_ne(), probe_mml_command(), Any, Probe U2020 MML commands per NE product type. Huawei wireless Open API has no…, Probe all candidate LST objects against one NE., Pick one sample NE per product_name and probe candidate LST commands. Returns… (+16 more)
 
 ### Community 22 - "pm_helpers.py"
-Cohesion: 0.07
-Nodes (58): Return the Postgres schema if this canonical file is on Postgres; else None., schema_for_sqlite_path(), True when the canonical SQLite file exists, or its Postgres schema is enabled., store_available(), build_cell_days(), _guess_layer(), latest_rows(), _mean_std() (+50 more)
+Cohesion: 0.06
+Nodes (62): _aggregate_hourly_to_daily(), _filter_points_last_days(), get_cell_trend_payload(), _linear_trend(), Average hourly points into daily buckets (oldest first)., _families_for(), _quiet_cutoff(), _scan_sleeping_cells() (+54 more)
 
-### Community 23 - "nokia_parse.py"
-Cohesion: 0.15
-Nodes (31): bcf_id_from_dn(), bsc_id_from_dn(), build_sector_rows(), is_admin_active(), is_bcch_channel0_type(), _param_lookup(), parent_bts_dn(), parse_adce_record() (+23 more)
+### Community 23 - "adjacency_gis/logic.py"
+Cohesion: 0.12
+Nodes (31): build_bcch_map_payload(), build_map_payload(), destination_point(), fetch_nokia_adjacency_snapshot(), haversine_km(), _list_huawei_bsc_ne_names(), _list_mo_ids(), load_cells_2g_index() (+23 more)
 
 ### Community 24 - "wncelg_logic.py"
 Cohesion: 0.12
-Nodes (35): Unit tests for WNCELG site split aggregation (no live NetAct)., test_aggregate_one_group_is_no_split(), test_aggregate_two_groups_is_split(), test_build_sankey_area_status_groups(), test_build_summary_and_filters(), test_enrich_wncelg_row_parses_dn(), test_site_id_and_instance_from_dn(), aggregate_site_groups() (+27 more)
+Nodes (38): Unit tests for WNCELG site split aggregation (no live NetAct)., test_aggregate_one_group_is_no_split(), test_aggregate_two_groups_is_split(), test_build_sankey_area_status_groups(), test_build_summary_and_filters(), test_enrich_wncelg_row_parses_dn(), test_site_id_and_instance_from_dn(), aggregate_site_groups() (+30 more)
 
 ### Community 25 - "precalc_job.py"
 Cohesion: 0.09
-Nodes (39): Network Health Scorecard — worst-cell ranking by KPI category against operator…, _category_preset_aliases(), _compute_precomputed_table_runtime(), get_precomputed_table(), list_kpi_columns(), _match_kpi_name(), Resolve a KPI hint to an available PM column name., Pick a bounded shortlist of KPIs to pre-calculate for fast initial load. (+31 more)
+Nodes (40): pm_technology_for_rat(), Network Health Scorecard — worst-cell ranking by KPI category against operator…, _category_preset_aliases(), _compute_precomputed_table_runtime(), get_precomputed_table(), list_kpi_columns(), _match_kpi_name(), Resolve a KPI hint to an available PM column name. (+32 more)
 
 ### Community 26 - "parameter_dictionary/nokia_loader.py"
 Cohesion: 0.12
 Nodes (35): build_nokia_data_from_excel(), _cache_mtime(), _clean(), _excel_mtime(), get_nokia_index_payload(), get_nokia_list_payload(), get_nokia_mos_payload(), _ingest_parameter_row() (+27 more)
 
 ### Community 27 - "renderAllCharts"
-Cohesion: 0.09
-Nodes (51): _activeKpiCategoryKey(), _buildDodDatasetsForKpi(), _buildMomDatasetsForKpi(), _colorFor(), _dateKeyLocal(), _defsForTrendRender(), _dodHourCategoryLabels(), escHtml() (+43 more)
+Cohesion: 0.15
+Nodes (30): _activeKpiCategoryKey(), closePerfChartTab(), escAttr(), escHtml(), _getActiveKpiCategory(), _isDodChartMode(), _isMomChartMode(), _isPeriodCompareChartMode() (+22 more)
 
-### Community 28 - "execute_query"
-Cohesion: 0.09
-Nodes (58): _apply_retention(), compute_next_run(), count_unread_notifications(), create_job(), delete_job(), describe_schedule(), describe_storage_path(), emit_job_notification() (+50 more)
+### Community 28 - "connect_app"
+Cohesion: 0.12
+Nodes (44): _apply_retention(), compute_next_run(), count_unread_notifications(), create_job(), delete_job(), describe_schedule(), describe_storage_path(), emit_job_notification() (+36 more)
 
 ### Community 29 - "map.js"
 Cohesion: 0.06
 Nodes (45): CELL_TECH_SORT_ORDER, CLUSTER_AREA, conflictMapTechFromActive(), conflictMapTechFromCellTech(), conflictMapTechFromMatches(), conflictMapUrlForCode(), DEFAULT_CENTER, _ELEVATION_CACHE (+37 more)
 
 ### Community 30 - "sync/routes.py"
-Cohesion: 0.09
-Nodes (52): admin_required(), download_sync_logs(), import_pm_path(), inspect_local(), latest_downloads(), _log_sync(), route, Sync Routes API endpoints for sync status, history, and manual triggers. Admin-… (+44 more)
+Cohesion: 0.10
+Nodes (50): admin_required(), download_sync_logs(), import_pm_path(), inspect_local(), latest_downloads(), _log_sync(), route, Sync Routes API endpoints for sync status, history, and manual triggers. Admin-… (+42 more)
 
 ### Community 31 - "cm_extractor.js"
 Cohesion: 0.05
 Nodes (56): buildHuaweiNeNamesFromSelection(), catalogNeNameForSite(), closeScheduleModal(), createScheduledJob(), executeNokiaReimport(), fullMoByClass, fullMoByHuaweiObject, getSchedNokiaScope() (+48 more)
 
-### Community 32 - "scoring.py"
-Cohesion: 0.08
-Nodes (52): make_radio_module(), Blueprint, Shared radio-insight blueprint factory (radio_module.html + issues API)., filter_rows(), Common scoring helpers for radio insight modules., severity_rank(), summarize(), admin_required() (+44 more)
+### Community 32 - "get_current_user"
+Cohesion: 0.07
+Nodes (51): make_radio_module(), Blueprint, Shared radio-insight blueprint factory (radio_module.html + issues API)., filter_rows(), Common scoring helpers for radio insight modules., severity_rank(), stable_id(), admin_required() (+43 more)
 
 ### Community 33 - "cell_heatmap.js"
 Cohesion: 0.09
@@ -569,8 +564,8 @@ Cohesion: 0.12
 Nodes (46): addMoSelections(), bindCmWorkflow(), buildSelections(), clearMoSelection(), cmState, compareCmNes(), currentScope(), currentVendor() (+38 more)
 
 ### Community 35 - "require_permission"
-Cohesion: 0.09
-Nodes (62): current_identity(), current_user(), login_required(), portal_role(), Identity and portal access control for NexPulse. Resolves the shared…, Explicit portal assignment wins; otherwise map the central user role., require_permission(), _stored_role() (+54 more)
+Cohesion: 0.13
+Nodes (48): current_user(), require_permission(), recent(), audit_trail(), route, flash_errors(), Render a portal page with the shell context every template expects., render() (+40 more)
 
 ### Community 36 - "femto_pm.js"
 Cohesion: 0.09
@@ -580,13 +575,13 @@ Nodes (46): allCounterNamesFlat(), applyFormulaTemplate(), closeFemtoKpiModal(),
 Cohesion: 0.11
 Nodes (11): HuaweiCmClient, HuaweiCmError, Any, Exception, Run MML and return per-NE report text plus default parsed rows., Run MML against many NEs using repeated single-command calls (≤100 NEs each).…, Format one-line MML script: COMMAND:; {NE1,NE2}., Create batch task, wait, download result, parse rows. (+3 more)
 
-### Community 38 - "huawei_semantics.py"
+### Community 38 - "ValueError"
 Cohesion: 0.04
-Nodes (93): _alarm_value(), _apply_cache_payload(), discover_nes_from_alarms(), discover_u2020_inventory(), fetch_fm_alarms(), get_cached_discovery(), _index_nes(), load_discovery_from_disk() (+85 more)
+Nodes (97): _alarm_value(), _apply_cache_payload(), discover_nes_from_alarms(), discover_u2020_inventory(), fetch_fm_alarms(), get_cached_discovery(), _index_nes(), load_discovery_from_disk() (+89 more)
 
-### Community 39 - "XMLToExcelConverter"
-Cohesion: 0.09
-Nodes (19): NokiaBulkExportError, Exception, raml_xml_to_excel(), FilterConfig, _mo_class_abbreviation(), RAML ``class`` may be ``FMCS`` or ``com.nokia.asrnc:FMCS`` — return ``FMCS``., Convert Nokia XML configuration to Excel format, Set parameter filtering (+11 more)
+### Community 39 - "identity/routes.py"
+Cohesion: 0.10
+Nodes (30): Per-platform identity (users DB + login routes)., _login_rate_limit_remaining(), nexuscore_login_url(), _prune_login_attempts(), deque, Login / logout blueprint — local users DB or central PrimeNet users DB., Allow same-site relative paths or absolute URLs under known public hosts., _safe_next_url() (+22 more)
 
 ### Community 40 - "get_kpi_mapping_payload"
 Cohesion: 0.50
@@ -601,12 +596,12 @@ Cohesion: 0.11
 Nodes (47): bindEvents(), buildChart(), cellDataAttr(), cellFromRow(), chartTheme(), currentPreset(), destroyChart(), ensureKpiLoaded() (+39 more)
 
 ### Community 43 - "sync_config.py"
-Cohesion: 0.06
-Nodes (29): build_kpi_headers_map(), _cols_from_map(), Static KPI catalog by vendor/technology for the Performance UI. The catalog is…, audit(), main(), Print per-table row counts for all app SQLite databases (diagnostics)., _list_raw(), main() (+21 more)
+Cohesion: 0.07
+Nodes (24): build_kpi_headers_map(), _cols_from_map(), Static KPI catalog by vendor/technology for the Performance UI. The catalog is…, audit(), main(), Print per-table row counts for all app SQLite databases (diagnostics)., _list_raw(), main() (+16 more)
 
 ### Community 44 - "site_area.py"
 Cohesion: 0.10
-Nodes (47): area_table_slug(), base_pm_table_name(), build_cell_area_index(), build_site_area_index(), canonicalize_area(), cluster_from_site_id(), derive_area_from_cluster_map(), is_pm_partition_of() (+39 more)
+Nodes (44): area_table_slug(), base_pm_table_name(), build_cell_area_index(), build_site_area_index(), canonicalize_area(), cluster_from_site_id(), derive_area_from_cluster_map(), is_pm_partition_of() (+36 more)
 
 ### Community 45 - "test_site_layout.py"
 Cohesion: 0.05
@@ -614,23 +609,23 @@ Nodes (81): Standalone conflict map module (PCI reuse by distance + azimuth vs. 
 
 ### Community 46 - "insights.py"
 Cohesion: 0.12
-Nodes (38): store_stats(), Shared radio operations helpers for PrimeNet modules., capacity_hotspots(), change_impact(), cm_parameter_audit(), layer_coverage_gaps(), _limit(), neighbor_quality() (+30 more)
+Nodes (45): alarm_impact(), Alarm bursts vs PM collapse vs CM-active/locked state., Shared radio operations helpers for PrimeNet modules., capacity_hotspots(), change_impact(), cm_parameter_audit(), layer_coverage_gaps(), _limit() (+37 more)
 
 ### Community 47 - "nokia_load_balancing.js"
 Cohesion: 0.14
 Nodes (36): analyze(), applySectorFilter(), coverageBadge(), daysAgoIso(), escapeAttr(), escapeHtml(), formatBytes(), formatTp() (+28 more)
 
 ### Community 48 - "job.py"
-Cohesion: 0.08
-Nodes (35): Tunable constants for SON ML (offline job + inference)., torch_enabled(), Offline SON ML — feature store, scoring, Flask-safe inference., Offline SON ML build — isolated subprocess, never imported by Flask request…, heuristic_cause_probs(), Soft scores from z-features when a classifier is not trained., fit_anomaly(), _minmax_01() (+27 more)
+Cohesion: 0.10
+Nodes (28): Tunable constants for SON ML (offline job + inference)., torch_enabled(), feature_matrix(), latest_rows(), Fixed-order numeric features for sklearn (NaNs → 0)., Offline SON ML — feature store, scoring, Flask-safe inference., build_all(), build_vendor_rat() (+20 more)
 
 ### Community 49 - "nokia_mrbts_graph.js"
 Cohesion: 0.15
 Nodes (37): bindNokiaGraphControls(), graphAnimateViewTo(), graphApplyView(), graphBindStageInteractions(), graphBuildDefs(), graphBuildNode(), graphEnsureSvg(), graphEscapeHtml() (+29 more)
 
 ### Community 50 - "band_techs_for_rmod"
-Cohesion: 0.17
-Nodes (19): band_techs_for_rmod(), BandIndex, _dedupe(), load_band_index(), normalize_lte_band(), parse_cell_tokens(), Any, Map RMOD active*CellsList tokens → band labels via PrimeNet metadata. (+11 more)
+Cohesion: 0.13
+Nodes (24): band_techs_for_rmod(), BandIndex, _dedupe(), load_band_index(), normalize_lte_band(), parse_cell_tokens(), Any, Map RMOD active*CellsList tokens → band labels via PrimeNet metadata. (+16 more)
 
 ### Community 51 - "femto_pm/routes.py"
 Cohesion: 0.11
@@ -646,43 +641,43 @@ Nodes (22): allUsers, compareBtn, compareXml1Area, compareXml1Input, compareXml1
 
 ### Community 54 - "ret_management/routes.py"
 Cohesion: 0.14
-Nodes (34): huawei_configured(), build_ret_workbook(), Any, BytesIO, Excel export for RET Management table views., _safe_filename_part(), RET Management — Huawei RETSUBUNIT and Nokia RETU angle read/write., resolve_huawei_ne() (+26 more)
+Nodes (34): huawei_configured(), nokia_configured(), build_ret_workbook(), Any, BytesIO, Excel export for RET Management table views., _safe_filename_part(), RET Management — Huawei RETSUBUNIT and Nokia RETU angle read/write. (+26 more)
 
-### Community 55 - "user_profile/routes.py"
+### Community 55 - "execute_query"
 Cohesion: 0.12
-Nodes (48): _decrypt(), delete_user_vendor_credentials(), _encrypt(), ensure_user_vendor_credentials_schema(), _fernet(), list_user_vendor_credential_status(), Any, Per-user vendor CM credentials (Nokia MantaRay / Huawei U2020) for RET… (+40 more)
+Nodes (51): _decrypt(), delete_user_vendor_credentials(), _encrypt(), ensure_user_vendor_credentials_schema(), _fernet(), list_user_vendor_credential_status(), Any, Per-user vendor CM credentials (Nokia MantaRay / Huawei U2020) for RET… (+43 more)
 
-### Community 56 - "cm_extractor/config.py"
-Cohesion: 0.11
-Nodes (43): build_nokia_operations_client(), _env(), _env_bool(), _env_float(), _env_int(), nokia_bulk_export_settings(), nokia_defaults(), nokia_export_ssh_settings() (+35 more)
+### Community 56 - "nokia_parse.py"
+Cohesion: 0.15
+Nodes (31): bcf_id_from_dn(), bsc_id_from_dn(), build_sector_rows(), is_admin_active(), is_bcch_channel0_type(), _param_lookup(), parent_bts_dn(), parse_adce_record() (+23 more)
 
 ### Community 57 - "NokiaOperationsClient"
-Cohesion: 0.15
-Nodes (15): apply_mass_modifications(), _failure_detail(), _parameter_attempts(), _parameter_values_expr(), Any, Nokia CM Provision_Mass_Modification — parameter updates without SFTP file…, Apply CM parameter changes via Provision_Mass_Modification. Each update dict:…, Build parameterValuesByNames attempts (new-only first for planned CM writes). (+7 more)
+Cohesion: 0.17
+Nodes (14): apply_mass_modifications(), _failure_detail(), _parameter_attempts(), _parameter_values_expr(), Any, Nokia CM Provision_Mass_Modification — parameter updates without SFTP file…, Apply CM parameter changes via Provision_Mass_Modification. Each update dict:…, Build parameterValuesByNames attempts (new-only first for planned CM writes). (+6 more)
 
 ### Community 58 - "parameter_dictionary/routes.py"
 Cohesion: 0.12
 Nodes (29): get_nokia_mo_parameters(), lookup_parameter_row(), Return all Excel-column parameters for one MO class., ai_ask(), format_user_data(), get_current_user(), huawei_params_viewer(), huawei_toc() (+21 more)
 
-### Community 59 - "module_access_before_request"
-Cohesion: 0.05
-Nodes (55): _bust_cache(), _connect(), default_roles(), effective_roles(), _ensure_table(), get_overrides(), _now_iso(), Configurable feature access. Stores, per feature (nav href), which roles may… (+47 more)
-
-### Community 60 - "_fetch_neighbor_lines_payload"
-Cohesion: 0.12
-Nodes (27): _any_raw_neighbor_table_exists(), _cell_kpi_sql_technologies(), _ensure_neighbor_schema(), _fetch_neighbor_lines_payload(), get_neighbor_cell_summary(), _neighbor_hourly_tech_aliases(), _neighbor_raw_base_prefix_for_slug(), _neighbor_raw_table_name_for_technology() (+19 more)
-
-### Community 61 - "extraction.py"
+### Community 59 - "get_user_by_session"
 Cohesion: 0.06
-Nodes (59): huawei_defaults(), allocate_sheet_title(), merge_sheet_parts(), _mo_class_from_nokia_object(), Any, Write CM extraction results to Excel workbooks., Write NCM-format sheet: metadata row, headers, data (matches bulk RAML export)., Merge sheet parts using NCM hierarchy discovery and column ordering. (+51 more)
+Nodes (62): build_pm_client(), _env(), _env_bool(), _env_float(), _env_int(), pm_configured(), pm_defaults(), Environment-backed defaults for Huawei PM Open API. (+54 more)
 
-### Community 62 - "ValueError"
-Cohesion: 0.16
-Nodes (25): build_pm_client(), pm_configured(), Supported NE and RAT types for Huawei PM Open API (MAE 5.4)., Performance Analytics — live Huawei PM queries via MAE Open API (section 5.4)., api_config(), api_counter_catalog(), api_counter_subsets(), api_counters() (+17 more)
+### Community 60 - "excel_writer.py"
+Cohesion: 0.05
+Nodes (58): allocate_sheet_title(), managed_objects_to_sheet(), merge_sheet_parts(), _mo_class_from_nokia_object(), Any, Write CM extraction results to Excel workbooks., Write NCM-format sheet: metadata row, headers, data (matches bulk RAML export)., Convert getManagedObjects payload to NCM-layout {headers, rows,… (+50 more)
+
+### Community 61 - "cm_extractor/config.py"
+Cohesion: 0.07
+Nodes (73): build_nokia_operations_client(), _env(), _env_bool(), _env_float(), _env_int(), huawei_defaults(), nokia_bulk_export_settings(), nokia_defaults() (+65 more)
+
+### Community 62 - "HuaweiPmClient"
+Cohesion: 0.12
+Nodes (15): HuaweiPmClient, HuaweiPmError, Any, Exception, Huawei MAE / U2020 Performance Management northbound REST client. Implements…, Accept flat fields or a nested ``condition`` object., 5.4.1 — Create a performance data query task. Returns (http_status, payload).…, 5.4.2 — Fetch one page of async performance results. (+7 more)
 
 ### Community 63 - "cases/store.py"
-Cohesion: 0.15
-Nodes (34): Optimization Cases store configuration., connect(), execute(), fetchall(), fetchone(), Connection, DB connection for optimization cases (SQLite under databases/cases/)., SQLite schema for optimization cases. (+26 more)
+Cohesion: 0.14
+Nodes (36): Optimization Cases store configuration., connect(), execute(), fetchall(), fetchone(), Connection, DB connection for optimization cases (SQLite under databases/cases/)., SQLite schema for optimization cases. (+28 more)
 
 ### Community 64 - "cell_heatmap/routes.py"
 Cohesion: 0.13
@@ -690,71 +685,71 @@ Nodes (30): cell_heatmap_page(), _column_nonempty_count(), _find_populated_col()
 
 ### Community 65 - "adjacency_gis/store.py"
 Cohesion: 0.15
-Nodes (23): _decode_meta_row(), ensure_db_dir(), _ensure_vendor_columns(), get_connection(), init_schema(), list_bsc_ids(), load_edges(), load_sectors() (+15 more)
+Nodes (25): _decode_meta_row(), ensure_db_dir(), _ensure_vendor_columns(), get_build_meta(), get_connection(), init_schema(), list_bsc_ids(), load_edges() (+17 more)
 
 ### Community 66 - "huawei_load_balancing/routes.py"
-Cohesion: 0.09
-Nodes (41): Huawei load-balancing rules — CellMLB knobs on Network Balance layers., build_mml(), build_review_excel(), _cell_value(), Any, Excel + MML export for Huawei CellMLB proposals., U2020-style MML grouped by sector/layer. LocalCellId is a review placeholder., analyze_sectors() (+33 more)
-
-### Community 67 - "cursor"
 Cohesion: 0.10
-Nodes (61): Append one audit event. Pass ``conn`` to join an open transaction., record(), msisdn_national_prefix(), cursor(), Transactional helper: commits on success, rolls back on error., Campaigns — the unit of work for the marketing function. A campaign ties…, set_channels(), update_campaign() (+53 more)
+Nodes (39): build_mml(), build_review_excel(), _cell_value(), Any, Excel + MML export for Huawei CellMLB proposals., U2020-style MML grouped by sector/layer. LocalCellId is a review placeholder., analyze_sectors(), load_preview() (+31 more)
+
+### Community 67 - "ValidationError"
+Cohesion: 0.12
+Nodes (42): _validate(), _decorate(), get_offer(), list_offers(), Offer & product catalog. The catalog is the portal's anchor entity: campaigns…, update_offer(), _validate(), check_date_order() (+34 more)
 
 ### Community 68 - "watch_remote_new_files_and_pull.py"
 Cohesion: 0.09
-Nodes (43): True when row counts or max timestamp increased between snapshots., snapshot_advanced(), Subprocess helpers for pipeline pull/load scripts., Pull and load the metadata snapshot only., Load an already-staged metadata snapshot only., Pull and load one PM target, e.g. hourly/huawei/cells., Load one already-staged PM target., run_daily_pull_load() (+35 more)
+Nodes (41): Subprocess helpers for pipeline pull/load scripts., Pull and load the metadata snapshot only., Load an already-staged metadata snapshot only., Pull and load one PM target, e.g. hourly/huawei/cells., Load one already-staged PM target., run_daily_pull_load(), run_hourly_pull_load(), run_metadata_load_only() (+33 more)
 
 ### Community 69 - "nokia_excel_reimport.py"
 Cohesion: 0.16
-Nodes (23): _cell_text(), compare_nokia_workbooks(), create_preview(), execute_preview(), _header_row_and_hierarchy(), _is_readonly_column(), load_preview(), parse_nokia_workbook() (+15 more)
+Nodes (24): _cell_text(), compare_nokia_workbooks(), create_preview(), execute_preview(), _header_row_and_hierarchy(), _is_readonly_column(), load_preview(), parse_nokia_workbook() (+16 more)
 
 ### Community 70 - "connect"
 Cohesion: 0.11
 Nodes (46): get_family_rules(), normalize_agg_rule(), Per-counter / per-family aggregation rules for PM Plus. Resolution order: 1.…, Effective time aggregation rule for a counter., Map Nokia catalog text → SUM|AVG|MAX|MIN (NONE→SUM; unknown→SUM)., resolve_time_agg(), set_counter_override(), upsert_family_rule() (+38 more)
 
-### Community 71 - "license_client.py"
-Cohesion: 0.17
-Nodes (28): activation_status(), _data_root(), get_instance_id(), _http_json(), is_activated(), is_configured(), license_server_url(), LicenseServiceError (+20 more)
-
-### Community 72 - "performance/routes.py"
+### Community 71 - "adapt_sqlite_app_sql"
 Cohesion: 0.06
-Nodes (58): Quote a SQL text literal (single-quoted, escaped)., sqlite_text_lit(), _build_pm_union(), _build_pm_union_minimal(), _cached_pm_cell_names_for_vendor_technology(), _db_mtime_token(), _drop_duplicate_kpis(), format_user() (+50 more)
+Nodes (18): adapt_sqlite_app_sql(), _insert_column_names(), qmark_to_percent(), Translate SQLite-shaped SQL to PostgreSQL. Used by every Postgres domain (app,…, Rewrite SQLite DDL/DML so Postgres accepts it., Replace ``?`` placeholders with ``%s``, ignoring quoted strings., Return Postgres SQL for a SQLite PRAGMA, or None if *sql* is not a PRAGMA., rewrite_insert_or() (+10 more)
 
-### Community 73 - "Connection"
-Cohesion: 0.10
-Nodes (33): _axis_column_sample_score(), _build_pm_table_column_layout(), _has_groups_schema(), _kpi_columns_for_sqlite_table(), _looks_like_merged_netact_header(), _nonnull_columns_via_aggregate(), _nonnull_columns_via_sample(), _norm_col_name() (+25 more)
+### Community 72 - "parse_gtrx_bcch_row"
+Cohesion: 0.18
+Nodes (28): _column_map(), is_main_bcch_trx(), is_trx_active(), join_trx_with_gcell(), _norm_col(), parse_g2gncell_row(), parse_gcell_row(), parse_gtrx_bcch_row() (+20 more)
+
+### Community 73 - "module_access.py"
+Cohesion: 0.13
+Nodes (27): allowed_hrefs_for_role(), default_visibility_for(), _default_visibility_map(), enforce_module_access(), feature_for_path(), href_allowed_for_role(), _link_visible(), navigation_sections_for_role() (+19 more)
 
 ### Community 74 - "ret_management.js"
 Cohesion: 0.12
 Nodes (51): applyAzimuthOffset(), applyLocalPendingUpdates(), applyLocalRowUpdate(), cellDisplayValue(), committedTiltRaw(), compareValues(), computeSectors(), displayColumns() (+43 more)
 
-### Community 75 - "get_cell_trend_by_name"
-Cohesion: 0.13
-Nodes (29): _apply_time_frame_rows(), _date_range_from_request(), _filter_trend_rows_by_range(), get_cell_trend(), get_cell_trend_by_name(), get_time_frame_config(), _hours_from_request(), _log_trend_time_parse_sample() (+21 more)
+### Community 75 - "performance/routes.py"
+Cohesion: 0.04
+Nodes (133): heavy_query_required(), Flask route decorator: acquire a heavy-query slot or return HTTP 503., apply_pm_read_pragmas(), Tune SQLite for large PM reads. No-op on Postgres., F, _apply_time_frame_rows(), _build_site_area_index(), _cached_pm_cell_names_for_vendor_technology() (+125 more)
 
 ### Community 76 - "fault_management/routes.py"
-Cohesion: 0.08
-Nodes (51): nokia_fm_configured(), nokia_fm_missing_settings(), build_ssl_context(), format_connection_error(), _get_session(), Any, BaseException, Shared HTTP helpers for CM Open API clients. (+43 more)
+Cohesion: 0.06
+Nodes (60): nokia_fm_configured(), nokia_fm_missing_settings(), build_ssl_context(), format_connection_error(), _get_session(), Any, BaseException, Shared HTTP helpers for CM Open API clients. (+52 more)
 
 ### Community 77 - "parse_pm_datetime"
-Cohesion: 0.11
-Nodes (31): canonicalize_pm_timestamp(), derive_pm_report_columns(), format_pm_report_date(), format_pm_report_time(), format_pm_timestamp(), parse_pm_datetime(), datetime, Canonical PM timestamp parsing for Nokia and Huawei exports. One wall-clock… (+23 more)
+Cohesion: 0.15
+Nodes (24): canonicalize_pm_timestamp(), derive_pm_report_columns(), format_pm_report_date(), format_pm_report_time(), format_pm_timestamp(), parse_pm_datetime(), datetime, Canonical PM timestamp parsing for Nokia and Huawei exports. One wall-clock… (+16 more)
 
 ### Community 78 - "cm_parameter_audit.js"
 Cohesion: 0.13
 Nodes (34): applyDeepLink(), commitTypedParam(), compareValues(), escapeHtml(), exportReport(), filteredSortedRows(), loadAreas(), loadGoldenRules() (+26 more)
 
-### Community 79 - "runtime.py"
-Cohesion: 0.03
-Nodes (70): _insert_return_id(), adapt_sqlite_app_sql(), _insert_column_names(), qmark_to_percent(), Translate SQLite-shaped SQL to PostgreSQL. Used by every Postgres domain (app,…, Rewrite SQLite DDL/DML so Postgres accepts it., Replace ``?`` placeholders with ``%s``, ignoring quoted strings., Return Postgres SQL for a SQLite PRAGMA, or None if *sql* is not a PRAGMA. (+62 more)
+### Community 79 - "query.py"
+Cohesion: 0.12
+Nodes (16): completeness(), eval_formula(), formula_tokens(), KPI formula validation and evaluation for PM Plus., Evaluate a KPI formula against a counter_id → value map. /0 → None., Evaluate arithmetic AST with a name → float map., _SafeEval, validate_formula() (+8 more)
 
 ### Community 80 - "_currentDataScope"
 Cohesion: 0.15
 Nodes (31): addChartsFromLastQuery(), _addChartTabsFromPmTable(), _appendTimeFrameParams(), _buildCellTrendParamsFromKey(), _captureCurrentReportConfig(), _cellMetaFromQueryKey(), _cellNameFromQueryKey(), _currentDataScope() (+23 more)
 
-### Community 81 - "pm_health.py"
-Cohesion: 0.18
-Nodes (22): audit_db(), _column_names(), _detect_cell_col(), _detect_ts_col(), _file_health(), metadata_distinct_cells(), _optional_empty_tables(), _parse_pm_timestamp() (+14 more)
+### Community 81 - "store_available"
+Cohesion: 0.11
+Nodes (33): get_network_activity(), Connection, Cheap network-activity level from hourly PM traffic (dashboard visuals).…, Return (timestamp_col, traffic_col) or None., Per-vendor level: latest-hour traffic sum vs peak hour in the scan window., _resolve_columns(), _vendor_activity(), audit_db() (+25 more)
 
 ### Community 82 - "network.py"
 Cohesion: 0.16
@@ -769,8 +764,8 @@ Cohesion: 0.16
 Nodes (26): allSites, describeRfOverlay(), escapeHtml(), fmtBytes(), focusSite(), gpxPoints, handleUpload(), loadSites() (+18 more)
 
 ### Community 85 - "refreshNeighborOverlay"
-Cohesion: 0.16
-Nodes (26): buildTechButtons(), clearNeighborOverlay(), drawNeighborRelations(), exportNeighborRelationsExcel(), filterByVendor(), loadNetworkStats(), mapChipTechnologyForKpi(), _neighborDirection() (+18 more)
+Cohesion: 0.13
+Nodes (30): _azBucket(), buildTechButtons(), clearNeighborOverlay(), drawNeighborRelations(), exportNeighborRelationsExcel(), filterByVendor(), _groupCellsIntoWedges(), _hasActiveFilters() (+22 more)
 
 ### Community 86 - "updateActionState"
 Cohesion: 0.16
@@ -784,33 +779,33 @@ Nodes (26): buildTechButtons(), clearNeighborOverlay(), drawNeighborRelations(),
 Cohesion: 0.15
 Nodes (24): _cell_a1_normalized(), _header_row_index_date_in_col_a(), _make_unique_original_headers(), DataFrame, Huawei PRS CSV/XLSX exports often include preamble rows; the real table starts…, Drop preamble rows until the row whose column A is ``Date``; that row becomes…, Build a ragged matrix (padded) — pandas rejects preamble + grid row width…, PRS preamble lines are often single-field while the grid is ``;`` or tab or… (+16 more)
 
-### Community 89 - "balance_data.py"
-Cohesion: 0.14
-Nodes (30): _as_date(), _file_path(), list_nok_sectors(), load_balance_df(), _load_csv(), _normalize_sector(), Any, DataFrame (+22 more)
+### Community 89 - "sectors_from_balance"
+Cohesion: 0.22
+Nodes (19): _as_date(), balance_root(), _file_path(), list_nok_sectors(), load_balance_df(), _load_csv(), _normalize_sector(), Any (+11 more)
 
 ### Community 90 - "performance_dictionary.js"
 Cohesion: 0.16
 Nodes (31): applyPerfDeepLink(), clearMainPanel(), detailTitle(), escapeHtml(), fetchAndRenderTable(), fetchHuaweiTable(), getSidebarItems(), hwRows (+23 more)
 
 ### Community 91 - "applyFilters"
-Cohesion: 0.19
-Nodes (25): applyFilters(), _applyGeoFilters(), _applyReportConfig(), _currentSelectionType(), _isPerfTreeLoadCurrent(), loadCellGroups(), maybeAutoReloadCells(), _nextPerfTreeLoadToken() (+17 more)
+Cohesion: 0.24
+Nodes (21): applyFilters(), _applyGeoFilters(), _applyReportConfig(), _currentSelectionType(), _isPerfTreeLoadCurrent(), loadCellGroups(), maybeAutoReloadCells(), _nextPerfTreeLoadToken() (+13 more)
 
 ### Community 92 - "load_raw_csv_to_databases.py"
 Cohesion: 0.06
-Nodes (73): _append_dataframe_to_table(), _apply_daily_retention_to_db(), _canonical_table_for_label(), _cleanup_legacy_metadata_tables(), _csv_chunk_iter(), _dedupe_table_on_cell_time(), _detect_huawei_header_row(), _drop_non_canonical_tables() (+65 more)
+Nodes (78): _cell_col_disambiguation_score(), _detect_cell_identifier_column(), Higher = better candidate for the human / inventory cell label., Like ``_detect_col`` but, for each keyword, chooses the best-scoring column…, _append_dataframe_to_table(), _apply_daily_retention_to_db(), _canonical_table_for_label(), _cleanup_legacy_metadata_tables() (+70 more)
 
-### Community 93 - "get_current_user"
-Cohesion: 0.11
-Nodes (40): _build_site_area_index(), _cell_cache_get(), _cell_cache_key(), _cell_cache_set(), _cells_filter_where(), _cells_matching_site_ids(), delete_performance_report(), _derive_cluster_area() (+32 more)
+### Community 93 - "adjacency_gis/routes.py"
+Cohesion: 0.18
+Nodes (20): Adjacency GIS — 2G Network Map fork (metadata.db) + CM NCL ingest scaffolding., list_bcch_options(), Distinct integer BCCH (ARFCN) values from metadata.db cells_2g with coordinates., adjacency_gis_bcch_map(), adjacency_gis_bcch_options(), adjacency_gis_data(), adjacency_gis_page(), adjacency_gis_refresh() (+12 more)
 
 ### Community 94 - "parameter_dictionary.js"
 Cohesion: 0.17
 Nodes (22): applyParameterDictionaryDeepLink(), escapeHtml(), fetchAndRenderNokiaParamTable(), hideAllVendorSections(), highlightMatch(), hwToc, loadHuaweiToc(), loadNetworkValues() (+14 more)
 
 ### Community 95 - "metadata_processor.py"
-Cohesion: 0.12
-Nodes (24): legacy_cells_activity_case_sql(), SQL CASE expression → 'Active' | 'Inactive' for INSERT into legacy cells.status., _extract_site_id(), _find_col(), _identify_tech(), import_csv_to_cells(), _load_file(), _lte_duplex() (+16 more)
+Cohesion: 0.07
+Nodes (43): legacy_cells_activity_case_sql(), SQL CASE expression → 'Active' | 'Inactive' for INSERT into legacy cells.status., _extract_site_id(), _find_col(), _identify_tech(), import_csv_to_cells(), _load_file(), _lte_duplex() (+35 more)
 
 ### Community 96 - "task_scheduler.js"
 Cohesion: 0.14
@@ -825,20 +820,20 @@ Cohesion: 0.16
 Nodes (21): extract_title(), _inline(), _is_table_sep(), Minimal, dependency-free Markdown -> HTML renderer. Scoped to the constructs…, First H1 in the document, or empty string., Render inline spans. Code spans are protected from further formatting., Convert a Markdown string to an HTML fragment., render_markdown() (+13 more)
 
 ### Community 99 - "cross_reference_metadata_pm_cell_names.py"
-Cohesion: 0.09
-Nodes (30): _activity_case_2g(), _activity_case_4g_fdd(), _activity_case_4g_tdd(), _activity_case_active_state_huawei_activated_nokia_unlocked(), perf_per_tech_union_sql(), Vendor-specific cell operational state (on-air vs offline). Rules ----- * 2G:…, Performance metadata union: all cell rows (same scope as network map data)., Huawei: active_state activated. Nokia: admin_state unlocked. (+22 more)
+Cohesion: 0.07
+Nodes (47): _axis_column_sample_score(), _build_pm_table_column_layout(), _kpi_columns_for_sqlite_table(), _looks_like_merged_netact_header(), _nonnull_columns_via_aggregate(), _nonnull_columns_via_sample(), _pick_axis_column_from_aliases(), _pick_time_column_from_aliases() (+39 more)
 
 ### Community 100 - "performance_analytics.js"
 Cohesion: 0.20
 Nodes (22): escHtml(), paCellsFromKeys(), paCollectCellKeys(), paConfigured(), paCounterLabel(), paFilterTableRows(), paLoadCounters(), paLoadDefaultCounters() (+14 more)
 
-### Community 101 - "repositories/segments.py"
-Cohesion: 0.09
-Nodes (31): Portal audit trail. Every state change and every consent/suppression write…, Convenience wrapper that stamps the acting portal user., record_for(), rows_to_dicts(), calendar_entries(), counts_by_state(), _decorate(), list_campaigns() (+23 more)
+### Community 101 - "cursor"
+Cohesion: 0.10
+Nodes (53): Portal audit trail. Every state change and every consent/suppression write…, Append one audit event. Pass ``conn`` to join an open transaction., Convenience wrapper that stamps the acting portal user., record(), record_for(), cursor(), Transactional helper: commits on success, rolls back on error., rows_to_dicts() (+45 more)
 
-### Community 102 - "get_session_token"
-Cohesion: 0.06
-Nodes (85): get_session_token(), Read the shared session cookie, with legacy per-portal name fallback., add_task_comment(), assign_task(), authenticate_user(), check_task_permission(), create_admin_user(), create_task() (+77 more)
+### Community 102 - "database_enhanced.py"
+Cohesion: 0.05
+Nodes (80): default_portals_for_role(), serialize_allowed_portals(), add_task_comment(), assign_task(), authenticate_user(), check_task_permission(), create_admin_user(), create_task() (+72 more)
 
 ### Community 103 - "pm_indexes.py"
 Cohesion: 0.20
@@ -861,8 +856,8 @@ Cohesion: 0.15
 Nodes (23): addHuaweiAreaSites(), addHuaweiMoSelections(), applyPastedHuaweiNeIds(), clearHuaweiMoSelection(), clearHuaweiNeSelection(), ensureHuaweiParametersLoaded(), fetchHuaweiParametersBatch(), filteredHuaweiMoObjects() (+15 more)
 
 ### Community 108 - "test_marketing.py"
-Cohesion: 0.09
-Nodes (43): permissions_for_role(), available_transitions(), create_campaign(), get_campaign(), Pre-flight checklist. ``blocking`` items stop a campaign being approved., readiness(), set_offers(), transition_campaign() (+35 more)
+Cohesion: 0.11
+Nodes (23): available_transitions(), create_offer(), transition_offer(), isolated_db(), _live_offer(), fixture, Domain rules for the NexPulse Marketing Portal. Run: python -m pytest…, Each test gets its own portal database. (+15 more)
 
 ### Community 109 - "Nokia CM Open API — RNC / BSC extraction reference"
 Cohesion: 0.07
@@ -874,15 +869,15 @@ Nodes (27): aggregateClient(), applyAreaFilterChange(), areaKey(), bindFilters()
 
 ### Community 111 - "features/README.md"
 Cohesion: 0.11
-Nodes (17): Approach, Elevation, Progress, Plans, Elevation — progress, From brief History (migrated 2026-09-17), Purpose, Adding a feature (+9 more)
+Nodes (17): Approach, Config History, Progress, Plans, Config History — progress, From brief History (migrated 2026-09-17), Purpose, Adding a feature (+9 more)
 
-### Community 112 - "get_user_by_session"
+### Community 112 - "showCellPicker"
+Cohesion: 0.11
+Nodes (23): _buildAreaChildrenHtml(), _buildCellListParams(), cellMetadataStatusTitle(), cellPmOnAir(), _expandPerfTreeAncestors(), _fetchCellsForArea(), filterCellChips(), _filterCellChipsDebounced() (+15 more)
+
+### Community 113 - "require_activation"
 Cohesion: 0.14
-Nodes (28): get_user_by_session(), Get user data by session token, login_required(), Decorator to require login, login_required(), Decorator to require login, _area(), format_user() (+20 more)
-
-### Community 113 - "adjacency_gis/logic.py"
-Cohesion: 0.13
-Nodes (28): build_map_payload(), destination_point(), fetch_nokia_adjacency_snapshot(), haversine_km(), _list_huawei_bsc_ne_names(), _list_mo_ids(), load_cells_2g_index(), _mml_ne_name() (+20 more)
+Nodes (20): install_sqlite_gate(), is_activated(), require_activation(), activation_unlock_url(), _env_true(), install_shared_activation(), Flask, Shared operator activation for local multi-platform testing. Today every… (+12 more)
 
 ### Community 114 - "loadNetworkSites"
 Cohesion: 0.20
@@ -894,11 +889,11 @@ Nodes (14): authenticate(), _connect(), create_session(), create_user(), delete_
 
 ### Community 116 - "nokia_semantics.py"
 Cohesion: 0.04
-Nodes (95): managed_objects_to_sheet(), query_rows_to_ncm_sheet(), Convert getManagedObjects payload to NCM-layout {headers, rows,…, Convert CM query rows to NCM-layout sheet data., NokiaCmClient, Any, adaptation_supports_path_scope(), _allowed_adaptations_for_scope() (+87 more)
+Nodes (76): query_rows_to_ncm_sheet(), Convert CM query rows to NCM-layout sheet data., NokiaCmClient, Any, adaptation_supports_path_scope(), _allowed_adaptations_for_scope(), build_query_expressions(), build_query_variables() (+68 more)
 
 ### Community 117 - "load_monitor.py"
 Cohesion: 0.09
-Nodes (29): available_memory_mb(), effective_query_concurrency(), effective_sqlite_cache_kb(), effective_sqlite_mmap_mb(), effective_worker_count(), memory_pressure(), pipeline_start_allowed(), process_rss_mb() (+21 more)
+Nodes (31): available_memory_mb(), effective_query_concurrency(), effective_sqlite_cache_kb(), effective_sqlite_mmap_mb(), effective_worker_count(), memory_pressure(), pipeline_start_allowed(), process_rss_mb() (+23 more)
 
 ### Community 118 - "admin-panel.md"
 Cohesion: 0.09
@@ -909,40 +904,40 @@ Cohesion: 0.22
 Nodes (17): alarmExtraFields(), alarmSearchText(), alarmSortValue(), closeAlarmInfoModal(), escapeAttr(), escapeHtml(), filteredSortedFaultRows(), FM_TABLE_COLUMNS (+9 more)
 
 ### Community 120 - "session.py"
-Cohesion: 0.07
-Nodes (50): create_base_app(), env_true(), Flask, Minimal Flask factory shared by NexusCore, PrimeNet, and NexPulse., Create a Flask app with shared security headers, health, and sanitizers., run_dev_server(), Per-platform identity (users DB + login routes)., create_identity_blueprint() (+42 more)
+Cohesion: 0.10
+Nodes (38): create_base_app(), env_true(), Flask, Minimal Flask factory shared by NexusCore, PrimeNet, and NexPulse., Create a Flask app with shared security headers, health, and sanitizers., run_dev_server(), create_identity_blueprint(), Blueprint (+30 more)
 
 ### Community 121 - "nokia_load_balancing/routes.py"
 Cohesion: 0.14
-Nodes (34): _upload_to_omc(), load_preview(), preview_backup_xml(), _preview_root(), preview_xml(), Path, save_preview(), write_preview_xml() (+26 more)
+Nodes (33): load_preview(), preview_backup_xml(), _preview_root(), preview_xml(), Path, save_preview(), write_preview_xml(), apply_preview_to_oss() (+25 more)
 
 ### Community 122 - "constellation.js"
 Cohesion: 0.21
 Nodes (16): clientToSceneXY(), drawRadarGrid(), drawSweep(), hexToRgb(), initAmbientBackground(), initJordanMap(), initLoginScene(), initPageBackground() (+8 more)
 
-### Community 123 - "HuaweiPmClient"
-Cohesion: 0.12
-Nodes (15): HuaweiPmClient, HuaweiPmError, Any, Exception, Huawei MAE / U2020 Performance Management northbound REST client. Implements…, Accept flat fields or a nested ``condition`` object., 5.4.1 — Create a performance data query task. Returns (http_status, payload).…, 5.4.2 — Fetch one page of async performance results. (+7 more)
+### Community 123 - "_renderOneKpiChartWithOptions"
+Cohesion: 0.15
+Nodes (22): _buildDodDatasetsForKpi(), _buildMomDatasetsForKpi(), _dateKeyLocal(), _dodHourCategoryLabels(), formatTrendXLabel(), formatTrendXLabelHierarchy(), kpiClass(), _momDayCategoryLabels() (+14 more)
 
 ### Community 124 - "network_map/routes.py"
-Cohesion: 0.09
-Nodes (55): connect_metadata(), _assign_area_from_nearest_known(), cells_wedge_data(), _collect_within_polygon(), _derive_cluster_area(), export_cell_code(), export_polygon_excel(), export_sites_excel() (+47 more)
+Cohesion: 0.04
+Nodes (113): _load_vendor_lines(), connect_metadata(), Lightweight rows for map pins (keeps API responses small)., repeaters_for_map(), _any_raw_neighbor_table_exists(), _assign_area_from_nearest_known(), _cell_kpi_sql_technologies(), cells_wedge_data() (+105 more)
 
 ### Community 125 - "rru_inventory/store.py"
-Cohesion: 0.17
-Nodes (21): _area_key(), list_areas(), Areas present in the local RMOD snapshot (never touches NetAct)., ensure_db_dir(), get_build_meta(), get_connection(), has_snapshot(), init_schema() (+13 more)
+Cohesion: 0.16
+Nodes (22): _area_key(), Build Sankey payload from the persisted network-wide snapshot (DB only)., snapshot_sankey_payload(), ensure_db_dir(), get_build_meta(), get_connection(), has_snapshot(), init_schema() (+14 more)
 
-### Community 126 - "query.py"
-Cohesion: 0.12
-Nodes (16): completeness(), eval_formula(), formula_tokens(), KPI formula validation and evaluation for PM Plus., Evaluate a KPI formula against a counter_id → value map. /0 → None., Evaluate arithmetic AST with a name → float map., _SafeEval, validate_formula() (+8 more)
+### Community 126 - "knowledge.py"
+Cohesion: 0.15
+Nodes (26): answer_question(), _format_retrieval_answer(), _llm_answer(), _public_sources(), Any, AI assistant for parameter dictionary Q&A., Format a readable answer directly from retrieved sources (no LLM)., Answer a parameter dictionary question using retrieval + optional LLM. (+18 more)
 
 ### Community 127 - "neighbor_health.py"
 Cohesion: 0.22
 Nodes (15): audit_neighbor_db(), _column_names(), _detect_ts_col(), _file_health(), get_neighbor_health_cached(), _latest_timestamp(), _parse_timestamp(), Any (+7 more)
 
-### Community 128 - "parse_gtrx_bcch_row"
-Cohesion: 0.18
-Nodes (28): _column_map(), is_main_bcch_trx(), is_trx_active(), join_trx_with_gcell(), _norm_col(), parse_g2gncell_row(), parse_gcell_row(), parse_gtrx_bcch_row() (+20 more)
+### Community 128 - "elevation/routes.py"
+Cohesion: 0.25
+Nodes (18): _connect(), coord_key(), elevation_for_point(), elevation_for_points(), _fetch_open_meteo(), is_in_jordan(), normalize_coord(), Connection (+10 more)
 
 ### Community 129 - "performance_explorer_plus/routes.py"
 Cohesion: 0.21
@@ -965,8 +960,8 @@ Cohesion: 0.34
 Nodes (15): _applyUrlViewIfPresent(), attachSavedViews(), _buildShareLink(), _copyText(), _deleteSelected(), _esc(), _openSelected(), _populateSelect() (+7 more)
 
 ### Community 134 - "network_health/routes.py"
-Cohesion: 0.14
-Nodes (40): pm_technology(), match_category(), metadata_technology_for_rat(), _norm_kpi(), pm_technology_for_rat(), public_category_presets(), rat_config(), KPI presets for Network Health Scorecard — operator category targets. (+32 more)
+Cohesion: 0.16
+Nodes (35): match_category(), metadata_technology_for_rat(), _norm_kpi(), public_category_presets(), rat_config(), KPI presets for Network Health Scorecard — operator category targets., Map a PM column name onto a scorecard category, or None., JSON-safe category targets for the UI and radio detectors. (+27 more)
 
 ### Community 135 - "showSiteDetails"
 Cohesion: 0.16
@@ -974,7 +969,7 @@ Nodes (19): _azBucket(), cellOperational(), _codeLabel(), displaySiteInfo(), dis
 
 ### Community 136 - "primenet_app.py"
 Cohesion: 0.08
-Nodes (34): after_request, context_processor, errorhandler, ConciseRequestHandler, enforce_csrf_origin_for_cookie_auth(), enforce_monthly_operator_activation(), _ensure_post_activation_bootstrap(), _env_true() (+26 more)
+Nodes (32): after_request, context_processor, errorhandler, ConciseRequestHandler, enforce_csrf_origin_for_cookie_auth(), _env_true(), health_check(), health_live() (+24 more)
 
 ### Community 137 - "PrimeNet frontend theme guide"
 Cohesion: 0.08
@@ -985,44 +980,44 @@ Cohesion: 0.28
 Nodes (14): _ensure_legacy_neighbor_hourly_schema(), _iter_input_files(), load_reports(), main(), _neighbor_db_uses_slim_2g_export(), _norm(), _norm_cell(), _parse_period() (+6 more)
 
 ### Community 139 - "cm_store.py"
-Cohesion: 0.13
-Nodes (26): build_narrative(), _collect_alarm_facts(), _collect_cm_facts(), _collect_neighbor_facts(), _collect_overshoot_facts(), _collect_pm_facts(), correlate_evidence(), _norm_cells() (+18 more)
+Cohesion: 0.23
+Nodes (16): approve_rule(), detect_changes(), _ensure_rule_columns(), get_connection(), infer_band(), init_schema(), latest_snapshot_rows(), list_rules() (+8 more)
 
-### Community 140 - "groups.py"
-Cohesion: 0.27
-Nodes (10): _connect(), group_db_inventory(), group_health(), _pick_col(), Any, Connection, Group / controller PM scans for Network Health and Group Health., _scan_table() (+2 more)
+### Community 140 - "repositories/segments.py"
+Cohesion: 0.16
+Nodes (19): _decorate(), describe(), describe_rule(), estimate_size(), get_segment(), list_segments(), Audience segments — rule definitions and size estimation. A segment is a…, Normalise a submitted rule expression, or raise ValidationError. (+11 more)
 
 ### Community 141 - "buildChartsForStyle"
-Cohesion: 0.18
-Nodes (17): addCompareTabFromLastQuery(), applyChartConfigModal(), buildChartsForStyle(), closeChartConfigModal(), closePerfChartTab(), onKpiSelectAllToggle(), onKpiSelectionChange(), _perfQueryUserMessage() (+9 more)
+Cohesion: 0.15
+Nodes (21): addCompareTabFromLastQuery(), applyChartConfigModal(), applyCustomTimeFrame(), buildChartsForStyle(), closeChartConfigModal(), closeTimeFrameModal(), _esc(), loadPmTable() (+13 more)
 
 ### Community 142 - "PrimeNet — Architecture & Onboarding Guide"
 Cohesion: 0.11
 Nodes (18): 10. Frontend / UI shell, 11. Running it, 12. Conventions (from `AGENTS.md`), 13. Request lifecycle, end to end, 14. Where to look first, by task, 15. Deploy, Docker, Network Balance, 16. Code map (graphify), 1. What PrimeNet is (+10 more)
 
 ### Community 143 - "nokia_bulk_export.py"
-Cohesion: 0.16
-Nodes (23): build_param_filter_from_selections(), _collect_export_errors(), export_controller_selection_to_excel(), _export_remote_dirs(), mo_class_id_to_class_filter_include(), normalize_class_filter_include(), _operation_output_file(), _operation_output_paths() (+15 more)
+Cohesion: 0.07
+Nodes (46): build_param_filter_from_selections(), _close_sftp_session(), _collect_export_errors(), _download_sftp_file_resumable(), export_controller_selection_to_excel(), _export_remote_dirs(), fetch_export_file_via_sftp(), _find_remote_export_file() (+38 more)
 
-### Community 144 - "elevation/routes.py"
-Cohesion: 0.25
-Nodes (18): _connect(), coord_key(), elevation_for_point(), elevation_for_points(), _fetch_open_meteo(), is_in_jordan(), normalize_coord(), Connection (+10 more)
+### Community 144 - "applyPerfDeepLinkChart"
+Cohesion: 0.14
+Nodes (18): _activatePerfTreeCellKey(), applyPerfDeepLinkAfterFilters(), applyPerfDeepLinkChart(), bootstrapPerformanceDeepLink(), deleteSelectedReport(), loadFilterCatalog(), loadFilters(), loadFiltersSidebarExtras() (+10 more)
 
 ### Community 145 - "rru_inventory/logic.py"
-Cohesion: 0.09
-Nodes (46): apply_band_techs(), build_sankey_payload(), _build_site_lookup(), enrich_rmod_row(), fetch_nokia_rmod_inventory(), filter_rows_by_area(), is_cells_list_empty(), list_rmod_mo_ids() (+38 more)
+Cohesion: 0.11
+Nodes (41): apply_band_techs(), _build_site_lookup(), enrich_rmod_row(), fetch_nokia_rmod_inventory(), filter_rows_by_area(), is_cells_list_empty(), list_rmod_mo_ids(), managed_list_to_cells_value() (+33 more)
 
-### Community 146 - "service.py"
-Cohesion: 0.15
-Nodes (19): expand_cell_list(), Deduplicate cells preserving order, keeping display form., compute_impact_score(), Any, PM-derived Impact Score for case triage (not subscriber CEM)., impact ≈ severity_weight * score_norm * cell_factor * traffic_factor *…, Optimization Cases — detect → correlate → case → propose → scorecard., open_case_from_issue() (+11 more)
+### Community 146 - "correlator.py"
+Cohesion: 0.16
+Nodes (20): build_narrative(), _collect_alarm_facts(), _collect_cm_facts(), _collect_neighbor_facts(), _collect_overshoot_facts(), _collect_pm_facts(), correlate_evidence(), _norm_cells() (+12 more)
 
 ### Community 147 - "pipeline_ingest_verify.py"
-Cohesion: 0.18
-Nodes (16): capture_ingest_snapshot(), count_raw_tabular_files(), _db_fingerprint(), _is_tabular(), _max_timestamp_in_table(), _parse_db_timestamp(), Any, Connection (+8 more)
+Cohesion: 0.15
+Nodes (20): capture_ingest_snapshot(), count_raw_tabular_files(), _db_fingerprint(), _is_tabular(), _max_timestamp_in_table(), _parse_db_timestamp(), Any, Connection (+12 more)
 
-### Community 148 - "parse_mml_report"
-Cohesion: 0.13
-Nodes (24): classify_mml_probe(), discover_commands_by_product(), discover_commands_for_ne(), probe_mml_command(), Any, Probe U2020 MML commands per NE product type. Huawei wireless Open API has no…, Probe all candidate LST objects against one NE., Pick one sample NE per product_name and probe candidate LST commands. Returns… (+16 more)
+### Community 148 - "task_scheduler/routes.py"
+Cohesion: 0.26
+Nodes (25): adapt_placeholders(), Legacy helper. Postgres conversion happens inside ``PgConn.execute``., _allowed_result_file(), _can_delete_tasks(), complete_task(), create_task(), _current_user(), _default_task_name() (+17 more)
 
 ### Community 149 - "rollup.py"
 Cohesion: 0.14
@@ -1036,29 +1031,29 @@ Nodes (11): availableParameters, deselectAllParams(), escapeXml(), generateExcel
 Cohesion: 0.11
 Nodes (18): 1. Which API stack?, 2. Interconnection (both stacks), 3.1 Login, 3.2 Single MML command, 3.3 MML batch script (multipart upload), 3.4 Topology cells, 3.5 Bulk CM (not in wireless guide body), 3. Wireless / RAN API (`wireless`) (+10 more)
 
-### Community 152 - "son_analytics/routes.py"
-Cohesion: 0.28
-Nodes (18): list_areas(), filter_recommendations(), filtered_summary(), get_recommendation_by_id(), save_feedback(), format_user(), get_current_user(), login_required() (+10 more)
+### Community 152 - "huawei_param_dict.py"
+Cohesion: 0.19
+Nodes (20): build_catalog(), _clean_text(), get_catalog_list(), get_mo_entry(), load_catalog(), _merge_entries(), _mode_to_tech(), _parameters() (+12 more)
 
 ### Community 153 - "_stopPolygonDrawMode"
 Cohesion: 0.26
 Nodes (12): clearMeasure(), _clearPolygonDrawPreview(), clearSelectionPolygon(), finishPolygonDraw(), onMeasureClick(), onPolygonDrawClick(), onPolygonDrawDblClick(), _showPolygonReadyPanel() (+4 more)
 
 ### Community 154 - "loadNetworkSites"
-Cohesion: 0.18
-Nodes (20): applyClientFilters(), applyNetworkMapState(), buildAreaFilter(), buildClusterFilter(), displayRepeaters(), enrichSites(), filterByArea(), filterByCluster() (+12 more)
+Cohesion: 0.24
+Nodes (16): applyClientFilters(), applyNetworkMapState(), buildAreaFilter(), buildClusterFilter(), displayRepeaters(), enrichSites(), filterByArea(), filterByCluster() (+8 more)
 
 ### Community 155 - "balance_store.py"
 Cohesion: 0.13
-Nodes (45): connect_network_balance(), balance_root(), daily_status_summary(), db_has_data(), find_snapshot(), get_sectors_from_db(), ingest_csv_file(), init_schema() (+37 more)
+Nodes (44): connect_network_balance(), daily_status_summary(), db_has_data(), find_snapshot(), get_sectors_from_db(), ingest_csv_file(), init_schema(), _json_safe() (+36 more)
 
-### Community 156 - "etl_enabled"
-Cohesion: 0.12
-Nodes (26): _ensure_dotenv(), _env_flag(), etl_disabled_reason(), etl_enabled(), _falsy(), Master kill switch for ETL / sync / PM-Plus ingest pipelines. Local laptop…, Load project ``.env`` once so CLI scripts see NCM_ENABLE_ETL without a shell…, Return True only when ETL/sync pipelines are allowed to run. (+18 more)
+### Community 156 - "metadata_active_sql.py"
+Cohesion: 0.14
+Nodes (11): _activity_case_2g(), _activity_case_4g_fdd(), _activity_case_4g_tdd(), _activity_case_active_state_huawei_activated_nokia_unlocked(), Vendor-specific cell operational state (on-air vs offline). Rules ----- * 2G:…, Huawei: active_state activated. Nokia: admin_state unlocked., One column active_state: Huawei activated; Nokia unlocked., LTE FDD: Huawei activated or cell_active; Nokia unlocked or cell_active (same… (+3 more)
 
-### Community 157 - "escapeHtml"
-Cohesion: 0.16
-Nodes (20): clearMeasure(), _clearPolygonDrawPreview(), clearSelectionPolygon(), _deriveSupportedRats(), escapeHtml(), escapeHtmlMaybeRtl(), finishPolygonDraw(), _hasArabicText() (+12 more)
+### Community 157 - "_stopPolygonDrawMode"
+Cohesion: 0.26
+Nodes (12): clearMeasure(), _clearPolygonDrawPreview(), clearSelectionPolygon(), finishPolygonDraw(), onMeasureClick(), onPolygonDrawClick(), onPolygonDrawDblClick(), _showPolygonReadyPanel() (+4 more)
 
 ### Community 158 - "extract"
 Cohesion: 0.17
@@ -1080,25 +1075,25 @@ Nodes (10): build(), _candidate_tables(), _collect_rows(), _detect_tech(), main(
 Cohesion: 0.20
 Nodes (9): Approach, Auth, sessions, activation, Progress, Plans, 2026-09-20 (Central SSO + portal allow-list), Auth, sessions, activation — progress, From brief History (migrated 2026-09-17), Purpose (+1 more)
 
-### Community 163 - "sync_reset_mode"
-Cohesion: 0.09
-Nodes (40): _build_metadata_index(), clear_groups_db(), _detect_col(), _groups_db(), _load_file(), _norm(), process_group_file(), DataFrame (+32 more)
+### Community 163 - "scheduler.py"
+Cohesion: 0.08
+Nodes (52): clear_groups_db(), apply_pm_retention(), downloaded_files = {technology: local_path or None} column_maps is accepted but…, Compat shim — column_map ignored., Delete rows older than ``days`` using vendor-aware timestamp columns (canonical…, run_nokia_pm_sync(), run_pm_sync(), Runtime switch for the parked sync pull/ingest paths. Nokia/Huawei PM pull +… (+44 more)
 
 ### Community 164 - "Network Coverage Heatmap"
 Cohesion: 0.20
 Nodes (9): Approach, Progress, Network Coverage Heatmap, Plans, 2026-09-08 (dark-mode UI fixes), From brief History (migrated 2026-09-17), Network Coverage Heatmap — progress, Purpose (+1 more)
 
 ### Community 165 - "network_health/logic.py"
-Cohesion: 0.08
-Nodes (41): breached_threshold(), True when the value is worse than the operator target., _aggregate_hourly_to_daily(), _annotate_threshold_rows(), _backfill_row_meta(), _enrich_benchmark_rows(), _filter_points_last_days(), get_cell_trend_payload() (+33 more)
+Cohesion: 0.11
+Nodes (37): breached_threshold(), True when the value is worse than the operator target., _annotate_threshold_rows(), _backfill_row_meta(), _build_category_rankings(), _enrich_benchmark_rows(), get_kpi_cells(), _infer_rnc() (+29 more)
 
 ### Community 166 - "escHtml"
 Cohesion: 0.31
 Nodes (10): displayMoInfo(), displayParamInfo(), displaySearchResults(), _escapeRegExp(), escHtml(), highlightMatch(), searchMoDatabase(), showMoInfo() (+2 more)
 
-### Community 167 - "ncm_core.py"
-Cohesion: 0.15
-Nodes (12): discover_hierarchy_elements(), import_parameters_from_excel(), Nokia Configuration Manager - Core Processing Logic Extracted from NCM_V3.py…, Sort parameter columns with list markers followed by Item-* children., Excel sheet titles cannot contain : \\ / ? * [ ]., Import parameter selections from Excel file. Supports both .xlsx and .xls…, Record MO class tokens from a distName path in first-seen depth order., Sort hierarchy columns by depth order discovered from distNames. (+4 more)
+### Community 167 - "open_db"
+Cohesion: 0.10
+Nodes (30): open_db(), Open a canonical SQLite file, or the mapped Postgres schema when enabled., _get_pm_cols_for_table(), _load_pm_cols_for_table(), _pm_cols_cache_key(), Return non-empty KPI columns for a specific table (uncached)., Cached KPI column list for trend / discovery endpoints., _create_cell_groups_db() (+22 more)
 
 ### Community 168 - "son_analytics.js"
 Cohesion: 0.33
@@ -1108,9 +1103,9 @@ Nodes (10): esc(), loadRecommendations(), loadSummary(), mlLine(), queryParams()
 Cohesion: 0.22
 Nodes (12): bulk_mo_abbreviations(), is_bulk_mo_abbreviation(), is_high_cardinality_mo(), _mo_abbreviation(), Any, Route Nokia CM extracts between Open API and CM Operations bulk export., True for neighbor / HO-interface classes whose instance count dominates query…, Prefer CM Operations Import_Export for high-cardinality neighbor MOs. Instance… (+4 more)
 
-### Community 170 - "knowledge.py"
-Cohesion: 0.15
-Nodes (26): answer_question(), _format_retrieval_answer(), _llm_answer(), _public_sources(), Any, AI assistant for parameter dictionary Q&A., Format a readable answer directly from retrieved sources (no LLM)., Answer a parameter dictionary question using retrieval + optional LLM. (+18 more)
+### Community 170 - "pull_huawei_raw_daily.py"
+Cohesion: 0.26
+Nodes (14): _build_search_dirs(), _convert_excel_file_to_csv(), _download_latest(), _extract_zip_csvs(), _finalize_raw_folder(), _finalize_vendor_domain(), _latest_file_in_remote_dir(), main() (+6 more)
 
 ### Community 171 - "radio_modules.js"
 Cohesion: 0.39
@@ -1118,7 +1113,7 @@ Nodes (9): escapeHtml(), formatEvidence(), loadData(), moduleKey(), renderDetail
 
 ### Community 172 - "rru_inventory/routes.py"
 Cohesion: 0.14
-Nodes (21): build_rmod_workbook(), Any, BytesIO, Excel export for Radio Hardware Inventory Report., _safe_filename_part(), Radio Hardware Inventory Report — Nokia RMOD_R Area → Tech → productName Sankey., Build Sankey payload from the persisted network-wide snapshot (DB only)., snapshot_sankey_payload() (+13 more)
+Nodes (20): build_rmod_workbook(), Any, BytesIO, Excel export for Radio Hardware Inventory Report., _safe_filename_part(), Radio Hardware Inventory Report — Nokia RMOD_R Area → Tech → productName Sankey., list_areas(), Areas present in the local RMOD snapshot (never touches NetAct). (+12 more)
 
 ### Community 173 - "escapeHtml"
 Cohesion: 0.42
@@ -1149,8 +1144,8 @@ Cohesion: 0.06
 Nodes (42): _apply_rule(), _iter_managed_objects(), _local(), _mo_leaf(), _param_specs(), Any, Pre-flight checks for Nokia RAML CM plans (XML parser / XML generator)., Return schema / dictionary / golden-rule / snapshot-diff findings for a RAML… (+34 more)
 
 ### Community 180 - "activation_gate.py"
-Cohesion: 0.17
-Nodes (29): activation_status(), ActivationRequired, _data_root(), _decode_hex(), _env_true(), is_activated(), is_bypass_enabled(), is_configured() (+21 more)
+Cohesion: 0.14
+Nodes (34): activation_period_days(), activation_status(), ActivationRequired, _data_root(), _decode_hex(), _env_true(), is_bypass_enabled(), is_configured() (+26 more)
 
 ### Community 181 - "NexusCore — Platform Vision"
 Cohesion: 0.25
@@ -1165,8 +1160,8 @@ Cohesion: 0.22
 Nodes (8): Approach, Config Task Scheduler, Progress, Plans, Config Task Scheduler — progress, From brief History (migrated 2026-09-17), Purpose, Watch-outs
 
 ### Community 184 - "ProviderResult"
-Cohesion: 0.06
-Nodes (33): CampaignMetricsProvider, env_configured(), get(), NetworkFootprintProvider, _NullCampaignMetrics, _NullNetworkFootprint, _NullSegmentSize, _base_url() (+25 more)
+Cohesion: 0.07
+Nodes (28): CampaignMetricsProvider, env_configured(), get(), NetworkFootprintProvider, _NullCampaignMetrics, _NullNetworkFootprint, _NullSegmentSize, _base_url() (+20 more)
 
 ### Community 185 - "loadAllUsers"
 Cohesion: 0.33
@@ -1185,20 +1180,20 @@ Cohesion: 0.10
 Nodes (38): _current_user(), _ensure_upload_dir(), _format_user(), _load_nemo_ff2_reference(), _load_nemo_object_mapper_summary(), login_required(), page(), _parse_gpx() (+30 more)
 
 ### Community 189 - "create_session"
-Cohesion: 0.10
-Nodes (32): create_session(), Create session token for user, set_user_force_password_change(), main(), CookieJar, Quick live HTTP test: one MRBTS + LNHOIF full MO (bulk path)., _session(), login() (+24 more)
+Cohesion: 0.17
+Nodes (20): create_session(), Create session token for user, main(), CookieJar, Quick live HTTP test: one MRBTS + LNHOIF full MO (bulk path)., _session(), main(), Simulate browser CM Extractor HTTP flow (login cookie + extract + poll). (+12 more)
 
 ### Community 190 - "performance_explorer_plus.js"
 Cohesion: 0.17
 Nodes (17): exportCsv(), loadCounters(), loadObjects(), metricMode(), queryPayload(), refreshHealth(), renderChart(), renderCounterList() (+9 more)
 
-### Community 191 - "nokia_load_balancing/logic.py"
-Cohesion: 0.11
-Nodes (33): _netact_candidates_for_metadata(), Build likely 5-digit NetAct MRBTS ids from a metadata site id., Map a PrimeNet metadata ``site_id`` to the NetAct MRBTS instance() in…, RNC distNames vary by MO class on NetAct (e.g. PLMN/RNC-2012 vs…, DistName substrings used to keep MOs for one scope element., resolve_nokia_netact_site_id(), _rnc_dn_needles(), scope_dn_needles() (+25 more)
+### Community 191 - "initializeMap"
+Cohesion: 0.16
+Nodes (14): applyDeepLinkFromUrl(), applySavedLeftPanelState(), closeKPIModal(), getNetworkMapState(), initializeMap(), loadBcchOptions(), onBasemapSelectChange(), _readSavedBasemapId() (+6 more)
 
-### Community 192 - "test_network_bridge.py"
-Cohesion: 0.11
-Nodes (17): database_path(), Portal-owned SQLite file. Never a PrimeNet database., connect(), _ensure_parent_dir(), init_schema(), Connection, Marketing Portal storage. Portal-owned SQLite database. Per NexusCore…, Create the portal database and schema if they do not exist. (+9 more)
+### Community 192 - "access.py"
+Cohesion: 0.07
+Nodes (30): assign_role(), current_identity(), login_required(), portal_role(), PortalUser, Identity and portal access control for NexPulse. Resolves the shared…, Explicit portal assignment wins; otherwise map the central user role., The acting user, as this portal sees them. (+22 more)
 
 ### Community 193 - "pull_and_load_daily.py"
 Cohesion: 0.67
@@ -1217,20 +1212,20 @@ Cohesion: 0.12
 Nodes (16): Capacity Hotspots — OK, Change Impact Tracker — OK, CM Parameter Audit — OK, Group / Cluster Health — Fixed (was 500), Huawei Load Balancing — OK (needs SMB share), Layer Coverage Gaps — OK, Mobility / HO Explorer, IRAT / Vendor Border, Alarm–PM Correlator — OK, Neighbor Quality — OK (+8 more)
 
 ### Community 197 - "ml/store.py"
-Cohesion: 0.10
-Nodes (38): feature_matrix(), Fixed-order numeric features for sklearn (NaNs → 0)., build_all(), build_vendor_rat(), _action_code(), attach_to_rows(), heuristic_score(), _kpi_delta() (+30 more)
+Cohesion: 0.09
+Nodes (39): env_disabled(), Flask-safe SON ML reads — sqlite + numpy/sklearn only, never import torch., cell_name lower -> latest score row., score_load_balancing_rows(), score_map(), score_one_proposal(), _action_code(), attach_to_rows() (+31 more)
 
-### Community 198 - "nokia_configured"
-Cohesion: 0.22
-Nodes (21): nokia_configured(), Configuration Dashboard — Hardware (RMOD_R) + WNCELG split views., combined_status(), configuration_dashboard_page(), format_user_data(), get_current_user(), hardware_areas(), hardware_export() (+13 more)
+### Community 198 - "configuration_dashboard/routes.py"
+Cohesion: 0.25
+Nodes (18): Configuration Dashboard — Hardware (RMOD_R) + WNCELG split views., combined_status(), configuration_dashboard_page(), format_user_data(), get_current_user(), hardware_areas(), hardware_export(), hardware_sankey() (+10 more)
 
-### Community 199 - "adjacency_gis/routes.py"
-Cohesion: 0.21
-Nodes (16): Adjacency GIS — 2G Network Map fork (metadata.db) + CM NCL ingest scaffolding., adjacency_gis_data(), adjacency_gis_page(), adjacency_gis_refresh(), adjacency_gis_status(), format_user_data(), get_current_user(), _is_owner() (+8 more)
+### Community 199 - "get_session_token"
+Cohesion: 0.16
+Nodes (26): get_session_token(), Read the shared session cookie, with legacy per-portal name fallback., login_required(), Decorator to require login, _area(), format_user(), get_current_user(), list_sites() (+18 more)
 
 ### Community 200 - "showSiteDetails"
-Cohesion: 0.16
-Nodes (19): cellOperational(), _codeLabel(), displaySiteInfo(), displaySites(), drawCodeSearchResults(), drawHighlightWedge(), drawSectorWedge(), escapeHtmlAttr() (+11 more)
+Cohesion: 0.12
+Nodes (24): cellMatchesMapTechFilter(), cellOperational(), _codeLabel(), displaySiteInfo(), displaySites(), drawCodeSearchResults(), drawHighlightWedge(), drawSectorWedge() (+16 more)
 
 ### Community 227 - "pull_huawei_neighbor_raw.py"
 Cohesion: 0.24
@@ -1241,8 +1236,8 @@ Cohesion: 0.19
 Nodes (14): cellMatchesMapTechFilter(), _csvEscape(), _downloadBlob(), _downloadCsv(), _exportPolygonClientSide(), extractFromCurrentPolygon(), extractFromSelectionPolygon(), _filenameFromContentDisposition() (+6 more)
 
 ### Community 235 - "neighbor_agg.py"
-Cohesion: 0.26
-Nodes (17): _normalize_ho_success_rate_percent(), NetAct may export SR as 0–1 ratio or 0–100 percent., _to_float(), _display_name(), _huawei_4g_pairs(), load_neighbor_pairs(), neighbor_stats(), _nokia_4g_pairs() (+9 more)
+Cohesion: 0.14
+Nodes (30): _normalize_ho_success_rate_percent(), NetAct may export SR as 0–1 ratio or 0–100 percent., _to_float(), aggregate_pairs(), attach_neighbor_features(), _display_name(), _haversine_km(), _huawei_4g_pairs() (+22 more)
 
 ### Community 236 - "Lesson 02 — Activation & security"
 Cohesion: 0.15
@@ -1250,11 +1245,11 @@ Nodes (13): 2.1 The problem activation solves, 2.2 The `sqlite3.connect` monkeyp
 
 ### Community 237 - "PrimeNet — progress log"
 Cohesion: 0.04
-Nodes (51): 2026-07-06, 2026-07-22, 2026-07-23, 2026-07-28, 2026-07-30, 2026-08-02, 2026-08-03, 2026-08-05 (+43 more)
+Nodes (53): 2026-07-06, 2026-07-22, 2026-07-23, 2026-07-28, 2026-07-30, 2026-08-02, 2026-08-03, 2026-08-05 (+45 more)
 
-### Community 238 - "son_analytics/logic.py"
-Cohesion: 0.12
-Nodes (41): get_cell_area_map(), get_cell_location_map(), primary_area_for_cells(), Return cell_name -> {latitude, longitude, area, site_id}., Tunable thresholds for SON Analytics (read-only 4G insights)., SON Analytics — read-only recommendation engine with offline ML scores., _attach_location_context(), build_all_recommendations() (+33 more)
+### Community 238 - "test_recommendations.py"
+Cohesion: 0.30
+Nodes (18): _build_anomaly_recommendations(), _build_geo_cluster_recommendations(), _build_topology_recommendations(), Group degraded cells by spatial ML cluster when present, else by area., _deg(), _isolated_maps(), Tests for SON Cluster / Anomaly / Topology builders (no torch, no metadata.db)., _score() (+10 more)
 
 ### Community 240 - "Lesson 03 — Auth, sessions & access control"
 Cohesion: 0.17
@@ -1264,9 +1259,9 @@ Nodes (12): 3.1 Where users live — `database_enhanced.py`, 3.2 Login / logout 
 Cohesion: 0.15
 Nodes (12): Approach, Dashboard, Progress, Plans, 2026-07-06, 2026-07-30, 2026-09-06 (UI unification), 2026-09-08 (dark-mode UI fixes) (+4 more)
 
-### Community 242 - "get_pm_table"
-Cohesion: 0.12
-Nodes (16): heavy_query_required(), Flask route decorator: acquire a heavy-query slot or return HTTP 503., F, get_pm_table(), _pm_table_cache_get(), _pm_table_cache_key(), _pm_table_cache_set(), _pm_table_cell_scope_sql() (+8 more)
+### Community 242 - "set_activation_password.py"
+Cohesion: 0.70
+Nodes (4): hash_password_for_config(), main(), _prompt_password_twice(), write_secrets()
 
 ### Community 243 - "Configuration"
 Cohesion: 0.14
@@ -1309,12 +1304,12 @@ Cohesion: 0.25
 Nodes (8): 9.1 The three data sources, 9.2 The folder taxonomy — `pipeline/paths.py`, 9.3 The orchestrators — the entry points, 9.4 Pull and load are thin wrappers over `scripts/pipeline/`, 9.5 How data lands in the tables modules read, 9.6 Running / scheduling it, Lesson 09 — The ETL pipeline, Recap
 
 ### Community 253 - "wncelg_store.py"
-Cohesion: 0.13
-Nodes (26): build_wncelg_workbook(), Any, BytesIO, Excel export for Configuration Dashboard WNCELG site summary., _safe_filename_part(), Tests for WNCELG snapshot store + Excel export (no live NetAct)., test_replace_and_load_wncelg_snapshot(), test_wncelg_excel_export() (+18 more)
+Cohesion: 0.20
+Nodes (18): test_replace_and_load_wncelg_snapshot(), list_areas(), Areas present in the local WNCELG site snapshot (never touches NetAct)., ensure_db_dir(), get_build_meta(), get_connection(), has_snapshot(), init_schema() (+10 more)
 
 ### Community 254 - "scorecard.py"
-Cohesion: 0.15
-Nodes (20): cell_aliases(), cells_match(), filter_rows_for_cells(), normalize_cell_key(), Lite cell-identity normalizer for Cases correlator/scorecard joins only. Does…, Lowercase compact key for fuzzy equality (drops separators)., Return matching keys for a cell label (raw + normalized)., Keep rows whose cell field matches any target cell alias. (+12 more)
+Cohesion: 0.29
+Nodes (11): _avg_change(), build_scorecard(), _parse_iso(), _pull_pm_signals(), Any, datetime, Before/after scorecard builder for optimization cases. Pulls live PM…, improve / worsen / flat / inconclusive. (+3 more)
 
 ### Community 255 - "Lesson 11 — Exercises & capstone"
 Cohesion: 0.29
@@ -1364,17 +1359,17 @@ Nodes (7): 3. Module by module, Admin Panel — OK, Administration & shared, Doc
 Cohesion: 0.40
 Nodes (4): Dashboard & module UI unification, Definition of done, Notes (2026-09-06), Out of scope
 
-### Community 268 - "activation_period_days"
-Cohesion: 0.21
-Nodes (13): activation_period_days(), hash_password_for_config(), Days each successful unlock keeps PrimeNet active (local mode). Override with…, _activation_period_days(), run_app_bootstrap_if_enabled(), activation_page(), api_activation_status(), api_activation_unlock() (+5 more)
+### Community 268 - "son_analytics/logic.py"
+Cohesion: 0.15
+Nodes (31): list_areas(), primary_area_for_cells(), Tunable thresholds for SON Analytics (read-only 4G insights)., SON Analytics — read-only recommendation engine with offline ML scores., build_all_recommendations(), _cluster_payload(), filter_recommendations(), filtered_summary() (+23 more)
 
-### Community 269 - "huawei_param_dict.py"
-Cohesion: 0.19
-Nodes (20): build_catalog(), _clean_text(), get_catalog_list(), get_mo_entry(), load_catalog(), _merge_entries(), _mode_to_tech(), _parameters() (+12 more)
+### Community 269 - "renderNeighborLines"
+Cohesion: 0.18
+Nodes (12): _neighborColor(), _neighborColorGradient(), _neighborFailuresMode(), _neighborLineBearingDeg(), _neighborLineColor(), _neighborLineEndpoint(), _neighborLinePointAlong(), _neighborLineWeight() (+4 more)
 
 ### Community 270 - "run_logged_subprocess"
-Cohesion: 0.25
-Nodes (8): _pump_stream(), deque, Stream child process output to logs without buffering entire stdout/stderr in…, Run ``cmd``, stream lines to ``logger``, retain only the last ``tail_lines``…, run_logged_subprocess(), SubprocessResult, _tail_text(), Logger
+Cohesion: 0.22
+Nodes (10): _pump_stream(), deque, Stream child process output to logs without buffering entire stdout/stderr in…, Run ``cmd``, stream lines to ``logger``, retain only the last ``tail_lines``…, run_logged_subprocess(), SubprocessResult, _tail_text(), Logger (+2 more)
 
 ### Community 271 - "Huawei Load Balancing"
 Cohesion: 0.20
@@ -1385,8 +1380,8 @@ Cohesion: 0.50
 Nodes (3): Huawei Daily Staging, Old to New Intent Mapping, Pipeline Scripts (Canonical + Compatibility)
 
 ### Community 273 - "init_schema"
-Cohesion: 0.24
-Nodes (31): init_schema(), find_related_by_cells(), Other cases sharing any cell alias in the last N days., Optimization Cases workspace., api_cluster_acceptance(), api_complaint(), api_create(), api_energy() (+23 more)
+Cohesion: 0.27
+Nodes (29): init_schema(), Optimization Cases workspace., api_cluster_acceptance(), api_complaint(), api_create(), api_energy(), api_from_issue(), api_from_morning_report() (+21 more)
 
 ### Community 274 - "NE Comparison"
 Cohesion: 0.22
@@ -1424,9 +1419,9 @@ Nodes (9): Approach, Progress, Parameter Dictionary, Plans, 2026-08-19, From bri
 Cohesion: 0.17
 Nodes (11): Approach, Progress, Performance Explorer, Plans, 2026-07-30, 2026-08-05, 2026-08-11, From brief History (migrated 2026-09-17) (+3 more)
 
-### Community 283 - "apply_retention"
-Cohesion: 0.18
-Nodes (14): apply_retention(), _match_column_name(), _parse_ts_series(), _pragma_column_names(), Connection, Series, Delete PM/group rows older than N calendar days from SQLite KPI databases. Uses…, Vendor-aware parse (lazy import from loader). (+6 more)
+### Community 283 - "test_network_bridge.py"
+Cohesion: 0.20
+Nodes (8): permissions_for_role(), test_role_permissions_are_layered(), isolated_db(), portal_token(), fixture, Tests for PrimeNet portal API + NexPulse network footprint bridge., test_primenet_provider_parses_http(), user()
 
 ### Community 284 - "Huawei PM Query Studio"
 Cohesion: 0.22
@@ -1476,25 +1471,25 @@ Nodes (8): Approach, Progress, Plans, From brief History (migrated 2026-09-17), 
 Cohesion: 0.18
 Nodes (10): Approach, Progress, Plans, 2026-08-19, 2026-09-08 (dark-mode UI fixes), From brief History (migrated 2026-09-17), XML Parser — progress, Purpose (+2 more)
 
-### Community 296 - "import_local_files.py"
-Cohesion: 0.18
-Nodes (17): ensure_schema(), _find_files(), _find_latest(), import_huawei_pm(), import_metadata(), import_nokia_pm(), _infer_tech_from_name(), main() (+9 more)
+### Community 296 - "group_processor.py"
+Cohesion: 0.36
+Nodes (9): _build_metadata_index(), _detect_col(), _groups_db(), _load_file(), _norm(), process_group_file(), DataFrame, Group Data Processor ==================== Imports vendor group files and stores… (+1 more)
 
 ### Community 297 - "adjacency_gis.js"
 Cohesion: 0.06
-Nodes (43): ADJACENCY_GIS_MODE, _azBucket(), CLUSTER_AREA, conflictMapTechFromActive(), conflictMapTechFromCellTech(), conflictMapTechFromMatches(), conflictMapUrlForCode(), DEFAULT_CENTER (+35 more)
+Nodes (43): ADJACENCY_GIS_MODE, BASEMAP_LABELS, BCCH_ROLE_COLORS, bcchOptionList, CLUSTER_AREA, conflictMapTechFromActive(), conflictMapTechFromCellTech(), conflictMapTechFromMatches() (+35 more)
 
 ### Community 298 - "metadata.py"
-Cohesion: 0.19
-Nodes (16): cell_index(), _col_expr(), enrich_cell(), _inventory_union_sql(), list_areas(), list_cells(), _list_cells_uncached(), list_map_sites() (+8 more)
+Cohesion: 0.13
+Nodes (23): cell_index(), _col_expr(), enrich_cell(), _inventory_union_sql(), list_areas(), list_cells(), _list_cells_uncached(), list_map_sites() (+15 more)
 
 ### Community 299 - "test_cases.py"
-Cohesion: 0.09
+Cohesion: 0.08
 Nodes (15): assert_can_approve(), check_golden_rules(), find_conflicts(), Any, Conflict + golden-rule gates before Case approval., Raise store.CaseError if approval should be blocked., Other open cases overlapping cells with similar proposed_change tokens., Best-effort CM Audit rule check. Returns {ok, checked, violations, note}. (+7 more)
 
-### Community 300 - "sleeping_cells/logic.py"
-Cohesion: 0.11
-Nodes (27): alarm_impact(), Alarm bursts vs PM collapse vs CM-active/locked state., fetch_recent_alarms(), match_alarms_for_cells(), Any, degraded_cells(), _degraded_cells_uncached(), _norm() (+19 more)
+### Community 300 - "test_wncelg_store.py"
+Cohesion: 0.31
+Nodes (7): build_wncelg_workbook(), Any, BytesIO, Excel export for Configuration Dashboard WNCELG site summary., _safe_filename_part(), Tests for WNCELG snapshot store + Excel export (no live NetAct)., test_wncelg_excel_export()
 
 ### Community 301 - "group-health.md"
 Cohesion: 0.20
@@ -1508,13 +1503,13 @@ Nodes (8): Approach, IRAT / Vendor Border, Progress, Plans, 2026-08-17 (roadmap)
 Cohesion: 0.33
 Nodes (15): cellsLabel(), checklistHtml(), escapeHtml(), loadDetail(), loadList(), loadSelection(), openCaseFromSelection(), openClusterAcceptance() (+7 more)
 
-### Community 304 - "layer_from_lncel"
-Cohesion: 0.21
-Nodes (15): layer_from_lncel(), lncels_for_sector_letter(), Map LNCEL id to throughput layer — same Excel IFS used in Network Balance:…, All LNCEL ids that belong to a co-sector letter (A–F)., Resolve target layer via co-sector LNCEL + ``targetCarrierFreq``.…, source_layer(), target_layer_from_sector(), Tests for LNCEL IFS layer mapping. (+7 more)
+### Community 304 - "parse_balance_filename"
+Cohesion: 0.36
+Nodes (8): detect_date(), detect_vendor(), _make_date(), parse_balance_filename(), date, Path, Detect vendor and date from Network Balance export filenames., Return (vendor, file_date) parsed from a CSV filename stem.
 
-### Community 305 - "extractFromSelectionPolygon"
-Cohesion: 0.19
-Nodes (14): cellMatchesMapTechFilter(), _csvEscape(), _downloadBlob(), _downloadCsv(), _exportPolygonClientSide(), extractFromCurrentPolygon(), extractFromSelectionPolygon(), _filenameFromContentDisposition() (+6 more)
+### Community 305 - "layer-coverage.md"
+Cohesion: 0.25
+Nodes (7): Approach, Layer Coverage Gaps, Progress, Plans, From brief History (migrated 2026-09-17), Layer Coverage Gaps — progress, Purpose
 
 ### Community 306 - "radio-morning-report.md"
 Cohesion: 0.22
@@ -1532,9 +1527,9 @@ Nodes (11): _ensure_tables(), _extract_tag_text(), main(), _parse_neun_kv(), _pa
 Cohesion: 0.18
 Nodes (10): Approach, Progress, Performance Explorer Plus, Plans, 2026-09-11 (Performance Explorer Plus), 2026-09-14 (PM Plus Admin Rules + sample ingest), From brief History (migrated 2026-09-17), Performance Explorer Plus — progress (+2 more)
 
-### Community 310 - "SFTPClient"
-Cohesion: 0.11
-Nodes (19): _close_sftp_session(), _download_sftp_file_resumable(), fetch_export_file_via_sftp(), _find_remote_export_file(), _is_transient_sftp_error(), _open_sftp_session(), BaseException, _remote_file_stat() (+11 more)
+### Community 310 - "build_table_workbook"
+Cohesion: 0.32
+Nodes (6): build_table_workbook(), Any, BytesIO, Generic Excel workbook builder for PrimeNet table exports., _safe_filename_part(), Excel export helpers for Admin Panel tables.
 
 ### Community 311 - "escapeHtml"
 Cohesion: 0.39
@@ -1544,33 +1539,25 @@ Nodes (8): _deriveSupportedRats(), escapeHtml(), escapeHtmlMaybeRtl(), _hasArabi
 Cohesion: 0.47
 Nodes (8): clear(), empty(), fetchServer(), normalize(), readLocal(), save(), setCells(), writeLocal()
 
-### Community 313 - "verify.py"
-Cohesion: 0.16
-Nodes (20): build_backup_xml(), build_changes_xml(), build_review_excel(), _cell_value(), Any, RAML/XML export for proposed AMLE parameter changes., Build Nokia RAML2 plan XML from a list of changes. Each change: {mo_class,…, Same RAML shape as ``build_changes_xml`` but with current (pre-change) values. (+12 more)
+### Community 313 - "balance_data.py"
+Cohesion: 0.09
+Nodes (33): Huawei load-balancing rules — CellMLB knobs on Network Balance layers., balance_configured(), Network Balance data access — SQLite first, CSV share fallback., AMLE optimizer rules and constants — edit adjustment logic here., build_backup_xml(), build_changes_xml(), build_review_excel(), _cell_value() (+25 more)
 
-### Community 314 - "test_rules_hl_pair.py"
-Cohesion: 0.24
-Nodes (12): missing_hl_direction_warnings(), qualifies_highest_lowest_pair(), True when this AMLEPR row is a co-sector link between the highest and lowest…, Flag incomplete highest↔lowest AMLEPR configuration (one direction only)., Tests for highest↔lowest AMLEPR pair filtering., test_complete_pair_no_gap_warning(), test_highest_to_lowest_qualifies(), test_l18_plus_pair() (+4 more)
+### Community 314 - "login"
+Cohesion: 0.67
+Nodes (5): login(), main(), CookieJar, Live HTTP test: login + South Jordan LNHOIF extract (same path as browser)., _request()
 
 ### Community 315 - "ret_hologram.js"
 Cohesion: 0.18
 Nodes (9): bandCoverageFactor(), buildLobeGeometry(), clamp(), create(), groundDistance(), latticeHalfW(), lobeLength(), patternExponent() (+1 more)
 
-### Community 316 - "counter_catalog.py"
-Cohesion: 0.26
-Nodes (14): catalog_dir(), counters_for_subset(), filter_counters(), get_technology_catalog(), list_technologies(), _load_technology(), _parse_counter_file(), _parse_int() (+6 more)
-
-### Community 317 - "network-management.md"
+### Community 317 - "elevation.md"
 Cohesion: 0.25
-Nodes (7): Approach, Progress, Network Management, Plans, From brief History (migrated 2026-09-17), Network Management — progress, Purpose
+Nodes (7): Approach, Elevation, Progress, Plans, Elevation — progress, From brief History (migrated 2026-09-17), Purpose
 
 ### Community 318 - "Radio Hardware Inventory Report — progress"
 Cohesion: 0.08
 Nodes (23): Approach, Configuration Dashboard, Progress, Plans, 2026-09-20 (Configuration Dashboard V1.0), 2026-09-20 (Dark mode), 2026-09-20 (WNCELG Sankey), Configuration Dashboard — progress (+15 more)
-
-### Community 319 - "loadKpiColumns"
-Cohesion: 0.16
-Nodes (18): chartConfigBackToStyle(), chartConfigGoToData(), ensureKpiCategoryConfigLoaded(), escAttr(), _isMetadataKpiKey(), _kpiDisplayName(), _labelForQueryKey(), loadKpiColumns() (+10 more)
 
 ### Community 320 - "admin_panel.js"
 Cohesion: 0.07
@@ -1579,14 +1566,6 @@ Nodes (61): ACTIVITY_ACTION_LABELS, _activityActionLabel(), _activityRowExport()
 ### Community 321 - "mobility-explorer.md"
 Cohesion: 0.22
 Nodes (8): Approach, Progress, Mobility / HO Explorer, Plans, 2026-08-17 (roadmap), From brief History (migrated 2026-09-17), Mobility / HO Explorer — progress, Purpose
-
-### Community 322 - "build_table_workbook"
-Cohesion: 0.24
-Nodes (8): build_table_workbook(), Any, BytesIO, Generic Excel workbook builder for PrimeNet table exports., _safe_filename_part(), Excel export helpers for Admin Panel tables., export_neighbor_lines_excel(), Excel workbook of neighbor relations for the current analyzer filters.
-
-### Community 323 - "NokiaMoSheetBuilder"
-Cohesion: 0.16
-Nodes (14): managed_objects_to_ncm_sheet(), merge_ncm_sheet_parts(), NokiaMoSheetBuilder, parse_distname_hierarchy(), Any, query_table_to_ncm_sheet(), Build Excel sheet rows using NCM core hierarchy discovery and list integration.…, Add a row that may already contain hierarchy columns and/or a DN/moId. (+6 more)
 
 ### Community 325 - "Optimization Cases"
 Cohesion: 0.18
@@ -1604,33 +1583,25 @@ Nodes (8): Approach, Change Impact Tracker, Progress, Plans, 2026-08-17 (roadmap
 Cohesion: 0.40
 Nodes (5): Admin Panel (Engineering), Administration, Developer Documentation, Platform Admin (NexusCore), User Profile
 
-### Community 330 - "export_sites_kml"
-Cohesion: 0.14
-Nodes (14): export_sites_kml(), _kml_cdata_fragment(), _kml_cell_active(), _kml_circle_ring_coords(), _kml_color_aabbggrr(), _kml_group_cells_into_wedges(), _kml_ring_to_coordinates(), _kml_wedge_ring_coords() (+6 more)
+### Community 330 - "pm.py"
+Cohesion: 0.29
+Nodes (9): _degraded_cells_uncached(), _norm(), pm_technology(), PM/KPI helper recipes for radio insight modules., resolve_kpi(), top_kpi_rows(), _top_kpi_rows_uncached(), collect_degraded_cells() (+1 more)
 
 ### Community 331 - "ci_check_wiring.py"
 Cohesion: 0.60
 Nodes (4): main(), Static wiring checks for CI. Catches the class of breakage that unit tests miss…, _read(), _sources()
 
-### Community 332 - "sort_huawei_ret_rows"
-Cohesion: 0.17
-Nodes (13): _natural_sort_parts(), _numeric_sort_value(), Split a value into number/text chunks so ``RETU-2`` sorts before ``RETU-10``.…, Numbers first (ascending), then text, then blanks — never raises. NaN/inf are…, Stable RETSUBUNIT order: Device No., then Subunit No., then subunit name. U2020…, Stable RETU_R order: sectorID, then subunitNumber, then DN. NetAct CM returns…, sort_huawei_ret_rows(), sort_nokia_retu_rows() (+5 more)
+### Community 332 - "loadKpiColumns"
+Cohesion: 0.22
+Nodes (14): _colorFor(), _defsForTrendRender(), ensureKpiCategoryConfigLoaded(), _isMetadataKpiKey(), _kpiDisplayName(), loadKpiColumns(), _normalizeKpiKey(), onKpiSelectAllToggle() (+6 more)
 
 ### Community 333 - "require_etl_enabled"
 Cohesion: 0.09
 Nodes (27): For CLI entry points. If ETL is disabled, print a short message and return…, require_etl_enabled(), Run PM raw → SQLite load subprocesses., Pull Nokia + Huawei neighbor exports from SFTP into raw/., Full-replace neighbor SQLite from raw exports (Nokia slim + Huawei wide). Each…, run_neighbor_load(), run_neighbor_pull(), main() (+19 more)
 
-### Community 335 - "RuntimeError"
-Cohesion: 0.30
-Nodes (11): last_ingest_result(), _persist_vendor(), Any, Daily / manual Nokia + Huawei 2G adjacency snapshots for Adjacency GIS., Pull Huawei GCELL/GTRX/G2GNCELL and replace the huawei vendor snapshot., Run Nokia and/or Huawei adjacency ingest. ``vendor``: ``nokia`` | ``huawei`` |…, Pull Nokia BTS/TRX/ADCE and replace the nokia vendor snapshot., run_adjacency_gis_ingest() (+3 more)
-
-### Community 336 - "build_audit_workbook"
-Cohesion: 0.36
-Nodes (11): build_audit_workbook(), _build_mo_workbook(), _build_parameter_workbook(), _payload_warnings(), Any, BytesIO, Excel export for CM Parameter Audit live scan results., Build a multi-sheet workbook from a live audit payload. (+3 more)
-
-### Community 337 - "get_current_user"
-Cohesion: 0.14
-Nodes (29): get_current_user(), _role(), list_canonical_areas(), test_mo_workbook_and_slim_payload(), _cache_path(), get_export_payload(), _purge_expired_locked(), Any (+21 more)
+### Community 337 - "cm_parameter_audit/routes.py"
+Cohesion: 0.10
+Nodes (41): json_error(), Exception, _role(), list_canonical_areas(), test_mo_workbook_and_slim_payload(), _cache_path(), get_export_payload(), _purge_expired_locked() (+33 more)
 
 ### Community 338 - "cases_morning_digest.py"
 Cohesion: 0.83
@@ -1640,17 +1611,17 @@ Nodes (3): build_payload(), _load_dotenv(), main()
 Cohesion: 0.25
 Nodes (11): _activeCellCodeSearch(), cellCodeSearch(), clearCodeSearch(), clearHighlights(), clearSectorLayers(), doCodeSearch(), filterByTechSpecific(), _maybeRerunCodeSearch() (+3 more)
 
-### Community 340 - "install_shared_activation"
-Cohesion: 0.24
-Nodes (9): install_sqlite_gate(), activation_unlock_url(), _env_true(), install_shared_activation(), Flask, Shared operator activation for local multi-platform testing. Today every…, Where operators unlock for the shared (test) activation., Block the app until the shared activation gate is unlocked. Skip with… (+1 more)
+### Community 340 - "RuntimeError"
+Cohesion: 0.30
+Nodes (11): last_ingest_result(), _persist_vendor(), Any, Daily / manual Nokia + Huawei 2G adjacency snapshots for Adjacency GIS., Pull Huawei GCELL/GTRX/G2GNCELL and replace the huawei vendor snapshot., Run Nokia and/or Huawei adjacency ingest. ``vendor``: ``nokia`` | ``huawei`` |…, Pull Nokia BTS/TRX/ADCE and replace the nokia vendor snapshot., run_adjacency_gis_ingest() (+3 more)
 
 ### Community 341 - "performance_dictionary/nokia_loader.py"
 Cohesion: 0.08
 Nodes (64): build_nokia_data_from_excel(), _cache_mtime(), _clean(), _compact_row(), _content_key(), _counter_shard_path(), _detect_header_row(), _enrich_fields() (+56 more)
 
-### Community 342 - "huawei_pm/config.py"
-Cohesion: 0.46
-Nodes (7): _env(), _env_bool(), _env_float(), _env_int(), pm_defaults(), Environment-backed defaults for Huawei PM Open API., PM Open API uses the same northbound host/credentials as CM (port 31127). Falls…
+### Community 342 - "feature_access.py"
+Cohesion: 0.19
+Nodes (17): _bust_cache(), _connect(), default_roles(), effective_roles(), _ensure_table(), get_overrides(), _now_iso(), Configurable feature access. Stores, per feature (nav href), which roles may… (+9 more)
 
 ### Community 343 - "Configuration"
 Cohesion: 0.12
@@ -1662,7 +1633,7 @@ Nodes (14): Adjacency GIS, Conflict Map, Fault Management, Femto PM, Huawei PM Q
 
 ### Community 345 - "progress.md"
 Cohesion: 0.13
-Nodes (11): Capacity Hotspots — progress, From brief History (migrated 2026-09-17), Config History — progress, From brief History (migrated 2026-09-17), Approach, Drive Test Viewer, Progress, Plans (+3 more)
+Nodes (11): Capacity Hotspots — progress, From brief History (migrated 2026-09-17), Drive Test Viewer — progress, From brief History (migrated 2026-09-17), Approach, Progress, Network Management, Plans (+3 more)
 
 ### Community 346 - "import_femto_catalogs.py"
 Cohesion: 0.43
@@ -1688,29 +1659,21 @@ Nodes (7): Blueprint registration (PrimeNet), How NexusCore is structured, NexAr
 Cohesion: 0.33
 Nodes (9): attributeByKey(), buildValueInput(), collect(), escapeHtml(), initRuleBuilder(), operatorsFor(), refreshPreview(), renderRule() (+1 more)
 
-### Community 352 - "kpi_filter.py"
-Cohesion: 0.23
-Nodes (11): filter_absolute_kpis(), filter_metadata_kpis(), filter_network_health_kpis(), is_metadata_kpi(), is_percentage_kpi(), Exclude percentage / ratio / rate KPIs from Network Health (absolute counters…, True for identifier / dimension columns that are not benchmark KPIs., Drop metadata / identifier columns, preserving order. (+3 more)
-
-### Community 353 - "get_map_repeaters"
-Cohesion: 0.33
-Nodes (6): Lightweight rows for map pins (keeps API responses small)., repeaters_for_map(), get_map_repeaters(), _json_gzip_response(), Repeater devices from manual Excel/CSV (network-map/repeater)., JSON response with optional gzip when the client accepts it.
+### Community 353 - "mrbts_tree_loader.py"
+Cohesion: 0.26
+Nodes (15): _build_tree_from_rows(), _cache_mtime(), _count_nodes(), _excel_mtime(), _flatten(), get_mrbts_tree_payload(), _load_cache_file(), load_mrbts_tree() (+7 more)
 
 ### Community 354 - "ran-features.md"
 Cohesion: 0.22
 Nodes (8): Approach, Progress, Plans, 2026-08-05, From brief History (migrated 2026-09-17), RAN Feature Library — progress, Purpose, RAN Feature Library
 
 ### Community 356 - "auth_routes.py"
-Cohesion: 0.04
-Nodes (94): allowed_hrefs_for_role(), navigation_sections_for_role(), Return feature-nav sections filtered for the user's role., get_network_activity(), _login_rate_limit_remaining(), nexuscore_login_url(), _prune_login_attempts(), deque (+86 more)
+Cohesion: 0.05
+Nodes (61): perf_per_tech_union_sql_with_activity(), Same as ``perf_per_tech_union_sql`` plus ``activity_status`` (Active /…, _clear_login_failures(), dashboard(), dashboard_neighbor_health(), dashboard_network_activity(), dashboard_operational_sites(), dashboard_pm_health() (+53 more)
 
 ### Community 357 - "NexPulse (Marketing Portal)"
 Cohesion: 0.17
 Nodes (11): Approach, Progress, NexPulse (Marketing Portal), Plans, 2026-09-16 (NexPulse — Marketing Portal), 2026-09-16 (NexPulse Phase 2 — network targeting bridge), From brief History (migrated 2026-09-17), NexPulse (Marketing Portal) — progress (+3 more)
-
-### Community 358 - "alarm-impact.md"
-Cohesion: 0.20
-Nodes (9): Alarm–PM Correlator, Approach, Progress, Plans, 2026-08-17 (roadmap), Alarm–PM Correlator — progress, From brief History (migrated 2026-09-17), Purpose (+1 more)
 
 ### Community 360 - "Platform shell"
 Cohesion: 0.29
@@ -1726,11 +1689,11 @@ Nodes (9): Approach, Progress, Plans, 2026-08-17 (roadmap), From brief History (
 
 ### Community 363 - "feature.md"
 Cohesion: 0.16
-Nodes (11): Adjacency GIS, Approach, Progress, Plans, Purpose, Watch-outs, Approach, Config History (+3 more)
+Nodes (11): Adjacency GIS, Approach, Progress, Plans, Purpose, Watch-outs, Approach, Drive Test Viewer (+3 more)
 
-### Community 365 - "initializeMap"
-Cohesion: 0.22
-Nodes (9): applyDeepLinkFromUrl(), applySavedLeftPanelState(), closeKPIModal(), initializeMap(), onNeighborFiltersChanged(), _setNeighborFiltersLocked(), _siteIdFromUrl(), updateNeighborMetricHint() (+1 more)
+### Community 365 - "getHuaweiScopeLevel"
+Cohesion: 0.27
+Nodes (12): buildHuaweiPayload(), buildHuaweiSelections(), getHuaweiScopeLevel(), huaweiPayload(), isHuaweiControllerScope(), loadHuaweiAreas(), loadHuaweiMoObjects(), loadHuaweiNeCatalog() (+4 more)
 
 ### Community 366 - "run_config_dashboard_ingest"
 Cohesion: 0.24
@@ -1740,29 +1703,25 @@ Nodes (12): last_ingest_result(), Any, Daily / manual shared Nokia ingest: RMOD_
 Cohesion: 0.16
 Nodes (24): aggregateClient(), applyAreaFilterChange(), areaKey(), bindFilters(), chip(), colorForNode(), escapeHtml(), filteredSites() (+16 more)
 
-### Community 370 - "loadPmTable"
-Cohesion: 0.29
-Nodes (10): applyCustomTimeFrame(), closeTimeFrameModal(), _esc(), loadPmTable(), onHwSearch(), prefetchPmChartData(), renderPmTable(), _renderTimeFramePresets() (+2 more)
+### Community 369 - "apply_retention"
+Cohesion: 0.18
+Nodes (14): apply_retention(), _match_column_name(), _parse_ts_series(), _pragma_column_names(), Connection, Series, Delete PM/group rows older than N calendar days from SQLite KPI databases. Uses…, Vendor-aware parse (lazy import from loader). (+6 more)
 
 ### Community 371 - "pull_huawei_raw.py"
-Cohesion: 0.07
-Nodes (57): Invoke ``load_raw_csv_to_databases.py``. ``vendor``: ``all`` | ``nokia`` |…, run_pm_load(), clear_tabular_files(), infer_technology_from_filename(), _is_tabular(), prune_stale_pm_files(), PM raw folder helpers: pick latest export per RAT and prune stale files.…, Delete older tabular exports, keeping up to ``keep_per_technology`` newest per… (+49 more)
+Cohesion: 0.10
+Nodes (41): Invoke ``load_raw_csv_to_databases.py``. ``vendor``: ``all`` | ``nokia`` |…, run_pm_load(), clear_tabular_files(), infer_technology_from_filename(), _is_tabular(), prune_stale_pm_files(), PM raw folder helpers: pick latest export per RAT and prune stale files.…, Delete older tabular exports, keeping up to ``keep_per_technology`` newest per… (+33 more)
 
 ### Community 372 - "raw_path"
 Cohesion: 0.09
 Nodes (31): pm_raw_paths_flat(), Pipeline path helpers. Canonical folder taxonomy: -…, raw_path(), _latest_snapshot_dir(), main(), _open_sftp(), Step 1 pipeline: pull latest metadata snapshot CSVs. - Connect to metadata…, _candidate_dirs_for_remote() (+23 more)
 
-### Community 373 - "mrbts_tree_loader.py"
-Cohesion: 0.26
-Nodes (15): _build_tree_from_rows(), _cache_mtime(), _count_nodes(), _excel_mtime(), _flatten(), get_mrbts_tree_payload(), _load_cache_file(), load_mrbts_tree() (+7 more)
-
 ### Community 374 - "Adjacency GIS — progress"
-Cohesion: 0.25
-Nodes (7): 2026-09-20, 2026-09-20 (Dark mode), 2026-09-20 (Huawei CM ingest), 2026-09-23 (UI fork from Network Map), Adjacency GIS — progress, Current track, NEXT
+Cohesion: 0.20
+Nodes (9): 2026-09-20, 2026-09-20 (Dark mode), 2026-09-20 (Huawei CM ingest), 2026-09-23 (UI fork from Network Map), 2026-09-24 (Basemap switcher), 2026-09-24 (BCCH adjacent-channel highlighter), Adjacency GIS — progress, Current track (+1 more)
 
-### Community 375 - "login_required"
-Cohesion: 0.22
-Nodes (10): format_user_data(), login_required(), neighbor_analysis_page(), network_map_page(), Trigger a metadata sync in the background and return immediately., Decorator to require login, Format user data for templates, Render Network Map page (+2 more)
+### Community 375 - "groups.py"
+Cohesion: 0.27
+Nodes (10): _connect(), group_db_inventory(), group_health(), _pick_col(), Any, Connection, Group / controller PM scans for Network Health and Group Health., _scan_table() (+2 more)
 
 ### Community 376 - "initializeMap"
 Cohesion: 0.22
@@ -1772,33 +1731,53 @@ Nodes (9): applyDeepLinkFromUrl(), applySavedLeftPanelState(), closeKPIModal(), 
 Cohesion: 0.60
 Nodes (4): audit(), main(), Path, _rel()
 
-### Community 382 - "getHuaweiScopeLevel"
-Cohesion: 0.27
-Nodes (12): buildHuaweiPayload(), buildHuaweiSelections(), getHuaweiScopeLevel(), huaweiPayload(), isHuaweiControllerScope(), loadHuaweiAreas(), loadHuaweiMoObjects(), loadHuaweiNeCatalog() (+4 more)
+### Community 379 - "kpi_filter.py"
+Cohesion: 0.23
+Nodes (11): filter_absolute_kpis(), filter_metadata_kpis(), filter_network_health_kpis(), is_metadata_kpi(), is_percentage_kpi(), Exclude percentage / ratio / rate KPIs from Network Health (absolute counters…, True for identifier / dimension columns that are not benchmark KPIs., Drop metadata / identifier columns, preserving order. (+3 more)
+
+### Community 381 - "_discover_ret_label_vocab.py"
+Cohesion: 0.23
+Nodes (14): Runtime RETU_R — live angle / device status., Config RETU — Provision_Mass_Modification target for angle., _resolve_mo_class_by_abbreviation(), resolve_nokia_retu_read_mo_class(), resolve_nokia_retu_write_mo_class(), test_resolve_nokia_retu_mo_class_fallbacks_without_client(), _alias(), _as_text() (+6 more)
 
 ### Community 385 - "score_vs_threshold"
 Cohesion: 0.50
 Nodes (4): _default_threshold_span(), Headroom past the operator target that maps to score=100., Map a KPI versus the operator target to 0–100 (0 = at/better than target)., score_vs_threshold()
 
+### Community 389 - "clearBcchHighlight"
+Cohesion: 0.33
+Nodes (9): clearBcchHighlight(), drawBcchWedge(), onBcchSelectChange(), refreshBcchOverlay(), _setBcchUiActive(), setSelectedBcch(), stepBcch(), _syncBcchSelectValue() (+1 more)
+
+### Community 390 - "escapeHtml"
+Cohesion: 0.39
+Nodes (8): _deriveSupportedRats(), escapeHtml(), escapeHtmlMaybeRtl(), _hasArabicText(), _neighborPanelUnavailable(), _renderRepeaterPanel(), _repeaterDisplayName(), _repeaterPanelRow()
+
+### Community 392 - "service.py"
+Cohesion: 0.15
+Nodes (19): expand_cell_list(), Deduplicate cells preserving order, keeping display form., compute_impact_score(), Any, PM-derived Impact Score for case triage (not subscriber CEM)., impact ≈ severity_weight * score_norm * cell_factor * traffic_factor *…, Optimization Cases — detect → correlate → case → propose → scorecard., open_case_from_issue() (+11 more)
+
+### Community 395 - "inventory_sqlite_databases.py"
+Cohesion: 0.53
+Nodes (5): _inspect(), main(), Phase 0 — inventory every SQLite file PrimeNet still uses. Prints canonical…, _row(), _size()
+
 ## Knowledge Gaps
-- **936 isolated node(s):** `fix_proxy_env.sh script`, `mount_network_balance.sh script`, `mount_network_balance_from_env.sh script`, `ADJACENCY_GIS_MODE`, `TECH_COLORS` (+931 more)
+- **943 isolated node(s):** `fix_proxy_env.sh script`, `mount_network_balance.sh script`, `mount_network_balance_from_env.sh script`, `ADJACENCY_GIS_MODE`, `TECH_COLORS` (+938 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **26 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `execute_query()` connect `execute_query` to `site_catalog.py`, `scheduler.py`, `primenet_app.py`, `admin_panel/routes.py`, `open_db`, `balance_store.py`, `sync/routes.py`, `sync_reset_mode`, `network_health/logic.py`, `huawei_semantics.py`, `metadata.py`, `site_area.py`, `test_site_layout.py`, `user_profile/routes.py`, `cm_extractor/config.py`, `_fetch_neighbor_lines_payload`, `xml_parser/routes.py`, `create_session`, `extraction.py`, `cell_heatmap/routes.py`, `performance/routes.py`, `export_sites_kml`, `runtime.py`, `get_current_user`, `metadata_processor.py`, `auth_routes.py`, `get_session_token`, `son_analytics/logic.py`, `get_user_by_session`, `network_map/routes.py`?**
-  _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `log_activity()` connect `log_activity` to `cm_extractor/routes.py`, `performance_explorer_plus/routes.py`, `ne_comparison/routes.py`, `admin_panel/routes.py`, `init_schema`, `parameter_dictionary/nokia_loader.py`, `rru_inventory/routes.py`, `validate_raml_plan`, `ret_management/routes.py`, `user_profile/routes.py`, `cm_extractor/config.py`, `parameter_dictionary/routes.py`, `xml_parser/routes.py`, `ValueError`, `cell_heatmap/routes.py`, `build_table_workbook`, `nokia_configured`, `adjacency_gis/routes.py`, `performance/routes.py`, `export_sites_kml`, `performance_dictionary/nokia_loader.py`, `get_current_user`, `get_map_repeaters`, `auth_routes.py`, `get_session_token`, `get_user_by_session`, `login_required`, `network_map/routes.py`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
-- **Why does `get_session_token()` connect `get_session_token` to `cm_extractor/routes.py`, `performance_explorer_plus/routes.py`, `ne_comparison/routes.py`, `network_health/routes.py`, `log_activity`, `primenet_app.py`, `admin_panel/routes.py`, `elevation/routes.py`, `init_schema`, `power_bi/routes.py`, `navi.py`, `son_analytics/routes.py`, `sync/routes.py`, `scoring.py`, `require_permission`, `rru_inventory/routes.py`, `validate_raml_plan`, `femto_pm/routes.py`, `ret_management/routes.py`, `user_profile/routes.py`, `parameter_dictionary/routes.py`, `module_access_before_request`, `xml_parser/routes.py`, `ValueError`, `cell_heatmap/routes.py`, `nokia_configured`, `adjacency_gis/routes.py`, `performance/routes.py`, `fault_management/routes.py`, `get_current_user`, `performance_dictionary/nokia_loader.py`, `get_current_user`, `auth_routes.py`, `get_user_by_session`, `login_required`, `session.py`, `network_map/routes.py`?**
+- **Why does `execute_query()` connect `execute_query` to `site_catalog.py`, `primenet_app.py`, `admin_panel/routes.py`, `runtime.py`, `balance_store.py`, `connect_app`, `sync/routes.py`, `scheduler.py`, `network_health/logic.py`, `ValueError`, `open_db`, `metadata.py`, `site_area.py`, `test_site_layout.py`, `login`, `xml_parser/routes.py`, `cm_extractor/config.py`, `create_session`, `cell_heatmap/routes.py`, `adapt_sqlite_app_sql`, `get_session_token`, `performance/routes.py`, `metadata_processor.py`, `auth_routes.py`, `database_enhanced.py`, `network_map/routes.py`?**
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Why does `get_session_token()` connect `get_session_token` to `cm_extractor/routes.py`, `elevation/routes.py`, `performance_explorer_plus/routes.py`, `ne_comparison/routes.py`, `network_health/routes.py`, `log_activity`, `primenet_app.py`, `son_analytics/logic.py`, `admin_panel/routes.py`, `init_schema`, `power_bi/routes.py`, `navi.py`, `task_scheduler/routes.py`, `sync/routes.py`, `get_current_user`, `identity/routes.py`, `rru_inventory/routes.py`, `validate_raml_plan`, `femto_pm/routes.py`, `ret_management/routes.py`, `execute_query`, `parameter_dictionary/routes.py`, `get_user_by_session`, `xml_parser/routes.py`, `cell_heatmap/routes.py`, `access.py`, `configuration_dashboard/routes.py`, `module_access.py`, `performance/routes.py`, `fault_management/routes.py`, `performance_dictionary/nokia_loader.py`, `adjacency_gis/routes.py`, `auth_routes.py`, `database_enhanced.py`, `session.py`, `network_map/routes.py`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `get_user_by_session()` connect `get_user_by_session` to `cm_extractor/routes.py`, `elevation/routes.py`, `performance_explorer_plus/routes.py`, `ne_comparison/routes.py`, `network_health/routes.py`, `log_activity`, `primenet_app.py`, `son_analytics/logic.py`, `admin_panel/routes.py`, `init_schema`, `power_bi/routes.py`, `navi.py`, `task_scheduler/routes.py`, `sync/routes.py`, `get_current_user`, `identity/routes.py`, `rru_inventory/routes.py`, `validate_raml_plan`, `femto_pm/routes.py`, `ret_management/routes.py`, `execute_query`, `parameter_dictionary/routes.py`, `xml_parser/routes.py`, `cell_heatmap/routes.py`, `access.py`, `configuration_dashboard/routes.py`, `get_session_token`, `module_access.py`, `performance/routes.py`, `fault_management/routes.py`, `performance_dictionary/nokia_loader.py`, `adjacency_gis/routes.py`, `auth_routes.py`, `database_enhanced.py`, `session.py`, `network_map/routes.py`?**
   _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `execute_query()` (e.g. with `main()` and `_session()`) actually correct?**
   _`execute_query()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `fix_proxy_env.sh script`, `mount_network_balance.sh script`, `mount_network_balance_from_env.sh script` to the rest of the system?**
-  _936 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _943 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `cm_extractor/routes.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.07332421340629275 - nodes in this community are weakly interconnected._
-- **Should `fetch_nokia_retu_angles` be split into smaller, more focused modules?**
-  _Cohesion score 0.10591133004926108 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07828967178560675 - nodes in this community are weakly interconnected._
+- **Should `ret_management/logic.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.0798611111111111 - nodes in this community are weakly interconnected._
