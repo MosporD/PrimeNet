@@ -77,7 +77,7 @@ def main() -> int:
     from core.platform.local_proxy import choose_listen_port, make_suite_wsgi
     from werkzeug.serving import make_server
 
-    preferred = int(os.getenv("PROXY_HTTP_PORT", "80"))
+    preferred = int(os.getenv("PROXY_HTTP_PORT", "8000"))
     listen_host = os.getenv("PROXY_LISTEN_HOST", "0.0.0.0")
 
     try:

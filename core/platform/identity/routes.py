@@ -244,10 +244,16 @@ def create_identity_blueprint(
             _clear_login_failures(client_ip, username)
             token = _create_session(int(user["id"]))
             fallback = url_for(post_login_endpoint)
-            redirect_to = _safe_next_url(
-                data.get("next") or request.args.get("next"),
-                fallback=fallback,
-            )
+            # NexusCore lobby: always land on the portal tower after login.
+            # SSO often passes next=/ or next=/dashboard (PrimeNet), which used
+            # to skip the portals window entirely.
+            if platform_id == "nexuscore":
+                redirect_to = fallback
+            else:
+                redirect_to = _safe_next_url(
+                    data.get("next") or request.args.get("next"),
+                    fallback=fallback,
+                )
             response = make_response(
                 jsonify(
                     {

@@ -50,10 +50,13 @@ def make_suite_wsgi(*, nxc: WsgiApp, pn: WsgiApp, np: WsgiApp) -> WsgiApp:
 
 
 def choose_listen_port(preferred: int, host: str = "0.0.0.0") -> int:
-    """Bind preferred port; if :80 is denied (common on Windows), try 8080."""
+    """Bind preferred port; fall back to 8080 if preferred is busy/denied."""
     candidates = [preferred]
-    if preferred == 80 and 8080 not in candidates:
+    if 8080 not in candidates:
         candidates.append(8080)
+    if preferred != 80 and 80 not in candidates:
+        # Optional: try :80 last when preferred was something else
+        pass
     last_err: OSError | None = None
     for port in candidates:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

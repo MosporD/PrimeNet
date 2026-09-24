@@ -128,20 +128,21 @@ def get_current_user():
 
 
 def _sso_login_redirect(*, next_url: str | None = None):
-    """Send unauthenticated operators to NexusCore (shared cookie)."""
+    """Send unauthenticated operators to NexusCore (shared cookie).
+
+    Do not default ``next`` to ``/dashboard`` — NexusCore login always opens
+    the portal tower; users pick Engineering / Marketing from there.
+    """
     import os
     from core.platform.identity.routes import nexuscore_login_url
-    from core.platform.paths import primenet_public_url
 
     allow_local = (os.getenv('NCM_ALLOW_LOCAL_LOGIN') or '').strip().lower() in (
         '1', 'true', 'yes', 'on',
     )
     target = (next_url or request.args.get('next') or '').strip()
-    if not target:
-        target = f"{primenet_public_url()}/dashboard"
     if allow_local:
         return render_template('login.html', next_url=target)
-    return redirect(nexuscore_login_url(next_url=target))
+    return redirect(nexuscore_login_url(next_url=target or None))
 
 def get_operational_site_stats():
     """
