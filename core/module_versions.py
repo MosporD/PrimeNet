@@ -52,7 +52,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "alarm-impact": "V1.0",
     "group-health": "V1.0",
     "irat-border": "V1.0",
-    "admin-panel": "V1.0",
+    "admin-panel": "V1.1",
     "profile": "V1.0",
     "documentation": "V1.0",
 }

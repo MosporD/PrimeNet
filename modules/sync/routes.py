@@ -131,6 +131,68 @@ def sync_progress():
     return jsonify({'success': True, 'progress': get_sync_progress()})
 
 
+@sync_bp.route('/api/sync/diagnosis', methods=['GET'])
+@admin_required
+def sync_diagnosis():
+    """Full ETL diagnosis snapshot for Engineering Admin."""
+    try:
+        from .etl_diagnosis import build_etl_diagnosis
+        limit = request.args.get('limit', 80, type=int) or 80
+        limit = max(20, min(200, int(limit)))
+        payload = build_etl_diagnosis(history_limit=limit)
+        return jsonify({'success': True, 'diagnosis': payload})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/hourly_full', methods=['POST'])
+@admin_required
+def trigger_hourly_full():
+    """Manually trigger hourly pull + load orchestrator."""
+    try:
+        _log_sync('admin_command', 'hourly_full', 'started', 0, 'Manual trigger requested: hourly full')
+        from .scheduler import trigger_raw_master_now
+        t = threading.Thread(target=trigger_raw_master_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'hourly_full', 'ok', 0, 'Manual trigger accepted: hourly full')
+        return jsonify({'success': True, 'message': 'Hourly full pipeline triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'hourly_full', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/daily_full', methods=['POST'])
+@admin_required
+def trigger_daily_full():
+    """Manually trigger daily pull + load orchestrator."""
+    try:
+        _log_sync('admin_command', 'daily_full', 'started', 0, 'Manual trigger requested: daily full')
+        from .scheduler import trigger_daily_full_now
+        t = threading.Thread(target=trigger_daily_full_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'daily_full', 'ok', 0, 'Manual trigger accepted: daily full')
+        return jsonify({'success': True, 'message': 'Daily full pipeline triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'daily_full', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/neighbor_sync', methods=['POST'])
+@admin_required
+def trigger_neighbor_sync():
+    """Manually trigger neighbor pull + load."""
+    try:
+        _log_sync('admin_command', 'neighbor_sync', 'started', 0, 'Manual trigger requested: neighbor sync')
+        from .scheduler import trigger_neighbor_sync_now
+        t = threading.Thread(target=trigger_neighbor_sync_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'neighbor_sync', 'ok', 0, 'Manual trigger accepted: neighbor sync')
+        return jsonify({'success': True, 'message': 'Neighbor sync triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'neighbor_sync', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @sync_bp.route('/api/sync/history', methods=['GET'])
 @admin_required
 def sync_history():

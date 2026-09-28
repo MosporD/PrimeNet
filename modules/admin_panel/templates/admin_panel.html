@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineering Admin - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
-    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=1.4">
+    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=1.5">
 </head>
 <body class="admin-panel-page" data-current-user-id="{{ user.id }}">
     <div class="container">
@@ -26,6 +26,7 @@
         <main class="main-content">
             <div class="admin-pages-nav" role="tablist" aria-label="Admin sections">
                 <button class="admin-page-tab active" data-page="data-sync" type="button" onclick="openAdminPage('data-sync')">Data Sync</button>
+                <button class="admin-page-tab" data-page="etl-diagnosis" type="button" onclick="openAdminPage('etl-diagnosis')">ETL Diagnosis</button>
                 <button class="admin-page-tab" data-page="sync-status" type="button" onclick="openAdminPage('sync-status')">Sync Status</button>
                 <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
                 <button class="admin-page-tab" data-page="api-connections" type="button" onclick="openAdminPage('api-connections')">API Connections</button>
@@ -110,6 +111,88 @@
                     </div>
                     <div id="sync-msg" class="sync-msg" style="display:none;"></div>
                     <pre id="inspect-output" class="inspect-output" style="display:none;"></pre>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="etl-diagnosis">
+                <div class="sync-section etl-diagnosis-section">
+                    <div class="section-title-row">
+                        <h2 class="section-title">ETL Pipeline Diagnosis</h2>
+                        <div class="etl-diag-toolbar">
+                            <label class="etl-auto-refresh">
+                                <input type="checkbox" id="etl-diag-auto" checked>
+                                Auto-refresh
+                            </label>
+                            <button type="button" class="btn-history-reload" onclick="loadEtlDiagnosis(true)">↻ Refresh</button>
+                        </div>
+                    </div>
+                    <p class="field-hint" id="etl-diag-generated">Loading diagnosis…</p>
+                    <div id="etl-diag-alerts" class="etl-alert-list" aria-live="polite"></div>
+
+                    <div class="etl-kpi-grid" id="etl-diag-kpis"></div>
+
+                    <h3 class="section-subtitle">Live pipeline progress</h3>
+                    <p class="field-hint">
+                        Progress bars update for jobs running in this process (manual triggers from the web UI).
+                        Scheduled work on the scheduler container is visible via events and store counts below.
+                    </p>
+                    <div class="live-progress-grid etl-progress-grid" id="etl-diag-progress"></div>
+
+                    <h3 class="section-subtitle">Manual operations</h3>
+                    <div class="etl-ops-grid" id="etl-diag-ops"></div>
+                    <div id="etl-diag-msg" class="sync-msg" style="display:none;"></div>
+
+                    <div class="etl-two-col">
+                        <div>
+                            <h3 class="section-subtitle">Postgres domains</h3>
+                            <div id="etl-diag-domains" class="etl-panel-box"></div>
+                            <h3 class="section-subtitle">Store row counts</h3>
+                            <div id="etl-diag-stores" class="etl-panel-box"></div>
+                        </div>
+                        <div>
+                            <h3 class="section-subtitle">Scheduler jobs</h3>
+                            <div id="etl-diag-jobs" class="etl-panel-box"></div>
+                            <h3 class="section-subtitle">Last successful runs</h3>
+                            <div id="etl-diag-last-ok" class="etl-panel-box"></div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-subtitle">Recent errors</h3>
+                    <div class="etl-table-wrap">
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>When</th>
+                                    <th>Type</th>
+                                    <th>Tech</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody id="etl-diag-errors">
+                                <tr><td colspan="4" style="text-align:center;">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-subtitle">Live event feed
+                        <button type="button" class="btn-history-reload" onclick="loadEtlDiagnosis(true)">↻</button>
+                    </h3>
+                    <div class="etl-table-wrap">
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>When</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Rows</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody id="etl-diag-events">
+                                <tr><td colspan="5" style="text-align:center;">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -345,6 +428,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
-    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.8"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.9"></script>
 </body>
 </html>

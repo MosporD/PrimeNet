@@ -27,7 +27,7 @@ Dated work log: [`network-map.progress.md`](network-map.progress.md). Do not dup
 
 ## Plans
 
-None parked for the map itself.
+Smoke: upload KMZ → folder checkboxes → reload persistence. GroundOverlay not in scope.
 
 ## Watch-outs
 

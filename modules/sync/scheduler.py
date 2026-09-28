@@ -55,6 +55,11 @@ _sync_progress_lock = threading.Lock()
 _pipeline_cycle_lock = threading.Lock()
 
 
+def pipeline_cycle_lock_held() -> bool:
+    """True when this process currently holds the shared hourly/daily/neighbor lock."""
+    return bool(_pipeline_cycle_lock.locked())
+
+
 def _defer_pipeline_if_low_memory(job_label: str) -> bool:
     """Return True when the cycle should be skipped due to low free RAM."""
     try:
@@ -91,10 +96,29 @@ def _trim_scheduler_memory(job_label: str = '') -> None:
 def _run_child_script(cmd: list[str], *, cwd: str | None = None) -> object:
     """Run a pipeline child with streamed logging and bounded in-memory tail."""
     return run_logged_subprocess(cmd, cwd=cwd or _PROJECT_ROOT, logger=logger)
+def _idle_progress() -> dict:
+    return {
+        'running': False,
+        'stage': 'idle',
+        'progress': 0,
+        'total': 0,
+        'percent': 0,
+        'message': '',
+        'updated_at': None,
+    }
+
+
 _sync_progress = {
-    'nokia_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
-    'huawei_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
-    'metadata': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
+    'nokia_pm': _idle_progress(),
+    'huawei_pm': _idle_progress(),
+    'metadata': _idle_progress(),
+    'hourly_full': _idle_progress(),
+    'daily_full': _idle_progress(),
+    'neighbor_sync': _idle_progress(),
+    'cells_hourly': _idle_progress(),
+    'cells_daily': _idle_progress(),
+    'groups_hourly': _idle_progress(),
+    'groups_daily': _idle_progress(),
 }
 
 
@@ -229,6 +253,7 @@ def run_full_sync_cycle():
 
     if not etl_enabled():
         logger.info('Hourly sync skipped — %s', etl_disabled_reason())
+        _skip_progress('hourly_full', f'ETL disabled: {etl_disabled_reason()}')
         return
 
     project_root = _PROJECT_ROOT
@@ -245,20 +270,25 @@ def run_full_sync_cycle():
     if not os.path.isfile(orchestrator):
         _log_sync('db_loader', 'all', 'error', 0, f'missing script: {orchestrator}')
         logger.error('Hourly orchestrator script not found: %s', orchestrator)
+        _finish_progress('hourly_full', False, f'missing script: {orchestrator}')
         return
 
     if not _pipeline_cycle_lock.acquire(blocking=False):
         msg = 'Hourly orchestrator skipped: another pipeline cycle is already running'
         _log_sync('db_loader', 'all', 'error', 0, msg)
         logger.warning(msg)
+        _skip_progress('hourly_full', msg)
         return
 
     try:
         if _defer_pipeline_if_low_memory('db_loader'):
+            _skip_progress('hourly_full', 'Deferred: low memory')
             return
 
+        _start_progress('hourly_full', 2, 'Hourly pull + load starting…')
         logger.info('Starting hourly orchestrator script: %s', orchestrator)
         proc = _run_child_script([sys.executable, orchestrator], cwd=project_root)
+        _advance_progress('hourly_full', 1, 'Orchestrator finished; recording row deltas…')
 
         # code=2 => partial pull (one vendor failed) but the load still ran on
         # whatever arrived. Record it as a visible warning, not a hard failure.
@@ -270,6 +300,7 @@ def run_full_sync_cycle():
                 msg = f'{msg}: {details}'
             _log_sync('db_loader', 'all', 'error', 0, msg)
             logger.error('Hourly orchestrator failed with code %s', proc.returncode)
+            _finish_progress('hourly_full', False, msg)
             return
 
         if partial:
@@ -289,9 +320,15 @@ def run_full_sync_cycle():
         }
         _log_loader_row_deltas(before, after)
         logger.info('Full sync cycle completed%s.', ' (partial pull)' if partial else ' successfully')
+        _finish_progress(
+            'hourly_full',
+            True,
+            'Hourly full completed (partial pull).' if partial else 'Hourly full completed.',
+        )
     except Exception as e:
         _log_sync('db_loader', 'all', 'error', 0, str(e))
         logger.exception('Full sync cycle failed during DB load: %s', e)
+        _finish_progress('hourly_full', False, str(e))
     finally:
         _pipeline_cycle_lock.release()
         _trim_scheduler_memory('db_loader')
@@ -303,6 +340,7 @@ def run_neighbor_sync_cycle():
 
     if not etl_enabled():
         logger.info('Neighbor sync skipped — %s', etl_disabled_reason())
+        _skip_progress('neighbor_sync', f'ETL disabled: {etl_disabled_reason()}')
         return
 
     project_root = _PROJECT_ROOT
@@ -311,20 +349,25 @@ def run_neighbor_sync_cycle():
     if not os.path.isfile(orchestrator):
         _log_sync('neighbor_sync', 'all', 'error', 0, f'missing script: {orchestrator}')
         logger.error('Neighbor orchestrator script not found: %s', orchestrator)
+        _finish_progress('neighbor_sync', False, f'missing script: {orchestrator}')
         return
 
     if not _pipeline_cycle_lock.acquire(blocking=False):
         msg = 'Neighbor sync skipped: another pipeline cycle is already running'
         _log_sync('neighbor_sync', 'all', 'error', 0, msg)
         logger.warning(msg)
+        _skip_progress('neighbor_sync', msg)
         return
 
     try:
         if _defer_pipeline_if_low_memory('neighbor_sync'):
+            _skip_progress('neighbor_sync', 'Deferred: low memory')
             return
 
+        _start_progress('neighbor_sync', 2, 'Neighbor pull + load starting…')
         logger.info('Starting neighbor orchestrator script: %s', orchestrator)
         proc = _run_child_script([sys.executable, orchestrator], cwd=project_root)
+        _advance_progress('neighbor_sync', 1, 'Neighbor orchestrator finished…')
 
         partial = proc.returncode == 2
         if proc.returncode not in (0, 2):
@@ -334,6 +377,7 @@ def run_neighbor_sync_cycle():
                 msg = f'{msg}: {details}'
             _log_sync('neighbor_sync', 'all', 'error', 0, msg)
             logger.error('Neighbor orchestrator failed with code %s', proc.returncode)
+            _finish_progress('neighbor_sync', False, msg)
             return
 
         if partial:
@@ -343,12 +387,15 @@ def run_neighbor_sync_cycle():
                 msg = f'{msg}: {details}'
             _log_sync('neighbor_sync', 'all', 'error', 0, msg)
             logger.warning(msg)
+            _finish_progress('neighbor_sync', True, msg)
         else:
             _log_sync('neighbor_sync', 'all', 'ok', 0, 'Neighbor pull + full-replace load completed')
             logger.info('Neighbor sync cycle completed successfully.')
+            _finish_progress('neighbor_sync', True, 'Neighbor sync completed.')
     except Exception as e:
         _log_sync('neighbor_sync', 'all', 'error', 0, str(e))
         logger.exception('Neighbor sync cycle failed: %s', e)
+        _finish_progress('neighbor_sync', False, str(e))
     finally:
         _pipeline_cycle_lock.release()
         _trim_scheduler_memory('neighbor_sync')
@@ -360,6 +407,7 @@ def run_daily_sync_cycle():
 
     if not etl_enabled():
         logger.info('Daily sync skipped — %s', etl_disabled_reason())
+        _skip_progress('daily_full', f'ETL disabled: {etl_disabled_reason()}')
         return
 
     project_root = _PROJECT_ROOT
@@ -367,28 +415,37 @@ def run_daily_sync_cycle():
     if not os.path.isfile(script):
         _log_sync('daily_full_sync', 'all', 'error', 0, f'missing script: {script}')
         logger.error('Daily pipeline script not found: %s', script)
+        _finish_progress('daily_full', False, f'missing script: {script}')
         return
 
     if not _pipeline_cycle_lock.acquire(blocking=False):
         msg = 'Daily orchestrator skipped: another pipeline cycle is already running'
         _log_sync('daily_full_sync', 'all', 'error', 0, msg)
         logger.warning(msg)
+        _skip_progress('daily_full', msg)
         return
 
     try:
         if _defer_pipeline_if_low_memory('daily_full_sync'):
+            _skip_progress('daily_full', 'Deferred: low memory')
             return
 
+        _start_progress('daily_full', 2, 'Daily pull + load starting…')
         proc = _run_child_script([sys.executable, script], cwd=project_root)
+        _advance_progress('daily_full', 1, 'Daily orchestrator finished…')
         if proc.returncode == 0:
             _log_sync('daily_full_sync', 'all', 'ok', 0, 'Daily full sync completed')
             logger.info('Daily full sync completed successfully.')
+            _finish_progress('daily_full', True, 'Daily full sync completed.')
         else:
-            _log_sync('daily_full_sync', 'all', 'error', 0, f'Daily full sync failed (code={proc.returncode})')
+            msg = f'Daily full sync failed (code={proc.returncode})'
+            _log_sync('daily_full_sync', 'all', 'error', 0, msg)
             logger.error('Daily full sync failed with code %s.', proc.returncode)
+            _finish_progress('daily_full', False, msg)
     except Exception as e:
         _log_sync('daily_full_sync', 'all', 'error', 0, str(e))
         logger.exception('Daily full sync failed: %s', e)
+        _finish_progress('daily_full', False, str(e))
     finally:
         _pipeline_cycle_lock.release()
         _trim_scheduler_memory('daily_full_sync')
@@ -405,6 +462,7 @@ def run_manual_category_sync(category: str):
     pull_args: list[str] = []
     load_args: list[str] = []
     sync_type = category.replace('-', '_')
+    progress_key = sync_type
     if category.endswith('daily'):
         pull_script = os.path.join('pipeline', 'pull', 'daily', 'pull_all.py')
         load_script = os.path.join('pipeline', 'load', 'daily', 'load_all.py')
@@ -416,15 +474,18 @@ def run_manual_category_sync(category: str):
         load_args.extend(['--category', 'groups'])
     else:
         _log_sync('manual_category_sync', category, 'error', 0, 'Unknown category')
+        _finish_progress(progress_key, False, 'Unknown category')
         return
 
     pull_path = os.path.join(project_root, pull_script)
     load_path = os.path.join(project_root, load_script)
     if not os.path.isfile(pull_path) or not os.path.isfile(load_path):
         _log_sync('manual_category_sync', category, 'error', 0, 'Required script missing')
+        _finish_progress(progress_key, False, 'Required script missing')
         return
 
     try:
+        _start_progress(progress_key, 2, f'{category} pull starting…')
         pull_proc = _run_child_script([sys.executable, pull_path] + pull_args, cwd=project_root)
         # code=2 => partial pull (one vendor failed); still load whatever arrived.
         pull_partial = pull_proc.returncode == 2
@@ -434,6 +495,7 @@ def run_manual_category_sync(category: str):
             if details:
                 msg = f'{msg}: {details}'
             _log_sync(sync_type, 'all', 'error', 0, msg)
+            _finish_progress(progress_key, False, msg)
             return
         if pull_partial:
             details = _subprocess_failure_detail(pull_proc)
@@ -442,28 +504,30 @@ def run_manual_category_sync(category: str):
                 msg = f'{msg}: {details}'
             _log_sync(sync_type, 'all', 'error', 0, msg)
 
+        _advance_progress(progress_key, 1, f'{category} load starting…')
         load_proc = _run_child_script([sys.executable, load_path] + load_args, cwd=project_root)
         if load_proc.returncode == 0:
             done_msg = 'Manual category sync completed (partial pull)' if pull_partial else 'Manual category sync completed'
             _log_sync(sync_type, 'all', 'ok', 0, done_msg)
+            _finish_progress(progress_key, True, done_msg)
         else:
             details = _subprocess_failure_detail(load_proc)
             msg = f'load failed (code={load_proc.returncode})'
             if details:
                 msg = f'{msg}: {details}'
             _log_sync(sync_type, 'all', 'error', 0, msg)
+            _finish_progress(progress_key, False, msg)
     except Exception as e:
         _log_sync(sync_type, 'all', 'error', 0, str(e))
         logger.exception('Manual category sync failed (%s): %s', category, e)
+        _finish_progress(progress_key, False, str(e))
     finally:
         _trim_scheduler_memory(f'manual_{sync_type}')
 
 
 def _set_progress(job_key: str, **fields) -> None:
-    if job_key not in _sync_progress:
-        return
     with _sync_progress_lock:
-        cur = dict(_sync_progress[job_key])
+        cur = dict(_sync_progress.get(job_key) or _idle_progress())
         cur.update(fields)
         p = int(cur.get('progress') or 0)
         t = int(cur.get('total') or 0)
@@ -492,7 +556,7 @@ def _advance_progress(job_key: str, progress: int, message: str | None = None) -
 
 def _finish_progress(job_key: str, ok: bool, message: str) -> None:
     with _sync_progress_lock:
-        total = int(_sync_progress[job_key].get('total') or 0)
+        total = int((_sync_progress.get(job_key) or {}).get('total') or 0)
     _set_progress(
         job_key,
         running=False,
@@ -1408,6 +1472,34 @@ def start_scheduler():
         )
     else:
         logger.info('Neighbor ingest job not registered (NCM_DISABLE_NEIGHBOR_SCHEDULER).')
+
+    # Metadata snapshot pull (Atoll CSVs) — daily, independent of PM orchestrators.
+    if os.environ.get('NCM_DISABLE_METADATA_SCHEDULER', '').strip().lower() not in (
+        '1',
+        'true',
+        'yes',
+    ):
+        meta_hour = int(DAILY_PULL_HOUR)
+        try:
+            meta_hour = int(os.environ.get('METADATA_PULL_HOUR', str(DAILY_PULL_HOUR)))
+        except ValueError:
+            meta_hour = int(DAILY_PULL_HOUR)
+        meta_minute = 20
+        try:
+            meta_minute = max(0, min(59, int(os.environ.get('METADATA_PULL_MINUTE', '20'))))
+        except ValueError:
+            meta_minute = 20
+        _scheduler.add_job(
+            pull_metadata,
+            trigger=CronTrigger(hour=meta_hour, minute=meta_minute),
+            id='metadata_pull_daily',
+            name=f'Metadata SFTP pull + load (daily {meta_hour:02d}:{meta_minute:02d})',
+            replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+        )
+    else:
+        logger.info('Metadata pull job not registered (NCM_DISABLE_METADATA_SCHEDULER).')
 
     # Watcher: remote signature probe + DB ingest verification / retry.
     if watcher_enabled:

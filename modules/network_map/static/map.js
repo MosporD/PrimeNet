@@ -123,6 +123,14 @@ let selectionPolygonLayer  = null;
 let selectionPolygon       = null;
 let _polygonExtractBusy    = false;
 
+// ─── Per-user KMZ / KML layers ────────────────────────────────────────────────
+/** @type {L.LayerGroup|null} */
+let userKmzLayerGroup = null;
+/** layerId → { meta, geojson, leafletLayer, visibility } */
+const kmzLayerStore = new Map();
+let _kmzVisibilityTimers = {};
+let _kmzDidFitBounds = false;
+
 const LEFT_PANEL_COLLAPSE_KEY = 'networkMapLeftPanelCollapsed';
 
 function applySavedLeftPanelState() {
@@ -168,6 +176,7 @@ function initializeMap() {
     neighborLinesLayer = L.layerGroup().addTo(map);
     repeaterLayer = L.layerGroup();
     selectionPolygonLayer = L.layerGroup().addTo(map);
+    userKmzLayerGroup = L.layerGroup().addTo(map);
     if (NEIGHBOR_ONLY_MODE) {
         mapModule = 'neighbor-explorer';
         neighborEnabled = true;
@@ -225,6 +234,7 @@ function initializeMap() {
         updateNeighborMetricHint();
         applyDeepLinkFromUrl();
     });
+    loadKmzLayers();
 }
 
 // ─── Stats & tech filter buttons ─────────────────────────────────────────────
@@ -3425,6 +3435,397 @@ async function applyNetworkMapState(state /* , opts */) {
         try { showSiteDetails(state.selectedSiteId); } catch (_) { /* ignore */ }
     }
 }
+
+// ─── Per-user KMZ / KML layers (Google Earth-style checkboxes) ───────────────
+
+function _kmzSetStatus(msg, isError) {
+    const el = document.getElementById('kmz-layers-status');
+    if (!el) return;
+    if (!msg) {
+        el.style.display = 'none';
+        el.textContent = '';
+        el.classList.remove('is-error');
+        return;
+    }
+    el.style.display = '';
+    el.textContent = msg;
+    el.classList.toggle('is-error', Boolean(isError));
+}
+
+function _kmzCollectIds(node, out) {
+    if (!node) return out;
+    out.push(node.id);
+    (node.children || []).forEach((c) => _kmzCollectIds(c, out));
+    return out;
+}
+
+function _kmzDescendantIds(node) {
+    const ids = [];
+    (node.children || []).forEach((c) => _kmzCollectIds(c, ids));
+    return ids;
+}
+
+function _kmzFindNode(nodes, id) {
+    for (const n of nodes || []) {
+        if (n.id === id) return n;
+        const hit = _kmzFindNode(n.children || [], id);
+        if (hit) return hit;
+    }
+    return null;
+}
+
+function _kmzStyleFeature(feature) {
+    const t = feature?.geometry?.type || '';
+    if (t === 'Point' || t === 'MultiPoint') {
+        return {};
+    }
+    if (t.includes('Line')) {
+        return { color: '#c0392b', weight: 2.5, opacity: 0.85 };
+    }
+    return {
+        color: '#2980b9',
+        weight: 1.5,
+        opacity: 0.9,
+        fillColor: '#3498db',
+        fillOpacity: 0.25,
+    };
+}
+
+function _kmzPointToLayer(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: 6,
+        color: '#c0392b',
+        weight: 2,
+        fillColor: '#e74c3c',
+        fillOpacity: 0.85,
+    });
+}
+
+function _kmzOnEachFeature(feature, layer) {
+    const name = feature?.properties?.name || 'Placemark';
+    const desc = feature?.properties?.description || '';
+    const safeName = escapeHtml(String(name));
+    const safeDesc = escapeHtml(String(desc)).replace(/\n/g, '<br>');
+    layer.bindPopup(
+        `<div class="kmz-popup"><strong>${safeName}</strong>`
+        + (desc ? `<div class="kmz-popup-desc">${safeDesc}</div>` : '')
+        + '</div>',
+    );
+}
+
+function _kmzFeatureVisible(feature, visibility) {
+    const fid = feature?.properties?.folder_id || feature?.properties?.id || feature?.id;
+    if (!fid) return true;
+    if (Object.prototype.hasOwnProperty.call(visibility, fid)) {
+        return Boolean(visibility[fid]);
+    }
+    // Fall back to parent chain
+    let pid = feature?.properties?.parent_id;
+    while (pid) {
+        if (Object.prototype.hasOwnProperty.call(visibility, pid) && !visibility[pid]) {
+            return false;
+        }
+        // parent visibility unknown → keep walking via tree isn't available here;
+        // treat missing as visible
+        break;
+    }
+    return true;
+}
+
+function _kmzRebuildLeaflet(layerId) {
+    const entry = kmzLayerStore.get(layerId);
+    if (!entry || !userKmzLayerGroup) return;
+
+    if (entry.leafletLayer) {
+        userKmzLayerGroup.removeLayer(entry.leafletLayer);
+        entry.leafletLayer = null;
+    }
+
+    const fc = entry.geojson;
+    if (!fc || !Array.isArray(fc.features)) return;
+
+    const filtered = {
+        type: 'FeatureCollection',
+        features: fc.features.filter((f) => _kmzFeatureVisible(f, entry.visibility || {})),
+    };
+
+    entry.leafletLayer = L.geoJSON(filtered, {
+        style: _kmzStyleFeature,
+        pointToLayer: _kmzPointToLayer,
+        onEachFeature: _kmzOnEachFeature,
+    });
+    userKmzLayerGroup.addLayer(entry.leafletLayer);
+}
+
+function _kmzMaybeFitBounds() {
+    if (_kmzDidFitBounds || !userKmzLayerGroup || !map) return;
+    try {
+        const b = userKmzLayerGroup.getBounds?.();
+        if (b && b.isValid && b.isValid()) {
+            map.fitBounds(b.pad(0.15));
+            _kmzDidFitBounds = true;
+        }
+    } catch (_) { /* ignore */ }
+}
+
+function _kmzSyncIndeterminate(layerId) {
+    const entry = kmzLayerStore.get(layerId);
+    if (!entry) return;
+    const roots = entry.meta?.tree || [];
+    const vis = entry.visibility || {};
+
+    function walk(node) {
+        const childNodes = node.children || [];
+        childNodes.forEach(walk);
+        const cb = document.querySelector(
+            `#kmz-layers-list input[data-layer-id="${layerId}"][data-node-id="${node.id}"]`,
+        );
+        if (!cb) return;
+        if (!childNodes.length) {
+            cb.indeterminate = false;
+            cb.checked = Boolean(vis[node.id]);
+            return;
+        }
+        const states = childNodes.map((c) => Boolean(vis[c.id]));
+        const allOn = states.every(Boolean);
+        const allOff = states.every((s) => !s);
+        cb.indeterminate = !allOn && !allOff;
+        cb.checked = allOn;
+        vis[node.id] = allOn;
+    }
+    roots.forEach(walk);
+}
+
+function _kmzSchedulePersist(layerId) {
+    if (_kmzVisibilityTimers[layerId]) {
+        clearTimeout(_kmzVisibilityTimers[layerId]);
+    }
+    _kmzVisibilityTimers[layerId] = setTimeout(() => {
+        _kmzPersistVisibility(layerId);
+    }, 400);
+}
+
+async function _kmzPersistVisibility(layerId) {
+    const entry = kmzLayerStore.get(layerId);
+    if (!entry) return;
+    try {
+        await fetch(`/api/map/layers/${encodeURIComponent(layerId)}/visibility`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ visibility: entry.visibility }),
+        });
+    } catch (_) { /* ignore transient */ }
+}
+
+function onKmzCheckboxChange(layerId, nodeId, checked) {
+    const entry = kmzLayerStore.get(layerId);
+    if (!entry) return;
+    const node = _kmzFindNode(entry.meta?.tree || [], nodeId);
+    const ids = [nodeId];
+    if (node) {
+        ids.push(..._kmzDescendantIds(node));
+    }
+    ids.forEach((id) => { entry.visibility[id] = Boolean(checked); });
+
+    // Recompute ancestors: if all siblings on → parent on, etc.
+    _kmzPropagateAncestors(layerId, nodeId);
+    _kmzSyncIndeterminate(layerId);
+    _kmzRebuildLeaflet(layerId);
+    _kmzSchedulePersist(layerId);
+}
+
+function _kmzPropagateAncestors(layerId, nodeId) {
+    const entry = kmzLayerStore.get(layerId);
+    if (!entry) return;
+    const flat = [];
+    function flatten(nodes, parent) {
+        (nodes || []).forEach((n) => {
+            flat.push({ node: n, parent });
+            flatten(n.children || [], n);
+        });
+    }
+    flatten(entry.meta?.tree || [], null);
+
+    let current = flat.find((x) => x.node.id === nodeId);
+    while (current && current.parent) {
+        const parent = current.parent;
+        const kids = parent.children || [];
+        const allOn = kids.every((c) => entry.visibility[c.id]);
+        entry.visibility[parent.id] = allOn;
+        current = flat.find((x) => x.node.id === parent.id);
+    }
+}
+
+function _kmzRenderTreeHtml(layerId, nodes) {
+    if (!nodes || !nodes.length) return '';
+    const lid = escapeHtmlAttr(layerId);
+    let html = '<ul class="kmz-tree">';
+    for (const n of nodes) {
+        const nid = escapeHtmlAttr(n.id);
+        const typeHint = n.type === 'folder' ? '📁' : '📍';
+        html += `<li>`;
+        html += `<div class="kmz-tree-node">`;
+        html += `<label>`;
+        html += `<input type="checkbox" data-layer-id="${lid}" data-node-id="${nid}" `
+            + `onchange="onKmzCheckboxChange('${lid}','${nid}',this.checked)">`;
+        html += `<span class="kmz-tree-type" aria-hidden="true">${typeHint}</span>`;
+        html += `<span class="kmz-tree-label">${escapeHtml(n.name || n.id)}</span>`;
+        html += `</label>`;
+        html += `</div>`;
+        if (n.children && n.children.length) {
+            html += _kmzRenderTreeHtml(layerId, n.children);
+        }
+        html += `</li>`;
+    }
+    html += '</ul>';
+    return html;
+}
+
+function renderKmzLayersPanel() {
+    const list = document.getElementById('kmz-layers-list');
+    if (!list) return;
+    if (!kmzLayerStore.size) {
+        list.innerHTML = '<div class="kmz-layers-empty">No KMZ layers yet. Upload a .kmz or .kml file.</div>';
+        return;
+    }
+    let html = '';
+    for (const [layerId, entry] of kmzLayerStore) {
+        const name = entry.meta?.name || entry.meta?.original_filename || layerId;
+        html += `<div class="kmz-layer-card" data-layer-id="${escapeHtmlAttr(layerId)}">`;
+        html += `<div class="kmz-layer-card-head">`;
+        html += `<span class="kmz-layer-card-name" title="${escapeHtmlAttr(name)}">${escapeHtml(name)}</span>`;
+        html += `<button type="button" class="kmz-layer-delete" title="Delete layer" `
+            + `onclick="deleteKmzLayer('${escapeHtmlAttr(layerId)}')">✕</button>`;
+        html += `</div>`;
+        html += _kmzRenderTreeHtml(layerId, entry.meta?.tree || []);
+        html += `</div>`;
+    }
+    list.innerHTML = html;
+
+    // Apply checked / indeterminate from visibility
+    for (const layerId of kmzLayerStore.keys()) {
+        const entry = kmzLayerStore.get(layerId);
+        const vis = entry.visibility || {};
+        list.querySelectorAll(`input[data-layer-id="${layerId}"]`).forEach((cb) => {
+            const nid = cb.getAttribute('data-node-id');
+            cb.checked = Boolean(vis[nid]);
+            cb.indeterminate = false;
+        });
+        _kmzSyncIndeterminate(layerId);
+    }
+}
+
+async function _kmzLoadGeojson(layerId) {
+    const res = await fetch(`/api/map/layers/${encodeURIComponent(layerId)}/geojson`);
+    if (!res.ok) throw new Error(`Failed to load layer geometry (${res.status})`);
+    return res.json();
+}
+
+async function loadKmzLayers() {
+    const list = document.getElementById('kmz-layers-list');
+    if (!list) return;
+    try {
+        const res = await fetch('/api/map/layers');
+        const data = await res.json();
+        if (!data.success) {
+            _kmzSetStatus(data.error || 'Could not load KMZ layers', true);
+            return;
+        }
+        kmzLayerStore.clear();
+        if (userKmzLayerGroup) userKmzLayerGroup.clearLayers();
+
+        const layers = data.layers || [];
+        for (const meta of layers) {
+            let geojson = { type: 'FeatureCollection', features: [] };
+            try {
+                geojson = await _kmzLoadGeojson(meta.id);
+            } catch (_) { /* keep empty */ }
+            kmzLayerStore.set(meta.id, {
+                meta,
+                geojson,
+                visibility: meta.visibility || {},
+                leafletLayer: null,
+            });
+            _kmzRebuildLeaflet(meta.id);
+        }
+        renderKmzLayersPanel();
+        if (layers.length) _kmzMaybeFitBounds();
+        _kmzSetStatus('');
+    } catch (e) {
+        _kmzSetStatus(e.message || 'Could not load KMZ layers', true);
+    }
+}
+
+async function uploadKmzLayer(inputEl) {
+    const file = inputEl?.files?.[0];
+    if (!file) return;
+    const btn = document.getElementById('kmz-upload-btn');
+    if (btn) btn.disabled = true;
+    _kmzSetStatus(`Uploading ${file.name}…`);
+    try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/map/layers', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Upload failed');
+        }
+        const meta = data.layer;
+        let geojson = { type: 'FeatureCollection', features: [] };
+        try {
+            geojson = await _kmzLoadGeojson(meta.id);
+        } catch (_) { /* empty */ }
+        kmzLayerStore.set(meta.id, {
+            meta,
+            geojson,
+            visibility: meta.visibility || {},
+            leafletLayer: null,
+        });
+        _kmzRebuildLeaflet(meta.id);
+        renderKmzLayersPanel();
+        _kmzDidFitBounds = false;
+        _kmzMaybeFitBounds();
+        const warns = (data.warnings || meta.warnings || []).filter(Boolean);
+        _kmzSetStatus(
+            warns.length
+                ? `Added “${meta.name}” (${meta.feature_count || 0} features). ${warns.join('; ')}`
+                : `Added “${meta.name}” (${meta.feature_count || 0} features).`,
+        );
+    } catch (e) {
+        _kmzSetStatus(e.message || 'Upload failed', true);
+    } finally {
+        if (btn) btn.disabled = false;
+        if (inputEl) inputEl.value = '';
+    }
+}
+
+async function deleteKmzLayer(layerId) {
+    const entry = kmzLayerStore.get(layerId);
+    const label = entry?.meta?.name || layerId;
+    if (!window.confirm(`Delete KMZ layer “${label}”?`)) return;
+    try {
+        const res = await fetch(`/api/map/layers/${encodeURIComponent(layerId)}`, {
+            method: 'DELETE',
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.success === false) {
+            throw new Error(data.error || 'Delete failed');
+        }
+        if (entry?.leafletLayer && userKmzLayerGroup) {
+            userKmzLayerGroup.removeLayer(entry.leafletLayer);
+        }
+        kmzLayerStore.delete(layerId);
+        renderKmzLayersPanel();
+        _kmzSetStatus(`Deleted “${label}”.`);
+    } catch (e) {
+        _kmzSetStatus(e.message || 'Delete failed', true);
+    }
+}
+
+window.onKmzCheckboxChange = onKmzCheckboxChange;
+window.uploadKmzLayer = uploadKmzLayer;
+window.deleteKmzLayer = deleteKmzLayer;
+window.loadKmzLayers = loadKmzLayers;
 
 window.getNetworkMapState = getNetworkMapState;
 window.applyNetworkMapState = applyNetworkMapState;

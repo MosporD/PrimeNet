@@ -2623,3 +2623,101 @@ def refresh_metadata():
         return jsonify({'success': True, 'message': 'Metadata sync started'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ── Per-user KMZ / KML reference layers ───────────────────────────────────────
+
+def _map_user_id():
+    user = get_current_user()
+    if not user:
+        return None
+    return user.get('id') if isinstance(user, dict) else user[0]
+
+
+@network_map_bp.route('/api/map/layers', methods=['GET'])
+@login_required
+def list_map_layers():
+    """List the current user's saved KMZ/KML layers (tree + visibility)."""
+    from .kmz_layers import list_layers
+    uid = _map_user_id()
+    if uid is None:
+        return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        layers = list_layers(uid)
+        return jsonify({'success': True, 'layers': layers})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/map/layers', methods=['POST'])
+@login_required
+def upload_map_layer():
+    """Upload a .kmz or .kml file as a persistent per-user map layer."""
+    from .kmz_layers import create_layer_from_upload
+    uid = _map_user_id()
+    if uid is None:
+        return jsonify({'error': 'Unauthorized'}), 401
+    file = request.files.get('file') or request.files.get('layer')
+    try:
+        layer = create_layer_from_upload(uid, file)
+        log_activity(
+            uid, 'map_layer_upload',
+            f"Uploaded map layer '{layer.get('name')}' "
+            f"({layer.get('original_filename')}, {layer.get('feature_count')} features)",
+        )
+        return jsonify({'success': True, 'layer': layer, 'warnings': layer.get('warnings') or []})
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/map/layers/<layer_id>/geojson', methods=['GET'])
+@login_required
+def get_map_layer_geojson(layer_id: str):
+    """Return parsed GeoJSON FeatureCollection for one of the user's layers."""
+    from .kmz_layers import load_geojson
+    uid = _map_user_id()
+    if uid is None:
+        return jsonify({'error': 'Unauthorized'}), 401
+    fc = load_geojson(layer_id, uid)
+    if fc is None:
+        return jsonify({'error': 'Layer not found'}), 404
+    return jsonify(fc)
+
+
+@network_map_bp.route('/api/map/layers/<layer_id>/visibility', methods=['PATCH', 'POST'])
+@login_required
+def patch_map_layer_visibility(layer_id: str):
+    """Persist Google Earth-style folder/placemark checkbox state."""
+    from .kmz_layers import save_visibility
+    uid = _map_user_id()
+    if uid is None:
+        return jsonify({'error': 'Unauthorized'}), 401
+    data = request.get_json(silent=True) or {}
+    visibility = data.get('visibility')
+    if not isinstance(visibility, dict):
+        return jsonify({'error': 'visibility must be an object of id → bool'}), 400
+    # Coerce values to bool
+    cleaned = {str(k): bool(v) for k, v in visibility.items()}
+    ok = save_visibility(layer_id, uid, cleaned)
+    if not ok:
+        return jsonify({'error': 'Layer not found'}), 404
+    return jsonify({'success': True, 'visibility': cleaned})
+
+
+@network_map_bp.route('/api/map/layers/<layer_id>', methods=['DELETE'])
+@login_required
+def delete_map_layer(layer_id: str):
+    """Delete a per-user KMZ/KML layer and its stored files."""
+    from .kmz_layers import delete_layer, get_layer_row
+    uid = _map_user_id()
+    if uid is None:
+        return jsonify({'error': 'Unauthorized'}), 401
+    row = get_layer_row(layer_id, uid)
+    name = row['name'] if row else layer_id
+    ok = delete_layer(layer_id, uid)
+    if not ok:
+        return jsonify({'error': 'Layer not found'}), 404
+    log_activity(uid, 'map_layer_delete', f"Deleted map layer '{name}'")
+    return jsonify({'success': True})

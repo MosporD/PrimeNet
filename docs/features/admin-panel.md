@@ -7,11 +7,11 @@ Engineering ops admin on PrimeNet (sync, APIs, PM Plus, activity).
 | Route | /admin-panel (default `?section=data-sync`) |
 | Module | modules/admin_panel/routes.py |
 | Access | admin (Owner) |
-| Version | V1.0 |
+| Version | V1.1 |
 
 ## Purpose
 
-Owner manages Data Sync, API connections, PM Plus Rules, Ops Alerts (RET/CM), and activity.
+Owner manages Data Sync, **ETL Diagnosis**, API connections, PM Plus Rules, Ops Alerts (RET/CM), and activity.
 **Users, portal allow-list, and module access** live on NexusCore Platform Admin (`/admin`) — see [platform-admin.md](platform-admin.md).
 
 ## Approach
@@ -25,7 +25,7 @@ Dated work log: [admin-panel.progress.md](admin-panel.progress.md). Do not dupli
 
 ## Plans
 
-None parked.
+None parked. After deploy: use ETL Diagnosis to clear hung pipeline + run metadata.
 
 ## Watch-outs
 

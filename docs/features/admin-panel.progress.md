@@ -4,6 +4,12 @@ Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+## 2026-09-28 (ETL Diagnosis page)
+
+- Done: Engineering Admin tab **ETL Diagnosis** (`?section=etl-diagnosis`) — live progress, manual pipeline ops, PG domain/store counts, sync_log feed, alerts (lock storm, ETL gate, reset mode, meta/pm mismatch).
+- Done: APIs `GET /api/sync/diagnosis`, `POST /api/sync/trigger/{hourly_full,daily_full,neighbor_sync}`; orchestrator progress keys; daily metadata scheduler job restored.
+- NEXT: After server deploy, restart scheduler and open `/admin-panel?section=etl-diagnosis` to clear lock storm + trigger metadata.
+
 ## 2026-09-23 (No Platform Admin chrome)
 
 - Done: Dropped Platform Admin header link; use NexusCore portals topbar Admin only.

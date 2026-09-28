@@ -1,6 +1,6 @@
 # Sync / pipeline (ETL)
 
-UI at `/sync`. Canonical pull/load lives in `pipeline/`; `modules/sync/` is the control plane + processors.
+UI at `/sync` and Engineering Admin **ETL Diagnosis** (`/admin-panel?section=etl-diagnosis`). Canonical pull/load lives in `pipeline/`; `modules/sync/` is the control plane + processors.
 
 | | |
 |---|---|

@@ -6,6 +6,12 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
+## 2026-09-28 (ETL diagnosis + metadata schedule)
+
+- Done: `modules/sync/etl_diagnosis.py` + `/api/sync/diagnosis`; progress for hourly/daily/neighbor/category jobs; triggers for hourly_full / daily_full / neighbor_sync.
+- Done: Re-registered daily `pull_metadata` cron (`METADATA_PULL_HOUR` / `METADATA_PULL_MINUTE`, default daily pull hour :20). Kill switch `NCM_DISABLE_METADATA_SCHEDULER=1`.
+- NEXT: Server rebuild/restart scheduler; confirm `NCM_SYNC_RESET_MODE=0` and `pm` in `NCM_PG_DOMAINS` (or unset domains).
+
 ## From brief History (migrated 2026-09-17)
 
 - 2026-09-11: `NCM_ENABLE_ETL` gate + local ETL data cleanup script.

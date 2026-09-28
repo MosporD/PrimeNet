@@ -8,6 +8,10 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **NEXT:** Open `/network-map` — upload KMZ, toggle folder checkboxes, reload (layer should persist).
 
+## 2026-09-28 (Eng Admin — ETL Diagnosis)
+
+- New `/admin-panel?section=etl-diagnosis` tab: pipeline progress, manual ops, domain/store visibility, sync_log feed; daily metadata job restored.
+
 ## 2026-09-28 (Postgres — full store catalog)
 
 - Extended domain catalog so all module stores (femto, SON ML, NH precalc, KPI headers, CM, elevation, RRU, adjacency, WNCELG, cases, PM Plus, marketing) route via `open_store` when `NCM_DATABASE_URL` enables them.

@@ -952,6 +952,164 @@ body.map-page {
     cursor: pointer;
 }
 
+/* ── Per-user KMZ / KML layers ─────────────────────────── */
+
+.kmz-layers-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid #e2e7ec;
+    border-radius: 8px;
+    background: #fafbfc;
+}
+
+.kmz-layers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.kmz-layers-title {
+    font-size: 0.88em;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.kmz-upload-btn {
+    padding: 4px 10px;
+    border: 1px solid #c5d0db;
+    border-radius: 6px;
+    background: #eef3f7;
+    color: #2c3e50;
+    font-size: 0.8em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.kmz-upload-btn:hover:not(:disabled) {
+    background: #e2ebf2;
+}
+
+.kmz-upload-btn:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.kmz-layers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 28vh;
+    overflow-y: auto;
+}
+
+.kmz-layer-card {
+    border: 1px solid #e2e7ec;
+    border-radius: 6px;
+    background: #fff;
+    padding: 6px 8px;
+}
+
+.kmz-layer-card-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.kmz-layer-card-name {
+    flex: 1;
+    font-size: 0.84em;
+    font-weight: 700;
+    color: #2c3e50;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kmz-layer-delete {
+    border: none;
+    background: transparent;
+    color: #c0392b;
+    font-size: 0.85em;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.kmz-layer-delete:hover {
+    background: #fdecea;
+}
+
+.kmz-tree {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 2px;
+}
+
+.kmz-tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 14px;
+}
+
+.kmz-tree-node {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 2px 0;
+    font-size: 0.8em;
+    color: #34495e;
+}
+
+.kmz-tree-node label {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+}
+
+.kmz-tree-node input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin: 2px 0 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.kmz-tree-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.kmz-tree-type {
+    color: #8a97a6;
+    font-size: 0.9em;
+    flex-shrink: 0;
+}
+
+.kmz-layers-status {
+    font-size: 0.78em;
+    color: #5d6d7e;
+}
+
+.kmz-layers-status.is-error {
+    color: #c0392b;
+}
+
+.kmz-layers-empty {
+    font-size: 0.78em;
+    color: #8a97a6;
+    padding: 2px 0;
+}
+
 .repeater-layer-badge {
     display: inline-block;
     padding: 2px 8px;
@@ -1556,6 +1714,7 @@ body.dark-mode.map-page .polygon-clear-btn,
 body.dark-mode.map-page .polygon-extract-btn,
 body.dark-mode.map-page .export-excel-btn,
 body.dark-mode.map-page .export-kml-btn,
+body.dark-mode.map-page .kmz-upload-btn,
 body.dark-mode.map-page .coord-go-btn,
 body.dark-mode.map-page .clear-code-btn,
 body.dark-mode.map-page .export-btn,
@@ -1572,6 +1731,7 @@ body.dark-mode.map-page .polygon-clear-btn:hover,
 body.dark-mode.map-page .polygon-extract-btn:hover,
 body.dark-mode.map-page .export-excel-btn:hover,
 body.dark-mode.map-page .export-kml-btn:hover,
+body.dark-mode.map-page .kmz-upload-btn:hover:not(:disabled),
 body.dark-mode.map-page .coord-go-btn:hover,
 body.dark-mode.map-page .clear-code-btn:hover,
 body.dark-mode.map-page .export-btn:hover,
@@ -1648,10 +1808,32 @@ body.dark-mode.map-page .neighbor-module-row,
 body.dark-mode.map-page .neighbor-explainer,
 body.dark-mode.map-page .code-result-site,
 body.dark-mode.map-page .repeater-toggle,
-body.dark-mode.map-page .repeater-highlight-block {
+body.dark-mode.map-page .repeater-highlight-block,
+body.dark-mode.map-page .kmz-layers-panel,
+body.dark-mode.map-page .kmz-layer-card {
     background: #142033 !important;
     border-color: #314257 !important;
     color: #e8edf3 !important;
+}
+
+body.dark-mode.map-page .kmz-layers-title,
+body.dark-mode.map-page .kmz-layer-card-name,
+body.dark-mode.map-page .kmz-tree-node {
+    color: #e8edf3 !important;
+}
+
+body.dark-mode.map-page .kmz-layers-empty,
+body.dark-mode.map-page .kmz-layers-status,
+body.dark-mode.map-page .kmz-tree-type {
+    color: #a8b7c8 !important;
+}
+
+body.dark-mode.map-page .kmz-layers-status.is-error {
+    color: #f0a8a0 !important;
+}
+
+body.dark-mode.map-page .kmz-layer-delete:hover {
+    background: #3a2430 !important;
 }
 
 body.dark-mode.map-page .cell-row:hover,

@@ -6,7 +6,7 @@
     <title>PrimeNet - Network Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.32">
+    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.33">
 </head>
 <body class="map-page">
     <header class="map-header">
@@ -73,6 +73,20 @@
                     <input type="checkbox" id="show-repeaters" onchange="toggleShowRepeaters()">
                     <span>Show repeaters (all)</span>
                 </label>
+                <div class="kmz-layers-panel" id="kmz-layers-panel">
+                    <div class="kmz-layers-header">
+                        <span class="kmz-layers-title">KMZ layers</span>
+                        <button type="button" class="kmz-upload-btn" id="kmz-upload-btn"
+                                onclick="document.getElementById('kmz-file-input').click()"
+                                title="Upload a KMZ or KML file (saved for your account)">
+                            + Add KMZ
+                        </button>
+                        <input type="file" id="kmz-file-input" accept=".kmz,.kml,application/vnd.google-earth.kmz,application/vnd.google-earth.kml+xml"
+                               style="display:none;" onchange="uploadKmzLayer(this)">
+                    </div>
+                    <div id="kmz-layers-list" class="kmz-layers-list" aria-live="polite"></div>
+                    <div id="kmz-layers-status" class="kmz-layers-status" style="display:none;"></div>
+                </div>
                 <button id="refresh-btn" class="refresh-btn" onclick="refreshMetadata()"
                         title="Pull latest metadata from server">
                     ↻ Refresh Data
@@ -138,7 +152,7 @@
     <script src="{{ url_for('static', filename='js/selection_context.js') }}?v=1.0"></script>
     <script src="{{ url_for('static', filename='js/saved_views.js') }}?v=1.0"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.45"></script>
+    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.46"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initializeMap();
