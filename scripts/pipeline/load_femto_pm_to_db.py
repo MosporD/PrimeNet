@@ -243,22 +243,51 @@ def _ensure_values_table(conn: sqlite3.Connection) -> None:
     )
 
 
-def _ensure_columns(conn: sqlite3.Connection, cols: list[str]) -> set[str]:
-    existing = {
-        r[1]
-        for r in conn.execute(f"PRAGMA table_info({_safe_ident(FEMTO_TABLE)})").fetchall()
-    }
+def _ensure_columns(conn, cols: list[str]) -> set[str]:
+    from db.runtime import _is_pg_conn, table_columns
+
+    if _is_pg_conn(conn):
+        existing = set(table_columns(conn, FEMTO_TABLE))
+    else:
+        existing = {
+            r[1]
+            for r in conn.execute(f"PRAGMA table_info({_safe_ident(FEMTO_TABLE)})").fetchall()
+        }
+    existing_l = {str(c).lower(): c for c in existing}
     existing_count = len(existing)
     for col in cols:
-        if col in existing:
+        if str(col).lower() in existing_l:
             continue
         if existing_count >= _MAX_WIDE_TABLE_COLUMNS:
             # Wide table kept for quick preview only; full KPI set is stored in values table.
             break
-        # Store as REAL where possible; SQLite remains flexible if text appears later.
-        conn.execute(f"ALTER TABLE {_safe_ident(FEMTO_TABLE)} ADD COLUMN {_safe_ident(col)} REAL")
-        existing.add(col)
-        existing_count += 1
+        try:
+            if _is_pg_conn(conn):
+                conn.execute("SAVEPOINT femto_add_col")
+            conn.execute(
+                f"ALTER TABLE {_safe_ident(FEMTO_TABLE)} ADD COLUMN {_safe_ident(col)} REAL"
+            )
+            if _is_pg_conn(conn):
+                conn.execute("RELEASE SAVEPOINT femto_add_col")
+            existing.add(col)
+            existing_l[str(col).lower()] = col
+            existing_count += 1
+        except Exception:
+            if _is_pg_conn(conn):
+                try:
+                    conn.execute("ROLLBACK TO SAVEPOINT femto_add_col")
+                except Exception:
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
+            # Column may already exist (race / case fold); refresh and continue.
+            if _is_pg_conn(conn):
+                existing = set(table_columns(conn, FEMTO_TABLE))
+                existing_l = {str(c).lower(): c for c in existing}
+                existing_count = len(existing)
+            else:
+                raise
     return existing
 
 

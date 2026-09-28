@@ -252,6 +252,28 @@ def _copy_table(sqlite_path: str, pg, table: str, chunk: int) -> int:
         src.close()
 
 
+def _reset_serial_sequences(pg, schema: str, tables: list[str]) -> None:
+    """After copying explicit ids from SQLite, bump Postgres identity sequences."""
+    for table in tables:
+        cols = table_columns(pg, table)
+        if 'id' not in cols:
+            continue
+        try:
+            execute_query(
+                pg,
+                f"""
+                SELECT setval(
+                    pg_get_serial_sequence(?, 'id'),
+                    COALESCE((SELECT MAX(id) FROM "{table}"), 1),
+                    true
+                )
+                """,
+                (f'{schema}.{table}',),
+            )
+        except Exception as exc:
+            print(f'    sequence {table}.id: {exc}')
+
+
 def migrate_schema(schema: str, *, replace: bool, chunk: int) -> int:
     paths = canonical_sqlite_paths()
     sqlite_path = paths.get(schema)
@@ -321,6 +343,10 @@ def migrate_schema(schema: str, *, replace: bool, chunk: int) -> int:
                     pass
                 print(f'  {name}: FAILED — {exc}')
                 return 1
+        _reset_serial_sequences(
+            pg, schema, [name for name, _ in tables if name not in _SKIP_TABLES]
+        )
+        pg.commit()
         print(f'Done. Copied {copied} rows into {schema}. SQLite file is unchanged.')
         return 0
     finally:
