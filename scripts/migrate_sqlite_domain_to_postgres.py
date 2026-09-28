@@ -93,6 +93,44 @@ def _pg_has_rows(pg, table: str) -> bool:
     return int(row[0] or 0) > 0
 
 
+def _pg_bool_columns(pg, table: str) -> set[str]:
+    try:
+        rows = execute_query(
+            pg,
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = current_schema()
+              AND table_name = ?
+              AND data_type = 'boolean'
+            """,
+            (table,),
+        ).fetchall()
+    except Exception:
+        return set()
+    out: set[str] = set()
+    for row in rows:
+        if isinstance(row, dict):
+            out.add(str(row.get('column_name') or ''))
+        else:
+            out.add(str(row[0]))
+    return {c for c in out if c}
+
+
+def _coerce_value(col: str, value, bool_cols: set[str]):
+    if col in bool_cols and value is not None and not isinstance(value, bool):
+        if isinstance(value, (bytes, bytearray)):
+            try:
+                value = int(value)
+            except Exception:
+                return value
+        if isinstance(value, (int, float)):
+            return bool(int(value))
+        if isinstance(value, str) and value.strip() in ('0', '1'):
+            return value.strip() == '1'
+    return value
+
+
 def _copy_table(sqlite_path: str, pg, table: str, chunk: int) -> int:
     src = sqlite3.connect(sqlite_path)
     src.row_factory = sqlite3.Row
@@ -106,6 +144,7 @@ def _copy_table(sqlite_path: str, pg, table: str, chunk: int) -> int:
         if not use_cols:
             print(f'    skip {table}: no overlapping columns')
             return 0
+        bool_cols = _pg_bool_columns(pg, table) & set(use_cols)
         col_sql = ', '.join(f'"{c}"' for c in use_cols)
         placeholders = ', '.join('?' for _ in use_cols)
         insert_sql = f'INSERT INTO "{table}" ({col_sql}) VALUES ({placeholders})'
@@ -115,7 +154,10 @@ def _copy_table(sqlite_path: str, pg, table: str, chunk: int) -> int:
             batch = cur.fetchmany(chunk)
             if not batch:
                 break
-            rows = [tuple(r[c] for c in use_cols) for r in batch]
+            rows = [
+                tuple(_coerce_value(c, r[c], bool_cols) for c in use_cols)
+                for r in batch
+            ]
             pg.executemany(insert_sql, rows)
             copied += len(rows)
             if copied % (chunk * 5) == 0:
@@ -183,10 +225,18 @@ def migrate_schema(schema: str, *, replace: bool, chunk: int) -> int:
         for name, _ddl in tables:
             if name in _SKIP_TABLES:
                 continue
-            n = _copy_table(sqlite_path, pg, name, chunk)
-            print(f'  {name}: {n} rows')
-            copied += n
-        pg.commit()
+            try:
+                n = _copy_table(sqlite_path, pg, name, chunk)
+                pg.commit()
+                print(f'  {name}: {n} rows')
+                copied += n
+            except Exception as exc:
+                try:
+                    pg.rollback()
+                except Exception:
+                    pass
+                print(f'  {name}: FAILED — {exc}')
+                return 1
         print(f'Done. Copied {copied} rows into {schema}. SQLite file is unchanged.')
         return 0
     finally:
