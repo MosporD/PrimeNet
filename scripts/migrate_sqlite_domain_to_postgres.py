@@ -93,32 +93,55 @@ def _pg_has_rows(pg, table: str) -> bool:
     return int(row[0] or 0) > 0
 
 
-def _pg_bool_columns(pg, table: str) -> set[str]:
+def _pg_typed_columns(pg, table: str, data_types: tuple[str, ...]) -> set[str]:
     try:
         rows = execute_query(
             pg,
             """
-            SELECT column_name
+            SELECT column_name, data_type
             FROM information_schema.columns
             WHERE table_schema = current_schema()
               AND table_name = ?
-              AND data_type = 'boolean'
             """,
             (table,),
         ).fetchall()
     except Exception:
         return set()
+    want = {t.lower() for t in data_types}
     out: set[str] = set()
     for row in rows:
         if isinstance(row, dict):
-            out.add(str(row.get('column_name') or ''))
+            name = str(row.get('column_name') or '')
+            dtype = str(row.get('data_type') or '').lower()
         else:
-            out.add(str(row[0]))
-    return {c for c in out if c}
+            name = str(row[0])
+            dtype = str(row[1]).lower()
+        if name and dtype in want:
+            out.add(name)
+    return out
 
 
-def _coerce_value(col: str, value, bool_cols: set[str]):
-    if col in bool_cols and value is not None and not isinstance(value, bool):
+def _username_id_map(pg) -> dict[str, int]:
+    try:
+        rows = execute_query(pg, 'SELECT id, username FROM users').fetchall()
+    except Exception:
+        return {}
+    out: dict[str, int] = {}
+    for row in rows:
+        if isinstance(row, dict):
+            uid, name = row.get('id'), row.get('username')
+        else:
+            uid, name = row[0], row[1]
+        if name is None or uid is None:
+            continue
+        out[str(name).strip().lower()] = int(uid)
+    return out
+
+
+def _coerce_value(col: str, value, *, bool_cols: set[str], int_cols: set[str], users: dict[str, int]):
+    if value is None:
+        return None
+    if col in bool_cols and not isinstance(value, bool):
         if isinstance(value, (bytes, bytearray)):
             try:
                 value = int(value)
@@ -128,6 +151,25 @@ def _coerce_value(col: str, value, bool_cols: set[str]):
             return bool(int(value))
         if isinstance(value, str) and value.strip() in ('0', '1'):
             return value.strip() == '1'
+        return value
+    if col in int_cols and not isinstance(value, int):
+        if isinstance(value, bool):
+            return int(value)
+        if isinstance(value, float):
+            return int(value)
+        if isinstance(value, (bytes, bytearray)):
+            try:
+                return int(value)
+            except Exception:
+                return None
+        if isinstance(value, str):
+            text = value.strip()
+            if text.isdigit() or (text.startswith('-') and text[1:].isdigit()):
+                return int(text)
+            # Legacy activity_log rows stored username in user_id.
+            if col.endswith('_id') or col == 'user_id':
+                return users.get(text.lower())
+            return None
     return value
 
 
@@ -144,25 +186,67 @@ def _copy_table(sqlite_path: str, pg, table: str, chunk: int) -> int:
         if not use_cols:
             print(f'    skip {table}: no overlapping columns')
             return 0
-        bool_cols = _pg_bool_columns(pg, table) & set(use_cols)
+        bool_cols = _pg_typed_columns(pg, table, ('boolean',)) & set(use_cols)
+        int_cols = _pg_typed_columns(
+            pg,
+            table,
+            ('integer', 'bigint', 'smallint'),
+        ) & set(use_cols)
+        users = _username_id_map(pg) if int_cols else {}
         col_sql = ', '.join(f'"{c}"' for c in use_cols)
         placeholders = ', '.join('?' for _ in use_cols)
         insert_sql = f'INSERT INTO "{table}" ({col_sql}) VALUES ({placeholders})'
         cur = src.execute(f'SELECT {col_sql} FROM "{table}"')
         copied = 0
+        skipped = 0
         while True:
             batch = cur.fetchmany(chunk)
             if not batch:
                 break
-            rows = [
-                tuple(_coerce_value(c, r[c], bool_cols) for c in use_cols)
-                for r in batch
-            ]
-            pg.executemany(insert_sql, rows)
-            copied += len(rows)
-            if copied % (chunk * 5) == 0:
+            rows = []
+            for r in batch:
+                vals = [
+                    _coerce_value(
+                        c,
+                        r[c],
+                        bool_cols=bool_cols,
+                        int_cols=int_cols,
+                        users=users,
+                    )
+                    for c in use_cols
+                ]
+                # Drop rows that still can't satisfy NOT NULL integer FKs like user_id.
+                bad = False
+                for c, v in zip(use_cols, vals):
+                    if c in int_cols and v is None and r[c] is not None:
+                        bad = True
+                        break
+                if bad:
+                    skipped += 1
+                    continue
+                rows.append(tuple(vals))
+            if not rows:
+                continue
+            try:
+                pg.executemany(insert_sql, rows)
+                copied += len(rows)
+            except Exception:
+                # Fall back to per-row so one bad legacy row does not kill the table.
+                try:
+                    pg.rollback()
+                except Exception:
+                    pass
+                for row in rows:
+                    try:
+                        execute_query(pg, insert_sql, row)
+                        copied += 1
+                    except Exception:
+                        skipped += 1
+            if (copied + skipped) % (chunk * 5) == 0:
                 pg.commit()
                 print(f'    {table}: {copied} rows…')
+        if skipped:
+            print(f'    {table}: skipped {skipped} incompatible rows')
         return copied
     finally:
         src.close()
