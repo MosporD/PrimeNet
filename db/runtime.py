@@ -137,9 +137,14 @@ class PgConn:
             _translate_pg_error(exc)
 
     def executemany(self, sql, seq_of_params):
+        """Batch insert/update. psycopg3 Connection has no executemany — use a cursor."""
         sql = adapt_sqlite_app_sql(sql)
         try:
-            return self._raw.executemany(sql, seq_of_params)
+            cur = self._raw.cursor()
+            try:
+                return cur.executemany(sql, list(seq_of_params))
+            finally:
+                cur.close()
         except Exception as exc:
             _translate_pg_error(exc)
 

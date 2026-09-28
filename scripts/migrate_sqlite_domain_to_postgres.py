@@ -51,8 +51,34 @@ def _sqlite_objects(path: str) -> tuple[list[tuple[str, str]], list[tuple[str, s
 
 
 def _ensure_if_not_exists(ddl: str, kind: str) -> str:
+    if kind.upper() == 'INDEX':
+        pattern = r'CREATE\s+(UNIQUE\s+)?INDEX\s+(?!IF\s+NOT\s+EXISTS)'
+        return re.sub(
+            pattern,
+            lambda m: f'CREATE {(m.group(1) or "")}INDEX IF NOT EXISTS ',
+            ddl,
+            count=1,
+            flags=re.IGNORECASE,
+        )
     pattern = rf'CREATE\s+{kind}\s+(?!IF\s+NOT\s+EXISTS)'
     return re.sub(pattern, f'CREATE {kind} IF NOT EXISTS ', ddl, count=1, flags=re.IGNORECASE)
+
+
+def _soft_ddl(pg, sql: str, label: str) -> None:
+    """Run optional DDL; roll back to a savepoint on failure so the txn stays usable."""
+    try:
+        execute_query(pg, 'SAVEPOINT ncm_migrate_ddl')
+        execute_query(pg, sql)
+        execute_query(pg, 'RELEASE SAVEPOINT ncm_migrate_ddl')
+    except Exception as exc:
+        try:
+            execute_query(pg, 'ROLLBACK TO SAVEPOINT ncm_migrate_ddl')
+        except Exception:
+            try:
+                pg.rollback()
+            except Exception:
+                pass
+        print(f'    {label}: {exc}')
 
 
 def _pg_has_rows(pg, table: str) -> bool:
@@ -147,13 +173,10 @@ def migrate_schema(schema: str, *, replace: bool, chunk: int) -> int:
             if name in _SKIP_TABLES:
                 continue
             sql = _ensure_if_not_exists(ddl, 'TABLE')
-            execute_query(pg, sql)
+            _soft_ddl(pg, sql, f'table {name}')
         for name, ddl in indexes:
             sql = _ensure_if_not_exists(ddl, 'INDEX')
-            try:
-                execute_query(pg, sql)
-            except Exception as exc:
-                print(f'    index {name}: {exc}')
+            _soft_ddl(pg, sql, f'index {name}')
         pg.commit()
 
         copied = 0
