@@ -9,9 +9,10 @@ Production / server (restore normal pull→load + scheduler)::
 
     NCM_ENABLE_ETL=1
 
-Legacy: ``NCM_DISABLE_SCHEDULER=1`` still forces pipelines off.
-If ``NCM_ENABLE_ETL`` is unset, behaviour follows legacy
-(enabled unless ``NCM_DISABLE_SCHEDULER``).
+Legacy: if ``NCM_ENABLE_ETL`` is unset, ``NCM_DISABLE_SCHEDULER=1`` still
+forces pipelines off. When ``NCM_ENABLE_ETL=1``, Sync UI / pull / load are
+allowed even if the web container has ``NCM_DISABLE_SCHEDULER=1`` (compose
+keeps the cron out of the web process; the ``scheduler`` service runs it).
 """
 
 from __future__ import annotations
@@ -57,16 +58,21 @@ def _falsy(raw: str) -> bool:
 
 
 def etl_enabled() -> bool:
-    """Return True only when ETL/sync pipelines are allowed to run."""
-    disable = _env_flag("NCM_DISABLE_SCHEDULER")
-    if disable is not None and _truthy(disable):
-        return False
+    """Return True only when ETL/sync pipelines are allowed to run.
 
+    ``NCM_ENABLE_ETL`` is the master switch when set.
+    ``NCM_DISABLE_SCHEDULER=1`` on web containers only means \"do not start the
+    in-process cron\" — it must not block Sync UI mutations when
+    ``NCM_ENABLE_ETL=1`` (scheduler runs as the separate compose service).
+    """
     enable = _env_flag("NCM_ENABLE_ETL")
     if enable is not None:
         return _truthy(enable)
 
-    # Unset NCM_ENABLE_ETL → legacy default (on, unless DISABLE above).
+    # Legacy when NCM_ENABLE_ETL is unset.
+    disable = _env_flag("NCM_DISABLE_SCHEDULER")
+    if disable is not None and _truthy(disable):
+        return False
     return True
 
 
@@ -74,14 +80,14 @@ def etl_disabled_reason() -> str:
     """Human-readable reason when ETL is off (empty string when enabled)."""
     if etl_enabled():
         return ""
-    disable = _env_flag("NCM_DISABLE_SCHEDULER")
-    if disable is not None and _truthy(disable):
-        return "NCM_DISABLE_SCHEDULER=1"
     enable = _env_flag("NCM_ENABLE_ETL")
     if enable is not None and _falsy(enable):
         return "NCM_ENABLE_ETL=0 (set to 1 on the server to resume pipelines)"
     if enable is not None and not _truthy(enable):
         return f"NCM_ENABLE_ETL={enable!r} (expected 1/true/yes)"
+    disable = _env_flag("NCM_DISABLE_SCHEDULER")
+    if disable is not None and _truthy(disable):
+        return "NCM_DISABLE_SCHEDULER=1 (set NCM_ENABLE_ETL=1 to allow Sync UI / pipelines)"
     return "ETL disabled"
 
 
