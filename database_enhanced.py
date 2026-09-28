@@ -31,6 +31,28 @@ def _exec(cur, sql: str, params=()):
     return cur.execute(adapt_app_sql(sql), tuple(params) if params is not None else ())
 
 
+def _try_add_column(conn, cursor, sql: str) -> None:
+    """Best-effort ALTER for older SQLite DBs. On Postgres, a failed ALTER aborts
+    the transaction unless we isolate it with a savepoint (SQLite just errors)."""
+    from db.runtime import is_app_postgresql
+
+    if is_app_postgresql():
+        cursor.execute('SAVEPOINT ncm_soft_alter')
+        try:
+            cursor.execute(sql)
+            cursor.execute('RELEASE SAVEPOINT ncm_soft_alter')
+        except Exception:
+            try:
+                cursor.execute('ROLLBACK TO SAVEPOINT ncm_soft_alter')
+            except Exception:
+                conn.rollback()
+        return
+    try:
+        cursor.execute(sql)
+    except Exception:
+        pass
+
+
 def _insert_return_id(conn, sql: str, params):
     from db.runtime import is_app_postgresql
 
@@ -80,19 +102,12 @@ def init_db():
         )
     ''')
     # Backward-compatible upgrades for existing SQLite user tables.
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP')
-    except Exception:
-        pass
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN force_password_change BOOLEAN DEFAULT 1')
-    except Exception:
-        pass
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN allowed_portals TEXT')
-    except Exception:
-        pass
-    
+    _try_add_column(conn, cursor, 'ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP')
+    _try_add_column(
+        conn, cursor, 'ALTER TABLE users ADD COLUMN force_password_change BOOLEAN DEFAULT 1'
+    )
+    _try_add_column(conn, cursor, 'ALTER TABLE users ADD COLUMN allowed_portals TEXT')
+
     # Sessions table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS sessions (
@@ -293,10 +308,7 @@ def init_db():
         )
     ''')
 
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN profile_photo_path TEXT')
-    except Exception:
-        pass
+    _try_add_column(conn, cursor, 'ALTER TABLE users ADD COLUMN profile_photo_path TEXT')
 
     _exec(cursor, '''
         CREATE TABLE IF NOT EXISTS feature_access (
