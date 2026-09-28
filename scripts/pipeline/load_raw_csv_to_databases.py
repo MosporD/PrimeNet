@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from db.runtime import open_db, sqlite_ident
+from db.runtime import _is_pg_conn, execute_query, open_db, sqlite_ident
 from sync_config import (
     HUAWEI_PM_DB,
     HUAWEI_GROUPS_DB,
@@ -76,6 +76,81 @@ from pipeline.paths import PM_RATS, raw_path
 
 HASH_COL = "_sync_row_hash"
 HASH_LOOKUP_BATCH = 500
+
+
+def _df_to_sql(
+    df: pd.DataFrame,
+    table: str,
+    conn,
+    *,
+    if_exists: str = "fail",
+    index: bool = False,
+) -> None:
+    """Write a DataFrame via pandas on SQLite, or native INSERT on Postgres.
+
+    pandas.DataFrame.to_sql() probes ``sqlite_master`` and breaks on PgConn.
+    """
+    work = df if index is False else df.reset_index()
+    if not _is_pg_conn(conn):
+        work.to_sql(table, conn, if_exists=if_exists, index=False)
+        return
+
+    cols = [str(c) for c in work.columns]
+
+    def _sql_type(series: pd.Series) -> str:
+        if pd.api.types.is_bool_dtype(series):
+            return "BOOLEAN"
+        if pd.api.types.is_integer_dtype(series):
+            return "BIGINT"
+        if pd.api.types.is_float_dtype(series):
+            return "DOUBLE PRECISION"
+        if pd.api.types.is_datetime64_any_dtype(series):
+            return "TIMESTAMP"
+        return "TEXT"
+
+    col_defs = ", ".join(f"{sqlite_ident(c)} {_sql_type(work[c])}" for c in cols)
+    qtable = sqlite_ident(table)
+
+    if if_exists == "replace":
+        execute_query(conn, f"DROP TABLE IF EXISTS {qtable} CASCADE")
+        execute_query(conn, f"CREATE TABLE {qtable} ({col_defs})")
+    elif if_exists == "append":
+        if not _table_exists(conn, table):
+            execute_query(conn, f"CREATE TABLE {qtable} ({col_defs})")
+    elif if_exists == "fail":
+        if _table_exists(conn, table):
+            raise ValueError(f"Table {table} already exists")
+        execute_query(conn, f"CREATE TABLE {qtable} ({col_defs})")
+    else:
+        raise ValueError(f"Unsupported if_exists={if_exists!r}")
+
+    if work.empty:
+        return
+
+    records: list[tuple] = []
+    for row in work.itertuples(index=False, name=None):
+        cleaned = []
+        for v in row:
+            if v is None:
+                cleaned.append(None)
+            elif isinstance(v, float) and pd.isna(v):
+                cleaned.append(None)
+            elif isinstance(v, pd.Timestamp):
+                cleaned.append(None if pd.isna(v) else v.to_pydatetime())
+            else:
+                try:
+                    cleaned.append(None if pd.isna(v) else v)
+                except (TypeError, ValueError):
+                    cleaned.append(v)
+        records.append(tuple(cleaned))
+
+    placeholders = ", ".join("?" for _ in cols)
+    col_sql = ", ".join(sqlite_ident(c) for c in cols)
+    sql = f"INSERT INTO {qtable} ({col_sql}) VALUES ({placeholders})"
+    chunk = 2000
+    for i in range(0, len(records), chunk):
+        conn.executemany(sql, records[i : i + chunk])
+
 
 # Lazy cache for cell_name → area during a load run.
 _CELL_AREA_INDEX_CACHE: dict[str, str] | None = None
@@ -579,7 +654,7 @@ def _append_dataframe_to_table(
     df = _enrich_pm_report_columns(df, label, scope=scope, base_table=table)
     table_exists = _table_exists(conn, table)
     if not table_exists:
-        df.to_sql(table, conn, if_exists="append", index=False)
+        _df_to_sql(df, table, conn, if_exists="append")
         return len(df)
 
     db_cols = [c for c in _pragma_column_names(conn, table) if c != HASH_COL]
@@ -600,7 +675,7 @@ def _append_dataframe_to_table(
                 work = aligned.loc[ts_vals.notna()].copy()
     if work.empty:
         return 0
-    work.to_sql(table, conn, if_exists="append", index=False)
+    _df_to_sql(work, table, conn, if_exists="append")
     return len(work)
 
 
@@ -960,7 +1035,7 @@ def _replace_pm_frame_to_tables(
     """Full replace for cells (area partitions) or groups (monotable)."""
     df = _enrich_pm_report_columns(df, label, scope=scope, base_table=base_table)
     if not _use_area_partitions(label):
-        df.to_sql(base_table, conn, if_exists="replace", index=False)
+        _df_to_sql(df, base_table, conn, if_exists="replace")
         print(f"[{label}] replaced {fn} -> table {base_table} ({len(df)} rows)")
         return
 
@@ -980,7 +1055,7 @@ def _replace_pm_frame_to_tables(
     cell_col, _ = _resolve_cell_time_key_columns(list(df.columns), df)
     total = 0
     for table, sub in _partition_frames_by_area(df, base_table, cell_col):
-        sub.to_sql(table, conn, if_exists="append", index=False)
+        _df_to_sql(sub, table, conn, if_exists="append")
         total += len(sub)
         print(f"[{label}] replaced {fn} -> table {table} ({len(sub)} rows)")
     print(f"[{label}] replaced {fn} -> {base_table} partitions total {total} rows")
@@ -1035,7 +1110,7 @@ def _mirror_metadata_table_for_map(conn: sqlite3.Connection, source_table: str, 
         return
     mirrored = df.copy()
     mirrored.columns = [str(c).strip().lower() for c in mirrored.columns]
-    mirrored.to_sql(canonical, conn, if_exists="replace", index=False)
+    _df_to_sql(mirrored, canonical, conn, if_exists="replace")
     print(f"[metadata] mirrored {source_table} -> {canonical} ({len(mirrored)} rows)")
 
 
@@ -1157,7 +1232,7 @@ def _load_folder_tabular_to_db(
                                 continue
                             out = df.copy()
                             out.columns = [str(c).strip().lower() for c in out.columns]
-                            out.to_sql(canonical, conn, if_exists="replace", index=False)
+                            _df_to_sql(out, canonical, conn, if_exists="replace")
                             print(f"[metadata] replaced {fn} -> table {canonical} ({len(out)} rows)")
                         else:
                             _replace_pm_frame_to_tables(conn, table, df, label, fn, scope=scope)
