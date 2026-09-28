@@ -6,7 +6,15 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Open `/adjacency-gis` — Map view switcher + BCCH highlighter smoke.
+**NEXT:** Open `/network-map` — upload KMZ, toggle folder checkboxes, reload (layer should persist).
+
+## 2026-09-28 (Postgres — full store catalog)
+
+- Extended domain catalog so all module stores (femto, SON ML, NH precalc, KPI headers, CM, elevation, RRU, adjacency, WNCELG, cases, PM Plus, marketing) route via `open_store` when `NCM_DATABASE_URL` enables them.
+
+## 2026-09-28 (Network Map — per-user KMZ layers)
+
+- Left-panel KMZ/KML upload; per-user server store; Google Earth-style folder checkboxes.
 
 ## 2026-09-24 (Adjacency GIS — basemap switcher)
 

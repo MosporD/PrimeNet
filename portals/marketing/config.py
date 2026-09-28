@@ -20,14 +20,13 @@ _REPO_ROOT = os.path.dirname(os.path.dirname(_PACKAGE_DIR))
 
 
 def database_path() -> str:
-    """Portal-owned SQLite file. Never a PrimeNet database."""
+    """Portal-owned store. Routes to Postgres schema ``marketing`` when enabled."""
     override = (os.getenv("NEXUS_MARKETING_DB") or "").strip()
     if override:
         return os.path.abspath(override)
-    data_root = (os.getenv("NEXUS_DATA_ROOT") or "").strip() or _REPO_ROOT
-    return os.path.join(
-        os.path.abspath(data_root), "data", "portals", "marketing", "marketing.db"
-    )
+    from sync_config import MARKETING_DB
+
+    return MARKETING_DB
 
 
 # ---------------------------------------------------------------------------

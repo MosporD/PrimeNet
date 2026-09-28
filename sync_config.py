@@ -112,6 +112,20 @@ KPI_DB_DIR = os.path.join(DATA_ROOT, 'raw', 'KPIs')
 os.makedirs(KPI_DB_DIR, exist_ok=True)
 KPI_HEADERS_DB = os.path.join(KPI_DB_DIR, 'kpi_headers.db')
 
+# Extra module stores (Postgres domains when NCM_DATABASE_URL enables them).
+FEMTO_PM_DB = os.path.join(CELLS_DB_DIR, 'femto_pm_cells.db')
+FEMTO_USER_KPI_DB = os.path.join(CELLS_DB_DIR, 'femto_user_kpis.db')
+NH_PRECALC_DB = os.path.join(DATABASES_ROOT, 'network_health', 'precalc.db')
+SON_ML_DB = os.path.join(DATABASES_ROOT, 'son_analytics', 'ml.db')
+CM_SNAPSHOTS_DB = os.path.join(DATABASES_ROOT, 'radio', 'cm_snapshots.db')
+ELEVATION_DB = os.path.join(DATABASES_ROOT, 'geo', 'elevation_cache.db')
+RRU_INVENTORY_DB = os.path.join(DATABASES_ROOT, 'rru_inventory', 'rmod_snapshot.db')
+ADJACENCY_GIS_DB = os.path.join(DATABASES_ROOT, 'adjacency_gis', 'adjacency_snapshot.db')
+WNCELG_SNAPSHOT_DB = os.path.join(DATABASES_ROOT, 'configuration_dashboard', 'wncelg_snapshot.db')
+OPTIMIZATION_CASES_DB = os.path.join(DATABASES_ROOT, 'cases', 'optimization_cases.db')
+PM_PLUS_DB = os.path.join(DATABASES_ROOT, 'pm_plus', 'pm_plus.db')
+MARKETING_DB = os.path.join(DATABASES_ROOT, 'portals', 'marketing', 'marketing.db')
+
 
 def _migrate_legacy_db_names():
     """One-time migration from legacy root DB names to databases/* subfolders."""

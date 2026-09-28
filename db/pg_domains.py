@@ -3,7 +3,7 @@
 Default remains SQLite. Enable domains with:
 
   NCM_DATABASE_URL=postgresql://…
-  NCM_PG_DOMAINS=app,metadata,neighbors,groups,balance,pm
+  NCM_PG_DOMAINS=app,metadata,neighbors,groups,balance,pm,femto,…
 
 ``NCM_APP_DATABASE_URL`` alone still means **app schema only** (phase 1).
 ``NCM_DATABASE_URL`` with ``NCM_PG_DOMAINS`` unset enables every group.
@@ -16,7 +16,26 @@ from __future__ import annotations
 
 import os
 
-ALL_GROUPS = ('app', 'metadata', 'neighbors', 'groups', 'balance', 'pm')
+ALL_GROUPS = (
+    'app',
+    'metadata',
+    'neighbors',
+    'groups',
+    'balance',
+    'pm',
+    'femto',
+    'son_ml',
+    'nh_precalc',
+    'kpi_headers',
+    'cm',
+    'elevation',
+    'rru',
+    'adjacency',
+    'wncelg',
+    'cases',
+    'pm_plus',
+    'marketing',
+)
 
 # Group (env value) → Postgres schema names (1:1 with canonical SQLite files).
 DOMAIN_GROUPS: dict[str, tuple[str, ...]] = {
@@ -36,6 +55,18 @@ DOMAIN_GROUPS: dict[str, tuple[str, ...]] = {
         'pm_nokia_daily',
         'pm_huawei_daily',
     ),
+    'femto': ('femto_pm', 'femto_user_kpis'),
+    'son_ml': ('son_ml',),
+    'nh_precalc': ('nh_precalc',),
+    'kpi_headers': ('kpi_headers',),
+    'cm': ('cm_snapshots',),
+    'elevation': ('elevation',),
+    'rru': ('rru_inventory',),
+    'adjacency': ('adjacency_gis',),
+    'wncelg': ('wncelg',),
+    'cases': ('cases',),
+    'pm_plus': ('pm_plus',),
+    'marketing': ('marketing',),
 }
 
 
@@ -86,19 +117,32 @@ def is_domain_postgresql(name: str) -> bool:
 
 def canonical_sqlite_paths() -> dict[str, str]:
     from sync_config import (
+        ADJACENCY_GIS_DB,
+        CM_SNAPSHOTS_DB,
+        ELEVATION_DB,
+        FEMTO_PM_DB,
+        FEMTO_USER_KPI_DB,
         HUAWEI_GROUPS_DAILY_DB,
         HUAWEI_GROUPS_DB,
         HUAWEI_NEIGHBOR_RAW_DB,
         HUAWEI_PM_DAILY_DB,
         HUAWEI_PM_DB,
+        KPI_HEADERS_DB,
+        MARKETING_DB,
         METADATA_DB,
         NCMUSERS_DB,
         NEIGHBOR_KPI_DB,
         NETWORK_BALANCE_DB,
+        NH_PRECALC_DB,
         NOKIA_GROUPS_DAILY_DB,
         NOKIA_GROUPS_DB,
         NOKIA_PM_DAILY_DB,
         NOKIA_PM_DB,
+        OPTIMIZATION_CASES_DB,
+        PM_PLUS_DB,
+        RRU_INVENTORY_DB,
+        SON_ML_DB,
+        WNCELG_SNAPSHOT_DB,
     )
 
     return {
@@ -115,6 +159,19 @@ def canonical_sqlite_paths() -> dict[str, str]:
         'neighbors_nokia': NEIGHBOR_KPI_DB,
         'neighbors_huawei': HUAWEI_NEIGHBOR_RAW_DB,
         'balance': NETWORK_BALANCE_DB,
+        'femto_pm': FEMTO_PM_DB,
+        'femto_user_kpis': FEMTO_USER_KPI_DB,
+        'son_ml': SON_ML_DB,
+        'nh_precalc': NH_PRECALC_DB,
+        'kpi_headers': KPI_HEADERS_DB,
+        'cm_snapshots': CM_SNAPSHOTS_DB,
+        'elevation': ELEVATION_DB,
+        'rru_inventory': RRU_INVENTORY_DB,
+        'adjacency_gis': ADJACENCY_GIS_DB,
+        'wncelg': WNCELG_SNAPSHOT_DB,
+        'cases': OPTIMIZATION_CASES_DB,
+        'pm_plus': PM_PLUS_DB,
+        'marketing': MARKETING_DB,
     }
 
 

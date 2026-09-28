@@ -1,16 +1,15 @@
-"""SQLite store for SON ML features, scores, and operator feedback."""
+"""SQLite / Postgres store for SON ML features, scores, and operator feedback."""
 
 from __future__ import annotations
 
 import json
 import os
-import sqlite3
 from datetime import datetime, timezone
 
-from sync_config import DATABASES_ROOT
+from sync_config import DATABASES_ROOT, SON_ML_DB
 
 _ML_DIR = os.path.join(DATABASES_ROOT, "son_analytics")
-_ML_DB = os.path.join(_ML_DIR, "ml.db")
+_ML_DB = SON_ML_DB
 _MODEL_DIR = os.path.join(_ML_DIR, "models")
 
 
@@ -31,17 +30,15 @@ def ensure_db_dir() -> None:
     os.makedirs(_ML_DIR, exist_ok=True)
 
 
-def get_connection() -> sqlite3.Connection:
-    ensure_db_dir()
-    conn = sqlite3.connect(_ML_DB, timeout=60)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=NORMAL")
+def get_connection():
+    from db.runtime import open_store
+
+    conn = open_store(_ML_DB, timeout=60)
     init_schema(conn)
     return conn
 
 
-def init_schema(conn: sqlite3.Connection) -> None:
+def init_schema(conn) -> None:
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS son_ml_build (

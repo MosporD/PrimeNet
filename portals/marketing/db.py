@@ -194,8 +194,9 @@ def init_schema(path: str | None = None) -> str:
     with _INIT_LOCK:
         if _initialised_for == target:
             return target
-        _ensure_parent_dir(target)
-        conn = sqlite3.connect(target)
+        from db.runtime import open_store
+
+        conn = open_store(target, timeout=15)
         try:
             conn.executescript(_SCHEMA)
             conn.execute(
@@ -210,14 +211,17 @@ def init_schema(path: str | None = None) -> str:
         return target
 
 
-def connect(path: str | None = None) -> sqlite3.Connection:
+def connect(path: str | None = None):
     """Open a connection with the portal's standard pragmas."""
     target = init_schema(path)
-    conn = sqlite3.connect(target, timeout=15)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode = WAL")
-    conn.execute("PRAGMA foreign_keys = ON")
-    conn.execute("PRAGMA busy_timeout = 10000")
+    from db.runtime import open_store
+
+    conn = open_store(target, timeout=15)
+    try:
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA busy_timeout = 10000")
+    except Exception:
+        pass
     return conn
 
 

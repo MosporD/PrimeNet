@@ -1,18 +1,17 @@
-"""SQLite store for precomputed Network Health KPI tables (daily batch job)."""
+"""SQLite / Postgres store for precomputed Network Health KPI tables (daily batch job)."""
 
 from __future__ import annotations
 
 import json
 import os
-import sqlite3
 from datetime import datetime, timezone
 
-from sync_config import DATABASES_ROOT
+from sync_config import NH_PRECALC_DB
 
 from . import config as cfg
 
-_PRECALC_DIR = os.path.join(DATABASES_ROOT, "network_health")
-_PRECALC_DB = os.path.join(_PRECALC_DIR, "precalc.db")
+_PRECALC_DB = NH_PRECALC_DB
+_PRECALC_DIR = os.path.dirname(_PRECALC_DB)
 
 
 def _utc_now_iso() -> str:
@@ -27,17 +26,15 @@ def ensure_db_dir() -> None:
     os.makedirs(_PRECALC_DIR, exist_ok=True)
 
 
-def get_connection() -> sqlite3.Connection:
-    ensure_db_dir()
-    conn = sqlite3.connect(_PRECALC_DB, timeout=60)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=NORMAL")
+def get_connection():
+    from db.runtime import open_store
+
+    conn = open_store(_PRECALC_DB, timeout=60)
     init_schema(conn)
     return conn
 
 
-def init_schema(conn: sqlite3.Connection) -> None:
+def init_schema(conn) -> None:
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS nh_build (
@@ -77,6 +74,7 @@ def pm_fingerprint(vendor: str, rat: str) -> str:
     """Fingerprint PM daily DB files for vendor + RAT (invalidates store when PM reloads)."""
     import hashlib
 
+    from db.runtime import store_available
     from modules.son_analytics.pm_helpers import PM_DATA_SCOPE, vendor_pm_sources
 
     pm_tech = cfg.pm_technology_for_rat(rat)
@@ -84,9 +82,12 @@ def pm_fingerprint(vendor: str, rat: str) -> str:
     for _vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, PM_DATA_SCOPE):
         if not db_path or not table:
             continue
-        if os.path.isfile(db_path):
-            # Use file size (not mtime): PM sync often touches mtime without changing data.
-            parts.append(f"{db_path}|{table}|{os.path.getsize(db_path)}")
+        if store_available(db_path):
+            # Size fingerprint only applies to on-disk SQLite; Postgres uses path+table.
+            if os.path.isfile(db_path):
+                parts.append(f"{db_path}|{table}|{os.path.getsize(db_path)}")
+            else:
+                parts.append(f"{db_path}|{table}|postgres")
         else:
             parts.append(f"{db_path}|{table}|missing")
     blob = "\n".join(sorted(parts))

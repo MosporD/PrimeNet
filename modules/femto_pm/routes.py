@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import time as _time
 
 from database_enhanced import get_user_by_session
-from sync_config import DATABASES_ROOT
+from sync_config import FEMTO_PM_DB
 from core.platform.session import get_session_token
 from modules.femto_pm.kpi_store import (
     FEMTO_USER_KPI_DB,
@@ -62,7 +62,6 @@ def format_user(user):
     return {"id": user.get("id"), "username": user.get("username"), "role": user.get("role")}
 
 
-FEMTO_PM_DB = os.path.join(DATABASES_ROOT, "cells", "femto_pm_cells.db")
 FEMTO_TABLE = "FEMTO_HOURLY"
 FEMTO_VALUES_TABLE = "FEMTO_HOURLY_VALUES"
 FEMTO_COUNTER_TABLE = "FEMTO_COUNTER_CATALOG"
@@ -109,9 +108,15 @@ _KPI_CACHE_TTL = 300  # 5 minutes
 
 
 def _femto_conn():
-    conn = sqlite3.connect(FEMTO_PM_DB, timeout=20)
-    conn.row_factory = sqlite3.Row
-    return conn
+    from db.runtime import open_store
+
+    return open_store(FEMTO_PM_DB, timeout=20)
+
+
+def _femto_available() -> bool:
+    from db.runtime import store_available
+
+    return store_available(FEMTO_PM_DB)
 
 
 def _sql_ident(name: str) -> str:
@@ -613,7 +618,7 @@ def femto_pm_devices():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    if not os.path.isfile(FEMTO_PM_DB):
+    if not _femto_available():
         return jsonify({"success": True, "devices": []})
     conn = _femto_conn()
     try:
@@ -640,7 +645,7 @@ def femto_pm_catalog():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    if not os.path.isfile(FEMTO_PM_DB):
+    if not _femto_available():
         return jsonify({"success": True, "kpis": [], "counters": {}})
     conn = _femto_conn()
     try:
@@ -656,7 +661,7 @@ def femto_pm_kpi_columns():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    if not os.path.isfile(FEMTO_PM_DB):
+    if not _femto_available():
         return jsonify({"success": True, "columns": []})
     conn = _femto_conn()
     try:
@@ -689,7 +694,7 @@ def femto_pm_trend():
         granularity = "hourly"
     limit = request.args.get("limit", 240, type=int) or 240
     limit = max(1, min(limit, 2000))
-    if not os.path.isfile(FEMTO_PM_DB):
+    if not _femto_available():
         return jsonify({"success": True, "rows": [], "columns": []})
 
     conn = _femto_conn()
@@ -780,7 +785,7 @@ def femto_pm_user_kpis_validate():
     check = validate_formula(formula, _counter_names_for_validation())
     sample_value = None
     sample_timestamp = None
-    if check["ok"] and formula and unique_id and os.path.isfile(FEMTO_PM_DB):
+    if check["ok"] and formula and unique_id and _femto_available():
         sample_value, sample_timestamp = _sample_formula_value(unique_id, kpi_name, formula)
     return jsonify({
         "success": True,
@@ -834,7 +839,7 @@ def femto_pm_user_kpis_delete(kpi_id: int):
 
 def _counter_names_for_validation() -> set[str]:
     names: set[str] = set()
-    if not os.path.isfile(FEMTO_PM_DB):
+    if not _femto_available():
         return names
     conn = _femto_conn()
     try:

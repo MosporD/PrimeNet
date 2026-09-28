@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`postgres-runtime.md`](postgres-r
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-28 (full catalog → Postgres)
+
+- Done: Extended `NCM_PG_DOMAINS` / `ALL_GROUPS` with femto, son_ml, nh_precalc, kpi_headers, cm, elevation, rru, adjacency, wncelg, cases, pm_plus, marketing.
+- Done: `open_store()` helper; wired leftover module stores + groups/femto/KPI headers/marketing through `open_db`/`store_available`.
+- Done: Fresh-start plan = migrate `app` only; other schemas empty until ingest.
+- NEXT: Server pull/rebuild; set full domains (or unset = all); migrate `--schema app` only.
+
 ## From brief History (migrated 2026-09-17)
 
 - 2026-08-31: phase 0 inventory; phase 1 app DB adapter; phases 2–4 plumbing + migrate scripts. Tests 16/16 on SQLite. No live PG here.

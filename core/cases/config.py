@@ -5,10 +5,10 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from sync_config import DATABASES_ROOT
+from sync_config import DATABASES_ROOT, OPTIMIZATION_CASES_DB
 
 CASES_DIR = Path(os.path.join(DATABASES_ROOT, "cases"))
-SQLITE_PATH = CASES_DIR / "optimization_cases.db"
+SQLITE_PATH = Path(OPTIMIZATION_CASES_DB)
 
 # Scorecard defaults (days)
 BASELINE_DAYS = 7

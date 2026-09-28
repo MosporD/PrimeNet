@@ -70,9 +70,11 @@ def _candidate_tables(conn: sqlite3.Connection) -> list[str]:
 
 
 def _collect_rows(vendor: str, db_path: str) -> list[tuple[str, str, str, str]]:
-    if not os.path.isfile(db_path):
+    from db.runtime import open_db, store_available
+
+    if not store_available(db_path):
         return []
-    conn = sqlite3.connect(db_path, timeout=30)
+    conn = open_db(db_path, timeout=30)
     out: list[tuple[str, str, str, str]] = []
     try:
         for table in _candidate_tables(conn):
@@ -95,8 +97,9 @@ def _collect_rows(vendor: str, db_path: str) -> list[tuple[str, str, str, str]]:
 
 
 def build() -> tuple[int, int]:
-    os.makedirs(os.path.dirname(KPI_HEADERS_DB), exist_ok=True)
-    conn = sqlite3.connect(KPI_HEADERS_DB, timeout=30)
+    from db.runtime import open_store
+
+    conn = open_store(KPI_HEADERS_DB, timeout=30)
     try:
         conn.execute(
             """

@@ -39,11 +39,16 @@ TRAFFIC_ALIASES = ("traffic volume", "payload", "data volume", "pdcp sdu volume"
 USERS_ALIASES = ("average user number", "avg act ues", "active users", "users")
 
 
-def _connect(path: str) -> sqlite3.Connection | None:
-    if not path or not os.path.isfile(path):
+def _connect(path: str):
+    from db.runtime import open_db, store_available
+
+    if not path or not store_available(path):
         return None
-    conn = sqlite3.connect(path, timeout=30)
-    conn.row_factory = sqlite3.Row
+    conn = open_db(path, timeout=30)
+    try:
+        conn.row_factory = __import__('sqlite3').Row
+    except Exception:
+        pass
     return conn
 
 

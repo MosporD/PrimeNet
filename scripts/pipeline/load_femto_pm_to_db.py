@@ -17,11 +17,11 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from sync_config import DATA_ROOT, DATABASES_ROOT, FEMTO_RETENTION_DAYS
+from sync_config import DATA_ROOT, FEMTO_PM_DB as FEMTO_PM_DB_PATH, FEMTO_RETENTION_DAYS
 
 
 RAW_FEMTO_DIR = Path(DATA_ROOT) / "raw" / "femto"
-FEMTO_PM_DB = Path(DATABASES_ROOT) / "cells" / "femto_pm_cells.db"
+FEMTO_PM_DB = Path(FEMTO_PM_DB_PATH)
 FEMTO_TABLE = "FEMTO_HOURLY"
 FEMTO_VALUES_TABLE = "FEMTO_HOURLY_VALUES"
 _FIXED_COLS = {
@@ -346,10 +346,9 @@ def main() -> int:
         print(f"[warn] no tgz files in {RAW_FEMTO_DIR}")
         return 0
 
-    FEMTO_PM_DB.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(FEMTO_PM_DB, timeout=60)
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=NORMAL")
+    from db.runtime import open_store
+
+    conn = open_store(str(FEMTO_PM_DB), timeout=60)
     _ensure_base_table(conn)
     _ensure_values_table(conn)
 

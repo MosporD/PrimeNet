@@ -41,6 +41,19 @@ _SCHEMA_ORDER = [
     'pm_huawei_hourly',
     'pm_nokia_daily',
     'pm_huawei_daily',
+    'femto_pm',
+    'femto_user_kpis',
+    'son_ml',
+    'nh_precalc',
+    'kpi_headers',
+    'cm_snapshots',
+    'elevation',
+    'rru_inventory',
+    'adjacency_gis',
+    'wncelg',
+    'cases',
+    'pm_plus',
+    'marketing',
 ]
 
 

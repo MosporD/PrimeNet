@@ -38,6 +38,7 @@ _SELECT_SQL_MASTER = re.compile(
     r"SELECT\s+sql\s+FROM\s+sqlite_master\b",
     re.IGNORECASE,
 )
+_COLLATE_NOCASE = re.compile(r'\s+COLLATE\s+NOCASE\b', re.IGNORECASE)
 
 
 def qmark_to_percent(sql: str) -> str:
@@ -163,4 +164,5 @@ def adapt_sqlite_app_sql(sql: str) -> str:
     sql = _ON_CONFLICT.sub('ON CONFLICT (', sql)
     sql = _EXCLUDED.sub('EXCLUDED.', sql)
     sql = _LAST_INSERT.sub('SELECT lastval()', sql)
+    sql = _COLLATE_NOCASE.sub('', sql)
     return qmark_to_percent(sql)

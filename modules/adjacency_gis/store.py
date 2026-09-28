@@ -1,17 +1,16 @@
-"""SQLite snapshot store for Adjacency GIS (Nokia ADCE + Huawei G2GNCELL)."""
+"""Snapshot store for Adjacency GIS (Nokia ADCE + Huawei G2GNCELL)."""
 
 from __future__ import annotations
 
 import json
 import os
-import sqlite3
 from datetime import datetime, timezone
 from typing import Any
 
-from sync_config import DATABASES_ROOT
+from sync_config import ADJACENCY_GIS_DB
 
-_STORE_DIR = os.path.join(DATABASES_ROOT, 'adjacency_gis')
-_STORE_DB = os.path.join(_STORE_DIR, 'adjacency_snapshot.db')
+_STORE_DB = ADJACENCY_GIS_DB
+_STORE_DIR = os.path.dirname(_STORE_DB)
 
 VENDORS = ('nokia', 'huawei')
 
@@ -28,17 +27,15 @@ def ensure_db_dir() -> None:
     os.makedirs(_STORE_DIR, exist_ok=True)
 
 
-def get_connection() -> sqlite3.Connection:
-    ensure_db_dir()
-    conn = sqlite3.connect(_STORE_DB, timeout=60)
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.execute('PRAGMA synchronous=NORMAL')
+def get_connection():
+    from db.runtime import open_store
+
+    conn = open_store(_STORE_DB, timeout=60)
     init_schema(conn)
     return conn
 
 
-def init_schema(conn: sqlite3.Connection) -> None:
+def init_schema(conn) -> None:
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS adj_build (

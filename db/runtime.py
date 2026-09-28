@@ -2,8 +2,9 @@
 DB connections.
 
 SQLite by default. Opt in per domain with ``NCM_DATABASE_URL`` /
-``NCM_APP_DATABASE_URL`` and ``NCM_PG_DOMAINS``. Unmapped files (femto, SON
-ML, KPI headers, …) always stay SQLite.
+``NCM_APP_DATABASE_URL`` and ``NCM_PG_DOMAINS``. When ``NCM_DATABASE_URL``
+is set and ``NCM_PG_DOMAINS`` is unset, every catalogued store routes to
+Postgres (including femto, SON ML, KPI headers, CM, elevation, …).
 """
 
 from __future__ import annotations
@@ -115,6 +116,16 @@ class PgConn:
     def __init__(self, raw, schema: str = 'public'):
         self._raw = raw
         self.schema = schema
+        self._row_factory = None
+
+    @property
+    def row_factory(self):
+        return self._row_factory
+
+    @row_factory.setter
+    def row_factory(self, _value):
+        # Callers set sqlite3.Row; Postgres already uses PgRow via row_factory.
+        self._row_factory = None
 
     def execute(self, sql, params=None):
         sql = adapt_sqlite_app_sql(sql)
@@ -342,6 +353,25 @@ def open_db(db_path: str, timeout: float = 120):
         return _connect_postgres(schema)
     conn = sqlite3.connect(db_path, timeout=timeout)
     return _configure_sqlite_conn(conn)
+
+
+def open_store(db_path: str, timeout: float = 60, *, wal: bool = True):
+    """Open a module store: Postgres schema when mapped, else SQLite with Row + WAL."""
+    if not schema_for_sqlite_path(db_path):
+        parent = os.path.dirname(db_path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+    conn = open_db(db_path, timeout=timeout)
+    if _is_pg_conn(conn):
+        return conn
+    conn.row_factory = sqlite3.Row
+    if wal:
+        try:
+            conn.execute('PRAGMA journal_mode=WAL')
+            conn.execute('PRAGMA synchronous=NORMAL')
+        except Exception:
+            pass
+    return conn
 
 
 def connect_app():

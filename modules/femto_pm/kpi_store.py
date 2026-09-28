@@ -1,14 +1,12 @@
-"""User-defined Femto KPI definitions (separate SQLite database)."""
+"""User-defined Femto KPI definitions (SQLite or Postgres domain ``femto_user_kpis``)."""
 
 from __future__ import annotations
 
-import os
 import re
-import sqlite3
+from typing import Any
 
-from sync_config import DATABASES_ROOT
+from sync_config import FEMTO_USER_KPI_DB
 
-FEMTO_USER_KPI_DB = os.path.join(DATABASES_ROOT, "cells", "femto_user_kpis.db")
 USER_KPI_TABLE = "FEMTO_USER_KPIS"
 
 _DEFAULT_CATEGORIES = (
@@ -25,17 +23,19 @@ _FORMULA_TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.]*\*?")
 _AGG_CALL_RE = re.compile(r"(SUM|AVG)\s*\(\s*([^)]+)\s*\)", re.IGNORECASE)
 
 
-def user_kpi_conn() -> sqlite3.Connection:
-    os.makedirs(os.path.dirname(FEMTO_USER_KPI_DB), exist_ok=True)
-    conn = sqlite3.connect(FEMTO_USER_KPI_DB, timeout=30)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA busy_timeout=30000")
+def user_kpi_conn():
+    from db.runtime import open_store
+
+    conn = open_store(FEMTO_USER_KPI_DB, timeout=30)
+    try:
+        conn.execute("PRAGMA busy_timeout=30000")
+    except Exception:
+        pass
     ensure_user_kpi_schema(conn)
     return conn
 
 
-def ensure_user_kpi_schema(conn: sqlite3.Connection) -> None:
+def ensure_user_kpi_schema(conn) -> None:
     conn.execute(
         f"""
         CREATE TABLE IF NOT EXISTS "{USER_KPI_TABLE}" (
@@ -60,7 +60,7 @@ def default_categories() -> list[str]:
     return list(_DEFAULT_CATEGORIES)
 
 
-def list_user_kpis(conn: sqlite3.Connection | None = None) -> list[dict]:
+def list_user_kpis(conn: Any | None = None) -> list[dict]:
     own = conn is None
     if own:
         conn = user_kpi_conn()
@@ -79,7 +79,7 @@ def list_user_kpis(conn: sqlite3.Connection | None = None) -> list[dict]:
             conn.close()
 
 
-def get_user_kpi(conn: sqlite3.Connection, kpi_id: int) -> dict | None:
+def get_user_kpi(conn: Any, kpi_id: int) -> dict | None:
     row = conn.execute(
         f"""
         SELECT id, kpi_name, category_l1, formula, unit, description,
@@ -92,7 +92,7 @@ def get_user_kpi(conn: sqlite3.Connection, kpi_id: int) -> dict | None:
     return _row_to_dict(row) if row else None
 
 
-def get_user_kpi_by_name(conn: sqlite3.Connection, kpi_name: str) -> dict | None:
+def get_user_kpi_by_name(conn: Any, kpi_name: str) -> dict | None:
     row = conn.execute(
         f"""
         SELECT id, kpi_name, category_l1, formula, unit, description,
@@ -105,7 +105,7 @@ def get_user_kpi_by_name(conn: sqlite3.Connection, kpi_name: str) -> dict | None
     return _row_to_dict(row) if row else None
 
 
-def create_user_kpi(conn: sqlite3.Connection, payload: dict, created_by: str = "") -> dict:
+def create_user_kpi(conn: Any, payload: dict, created_by: str = "") -> dict:
     name = str(payload.get("kpi_name") or "").strip()
     formula = str(payload.get("formula") or "").strip()
     if not name:
@@ -127,7 +127,7 @@ def create_user_kpi(conn: sqlite3.Connection, payload: dict, created_by: str = "
     return get_user_kpi(conn, int(cur.lastrowid)) or {}
 
 
-def update_user_kpi(conn: sqlite3.Connection, kpi_id: int, payload: dict) -> dict:
+def update_user_kpi(conn: Any, kpi_id: int, payload: dict) -> dict:
     existing = get_user_kpi(conn, kpi_id)
     if not existing:
         raise ValueError("KPI not found")
@@ -153,13 +153,13 @@ def update_user_kpi(conn: sqlite3.Connection, kpi_id: int, payload: dict) -> dic
     return get_user_kpi(conn, kpi_id) or {}
 
 
-def delete_user_kpi(conn: sqlite3.Connection, kpi_id: int) -> bool:
+def delete_user_kpi(conn: Any, kpi_id: int) -> bool:
     cur = conn.execute(f'DELETE FROM "{USER_KPI_TABLE}" WHERE id = ?', (kpi_id,))
     conn.commit()
     return cur.rowcount > 0
 
 
-def user_kpi_defs_map(conn: sqlite3.Connection | None = None) -> dict[str, str]:
+def user_kpi_defs_map(conn: Any | None = None) -> dict[str, str]:
     rows = list_user_kpis(conn) if conn is None else [
         _row_to_dict(r)
         for r in conn.execute(
@@ -282,7 +282,7 @@ def validate_formula(
     }
 
 
-def _row_to_dict(row: sqlite3.Row | dict | None) -> dict:
+def _row_to_dict(row: Any) -> dict:
     if row is None:
         return {}
     if isinstance(row, dict):

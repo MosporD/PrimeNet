@@ -4,30 +4,28 @@ from __future__ import annotations
 
 import os
 import re
-import sqlite3
 from datetime import datetime, timezone
 
-from sync_config import DATABASES_ROOT
+from sync_config import CM_SNAPSHOTS_DB, DATABASES_ROOT
 
 
 RADIO_DB_DIR = os.path.join(DATABASES_ROOT, "radio")
-CM_STORE_DB = os.path.join(RADIO_DB_DIR, "cm_snapshots.db")
+CM_STORE_DB = CM_SNAPSHOTS_DB
 
 
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
-def get_connection() -> sqlite3.Connection:
-    os.makedirs(RADIO_DB_DIR, exist_ok=True)
-    conn = sqlite3.connect(CM_STORE_DB, timeout=60)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
+def get_connection():
+    from db.runtime import open_store
+
+    conn = open_store(CM_STORE_DB, timeout=60)
     init_schema(conn)
     return conn
 
 
-def init_schema(conn: sqlite3.Connection) -> None:
+def init_schema(conn) -> None:
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS cm_snapshot (

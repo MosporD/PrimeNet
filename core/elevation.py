@@ -1,17 +1,16 @@
-"""Shared Jordan elevation lookup with persistent SQLite caching."""
+"""Shared Jordan elevation lookup with persistent caching (SQLite or Postgres)."""
 
 from __future__ import annotations
 
 import json
 import os
-import sqlite3
 import threading
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from typing import Iterable
 
-from sync_config import DATABASES_ROOT
+from sync_config import ELEVATION_DB
 
 JORDAN_BOUNDS = {
     "min_lat": 29.0,
@@ -20,7 +19,6 @@ JORDAN_BOUNDS = {
     "max_lng": 39.4,
 }
 
-ELEVATION_DB = os.path.join(DATABASES_ROOT, "geo", "elevation_cache.db")
 _DB_LOCK = threading.Lock()
 
 
@@ -46,11 +44,10 @@ def is_in_jordan(lat: float, lng: float) -> bool:
     )
 
 
-def _connect() -> sqlite3.Connection:
-    os.makedirs(os.path.dirname(ELEVATION_DB), exist_ok=True)
-    conn = sqlite3.connect(ELEVATION_DB, timeout=30)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
+def _connect():
+    from db.runtime import open_store
+
+    conn = open_store(ELEVATION_DB, timeout=30)
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS elevation_cache (

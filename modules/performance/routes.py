@@ -744,7 +744,9 @@ _KPI_COLS_CACHE_TTL_SEC = 90
 
 
 def _kpi_headers_db_available() -> bool:
-    return os.path.isfile(KPI_HEADERS_DB)
+    from db.runtime import store_available
+
+    return store_available(KPI_HEADERS_DB)
 
 
 def _kpi_scope_from_catalog(vendor: str = "", technology: str = "") -> list[str]:
@@ -759,7 +761,9 @@ def _kpi_scope_from_catalog(vendor: str = "", technology: str = "") -> list[str]
         where.append("technology = ?")
         params.append(technology)
     where_sql = f"WHERE {' AND '.join(where)}" if where else ""
-    conn = sqlite3.connect(KPI_HEADERS_DB, timeout=15)
+    from db.runtime import open_store
+
+    conn = open_store(KPI_HEADERS_DB, timeout=15)
     try:
         rows = conn.execute(
             f"""
@@ -780,8 +784,9 @@ def _kpi_scope_from_catalog(vendor: str = "", technology: str = "") -> list[str]
 def _kpi_mapping_from_catalog() -> dict[str, list[str]]:
     if not _kpi_headers_db_available():
         return {}
-    conn = sqlite3.connect(KPI_HEADERS_DB, timeout=15)
-    conn.row_factory = sqlite3.Row
+    from db.runtime import open_store
+
+    conn = open_store(KPI_HEADERS_DB, timeout=15)
     try:
         rows = conn.execute(
             """

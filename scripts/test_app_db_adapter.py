@@ -109,6 +109,12 @@ class DomainRoutingTests(unittest.TestCase):
         self.assertIn('neighbors', groups)
         self.assertIn('groups', groups)
         self.assertIn('balance', groups)
+        self.assertIn('femto', groups)
+        self.assertIn('son_ml', groups)
+        self.assertIn('nh_precalc', groups)
+        self.assertIn('kpi_headers', groups)
+        self.assertIn('cm', groups)
+        self.assertIn('marketing', groups)
 
     def test_pg_domains_subset(self):
         os.environ['NCM_DATABASE_URL'] = 'postgresql://u:p@127.0.0.1:5432/primenet'
