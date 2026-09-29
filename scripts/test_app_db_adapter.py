@@ -22,6 +22,13 @@ class AppSqlTests(unittest.TestCase):
         sql = "SELECT * FROM t WHERE name = '?' AND id = ?"
         self.assertEqual(qmark_to_percent(sql), "SELECT * FROM t WHERE name = '?' AND id = %s")
 
+    def test_qmark_escapes_literal_percent(self):
+        sql = "SELECT name FROM t WHERE name LIKE 't_%' AND id = ?"
+        out = qmark_to_percent(sql)
+        self.assertIn("LIKE 't_%%'", out)
+        self.assertIn('%s', out)
+        self.assertNotIn("got '%'", out)
+
     def test_autoincrement(self):
         sql = 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
         out = adapt_sqlite_app_sql(sql)
@@ -75,6 +82,8 @@ class AppSqlTests(unittest.TestCase):
         self.assertIn('information_schema.tables', out)
         self.assertIn('table_name LIKE', out)
         self.assertNotIn('sqlite_master', out)
+        # Literal LIKE wildcards must be %% for psycopg
+        self.assertIn("LIKE 't_%%'", out)
 
     def test_unique_on_conflict_replace(self):
         sql = 'UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE'
@@ -94,6 +103,71 @@ class AppSqlTests(unittest.TestCase):
         sql = 'INSERT OR IGNORE INTO cells (cell_name) VALUES (?)'
         out = adapt_sqlite_app_sql(sql)
         self.assertIn('ON CONFLICT DO NOTHING', out)
+
+
+class _RecordingRaw:
+    def __init__(self):
+        self.calls = []
+
+    def execute(self, sql, params=None):
+        self.calls.append((sql, params))
+
+    def cursor(self):
+        return self
+
+    def executemany(self, sql, seq):
+        self.calls.append((sql, list(seq)[0]))
+
+    def close(self):
+        pass
+
+
+def _psycopg_final_sql(sql, params) -> str:
+    from psycopg._queries import PostgresQuery
+    from psycopg.adapt import Transformer
+
+    q = PostgresQuery(Transformer())
+    q.convert(sql, params)
+    return q.query.decode()
+
+
+class PercentColumnTests(unittest.TestCase):
+    """PM counter headers like ``CSSR(%)`` must survive psycopg placeholder parsing."""
+
+    def setUp(self):
+        try:
+            import psycopg  # noqa: F401
+        except ImportError:
+            self.skipTest('psycopg not installed')
+        from db.runtime import PgConn
+
+        self.raw = _RecordingRaw()
+        self.conn = PgConn(self.raw)
+
+    def test_insert_with_percent_column(self):
+        self.conn.executemany('INSERT INTO "t" ("cell", "CSSR(%)") VALUES (?, ?)', [('A', 1.0)])
+        sql, params = self.raw.calls[-1]
+        self.assertEqual(
+            _psycopg_final_sql(sql, params),
+            'INSERT INTO "t" ("cell", "CSSR(%)") VALUES ($1, $2)',
+        )
+
+    def test_alter_add_percent_column_without_params(self):
+        self.conn.execute('ALTER TABLE "t" ADD COLUMN "CSSR(%)" TEXT')
+        sql, params = self.raw.calls[-1]
+        self.assertIsNotNone(params)
+        self.assertEqual(
+            _psycopg_final_sql(sql, params),
+            'ALTER TABLE "t" ADD COLUMN "CSSR(%)" TEXT',
+        )
+
+    def test_cursor_execute_without_params(self):
+        self.conn.cursor().execute('CREATE TABLE "t" ("Drop Rate(%)" TEXT)')
+        sql, params = self.raw.calls[-1]
+        self.assertEqual(
+            _psycopg_final_sql(sql, params),
+            'CREATE TABLE "t" ("Drop Rate(%)" TEXT)',
+        )
 
 
 class DomainRoutingTests(unittest.TestCase):

@@ -42,7 +42,13 @@ _COLLATE_NOCASE = re.compile(r'\s+COLLATE\s+NOCASE\b', re.IGNORECASE)
 
 
 def qmark_to_percent(sql: str) -> str:
-    """Replace ``?`` placeholders with ``%s``, ignoring quoted strings."""
+    """Replace ``?`` placeholders with ``%s``, escaping literal ``%`` for psycopg.
+
+    psycopg treats ``%`` as format markers. SQL that still contains LIKE patterns
+    such as ``'t_%'`` after sqlite_master rewrites must become ``'t_%%'``.
+    """
+    # Escape every literal % before introducing %s placeholders.
+    sql = sql.replace('%', '%%')
     out: list[str] = []
     in_single = False
     in_double = False

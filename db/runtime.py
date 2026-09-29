@@ -111,6 +111,12 @@ def _translate_pg_error(exc):
     raise exc
 
 
+def _pg_params(params):
+    if params is None:
+        return ()
+    return params if isinstance(params, (list, tuple, dict)) else tuple(params)
+
+
 class PgConn:
     """Thin wrapper so existing ``conn.execute`` / ``cursor().execute`` callers keep working."""
 
@@ -131,9 +137,8 @@ class PgConn:
     def execute(self, sql, params=None):
         sql = adapt_sqlite_app_sql(sql)
         try:
-            if params is None:
-                return self._raw.execute(sql)
-            return self._raw.execute(sql, tuple(params) if not isinstance(params, (list, tuple)) else params)
+            # Always pass params: psycopg only collapses the escaped ``%%`` back to ``%`` when it parses placeholders.
+            return self._raw.execute(sql, _pg_params(params))
         except Exception as exc:
             _translate_pg_error(exc)
 
@@ -181,9 +186,7 @@ class PgCursor:
     def execute(self, sql, params=None):
         sql = adapt_sqlite_app_sql(sql)
         try:
-            if params is None:
-                return self._raw.execute(sql)
-            return self._raw.execute(sql, tuple(params) if not isinstance(params, (list, tuple)) else params)
+            return self._raw.execute(sql, _pg_params(params))
         except Exception as exc:
             _translate_pg_error(exc)
 

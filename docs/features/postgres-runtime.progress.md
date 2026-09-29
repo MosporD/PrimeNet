@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`postgres-runtime.md`](postgres-r
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-29 (psycopg `%` in PM column names)
+
+- Root cause: PM counter headers like `CSSR(%)` reached psycopg unescaped → `only '%s', '%b', '%t' are allowed as placeholders, got '%)'` on every Huawei cells/groups hourly+daily load.
+- Done: `qmark_to_percent` escapes `%` → `%%`; `PgConn.execute` / `PgCursor.execute` always pass params (`()` when None) so psycopg collapses `%%` on no-param DDL too (else `ALTER TABLE ADD COLUMN "X(%)"` would create `X(%%)`).
+- Tests: `scripts/test_app_db_adapter.py` 23 passed (INSERT / ALTER / CREATE with `(%)` columns, via psycopg's query parser).
+- NEXT: Commit + rebuild primenet/scheduler on 97.141; re-run Hourly + Daily; confirm `failed_files=0`.
+
 ## 2026-09-29 (Postgres-only 1B)
 
 - Done: `require_postgres_url()` in `db/pg_domains.py`; wired into `deploy/bootstrap.py`, `primenet_app.py`, `nexuscore_app.py`, `nexpulse_app.py`.
