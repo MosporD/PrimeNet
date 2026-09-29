@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [`network-map.md`](network-map.md)
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: metadata + neighbor stores via `open_db` / `connect_metadata`; table probes use `table_exists` (adapter → `information_schema`). Map 500s after Daily failure were empty/missing metadata tables plus catalog SQL against PG — fix depends on successful Daily load + existence rewrite.
+- NEXT: After Daily load on PG, re-check `/api/map/sites?tech=2G|3G` and cell-code search.
+
 ## 2026-09-28 — Per-user KMZ layers
 
 - Upload `.kmz`/`.kml` from left filter panel; files + GeoJSON stored under `uploads/network_map_kmz/{user_id}/`; metadata in `map_user_layers`.

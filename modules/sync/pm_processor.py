@@ -39,7 +39,7 @@ from core.pm_timestamp import (
     format_pm_report_time,
     parse_pm_datetime,
 )
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 from modules.sync.reset_mode import sync_reset_mode
 from sync_config import (
     NOKIA_PM_DB,
@@ -1467,12 +1467,7 @@ def huawei_pm_kpi_tables(db_path: str | None = None) -> list[str]:
     try:
         conn = open_db(path, timeout=15)
         try:
-            names = [
-                r[0]
-                for r in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-                ).fetchall()
-            ]
+            names = list_tables(conn)
         finally:
             conn.close()
     except sqlite3.Error:
@@ -1532,12 +1527,7 @@ def huawei_pm_table_for_cell(
 
     conn = open_db(path, timeout=15)
     try:
-        names = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-        ]
+        names = list_tables(conn)
         for base_cand in [base] + [
             pm_table_name(t, scope) for t in PM_TECHNOLOGIES if pm_table_name(t, scope) != base
         ]:

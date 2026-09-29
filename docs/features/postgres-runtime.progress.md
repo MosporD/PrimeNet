@@ -1,9 +1,17 @@
-# Postgres runtime (opt-in) — progress
+# Postgres runtime (required) — progress
 
 Detailed dated log for this blueprint. Brief: [`postgres-runtime.md`](postgres-runtime.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-29 (Postgres-only 1B)
+
+- Done: `require_postgres_url()` in `db/pg_domains.py`; wired into `deploy/bootstrap.py`, `primenet_app.py`, `nexuscore_app.py`, `nexpulse_app.py`.
+- Done: `open_db` / `open_store` / `store_available` / `performance_meta_pm_conn` are Postgres-only (no SQLite ATTACH fallback).
+- Done: `rewrite_sqlite_master` handles existence probes; `table_exists` / `list_tables` helpers.
+- Done: `.env.example` + brief rewritten for Compose `app-db` laptop runbook.
+- NEXT: Server rebuild; Daily load verify; finish blueprint catalog sweeps using `list_tables`.
+
 ## 2026-09-28 (full catalog → Postgres)
 
 - Done: Extended `NCM_PG_DOMAINS` / `ALL_GROUPS` with femto, son_ml, nh_precalc, kpi_headers, cm, elevation, rru, adjacency, wncelg, cases, pm_plus, marketing.

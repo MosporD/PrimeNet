@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`optimization-cases.md`](optimiza
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## From brief History (migrated 2026-09-17)
 
 - 2026-09-14: V1 Case object, scorecard, correlator, selection context, workspace UI, Open Case from radio issues + SON, map polygon → selection.

@@ -32,7 +32,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from db.runtime import _is_pg_conn, execute_query, open_db, sqlite_ident
+from db.runtime import (
+    _is_pg_conn,
+    execute_query,
+    list_tables,
+    open_db,
+    sqlite_ident,
+    table_exists,
+)
 from sync_config import (
     HUAWEI_PM_DB,
     HUAWEI_GROUPS_DB,
@@ -226,16 +233,13 @@ def _drop_non_canonical_tables(conn: sqlite3.Connection, label: str, scope: str 
         keep_extra = {"groups", "group_cells"}
     else:
         return
-    rows = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-    ).fetchall()
-    for (name,) in rows:
+    for name in list_tables(conn):
         if name in keep_extra:
             continue
         # Keep monotable and area partitions (e.g. 4G_CELLS_HOURLY__WEST_AMMAN).
         if any(name == base or name.startswith(f"{base}__") for base in keep_bases):
             continue
-        conn.execute(f'DROP TABLE IF EXISTS "{name}"')
+        execute_query(conn, f'DROP TABLE IF EXISTS "{name}"')
         print(f"[{label}] dropped non-canonical table: {name}")
 
 
@@ -898,15 +902,18 @@ def _prepare_hashed_frame(df_raw: pd.DataFrame) -> pd.DataFrame:
 
 
 def _table_exists(conn: sqlite3.Connection, table: str) -> bool:
-    row = conn.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
-        (table,),
-    ).fetchone()
-    return row is not None
+    return table_exists(conn, table)
 
 
 def _pragma_column_names(conn: sqlite3.Connection, table: str) -> list[str]:
-    return [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
+    rows = execute_query(conn, f'PRAGMA table_info("{table}")').fetchall()
+    names: list[str] = []
+    for r in rows:
+        if isinstance(r, dict):
+            names.append(str(r.get("name") or r.get("column_name") or ""))
+        else:
+            names.append(str(r[1]))
+    return [n for n in names if n]
 
 
 _sqlite_ident = sqlite_ident
@@ -1037,15 +1044,10 @@ def _replace_pm_frame_to_tables(
         return
 
     # Drop existing partitions for this base, then rewrite by area.
-    existing = [
-        r[0]
-        for r in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        ).fetchall()
-    ]
+    existing = list_tables(conn)
     for name in existing:
         if name == base_table or name.startswith(f"{base_table}__"):
-            conn.execute(f'DROP TABLE IF EXISTS "{name}"')
+            execute_query(conn, f'DROP TABLE IF EXISTS "{name}"')
     if df.empty:
         print(f"[{label}] replaced {fn} -> {base_table} partitions: 0 rows")
         return
@@ -1112,13 +1114,10 @@ def _mirror_metadata_table_for_map(conn: sqlite3.Connection, source_table: str, 
 
 
 def _cleanup_legacy_metadata_tables(conn: sqlite3.Connection) -> None:
-    rows = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 't_%'"
-    ).fetchall()
-    for (name,) in rows:
+    for name in list_tables(conn, like="t_%"):
         canonical = _metadata_canonical_table(name)
         if canonical:
-            conn.execute(f'DROP TABLE IF EXISTS "{name}"')
+            execute_query(conn, f'DROP TABLE IF EXISTS "{name}"')
             print(f"[metadata] dropped legacy table {name}")
 
 
@@ -1194,6 +1193,7 @@ def _load_folder_tabular_to_db(
     files.sort()
     loaded = 0
     failed = 0
+    last_fail_reason = ''
     conn = open_db(db_path, timeout=60)
     try:
         for fn in files:
@@ -1208,7 +1208,9 @@ def _load_folder_tabular_to_db(
                 if use_chunked:
                     table = _canonical_table_for_label(label, fn, scope=scope)
                     if not table:
-                        print(f"[{label}] skipped {fn}: could not infer technology for canonical table")
+                        reason = f"could not infer technology for canonical table"
+                        print(f"[{label}] failed {fn}: {reason}")
+                        last_fail_reason = f"[{label}] failed {fn}: {reason}"
                         failed += 1
                         continue
                     _load_csv_file_incremental_in_chunks(conn, table, full_path, label, fn, scope=scope)
@@ -1216,7 +1218,9 @@ def _load_folder_tabular_to_db(
                     df = _read_tabular_as_is(full_path)
                     table = _canonical_table_for_label(label, fn, list(df.columns), scope=scope)
                     if label != "metadata" and not table:
-                        print(f"[{label}] skipped {fn}: could not infer technology for canonical table")
+                        reason = f"could not infer technology for canonical table"
+                        print(f"[{label}] failed {fn}: {reason}")
+                        last_fail_reason = f"[{label}] failed {fn}: {reason}"
                         failed += 1
                         continue
                     if incremental:
@@ -1236,6 +1240,7 @@ def _load_folder_tabular_to_db(
                 loaded += 1
             except Exception as e:
                 print(f"[{label}] failed {fn}: {e}")
+                last_fail_reason = f"[{label}] failed {fn}: {e}"
                 failed += 1
         if label == "metadata":
             try:
@@ -1243,6 +1248,7 @@ def _load_folder_tabular_to_db(
                 _rebuild_sites_from_metadata(conn)
             except Exception as ex:
                 print(f"[metadata] failed rebuilding sites table: {ex}")
+                last_fail_reason = f"[metadata] failed rebuilding sites table: {ex}"
                 failed += 1
         else:
             try:
@@ -1263,6 +1269,9 @@ def _load_folder_tabular_to_db(
                     print(f"[{label}] pruned {removed} older raw file(s) from {folder}")
     finally:
         conn.close()
+    if failed and last_fail_reason:
+        # Always emit one high-signal line to stderr so sync_log summaries can pick it up.
+        print(last_fail_reason, file=sys.stderr)
     return loaded, failed
 
 
@@ -1449,6 +1458,11 @@ def main() -> int:
             print(f"[pm-indexes] warning: {ex}")
 
     print(f"[done] mode={mode} loaded_tables={total_loaded} failed_files={total_failed}")
+    if total_failed:
+        print(
+            f"[done] FAILED loaded_tables={total_loaded} failed_files={total_failed}",
+            file=sys.stderr,
+        )
     return 0 if total_failed == 0 else 1
 
 

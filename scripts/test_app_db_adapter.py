@@ -62,6 +62,20 @@ class AppSqlTests(unittest.TestCase):
         self.assertIn('information_schema.tables', out)
         self.assertNotIn('sqlite_master', out)
 
+    def test_sqlite_master_table_exists(self):
+        sql = "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1"
+        out = adapt_sqlite_app_sql(sql)
+        self.assertIn('information_schema.tables', out)
+        self.assertIn('table_name = %s', out)
+        self.assertNotIn('sqlite_master', out)
+
+    def test_sqlite_master_like_filter(self):
+        sql = "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 't_%'"
+        out = adapt_sqlite_app_sql(sql)
+        self.assertIn('information_schema.tables', out)
+        self.assertIn('table_name LIKE', out)
+        self.assertNotIn('sqlite_master', out)
+
     def test_unique_on_conflict_replace(self):
         sql = 'UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE'
         out = adapt_sqlite_app_sql(sql)
@@ -125,25 +139,19 @@ class DomainRoutingTests(unittest.TestCase):
 
 
 class SqliteAppDbStillWorks(unittest.TestCase):
-    def test_connect_app_sqlite_default(self):
+    def test_require_postgres_url_without_env(self):
         _clear_pg_env()
-        os.environ['NCM_SKIP_ACTIVATION'] = '1'
-        from db.runtime import connect_app, connect_metadata, is_app_postgresql, is_postgresql
+        from db.pg_domains import require_postgres_url
 
-        self.assertFalse(is_app_postgresql())
-        self.assertFalse(is_postgresql())
-        conn = connect_app()
-        try:
-            row = conn.execute('SELECT 1 AS n').fetchone()
-            self.assertEqual(int(row['n'] if row['n'] is not None else row[0]), 1)
-        finally:
-            conn.close()
-        meta = connect_metadata()
-        try:
-            row = meta.execute('SELECT 1 AS n').fetchone()
-            self.assertEqual(int(row['n'] if row['n'] is not None else row[0]), 1)
-        finally:
-            meta.close()
+        with self.assertRaises(RuntimeError) as ctx:
+            require_postgres_url()
+        self.assertIn('NCM_DATABASE_URL', str(ctx.exception))
+
+    def test_use_sqlite_helper_always_false(self):
+        _clear_pg_env()
+        from db.runtime import use_sqlite_for_app_and_metadata
+
+        self.assertFalse(use_sqlite_for_app_and_metadata())
 
 
 if __name__ == '__main__':

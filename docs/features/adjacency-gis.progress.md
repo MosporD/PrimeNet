@@ -43,3 +43,10 @@ Open `/adjacency-gis`, use **Map view** to switch basemaps; pick a BCCH and veri
 - Wired: `primenet_app`, NAV, versions, dashboard tile, scheduler cron, Admin status/run APIs.
 - Audits: unidirectional, overshoot (default 15 km), NCL > 32, co-channel.
 - Tests: `test_nokia_parse`, `test_logic`, `test_store`.
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+

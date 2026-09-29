@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-from db.runtime import open_db, sqlite_ident, store_available
+from db.runtime import list_tables, open_db, sqlite_ident, store_available
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
 _CACHE_TTL_SEC = 600
@@ -157,13 +157,7 @@ def audit_neighbor_db(path: str, label: str) -> dict:
 
     conn = open_db(path, timeout=60)
     try:
-        tables = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' "
-                "AND name NOT LIKE 'sqlite_%' ORDER BY name"
-            ).fetchall()
-        ]
+        tables = sorted(list_tables(conn))
         for table in tables:
             result["tables"].append(_table_stats(conn, table))
     finally:

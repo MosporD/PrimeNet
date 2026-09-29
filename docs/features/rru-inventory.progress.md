@@ -8,6 +8,13 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **NEXT:** None parked — use `/configuration-dashboard?tab=hardware`; shared ingest also pulls WNCELG.
 
 ---
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## 2026-09-20 (Moved under Configuration Dashboard)
 
 - Product surface: Hardware tab of `/configuration-dashboard`; `/rru-inventory` redirects.

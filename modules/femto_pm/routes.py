@@ -124,11 +124,9 @@ def _sql_ident(name: str) -> str:
 
 
 def _table_exists(conn: sqlite3.Connection, name: str) -> bool:
-    row = conn.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
-        (name,),
-    ).fetchone()
-    return bool(row)
+    from db.runtime import table_exists
+
+    return table_exists(conn, name)
 
 
 def _counter_hierarchy(name: str) -> tuple[str, str, str]:

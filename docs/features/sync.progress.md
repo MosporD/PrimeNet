@@ -6,6 +6,12 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
+## 2026-09-29 (Postgres-only Daily load)
+
+- How it works on PG: orchestrators call `pipeline/load/daily/load_all.py` → `scripts/pipeline/load_raw_csv_to_databases.py` with `--scope daily`. Stores open via `open_db` into `pm_*` / `groups_*` / `metadata` schemas. Catalog checks use `table_exists` / `list_tables` (adapter rewrites legacy `sqlite_master` SQL). Child Python runs with `-u` / `PYTHONUNBUFFERED=1` so per-file `[label] failed …` lines reach Docker logs.
+- Root cause of empty PM: existence probe `SELECT 1 FROM sqlite_master …` was not rewritten → every file failed with `relation "sqlite_master" does not exist`.
+- NEXT: Rebuild primenet+scheduler on 97.141; re-run Daily; confirm `[done] failed_files=0`.
+
 ## 2026-09-29 (No PM after cutover — diagnosis)
 
 - State: all `pm_*` hourly tables still 0 rows; metadata RAT tables populated; daily schemas empty.

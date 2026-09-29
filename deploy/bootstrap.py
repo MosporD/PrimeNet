@@ -39,9 +39,11 @@ def run_bootstrap(*, start_scheduler: bool | None = None) -> None:
         sys.path.insert(0, project_root)
 
     from core.activation_gate import install_sqlite_gate, require_activation
+    from db.pg_domains import require_postgres_url
 
     install_sqlite_gate()
     require_activation()
+    require_postgres_url()
 
     from modules.sync.db_migration import run_migrations
     from database_enhanced import init_db, create_admin_user

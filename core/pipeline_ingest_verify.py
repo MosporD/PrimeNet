@@ -11,7 +11,7 @@ import sqlite3
 from datetime import datetime
 from typing import Any
 
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 from pipeline.paths import iter_pm_raw_paths
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
@@ -56,12 +56,7 @@ def _db_fingerprint(db_path: str) -> dict[str, Any]:
 
     conn = open_db(db_path, timeout=30)
     try:
-        tables = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-        ]
+        tables = list_tables(conn)
         for table in tables:
             try:
                 row_count = int(conn.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0] or 0)

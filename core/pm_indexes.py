@@ -12,7 +12,7 @@ import re
 import sqlite3
 from typing import Iterable
 
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 
 _TIME_ALIASES = (
     "timestamp",
@@ -234,13 +234,7 @@ def ensure_pm_database(
     except sqlite3.Error:
         pass
     try:
-        tables = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' "
-                "AND name NOT LIKE 'sqlite_%' ORDER BY name"
-            ).fetchall()
-        ]
+        tables = sorted(list_tables(conn))
         for table in tables:
             idxs = ensure_table_indexes(conn, table)
             if idxs:

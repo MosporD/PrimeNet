@@ -9,6 +9,7 @@ RSS growth on production hosts.
 from __future__ import annotations
 
 import logging
+import os
 import subprocess
 import threading
 from collections import deque
@@ -72,13 +73,24 @@ def run_logged_subprocess(
     stdout_tail: deque[str] = deque(maxlen=max(10, int(tail_lines)))
     stderr_tail: deque[str] = deque(maxlen=max(10, int(tail_lines)))
 
+    env = os.environ.copy()
+    env["PYTHONUNBUFFERED"] = "1"
+    # Force line-buffered child Python so loader print() lines reach the parent
+    # pipe before process exit (gunicorn/docker otherwise often only show the
+    # orchestrator wrapper line).
+    run_cmd = list(cmd)
+    if len(run_cmd) >= 2 and 'python' in os.path.basename(run_cmd[0]).lower():
+        if run_cmd[1] != '-u':
+            run_cmd = [run_cmd[0], '-u', *run_cmd[1:]]
+
     proc = subprocess.Popen(
-        cmd,
+        run_cmd,
         cwd=cwd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
+        env=env,
     )
 
     threads: list[threading.Thread] = []

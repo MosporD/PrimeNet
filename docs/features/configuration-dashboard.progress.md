@@ -8,6 +8,13 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **NEXT:** Admin → Data Sync → Run dashboard ingest; open `/configuration-dashboard` Hardware + WNCELG Sankey tabs against live NetAct snapshot; confirm dark toggle on both tabs.
 
 ---
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## 2026-09-20 (Dark mode)
 
 - Done: Module `body.dark-mode.configuration-dashboard-page` rules + global `theme-dark-final.css` safety net (buttons/tables/chips no longer stuck light).

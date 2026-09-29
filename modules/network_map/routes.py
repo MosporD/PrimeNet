@@ -23,7 +23,7 @@ from sync_config import (
     NEIGHBOR_KPI_DB,
     pm_table_name,
 )
-from db.runtime import connect_metadata, execute_query, open_db, store_available
+from db.runtime import connect_metadata, execute_query, open_db, store_available, table_exists
 from core.table_excel_export import build_table_workbook
 from .neighbor_raw_linking import build_raw_neighbor_lines, neighbor_ho_failures
 from .repeater_loader import load_all_repeaters, repeaters_for_map
@@ -485,12 +485,7 @@ def _load_neighbor_coords(vendor: str, technology: str) -> dict[str, dict]:
 
 
 def _neighbor_table_exists(conn, name: str) -> bool:
-    row = execute_query(
-        conn,
-        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
-        (name,),
-    ).fetchone()
-    return bool(row)
+    return table_exists(conn, name)
 
 
 def _neighbor_table_non_empty(conn: sqlite3.Connection, name: str) -> bool:

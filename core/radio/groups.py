@@ -53,8 +53,9 @@ def _connect(path: str):
 
 
 def _tables(conn: sqlite3.Connection) -> list[str]:
-    rows = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-    return [str(r[0]) for r in rows if r[0] and not str(r[0]).startswith("sqlite_")]
+    from db.runtime import list_tables
+
+    return list_tables(conn)
 
 
 def _pick_col(columns: list[str], aliases: tuple[str, ...]) -> str | None:

@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). PM surveys + ETL diagnosis use `list_tables` / `store_available`; UI domain fallback is Postgres-oriented.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## 2026-09-28 (ETL Diagnosis page)
 
 - Done: Engineering Admin tab **ETL Diagnosis** (`?section=etl-diagnosis`) — live progress, manual pipeline ops, PG domain/store counts, sync_log feed, alerts (lock storm, ETL gate, reset mode, meta/pm mismatch).

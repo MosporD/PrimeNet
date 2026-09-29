@@ -1,10 +1,9 @@
 """
 DB connections.
 
-SQLite by default. Opt in per domain with ``NCM_DATABASE_URL`` /
-``NCM_APP_DATABASE_URL`` and ``NCM_PG_DOMAINS``. When ``NCM_DATABASE_URL``
-is set and ``NCM_PG_DOMAINS`` is unset, every catalogued store routes to
-Postgres (including femto, SON ML, KPI headers, CM, elevation, …).
+Postgres-only runtime. Set ``NCM_DATABASE_URL`` (or ``NCM_APP_DATABASE_URL``
+for app schema only). Domains are selected with ``NCM_PG_DOMAINS``; unset with
+``NCM_DATABASE_URL`` enables every catalogued store.
 """
 
 from __future__ import annotations
@@ -23,6 +22,7 @@ from db.pg_domains import (
     is_domain_postgresql,
     pm_schema,
     postgres_url,
+    require_postgres_url,
     schema_for_sqlite_path,
 )
 
@@ -51,7 +51,8 @@ def is_postgresql() -> bool:
 
 
 def use_sqlite_for_app_and_metadata() -> bool:
-    return not is_domain_postgresql('app') and not is_domain_postgresql('metadata')
+    """Deprecated: always False under Postgres-only runtime."""
+    return False
 
 
 def is_app_postgresql() -> bool:
@@ -278,6 +279,45 @@ def table_columns(conn, table: str) -> set[str]:
     return names
 
 
+def _row_name(row, *, key: str = 'name', idx: int = 0) -> str:
+    """Extract a table/column name from a SQLite Row or Postgres PgRow."""
+    if isinstance(row, dict):
+        val = row.get(key)
+        if val is None and key == 'name':
+            val = row.get('table_name')
+        if val is None:
+            val = next(iter(row.values()))
+        return str(val)
+    return str(row[idx])
+
+
+def table_exists(conn, table: str) -> bool:
+    """True when ``table`` exists (SQLite or Postgres)."""
+    row = execute_query(
+        conn,
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+        (table,),
+    ).fetchone()
+    return row is not None
+
+
+def list_tables(conn, *, like: str | None = None) -> list[str]:
+    """User table names in the current schema/file (SQLite or Postgres)."""
+    if like:
+        rows = execute_query(
+            conn,
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name LIKE ? AND name NOT LIKE 'sqlite_%'",
+            (like,),
+        ).fetchall()
+    else:
+        rows = execute_query(
+            conn,
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+        ).fetchall()
+    return [_row_name(r) for r in rows]
+
+
 def _configure_sqlite_conn(conn: sqlite3.Connection) -> sqlite3.Connection:
     """
     Favor user-read resilience while background sync/watcher writes are active.
@@ -342,41 +382,29 @@ def _connect_postgres(schema: str) -> PgConn:
 
 
 def store_available(path: str | None) -> bool:
-    """True when the canonical SQLite file exists, or its Postgres schema is enabled."""
+    """True when the path maps to an enabled Postgres schema."""
     if not path:
         return False
-    if schema_for_sqlite_path(path):
-        return True
-    return os.path.isfile(path)
+    return schema_for_sqlite_path(path) is not None
 
 
 def open_db(db_path: str, timeout: float = 120):
-    """Open a canonical SQLite file, or the mapped Postgres schema when enabled."""
+    """Open the Postgres schema mapped to this canonical store path."""
     require_activation()
+    require_postgres_url()
     schema = schema_for_sqlite_path(db_path)
     if schema:
         return _connect_postgres(schema)
-    conn = sqlite3.connect(db_path, timeout=timeout)
-    return _configure_sqlite_conn(conn)
+    raise RuntimeError(
+        f'No Postgres schema mapped for store path {db_path!r}. '
+        'Add it to db.pg_domains.canonical_sqlite_paths and DOMAIN_GROUPS, '
+        'or enable the domain via NCM_PG_DOMAINS / NCM_DATABASE_URL.'
+    )
 
 
 def open_store(db_path: str, timeout: float = 60, *, wal: bool = True):
-    """Open a module store: Postgres schema when mapped, else SQLite with Row + WAL."""
-    if not schema_for_sqlite_path(db_path):
-        parent = os.path.dirname(db_path)
-        if parent:
-            os.makedirs(parent, exist_ok=True)
-    conn = open_db(db_path, timeout=timeout)
-    if _is_pg_conn(conn):
-        return conn
-    conn.row_factory = sqlite3.Row
-    if wal:
-        try:
-            conn.execute('PRAGMA journal_mode=WAL')
-            conn.execute('PRAGMA synchronous=NORMAL')
-        except Exception:
-            pass
-    return conn
+    """Open a module store on its Postgres schema (``wal`` ignored)."""
+    return open_db(db_path, timeout=timeout)
 
 
 def connect_app():
@@ -426,39 +454,21 @@ def _pm_sqlite_path(vendor: str, scope: str = 'hourly') -> str:
 
 def performance_meta_pm_conn(vendor: str | None, scope: str = 'hourly'):
     """
-    Open metadata and the relevant PM store(s).
+    Open metadata and resolve the PM schema alias for ``alias."table"`` SQL.
 
-    SQLite: ATTACH PM files as ``pm`` / ``nokia_pm`` / ``huawei_pm``.
-    Postgres: one connection on schema ``metadata``; returned aliases are the
-    PM schema names so ``alias."table"`` stays valid (Nokia/Huawei table names collide).
+    Postgres-only: one connection on schema ``metadata``; returned aliases are
+    the PM schema names (Nokia/Huawei table names collide across vendors).
     """
     require_activation()
-    meta_pg = is_domain_postgresql('metadata')
-    pm_pg = is_domain_postgresql('pm')
-    if meta_pg != pm_pg:
+    require_postgres_url()
+    if not is_domain_postgresql('metadata') or not is_domain_postgresql('pm'):
         raise RuntimeError(
-            'Metadata and PM must use the same backend. Enable both in NCM_PG_DOMAINS '
-            '(metadata,pm) or leave both on SQLite.'
+            'Metadata and PM must both be enabled. Set NCM_DATABASE_URL '
+            '(all domains) or NCM_PG_DOMAINS including metadata,pm.'
         )
-    if meta_pg:
-        conn = _connect_postgres('metadata')
-        nv = None if vendor is None or not str(vendor).strip() else str(vendor).strip()
-        if nv is None:
-            return conn, None
-        schema = pm_schema(nv, scope)
-        return conn, schema
-
-    conn = sqlite3.connect(METADATA_DB, timeout=120)
-    conn = _configure_sqlite_conn(conn)
-    if vendor == 'Nokia' or (isinstance(vendor, str) and vendor.strip().lower() == 'nokia'):
-        conn.execute(f"ATTACH DATABASE '{_pm_sqlite_path('Nokia', scope)}'  AS pm")
-        return conn, 'pm'
-    if vendor == 'Huawei' or (isinstance(vendor, str) and vendor.strip().lower().startswith('huawei')):
-        conn.execute(f"ATTACH DATABASE '{_pm_sqlite_path('Huawei', scope)}' AS pm")
-        return conn, 'pm'
-    if vendor is None or (isinstance(vendor, str) and not str(vendor).strip()):
-        conn.execute(f"ATTACH DATABASE '{_pm_sqlite_path('Nokia', scope)}'  AS nokia_pm")
-        conn.execute(f"ATTACH DATABASE '{_pm_sqlite_path('Huawei', scope)}' AS huawei_pm")
+    conn = _connect_postgres('metadata')
+    nv = None if vendor is None or not str(vendor).strip() else str(vendor).strip()
+    if nv is None:
         return conn, None
-    conn.execute(f"ATTACH DATABASE '{_pm_sqlite_path('Nokia', scope)}'  AS pm")
-    return conn, 'pm'
+    schema = pm_schema(nv, scope)
+    return conn, schema

@@ -11,7 +11,7 @@ import sqlite3
 import pandas as pd
 
 from modules.sync.pm_processor import _pick_best_timestamp_column
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 
 
 def _retention_parse_label(db_path: str, label: str) -> str:
@@ -64,10 +64,7 @@ def apply_retention(db_path: str, days: int, label: str) -> int:
     except sqlite3.Error:
         pass
     try:
-        tables = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        ).fetchall()
-        for (table,) in tables:
+        for table in list_tables(conn):
             if table in ("groups", "group_cells"):
                 continue
             try:

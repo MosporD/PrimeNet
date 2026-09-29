@@ -16,7 +16,7 @@ import sys
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -166,13 +166,9 @@ def _all_table_row_counts(db_path: str) -> dict[str, int]:
     out: dict[str, int] = {}
     conn = open_db(db_path)
     try:
-        cur = conn.cursor()
-        tables = cur.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        ).fetchall()
-        for (tbl,) in tables:
+        for tbl in list_tables(conn):
             try:
-                n = cur.execute(f'SELECT COUNT(*) FROM "{tbl}"').fetchone()[0]
+                n = conn.execute(f'SELECT COUNT(*) FROM "{tbl}"').fetchone()[0]
                 out[str(tbl)] = int(n or 0)
             except Exception:
                 # Skip objects that are not normal row tables.
@@ -208,6 +204,13 @@ def _subprocess_failure_detail(proc, *, max_len: int = 500) -> str:
         'futurewarning',
         'userwarning',
     )
+    # Prefer specific loader/file failures over the orchestrator's generic wrapper line.
+    generic_wrap = (
+        '[daily] load failed',
+        '[hourly] load failed',
+        '[daily] pull failed',
+        '[hourly] pull failed',
+    )
     try:
         stderr_raw = getattr(proc, 'stderr', None)
         stdout_raw = getattr(proc, 'stdout', None)
@@ -215,46 +218,44 @@ def _subprocess_failure_detail(proc, *, max_len: int = 500) -> str:
             stderr_raw = getattr(proc, 'stderr_tail', '') or ''
         if stdout_raw is None:
             stdout_raw = getattr(proc, 'stdout_tail', '') or ''
-        err_lines = [ln.strip() for ln in str(stderr_raw).splitlines() if ln.strip()]
-        out_lines = [ln.strip() for ln in str(stdout_raw).splitlines() if ln.strip()]
+        all_lines = [
+            ln.strip()
+            for ln in (str(stdout_raw) + '\n' + str(stderr_raw)).splitlines()
+            if ln.strip()
+        ]
 
-        def _useful(lines: list[str]) -> str:
-            ranked: list[str] = []
-            for ln in lines:
-                if is_openpyxl_style_noise(ln):
-                    continue
-                low = ln.lower()
-                if any(n in low for n in noise):
-                    continue
-                if any(
-                    tok in ln
-                    for tok in (
-                        'Traceback',
-                        'Error',
-                        'Exception',
-                        'failed',
-                        '[pull]',
-                        '[done]',
-                        '[hourly]',
-                        '[daily]',
-                        'DatabaseError',
-                        'OperationalError',
-                    )
-                ) or 'error' in low:
-                    ranked.append(ln)
-            if ranked:
-                return ranked[-1][:max_len]
-            for ln in reversed(lines):
-                if is_openpyxl_style_noise(ln):
-                    continue
-                low = ln.lower()
-                if any(n in low for n in noise):
-                    continue
-                return ln[:max_len]
-            return ''
+        def _skip(ln: str) -> bool:
+            if is_openpyxl_style_noise(ln):
+                return True
+            low = ln.lower()
+            return any(n in low for n in noise)
 
-        detail = _useful(err_lines) or _useful(out_lines)
-        return detail
+        def _score(ln: str) -> int:
+            low = ln.lower()
+            if _skip(ln):
+                return -1
+            if any(g in low for g in generic_wrap):
+                return 1
+            if '] failed ' in low or 'failed ' in low and 'rc=' not in low:
+                return 50
+            if low.startswith('[done]') and 'failed_files' in low:
+                return 40
+            if any(tok in ln for tok in ('Traceback', 'DatabaseError', 'OperationalError', 'Exception')):
+                return 45
+            if 'Error' in ln or 'error' in low:
+                return 30
+            if low.startswith('[pull]') or 'failed' in low:
+                return 20
+            return 0
+
+        best = ''
+        best_score = 0
+        for ln in all_lines:
+            sc = _score(ln)
+            if sc > best_score:
+                best_score = sc
+                best = ln
+        return best[:max_len] if best else ''
     except Exception:
         pass
     return ''

@@ -5,7 +5,6 @@ Identity and module access live on NexusCore Platform Admin (/admin).
 """
 
 import os
-import sqlite3
 from datetime import datetime
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, send_file
 from functools import wraps
@@ -15,7 +14,14 @@ from database_enhanced import (
     log_activity,
     get_db,
 )
-from db.runtime import execute_query
+from db.runtime import (
+    execute_query,
+    list_tables,
+    open_db,
+    sqlite_ident,
+    store_available,
+    table_columns,
+)
 from core.cm_extractor.config import (
     huawei_configured,
     huawei_defaults,
@@ -29,7 +35,8 @@ from core.huawei_pm.client import HuaweiPmError
 from core.platform.paths import platform_admin_entry_url
 from modules.admin_panel.export import build_table_workbook
 from sync_config import (
-    DATABASES_ROOT,
+    FEMTO_PM_DB,
+    FEMTO_USER_KPI_DB,
     HUAWEI_PM_DAILY_DB,
     HUAWEI_PM_DB,
     NOKIA_PM_DAILY_DB,
@@ -159,10 +166,6 @@ def users_admin_moved(**_kwargs):
     return _platform_admin_moved()
 
 
-def _sqlite_quote_ident(name: str) -> str:
-    return '"' + str(name).replace('"', '""') + '"'
-
-
 def _pick_time_column(cols: list) -> str | None:
     """First usable time column (same priority idea as performance routes)."""
     by_lower = {str(c).lower(): c for c in cols}
@@ -221,17 +224,17 @@ def _normalize_pm_timestamp(value):
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def _best_timestamp_sqlite(conn, table_name: str, time_column: str):
+def _best_timestamp(conn, table_name: str, time_column: str):
     """
     Return chronologically latest timestamp by parsing row values, not lexical MAX().
     This avoids wrong ordering for text formats like dd/mm/yyyy.
     """
     best_raw = None
     best_dt = None
-    qtbl = _sqlite_quote_ident(table_name)
-    qcol = _sqlite_quote_ident(time_column)
+    qtbl = sqlite_ident(table_name)
+    qcol = sqlite_ident(time_column)
     try:
-        cur = conn.execute(f'SELECT {qcol} FROM {qtbl}')
+        cur = execute_query(conn, f'SELECT {qcol} FROM {qtbl}')
         for row in cur.fetchall():
             raw = row[0] if row else None
             dt = _parse_pm_timestamp(raw)
@@ -245,38 +248,31 @@ def _best_timestamp_sqlite(conn, table_name: str, time_column: str):
     return best_raw
 
 
-def _sqlite_pm_survey(path: str) -> dict:
-    """Return last timestamp across tables that expose a ``timestamp`` column."""
+def _pm_survey(path: str) -> dict:
+    """Return last timestamp across tables that expose a time column."""
+    available = store_available(path)
     out = {
-        'backend': 'sqlite',
+        'backend': 'postgresql' if available else 'none',
         'path': path,
-        'exists': os.path.isfile(path),
+        'exists': available,
         'last_timestamp': None,
         'latest_table': None,
         'per_table': [],
         'error': None,
     }
-    if not out['exists']:
+    if not available:
         return out
     try:
-        conn = sqlite3.connect(path, timeout=20)
+        conn = open_db(path, timeout=20)
         try:
-            tables = [
-                r[0]
-                for r in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-                ).fetchall()
-            ]
+            tables = list_tables(conn)
             best_ts, best_tbl = None, None
             for tbl in tables:
-                cols = [
-                    r[1]
-                    for r in conn.execute(f'PRAGMA table_info({_sqlite_quote_ident(tbl)})').fetchall()
-                ]
+                cols = list(table_columns(conn, tbl))
                 tcol = _pick_time_column(cols)
                 if not tcol:
                     continue
-                mx = _best_timestamp_sqlite(conn, tbl, tcol)
+                mx = _best_timestamp(conn, tbl, tcol)
                 if mx is not None and str(mx).strip() != '':
                     out['per_table'].append({'table': tbl, 'last_timestamp': _normalize_pm_timestamp(mx)})
                     if _compare_pm_timestamp(best_ts, mx):
@@ -292,15 +288,13 @@ def _sqlite_pm_survey(path: str) -> dict:
 
 def _pm_database_definitions():
     """Ordered list of (label, kind, path) for PM cell databases."""
-    femto = os.path.join(DATABASES_ROOT, 'cells', 'femto_pm_cells.db')
-    femto_kpis = os.path.join(DATABASES_ROOT, 'cells', 'femto_user_kpis.db')
     return [
         ('Nokia PM (hourly)', 'nokia_hourly', NOKIA_PM_DB),
         ('Huawei PM (hourly)', 'huawei_hourly', HUAWEI_PM_DB),
-        ('Nokia PM (daily)', 'sqlite', NOKIA_PM_DAILY_DB),
-        ('Huawei PM (daily)', 'sqlite', HUAWEI_PM_DAILY_DB),
-        ('Femto PM', 'sqlite', femto),
-        ('Femto user KPIs', 'sqlite', femto_kpis),
+        ('Nokia PM (daily)', 'nokia_daily', NOKIA_PM_DAILY_DB),
+        ('Huawei PM (daily)', 'huawei_daily', HUAWEI_PM_DAILY_DB),
+        ('Femto PM', 'femto', FEMTO_PM_DB),
+        ('Femto user KPIs', 'femto_kpis', FEMTO_USER_KPI_DB),
     ]
 
 
@@ -476,14 +470,8 @@ def pm_latest_timestamps():
 
     databases = []
     try:
-        for label, kind, path in _pm_database_definitions():
-            if kind == 'nokia_hourly':
-                row = {**_sqlite_pm_survey(path), 'label': label}
-            elif kind == 'huawei_hourly':
-                row = {**_sqlite_pm_survey(path), 'label': label}
-            else:
-                row = {**_sqlite_pm_survey(path), 'label': label}
-            databases.append(row)
+        for label, _kind, path in _pm_database_definitions():
+            databases.append({**_pm_survey(path), 'label': label})
 
         log_activity(
             (user.get('id') if isinstance(user, dict) else user[0]),

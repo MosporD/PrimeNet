@@ -93,6 +93,16 @@ def rewrite_sqlite_master(sql: str) -> str:
         return sql
     if _SELECT_SQL_MASTER.search(sql):
         return 'SELECT NULL AS sql WHERE false'
+    # Existence probe used across loaders / map / health checks.
+    sql = re.sub(
+        r"SELECT\s+1\s+FROM\s+sqlite_master\s+WHERE\s+type\s*=\s*'table'\s+"
+        r"AND\s+name\s*=\s*\?",
+        "SELECT 1 FROM information_schema.tables "
+        "WHERE table_schema = current_schema() AND table_type = 'BASE TABLE' "
+        "AND table_name = ?",
+        sql,
+        flags=re.IGNORECASE,
+    )
     sql = re.sub(
         r"SELECT\s+name\s+FROM\s+sqlite_master\s+WHERE\s+type\s*=\s*'table'",
         "SELECT table_name AS name FROM information_schema.tables "

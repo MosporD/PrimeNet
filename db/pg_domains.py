@@ -1,15 +1,16 @@
-"""Postgres domain catalog for the phased SQLite → Postgres cutover.
+"""Postgres domain catalog for the Postgres-only runtime.
 
-Default remains SQLite. Enable domains with:
+Require:
 
   NCM_DATABASE_URL=postgresql://…
-  NCM_PG_DOMAINS=app,metadata,neighbors,groups,balance,pm,femto,…
 
-``NCM_APP_DATABASE_URL`` alone still means **app schema only** (phase 1).
-``NCM_DATABASE_URL`` with ``NCM_PG_DOMAINS`` unset enables every group.
+``NCM_PG_DOMAINS`` unset enables every group. A subset still works for
+narrow cutovers, but catalogued ``open_db`` paths with no mapped schema
+fail closed (no SQLite fallback).
 
+``NCM_APP_DATABASE_URL`` alone still means **app schema only** (legacy).
 Nokia and Huawei hourly tables share names like ``"4G_Hourly"``, so each
-SQLite file maps to its own Postgres schema — never a shared ``pm`` search_path.
+logical store maps to its own Postgres schema.
 """
 
 from __future__ import annotations
@@ -37,7 +38,7 @@ ALL_GROUPS = (
     'marketing',
 )
 
-# Group (env value) → Postgres schema names (1:1 with canonical SQLite files).
+# Group (env value) → Postgres schema names (1:1 with canonical store paths).
 DOMAIN_GROUPS: dict[str, tuple[str, ...]] = {
     'app': ('app',),
     'metadata': ('metadata',),
@@ -82,6 +83,19 @@ def postgres_url() -> str:
 def url_is_postgres(url: str | None = None) -> bool:
     u = (url if url is not None else postgres_url()).lower()
     return u.startswith('postgres://') or u.startswith('postgresql://')
+
+
+def require_postgres_url() -> str:
+    """Return the Postgres URL or raise. PrimeNet is Postgres-only."""
+    url = postgres_url()
+    if not url_is_postgres(url):
+        raise RuntimeError(
+            'NCM_DATABASE_URL is required (Postgres-only runtime). '
+            'Laptop: set NCM_APP_POSTGRES_PASSWORD in .env, then '
+            '`docker compose --profile app-db up -d postgres`, then set '
+            'NCM_DATABASE_URL=postgresql://primenet:<password>@127.0.0.1:5432/primenet'
+        )
+    return url
 
 
 def enabled_groups() -> frozenset[str]:

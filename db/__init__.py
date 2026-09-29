@@ -1,4 +1,4 @@
-"""Database runtime: SQLite by default; optional Postgres per domain."""
+"""Database runtime: Postgres-only catalogued stores."""
 
 from db.runtime import (
     adapt_app_sql,
@@ -12,10 +12,13 @@ from db.runtime import (
     connect_pm_db,
     is_app_postgresql,
     is_postgresql,
+    list_tables,
     open_db,
+    open_store,
     quote_ident,
     store_available,
     table_columns,
+    table_exists,
     use_sqlite_for_app_and_metadata,
 )
 
@@ -31,9 +34,12 @@ __all__ = [
     'connect_pm_db',
     'is_app_postgresql',
     'is_postgresql',
+    'list_tables',
     'open_db',
+    'open_store',
     'quote_ident',
     'store_available',
     'table_columns',
+    'table_exists',
     'use_sqlite_for_app_and_metadata',
 ]

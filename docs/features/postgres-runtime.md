@@ -1,36 +1,45 @@
-# Postgres runtime (opt-in)
+# Postgres runtime (required)
 
-Not a dashboard tile. Default remains SQLite until ``NCM_DATABASE_URL`` is set.
+Not a dashboard tile. PrimeNet is **Postgres-only**: the app will not start without a Postgres URL.
 
 | | |
 |---|---|
 | Routing | `db/runtime.py` `open_db()` / `open_store()` / `store_available()` |
-| Domains | `db/pg_domains.py` |
-| SQL adapt | `db/app_sql.py` |
-| Migrate | `scripts/migrate_ncm_users_to_postgres.py`, `scripts/migrate_sqlite_domain_to_postgres.py`, `scripts/migrate_all_sqlite_to_postgres.py` |
+| Domains | `db/pg_domains.py` (`require_postgres_url`) |
+| SQL adapt | `db/app_sql.py` (SQLite-shaped SQL → Postgres) |
+| Migrate | `scripts/migrate_ncm_users_to_postgres.py`, `scripts/migrate_sqlite_domain_to_postgres.py` (one-shot from cold SQLite backups) |
 
 ## Purpose
 
-Optional cutover of canonical SQLite files to one Postgres server, **per domain**. Nokia and Huawei hourly tables share names (`"4G_Hourly"`) so each file is its own schema (`pm_nokia_hourly`, `pm_huawei_hourly`, …).
+One Postgres server hosts every catalogued store as its own schema (`app`, `metadata`, `pm_nokia_hourly`, …). Nokia and Huawei hourly table names collide, so vendors never share a PM search_path.
+
+## Laptop runbook
+
+1. Set in `.env`: `NCM_APP_POSTGRES_PASSWORD`, matching `NCM_DATABASE_URL=postgresql://primenet:<password>@127.0.0.1:5432/primenet`.
+2. `docker compose --profile app-db up -d postgres`
+3. `pip install "psycopg[binary]"` if needed
+4. `python scripts/migrate_ncm_users_to_postgres.py` (users/sessions only)
+5. Leave PM/metadata empty; fill with Daily/Hourly ingest or a small CSV load
+6. Smoke: `python -c "from db.pg_domains import require_postgres_url; from db.runtime import connect_app; require_postgres_url(); c=connect_app(); print(c.execute('select current_schema()').fetchone()); c.close()"`
+
+Reset volume (destructive): `docker compose --profile app-db down -v`
 
 ## Approach
 
-- **Do not set** `NCM_DATABASE_URL` / `NCM_APP_DATABASE_URL` on this laptop without a running Postgres + migrate (for domains you copy).
-- `NCM_APP_DATABASE_URL` alone = app schema only. `NCM_DATABASE_URL` with unset `NCM_PG_DOMAINS` = **all** groups (PM, femto, SON ML, NH precalc, KPI headers, CM, elevation, RRU, adjacency, WNCELG, cases, PM Plus, marketing, …).
-- Subset via `NCM_PG_DOMAINS=app,metadata,pm,…`.
-- Enabling `pm` requires `metadata` (same backend) or `performance_meta_pm_conn` raises.
-- Fresh-start ops: migrate **app** only; leave other schemas empty and fill via ingest/jobs.
-- Readers/writers: `open_db` / `open_store` / `store_available`, not raw `sqlite3.connect` + `os.path.isfile` for catalogued paths.
+- Startup (`deploy/bootstrap.py` and entrypoints) calls `require_postgres_url()`.
+- `open_db` / `open_store` never open SQLite files for catalogued paths.
+- Unset `NCM_PG_DOMAINS` with `NCM_DATABASE_URL` enables all groups.
+- Readers/writers use `list_tables` / `table_exists` / `execute_query`, not raw `sqlite3.connect`.
+- Thin SQL adapter remains until call sites speak native Postgres catalog SQL.
 
 ## Progress
 
-Dated work log: [`postgres-runtime.progress.md`](postgres-runtime.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.
-
+Dated work log: [`postgres-runtime.progress.md`](postgres-runtime.progress.md).
 
 ## Plans
 
-Server cutover with full `NCM_PG_DOMAINS` (or unset = all). Migrate `app` only for users/sessions; everything else fresh ingest. PM ingest on PG not load-tested at 14 GB historical scale (empty start is fine).
+Server rebuild/redeploy with Postgres-only gate; re-run Daily load and confirm `failed_files=0`. Keep SQL adapter until call sites use native `information_schema`. Run `python -m graphify update .` after pull if the local graph extract is stale.
 
 ## Watch-outs
 
-`sync_config.use_postgresql()` is the old global stub. Domain routing is `is_domain_postgresql()` / `open_db()`. SQLite files stay as cold backup after any migrate you do run.
+`sync_config.use_postgresql()` is a legacy stub. Domain routing is `is_domain_postgresql()` / `open_db()`. Enabling `pm` requires `metadata` (same backend).

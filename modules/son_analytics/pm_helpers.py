@@ -7,7 +7,7 @@ import re
 import sqlite3
 import time
 
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 from sync_config import (
     HUAWEI_PM_DAILY_DB,
     HUAWEI_PM_DB,
@@ -297,12 +297,7 @@ def _resolve_pm_source(
             return []
         conn = open_db(db_path, timeout=30)
         try:
-            names = [
-                r[0]
-                for r in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-                ).fetchall()
-            ]
+            names = list_tables(conn)
             hits = []
             for table in list_pm_partition_tables(names, base) or [base]:
                 if _table_has_rows(conn, table):

@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [auth-activation.md](auth-activati
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## 2026-09-20 (Central SSO + portal allow-list)
 
 - Done: Shared nexus_session cookie (+ optional NEXUS_COOKIE_DOMAIN); PrimeNet ncm_users.db is the only identity store.

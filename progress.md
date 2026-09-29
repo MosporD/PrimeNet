@@ -2,11 +2,18 @@
 
 Dated log of verified work. Mark items done only after end-to-end verification.
 
-**Current track:** Configuration Dashboard V1.0 (Hardware + WNCELG shared ingest).
+**Current track:** Postgres-only runtime (1B) + blueprint sweep (2B).
 
 **Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Open `/network-map` — upload KMZ, toggle folder checkboxes, reload (layer should persist).
+**NEXT:** Rebuild 97.141 with adapter + Postgres-only gate; re-run Daily load; confirm `failed_files=0`. Laptop: `docker compose --profile app-db up -d postgres` + `NCM_DATABASE_URL`.
+
+## 2026-09-29 (Postgres-only cutover)
+
+- Runtime requires `NCM_DATABASE_URL`; `open_db` no longer falls back to SQLite for catalogued stores.
+- Fixed `sqlite_master` existence rewrite (`SELECT 1 … name=?`) blocking Daily load on PG.
+- Loader uses `list_tables` / `table_exists`; unbuffered orchestrator child processes.
+- Local runbook: Compose profile `app-db` + migrate app users only.
 
 ## 2026-09-28 (Eng Admin — ETL Diagnosis)
 

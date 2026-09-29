@@ -68,6 +68,7 @@ DELETE_LOCAL_AFTER_INGEST = _env_bool("PM_PLUS_DELETE_LOCAL_AFTER_INGEST", True)
 
 
 def use_postgres() -> bool:
+    """Always True under PrimeNet Postgres-only runtime when a URL is configured."""
     return bool(PM_PLUS_DATABASE_URL)
 
 

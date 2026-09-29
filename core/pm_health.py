@@ -10,7 +10,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DB,
@@ -354,13 +354,7 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
 
     conn = open_db(path, timeout=120)
     try:
-        tables = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' "
-                "AND name NOT LIKE 'sqlite_%' ORDER BY name"
-            ).fetchall()
-        ]
+        tables = sorted(list_tables(conn))
         for table in tables:
             result["tables"].append(_table_stats(conn, table, label))
 
@@ -457,12 +451,7 @@ def metadata_distinct_cells() -> dict | None:
         return None
     conn = open_db(METADATA_DB, timeout=60)
     try:
-        tables = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'cells_%'"
-            ).fetchall()
-        ]
+        tables = list_tables(conn, like='cells_%')
         unions = [f'SELECT cell_name FROM "{t}"' for t in tables]
         if not unions:
             return None
@@ -483,21 +472,16 @@ def pm_union_distinct_cells(pm_paths: list[str]) -> int:
             continue
         conn = open_db(path, timeout=120)
         try:
-            tables = [
-                r[0]
-                for r in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table' "
-                    "AND name NOT LIKE 'sqlite_%'"
-                ).fetchall()
-            ]
+            tables = list_tables(conn)
             for table in tables:
                 cell_col = _detect_cell_col(_column_names(conn, table))
                 if not cell_col:
                     continue
-                for (cell_name,) in conn.execute(
+                for row in conn.execute(
                     f'SELECT DISTINCT "{cell_col}" FROM "{table}" '
                     f'WHERE "{cell_col}" IS NOT NULL'
                 ):
+                    cell_name = row[0]
                     if cell_name and str(cell_name).strip():
                         all_cells.add(str(cell_name).strip())
         finally:

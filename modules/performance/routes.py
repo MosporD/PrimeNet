@@ -56,6 +56,7 @@ from db.runtime import (
     connect_app,
     connect_metadata,
     execute_query,
+    list_tables,
     open_db,
     performance_meta_pm_conn,
     sqlite_ident,
@@ -986,12 +987,7 @@ def _groups_conn(vendor: str, scope: str = 'hourly'):
 
 
 def _has_groups_schema(conn: sqlite3.Connection) -> bool:
-    names = {
-        r[0]
-        for r in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        ).fetchall()
-    }
+    names = set(list_tables(conn))
     return 'groups' in names and 'group_cells' in names
 
 
@@ -1015,10 +1011,7 @@ def _pick_first_col(cols: list[str], keywords: tuple[str, ...]) -> str | None:
 
 def _raw_group_table_specs(conn: sqlite3.Connection) -> list[tuple[str, str, str | None, str | None, str | None]]:
     specs: list[tuple[str, str, str | None, str | None, str | None]] = []
-    rows = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
-    ).fetchall()
-    for (table,) in rows:
+    for table in sorted(list_tables(conn)):
         cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
         if not cols:
             continue
@@ -1382,10 +1375,7 @@ def _resolve_pm_table_sqlite(
     preferred: str | None = None,
     scope: str = 'hourly',
 ) -> str | None:
-    rows = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name DESC"
-    ).fetchall()
-    tables = [r[0] for r in rows]
+    tables = sorted(list_tables(conn), reverse=True)
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
     data_scope = _normalize_data_scope(scope)
     base = pm_table_name(tech, data_scope) if tech else None
@@ -1473,10 +1463,7 @@ def _preferred_pm_table_for_cell_name(technology: str, cell_name: str, scope: st
 
 
 def _sqlite_table_names(conn: sqlite3.Connection) -> set[str]:
-    rows = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-    ).fetchall()
-    return {r[0] for r in rows}
+    return set(list_tables(conn))
 
 
 def _pm_dual_read_tables(
@@ -1617,12 +1604,7 @@ def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: st
     conn = None
     try:
         conn = open_db(db_path, timeout=15)
-        existing = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-        ]
+        existing = list_tables(conn)
         tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
         data_scope = _normalize_data_scope(scope)
         base = pm_table_name(tech, data_scope)
@@ -1862,12 +1844,7 @@ def _get_pm_cols(db_path, technology=None):
     data_scope = _scope_from_pm_db(db_path)
     try:
         conn = open_db(db_path, timeout=30)
-        existing = [
-            r[0]
-            for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-        ]
+        existing = list_tables(conn)
         for tech in techs:
             base = pm_table_name(tech, data_scope)
             tables = list_pm_partition_tables(existing, base)

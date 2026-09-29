@@ -6,6 +6,13 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **NEXT:** Phase 2 remaining — campaign performance/holdout reporting, creative library, promo/quota engine.
 
 ---
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## From brief History (migrated 2026-09-17)
 
 - 2026-09-16: Phase 1 spine shipped — 31 routes, portal-local RBAC (5 roles / 13

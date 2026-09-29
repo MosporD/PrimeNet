@@ -220,7 +220,7 @@ function _renderEtlKpis(d) {
     const lockHere = !!d.scheduler?.pipeline_lock_held_here;
     const stuck = !!d.pipeline_health?.appears_stuck;
     const schedIn = !!d.scheduler?.in_process;
-    const domains = (d.domains?.enabled_groups || []).join(', ') || 'sqlite-only / none';
+    const domains = (d.domains?.enabled_groups || []).join(', ') || 'postgres domains unset';
     const items = [
         { label: 'ETL gate', value: etlOn ? 'ENABLED' : 'DISABLED', cls: etlOn ? 'ok' : 'bad' },
         { label: 'Scheduler here', value: schedIn ? 'yes' : 'no (web tier)', cls: '' },

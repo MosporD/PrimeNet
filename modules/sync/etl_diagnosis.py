@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Any
 
 from db.pg_domains import ALL_GROUPS, DOMAIN_GROUPS, enabled_groups, postgres_url
-from db.runtime import open_db, store_available
+from db.runtime import list_tables, open_db, store_available
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DB,
@@ -53,16 +53,9 @@ def _table_row_counts(db_path: str) -> dict[str, int]:
     except Exception:
         return {}
     try:
-        cur = conn.cursor()
-        tables = cur.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-        ).fetchall()
-        for row in tables:
-            tbl = row[0] if not isinstance(row, dict) else row.get('name')
-            if not tbl:
-                continue
+        for tbl in list_tables(conn):
             try:
-                n = cur.execute(f'SELECT COUNT(*) FROM "{tbl}"').fetchone()[0]
+                n = conn.execute(f'SELECT COUNT(*) FROM "{tbl}"').fetchone()[0]
                 out[str(tbl)] = int(n or 0)
             except Exception:
                 continue
@@ -269,7 +262,7 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
         stores.append({
             'group': group,
             'store': label,
-            'backend': 'postgresql' if group in enabled_groups() else 'sqlite',
+            'backend': 'postgresql' if group in enabled_groups() else 'disabled',
             'available': available,
             'table_count': len(counts),
             'row_total': total,
@@ -333,7 +326,7 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
         alerts.append({
             'level': 'critical',
             'code': 'meta_pm_mismatch',
-            'message': 'metadata and pm must share the same backend. Add both to NCM_PG_DOMAINS or leave both on SQLite.',
+            'message': 'metadata and pm must both be enabled under NCM_DATABASE_URL / NCM_PG_DOMAINS.',
         })
     empty_meta = next((s for s in stores if s['store'] == 'metadata' and s['empty']), None)
     if empty_meta and etl_enabled():

@@ -106,7 +106,7 @@ offer catalog). See `docs/NEXUSCORE_VISION.md` §5.
 
 **Plan:** UI unification in `checklist.md` mostly checked (2026-09-06). Remaining: browser verify light/dark on dashboard + one radio + one standalone + login.
 
-### Postgres runtime (opt-in)
+### Postgres runtime (required)
 
 | | |
 |---|---|
@@ -117,14 +117,14 @@ offer catalog). See `docs/NEXUSCORE_VISION.md` §5.
 | Brief | [`features/postgres-runtime.md`](features/postgres-runtime.md) |
 | Progress | [`features/postgres-runtime.progress.md`](features/postgres-runtime.progress.md) |
 
-**User sees:** Invisible to end users — DB routing SQLite vs Postgres for domains; agents must use db/runtime helpers.
+**User sees:** Invisible to end users — all catalogued stores are Postgres schemas.
 
-**What it does:** Optional cutover of canonical SQLite files to one Postgres server, per domain, for backup/HA. Nokia and Huawei hourly tables share names (`"4G_Hourly"`) so each file is its own schema (`pm_nokia_hourly`, `pm_huawei_hour…
+**What it does:** Required Postgres runtime. `NCM_DATABASE_URL` maps every sync_config store path to its own schema (`pm_nokia_hourly`, `metadata`, `app`, …). SQL adapter rewrites SQLite-shaped queries. Migrate scripts are one-shot from cold SQLite backups only.
 
 **Progress:** [`features/postgres-runtime.progress.md`](features/postgres-runtime.progress.md)
 
 
-**Plan:** Cut over on the **server** after migrate. PM ingest on PG is not load-tested (~14 GB). Dashboard constellation pulse still uses SQLite `rowid` — will go quiet on PG until rewritten (visual only).
+**Plan:** Server rebuild with Postgres-only gate + Daily load verify. Laptop uses Compose `app-db`. Dashboard constellation pulse may need PG-native row probes (visual only).
 
 ### Sync / pipeline (ETL)
 

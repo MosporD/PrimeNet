@@ -25,6 +25,15 @@ from core.platform.session import get_session_token
 
 install_sqlite_gate()
 
+# Postgres-only gate (after .env load above).
+try:
+    from db.pg_domains import require_postgres_url
+
+    require_postgres_url()
+except RuntimeError as _pg_exc:
+    print(f"[FATAL] {_pg_exc}")
+    raise
+
 # Initialize Flask app — Engineering Portal (PrimeNet) process only.
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB

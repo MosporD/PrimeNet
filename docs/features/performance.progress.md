@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [`performance.md`](performance.md)
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: `performance_meta_pm_conn` opens metadata schema and returns PM schema aliases (`pm_nokia_hourly`, …) for `alias."table"` SQL — no SQLite ATTACH. Table listing uses `list_tables` / adapted `sqlite_master` SQL. Data appears only after Daily/Hourly load into PG schemas.
+- NEXT: Smoke Performance after Daily load on 97.141.
+
 ## From brief History (migrated 2026-09-17)
 
 - 2026-08-05: chart layouts, site-search fix.

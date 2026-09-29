@@ -9,13 +9,16 @@ Files: `sync_config.py`, `db/runtime.py`, `core/radio/pm.py`,
 
 ---
 
-## 4.1 Everything is SQLite files
+## 4.1 Postgres schemas (required)
 
-PrimeNet has no Postgres/MySQL server. It's a set of **SQLite database files**
-on disk under `databases/`, laid out in a strict taxonomy. `db/runtime.py:26`
-literally hardcodes `is_postgresql() → False`; the Postgres-shaped helpers next
-to it (`adapt_placeholders`, `quote_ident`) are vestigial. Treat it as
-SQLite-only.
+PrimeNet is **Postgres-only**. Set ``NCM_DATABASE_URL`` (laptop: Compose profile
+``app-db``). Each catalogued store from `sync_config.py` maps to its own Postgres
+schema via `db/pg_domains.py` (`pm_nokia_hourly`, `metadata`, `app`, …). Path
+constants still end in `.db` as **logical store IDs**; `open_db()` never opens
+SQLite files for those paths.
+
+SQL that still looks like SQLite (`sqlite_master`, `PRAGMA table_info`, `?`
+placeholders) is rewritten by `db/app_sql.adapt_sqlite_app_sql` inside `PgConn`.
 
 ### `sync_config.py` is the map of every path
 

@@ -1,7 +1,8 @@
-"""Parameterized SQLite users/sessions for NexusCore and NexPulse.
+"""Parameterized users/sessions for NexusCore and NexPulse.
 
-PrimeNet continues to use ``database_enhanced`` / ``ncm_users.db``. These
-helpers are for platforms that own a separate users database and cookie.
+PrimeNet continues to use ``database_enhanced`` / the shared app schema.
+These helpers are for platforms that own a separate users cookie; under
+Postgres-only they share the central ``NCMUSERS_DB`` / app schema.
 """
 
 from __future__ import annotations
@@ -9,10 +10,8 @@ from __future__ import annotations
 import hashlib
 import os
 import secrets
-import sqlite3
 import threading
 from datetime import datetime, timedelta
-from pathlib import Path
 
 _lock = threading.Lock()
 _schema_ready: set[str] = set()
@@ -33,16 +32,24 @@ def _verify_password(password: str, password_hash: str) -> bool:
         return False
 
 
-def _connect(db_path: str) -> sqlite3.Connection:
-    Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(db_path, timeout=30, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+def _resolve_store_path(db_path: str) -> str:
+    """Map portal db_path to a catalogued store; default to central users."""
+    from db.runtime import schema_for_sqlite_path
+    from sync_config import NCMUSERS_DB
+
+    if schema_for_sqlite_path(db_path) is not None:
+        return db_path
+    return NCMUSERS_DB
+
+
+def _connect(db_path: str):
+    from db.runtime import open_db
+
+    return open_db(_resolve_store_path(db_path), timeout=30)
 
 
 def ensure_schema(db_path: str) -> None:
-    key = os.path.abspath(db_path)
+    key = os.path.abspath(_resolve_store_path(db_path))
     if key in _schema_ready:
         return
     with _lock:
@@ -107,11 +114,15 @@ def create_user(
             """
             INSERT INTO users (username, email, password_hash, full_name, role, is_active)
             VALUES (?, ?, ?, ?, ?, 1)
+            RETURNING id
             """,
             (username.strip(), email.strip(), _hash_password(password), full_name, role),
         )
+        row = cur.fetchone()
         conn.commit()
-        return int(cur.lastrowid)
+        if row is None:
+            raise RuntimeError("INSERT users RETURNING id produced no row")
+        return int(row["id"] if isinstance(row, dict) else row[0])
     finally:
         conn.close()
 

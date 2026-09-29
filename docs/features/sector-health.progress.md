@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`sector-health.md`](sector-health
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+
+---
+## 2026-09-29 (Postgres-only)
+
+- How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.
+- NEXT: Smoke primary routes after Daily load on server PG.
+
 ## 2026-09-23
 
 - Done: Vendor column labels — **Huawei / Nokia Thin** (FDD split), **Huawei TDD / Nokia Thin** (FDD split + Huawei TDD), **Huawei TDD / Nokia** (TDD + Nokia, FDD not split). FDD completeness still L18/L18+/L9/L21.

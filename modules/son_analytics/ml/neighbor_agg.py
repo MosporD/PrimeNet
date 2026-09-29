@@ -11,7 +11,7 @@ import math
 import sqlite3
 from collections import defaultdict
 
-from db.runtime import open_db, store_available
+from db.runtime import open_db, store_available, table_exists
 from modules.network_map.neighbor_raw_linking import (
     _normalize_ho_success_rate_percent,
     _pick_column,
@@ -56,11 +56,7 @@ def _table_columns(conn: sqlite3.Connection, table: str) -> list[str]:
 
 def _table_exists(conn: sqlite3.Connection, table: str) -> bool:
     try:
-        row = conn.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
-            (table,),
-        ).fetchone()
-        return row is not None
+        return table_exists(conn, table)
     except sqlite3.Error:
         return False
 
@@ -151,11 +147,7 @@ def _nokia_eci_to_cell_name() -> dict[int, str]:
     meta = open_db(METADATA_DB, timeout=30)
     try:
         tables = [
-            r[0]
-            for r in meta.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' "
-                "AND name IN ('cells_4g_fdd','cells_4g_tdd')"
-            )
+            t for t in ('cells_4g_fdd', 'cells_4g_tdd') if table_exists(meta, t)
         ]
         for table in tables:
             cols = _table_columns(meta, table)

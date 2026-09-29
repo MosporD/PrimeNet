@@ -34,6 +34,9 @@ SESSION_COOKIE = (
 
 def create_app():
     from database_enhanced import init_db
+    from db.pg_domains import require_postgres_url
+
+    require_postgres_url()
 
     app = create_base_app(
         "nexuscore",

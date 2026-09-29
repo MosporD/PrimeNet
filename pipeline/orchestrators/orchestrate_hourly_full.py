@@ -19,8 +19,10 @@ from pipeline.paths import PROJECT_ROOT, ensure_taxonomy_dirs
 
 def _run(script_name: str, args: list[str] | None = None) -> int:
     script = os.path.join(PROJECT_ROOT, script_name)
-    cmd = [sys.executable, script] + (args or [])
-    proc = subprocess.run(cmd, cwd=PROJECT_ROOT)
+    env = os.environ.copy()
+    env["PYTHONUNBUFFERED"] = "1"
+    cmd = [sys.executable, "-u", script] + (args or [])
+    proc = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env)
     return int(proc.returncode or 0)
 
 
