@@ -864,17 +864,14 @@ def _read_csv_auto(path: str) -> pd.DataFrame:
 
 
 def _read_tabular_as_is(path: str) -> pd.DataFrame:
+    from core.openpyxl_quiet import quiet_read_excel, silence_openpyxl_style_warning
+
+    silence_openpyxl_style_warning()
     ext = os.path.splitext(path)[1].lower()
     if ext in (".csv", ".txt", ".tsv"):
         return _read_csv_auto(path)
     if ext in (".xlsx", ".xlsm"):
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="Workbook contains no default style, apply openpyxl's default",
-                category=UserWarning,
-            )
-            return pd.read_excel(path, sheet_name=0, engine="openpyxl")
+        return quiet_read_excel(path, sheet_name=0)
     if ext == ".xls":
         return pd.read_excel(path, sheet_name=0)
     raise ValueError(f"unsupported extension: {ext}")
@@ -1326,7 +1323,9 @@ def _relocate_legacy_all_inputs(scope: str, vendor: str, category: str) -> None:
 
 def main() -> int:
     from core.etl_gate import require_etl_enabled
+    from core.openpyxl_quiet import silence_openpyxl_style_warning
 
+    silence_openpyxl_style_warning()
     if not require_etl_enabled():
         return 0
 

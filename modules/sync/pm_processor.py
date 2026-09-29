@@ -266,7 +266,9 @@ def _load_pm_file(file_path, *, trace: bool = False):
 
     # 1. Real XLSX (ZIP-based Office Open XML)
     try:
-        df = pd.read_excel(file_path, engine='openpyxl')
+        from core.openpyxl_quiet import quiet_read_excel
+
+        df = quiet_read_excel(file_path)
         logger.info('PM load: read_excel(openpyxl) success rows=%s cols=%s', len(df), len(df.columns))
         return df
     except Exception as e:
@@ -1800,6 +1802,9 @@ def process_huawei_pm_file(file_path, column_maps=None, sheet_tech_map=None, def
     xl = None
     if ext in ('.xlsx', '.xls', '.xlsm'):
         try:
+            from core.openpyxl_quiet import silence_openpyxl_style_warning
+
+            silence_openpyxl_style_warning()
             xl = pd.ExcelFile(file_path, engine='openpyxl')
         except Exception:
             try:

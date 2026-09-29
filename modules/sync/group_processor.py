@@ -36,7 +36,9 @@ def _groups_db(vendor: str) -> str:
 
 def _load_file(file_path: str) -> pd.DataFrame:
     try:
-        return pd.read_excel(file_path, engine='openpyxl')
+        from core.openpyxl_quiet import quiet_read_excel
+
+        return quiet_read_excel(file_path)
     except Exception:
         pass
     try:

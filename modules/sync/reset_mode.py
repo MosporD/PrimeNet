@@ -6,17 +6,17 @@ implementations are intact behind :func:`sync_reset_mode` rather than stranded
 after an early ``return``, so the parked state is a deliberate, reversible
 switch instead of unreachable code.
 
-Default is parked (matching the behaviour since July). Set
-``NCM_SYNC_RESET_MODE=0`` in ``.env`` to run the real pull/ingest again.
+**Default is OFF** (real pull/ingest runs). Set ``NCM_SYNC_RESET_MODE=1`` only
+when you intentionally want those legacy scheduler pulls parked.
 """
 
 from __future__ import annotations
 
 import os
 
-_FALSEY = frozenset({'0', 'false', 'no', 'off'})
+_TRUTHY = frozenset({'1', 'true', 'yes', 'on'})
 
 
 def sync_reset_mode() -> bool:
-    """True while PM/metadata/group pull and ingest are parked (the default)."""
-    return (os.getenv('NCM_SYNC_RESET_MODE') or '').strip().lower() not in _FALSEY
+    """True only when ``NCM_SYNC_RESET_MODE`` is explicitly enabled."""
+    return (os.getenv('NCM_SYNC_RESET_MODE') or '').strip().lower() in _TRUTHY

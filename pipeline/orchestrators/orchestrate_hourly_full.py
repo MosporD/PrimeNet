@@ -34,8 +34,19 @@ def main() -> int:
     # pull_rc == 2 => partial pull (some vendors failed). Still load whatever
     # arrived so a single-vendor miss does not stall all ingestion.
     if pull_rc not in (0, 2):
+        print(
+            f"[hourly] pull failed rc={pull_rc} "
+            "(both Nokia and Huawei hourly pulls failed — check SFTP / raw paths)",
+            file=sys.stderr,
+        )
         return pull_rc
     load_rc = _run(os.path.join("pipeline", "load", "hourly", "load_all.py"))
+    if load_rc != 0:
+        print(
+            f"[hourly] load failed rc={load_rc} "
+            "(see [done] failed_files / per-file errors above)",
+            file=sys.stderr,
+        )
     # Surface the partial-pull signal upward when the load itself succeeded.
     if load_rc == 0 and pull_rc == 2:
         return 2

@@ -6,7 +6,11 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
-## 2026-09-28 (ETL diagnosis + metadata schedule)
+## 2026-09-29 (No PM after cutover — diagnosis)
+
+- State: all `pm_*` hourly tables still 0 rows; metadata RAT tables populated; daily schemas empty.
+- Causes: `NCM_SYNC_RESET_MODE` default was parked (fixed → opt-in); scheduler pipeline lock still stuck (restart); daily/hourly failures had opaque `code=1` (now include stderr detail).
+- NEXT: Server set `NCM_SYNC_RESET_MODE=0` (or omit), restart scheduler, redeploy, re-run hourly/daily from ETL Diagnosis.
 
 - Done: `modules/sync/etl_diagnosis.py` + `/api/sync/diagnosis`; progress for hourly/daily/neighbor/category jobs; triggers for hourly_full / daily_full / neighbor_sync.
 - Done: Re-registered daily `pull_metadata` cron (`METADATA_PULL_HOUR` / `METADATA_PULL_MINUTE`, default daily pull hour :20). Kill switch `NCM_DISABLE_METADATA_SCHEDULER=1`.

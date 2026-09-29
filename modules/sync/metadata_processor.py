@@ -543,7 +543,9 @@ def _load_file(file_path, nrows=None):
     if ext == '.csv':
         return pd.read_csv(file_path, **kw)
     try:
-        return pd.read_excel(file_path, engine='openpyxl', **kw)
+        from core.openpyxl_quiet import quiet_read_excel
+
+        return quiet_read_excel(file_path, **kw)
     except Exception:
         return pd.read_excel(file_path, engine='xlrd', **kw)
 

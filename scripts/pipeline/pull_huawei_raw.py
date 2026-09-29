@@ -192,6 +192,9 @@ def _convert_excel_file_to_csv(path: str) -> int:
     if not path.lower().endswith((".xlsx", ".xls", ".xlsm")):
         return 0
     try:
+        from core.openpyxl_quiet import silence_openpyxl_style_warning
+
+        silence_openpyxl_style_warning()
         sheets = pd.read_excel(path, sheet_name=None, dtype=str, engine=None)
     except Exception as e:
         print(f"[csv-normalize] failed reading workbook {path}: {e}")

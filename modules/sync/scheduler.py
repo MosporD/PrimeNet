@@ -199,8 +199,15 @@ def _extract_technology_key(table_name: str) -> str:
     return 'all'
 
 
-def _subprocess_failure_detail(proc, *, max_len: int = 350) -> str:
-    """Last actionable line from child stdout/stderr for sync_log."""
+def _subprocess_failure_detail(proc, *, max_len: int = 500) -> str:
+    """Best actionable line from child stdout/stderr for sync_log."""
+    from core.openpyxl_quiet import is_openpyxl_style_noise
+
+    noise = (
+        'deprecationwarning',
+        'futurewarning',
+        'userwarning',
+    )
     try:
         stderr_raw = getattr(proc, 'stderr', None)
         stdout_raw = getattr(proc, 'stdout', None)
@@ -210,16 +217,44 @@ def _subprocess_failure_detail(proc, *, max_len: int = 350) -> str:
             stdout_raw = getattr(proc, 'stdout_tail', '') or ''
         err_lines = [ln.strip() for ln in str(stderr_raw).splitlines() if ln.strip()]
         out_lines = [ln.strip() for ln in str(stdout_raw).splitlines() if ln.strip()]
-        if err_lines:
-            for ln in reversed(err_lines):
-                if 'Error' in ln or 'error' in ln or 'failed' in ln or 'Traceback' in ln:
-                    return ln[:max_len]
-            return err_lines[-1][:max_len]
-        if out_lines:
-            for ln in reversed(out_lines):
-                if 'failed' in ln.lower() or 'error' in ln.lower():
-                    return ln[:max_len]
-            return out_lines[-1][:max_len]
+
+        def _useful(lines: list[str]) -> str:
+            ranked: list[str] = []
+            for ln in lines:
+                if is_openpyxl_style_noise(ln):
+                    continue
+                low = ln.lower()
+                if any(n in low for n in noise):
+                    continue
+                if any(
+                    tok in ln
+                    for tok in (
+                        'Traceback',
+                        'Error',
+                        'Exception',
+                        'failed',
+                        '[pull]',
+                        '[done]',
+                        '[hourly]',
+                        '[daily]',
+                        'DatabaseError',
+                        'OperationalError',
+                    )
+                ) or 'error' in low:
+                    ranked.append(ln)
+            if ranked:
+                return ranked[-1][:max_len]
+            for ln in reversed(lines):
+                if is_openpyxl_style_noise(ln):
+                    continue
+                low = ln.lower()
+                if any(n in low for n in noise):
+                    continue
+                return ln[:max_len]
+            return ''
+
+        detail = _useful(err_lines) or _useful(out_lines)
+        return detail
     except Exception:
         pass
     return ''
@@ -433,15 +468,28 @@ def run_daily_sync_cycle():
         _start_progress('daily_full', 2, 'Daily pull + load starting…')
         proc = _run_child_script([sys.executable, script], cwd=project_root)
         _advance_progress('daily_full', 1, 'Daily orchestrator finished…')
-        if proc.returncode == 0:
-            _log_sync('daily_full_sync', 'all', 'ok', 0, 'Daily full sync completed')
-            logger.info('Daily full sync completed successfully.')
-            _finish_progress('daily_full', True, 'Daily full sync completed.')
-        else:
+        partial = proc.returncode == 2
+        if proc.returncode not in (0, 2):
+            details = _subprocess_failure_detail(proc)
             msg = f'Daily full sync failed (code={proc.returncode})'
+            if details:
+                msg = f'{msg}: {details}'
             _log_sync('daily_full_sync', 'all', 'error', 0, msg)
             logger.error('Daily full sync failed with code %s.', proc.returncode)
             _finish_progress('daily_full', False, msg)
+            return
+        if partial:
+            details = _subprocess_failure_detail(proc)
+            msg = 'Daily full sync partial: some vendors failed to pull'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('daily_full_sync', 'all', 'error', 0, msg)
+            logger.warning(msg)
+            _finish_progress('daily_full', True, msg)
+        else:
+            _log_sync('daily_full_sync', 'all', 'ok', 0, 'Daily full sync completed')
+            logger.info('Daily full sync completed successfully.')
+            _finish_progress('daily_full', True, 'Daily full sync completed.')
     except Exception as e:
         _log_sync('daily_full_sync', 'all', 'error', 0, str(e))
         logger.exception('Daily full sync failed: %s', e)

@@ -15,6 +15,8 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Iterable
 
+from core.openpyxl_quiet import is_openpyxl_style_noise
+
 
 @dataclass(frozen=True)
 class SubprocessResult:
@@ -39,6 +41,10 @@ def _pump_stream(stream, tail: deque[str], log_fn) -> None:
     try:
         for raw in stream:
             line = raw.rstrip('\n\r')
+            if is_openpyxl_style_noise(line):
+                # Drop harmless openpyxl stylesheet noise so it never becomes
+                # the "last stderr line" in ETL failure summaries.
+                continue
             tail.append(line)
             if line and log_fn:
                 log_fn(line)
