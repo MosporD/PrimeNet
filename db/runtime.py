@@ -498,6 +498,11 @@ def apply_pm_read_pragmas(conn) -> None:
             pass
 
 
+def app_timezone() -> str:
+    """Wall-clock zone for Postgres sessions (``CURRENT_TIMESTAMP`` into ``timestamp`` columns)."""
+    return (os.getenv('NCM_TIMEZONE') or os.getenv('TZ') or 'Asia/Amman').strip() or 'Asia/Amman'
+
+
 def _connect_postgres(schema: str) -> PgConn:
     try:
         import psycopg
@@ -514,6 +519,7 @@ def _connect_postgres(schema: str) -> PgConn:
     )
     raw.execute(f'CREATE SCHEMA IF NOT EXISTS {ident}')
     raw.execute(f'SET search_path TO {ident}, public')
+    raw.execute(f'SET TIME ZONE {sqlite_text_lit(app_timezone())}')
     raw.commit()
     _ensure_pg_safe_cast_functions(raw)
     return PgConn(raw, schema=schema)

@@ -1248,6 +1248,17 @@ def _load_folder_tabular_to_db(
                             out = df.copy()
                             out.columns = [str(c).strip().lower() for c in out.columns]
                             _df_to_sql(out, canonical, conn, if_exists="replace")
+                            from modules.sync.db_migration import (
+                                PER_TECH_TECHNOLOGY,
+                                ensure_per_tech_table_shape,
+                            )
+
+                            ensure_per_tech_table_shape(conn, canonical)
+                            execute_query(
+                                conn,
+                                f"UPDATE {sqlite_ident(canonical)} SET technology = ?, updated_at = CURRENT_TIMESTAMP",
+                                (PER_TECH_TECHNOLOGY.get(canonical),),
+                            )
                             print(f"[metadata] replaced {fn} -> table {canonical} ({len(out)} rows)")
                         else:
                             _replace_pm_frame_to_tables(conn, table, df, label, fn, scope=scope)

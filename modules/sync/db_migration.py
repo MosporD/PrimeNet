@@ -16,7 +16,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from db.runtime import open_db
+from db.runtime import _is_pg_conn, execute_query, open_db, table_columns
 from sync_config import (
     PROJECT_ROOT,
     METADATA_DB,
@@ -322,6 +322,54 @@ PER_TECH_CSV_SCHEMA = {
         'last_update', 'date', 'cluster_y',
     ],
 }
+
+
+PER_TECH_TECHNOLOGY = {
+    'cells_2g': '2G',
+    'cells_3g': '3G',
+    'cells_4g_fdd': '4G-FDD',
+    'cells_4g_tdd': '4G-TDD',
+    'cells_5g': '5G',
+}
+
+
+def ensure_per_tech_table_shape(conn, table: str) -> None:
+    """Make an existing per-tech table upsert-ready on SQLite or Postgres.
+
+    The raw loader recreates ``cells_*`` from the CSV as-is; ``metadata_processor``
+    upserts on ``cell_name`` and writes ``technology`` / ``updated_at``. Both call
+    this so the two writers agree on one shape.
+    """
+    cols = table_columns(conn, table)
+    if not cols:
+        return
+    lower = {c.lower() for c in cols}
+    for c in PER_TECH_CSV_SCHEMA.get(table, []):
+        if c.lower() not in lower:
+            execute_query(conn, f'ALTER TABLE "{table}" ADD COLUMN "{c}" TEXT')
+            lower.add(c.lower())
+    if 'technology' not in lower:
+        execute_query(conn, f'ALTER TABLE "{table}" ADD COLUMN technology TEXT')
+    if 'updated_at' not in lower:
+        execute_query(conn, f'ALTER TABLE "{table}" ADD COLUMN updated_at TIMESTAMP')
+    if _is_pg_conn(conn):
+        execute_query(
+            conn,
+            f'DELETE FROM "{table}" a USING ('
+            f'  SELECT ctid AS _ctid, ROW_NUMBER() OVER (PARTITION BY cell_name ORDER BY ctid DESC) AS rn'
+            f'  FROM "{table}" WHERE cell_name IS NOT NULL'
+            f') d WHERE a.ctid = d._ctid AND d.rn > 1',
+        )
+    else:
+        execute_query(
+            conn,
+            f'DELETE FROM "{table}" WHERE cell_name IS NOT NULL AND rowid NOT IN ('
+            f'  SELECT MAX(rowid) FROM "{table}" WHERE cell_name IS NOT NULL GROUP BY cell_name)',
+        )
+    execute_query(
+        conn,
+        f'CREATE UNIQUE INDEX IF NOT EXISTS "uq_{table}_cell_name" ON "{table}" (cell_name)',
+    )
 
 
 def ensure_per_tech_columns():

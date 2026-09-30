@@ -145,6 +145,43 @@ def sync_diagnosis():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@sync_bp.route('/api/sync/errors/export', methods=['GET'])
+@admin_required
+def export_sync_errors():
+    """CSV of every sync_log error in the last ``days`` (default 30, max 90)."""
+    from datetime import timedelta
+
+    days = max(1, min(90, request.args.get('days', 30, type=int) or 30))
+    since = datetime.now() - timedelta(days=days)
+    conn = connect_app()
+    try:
+        rows = execute_query(
+            conn,
+            "SELECT started_at, sync_type, technology, rows_affected, message FROM sync_log "
+            "WHERE LOWER(status) = 'error' AND started_at >= ? ORDER BY started_at DESC",
+            (since,),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(['When', 'Type', 'Tech', 'Rows', 'Message'])
+    for r in rows:
+        r = dict(r)
+        when = r.get('started_at')
+        writer.writerow([
+            when.strftime('%Y-%m-%d %H:%M:%S') if hasattr(when, 'strftime') else (when or ''),
+            r.get('sync_type') or '',
+            r.get('technology') or '',
+            r.get('rows_affected') or 0,
+            r.get('message') or '',
+        ])
+    data = io.BytesIO(buf.getvalue().encode('utf-8-sig'))
+    name = f"etl_errors_last_{days}d_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+    return send_file(data, mimetype='text/csv', as_attachment=True, download_name=name)
+
+
 @sync_bp.route('/api/sync/trigger/hourly_full', methods=['POST'])
 @admin_required
 def trigger_hourly_full():

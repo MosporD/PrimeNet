@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
     NCM_DATA_ROOT=/data \
     NCM_BOOTSTRAP_ON_IMPORT=0 \
     NCM_DISABLE_SCHEDULER=1 \
+    TZ=Asia/Amman \
     FLASK_HOST=0.0.0.0 \
     FLASK_PORT=8000
 
@@ -24,6 +25,7 @@ RUN sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources \
         cifs-utils \
         libxml2 \
         libxslt1.1 \
+        tzdata \
         util-linux \
     && rm -rf /var/lib/apt/lists/*
 

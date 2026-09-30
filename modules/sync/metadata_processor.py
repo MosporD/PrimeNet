@@ -45,7 +45,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from db.runtime import adapt_placeholders, connect_metadata, execute_query, open_db
 from sync_config import HUAWEI_PM_DB, METADATA_DB
-from .db_migration import PER_TECH_CSV_SCHEMA
+from .db_migration import PER_TECH_CSV_SCHEMA, ensure_per_tech_table_shape
 from .metadata_active_sql import legacy_cells_activity_case_sql
 
 logger = logging.getLogger(__name__)
@@ -198,10 +198,13 @@ def import_csv_to_cells(file_path, table_name, technology):
 
     conn = connect_metadata()
     try:
+        ensure_per_tech_table_shape(conn, table_name)
+        updates = ', '.join(f'"{c}" = excluded."{c}"' for c in insert_cols if c != 'cell_name')
         sql = (
-            f'INSERT OR REPLACE INTO "{table_name}" '
+            f'INSERT INTO "{table_name}" '
             f'({col_sql}, updated_at) '
-            f'VALUES ({ph_sql}, CURRENT_TIMESTAMP)'
+            f'VALUES ({ph_sql}, CURRENT_TIMESTAMP) '
+            f'ON CONFLICT (cell_name) DO UPDATE SET {updates}, updated_at = CURRENT_TIMESTAMP'
         )
         conn.executemany(sql, rows)
         upserted = len(rows)

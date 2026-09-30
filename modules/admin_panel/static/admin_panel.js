@@ -18,6 +18,10 @@ const ACTIVITY_PAGE_SIZE = 15;
 let progressPollTimer = null;
 let etlDiagPollTimer = null;
 let etlDiagMsgTimer = null;
+let etlDiagLastFingerprint = '';
+let etlDiagInflight = false;
+const ETL_DIAG_POLL_MS = 10000;
+const ETL_PROGRESS_META_MAX = 140;
 const API_CONNECTION_KEYS = ['nokia_cm', 'huawei_cm', 'huawei_pm'];
 const ETL_PROGRESS_ORDER = [
     'hourly_full',
@@ -158,7 +162,7 @@ function startEtlDiagnosisPolling() {
         const auto = document.getElementById('etl-diag-auto');
         if (auto && !auto.checked) return;
         loadEtlDiagnosis(false);
-    }, 4000);
+    }, ETL_DIAG_POLL_MS);
 }
 
 function showEtlDiagMsg(text, type = 'info', durationMs = 12000) {
@@ -174,14 +178,64 @@ function showEtlDiagMsg(text, type = 'info', durationMs = 12000) {
     etlDiagMsgTimer = setTimeout(() => { el.style.display = 'none'; }, durationMs);
 }
 
+function _etlShortMeta(message, updatedAt) {
+    const stamp = updatedAt ? ` [${updatedAt}]` : '';
+    const full = `${message || ''}${stamp}`;
+    if (full.length <= ETL_PROGRESS_META_MAX) return { text: full, title: full };
+    return { text: `${full.slice(0, ETL_PROGRESS_META_MAX - 1)}…`, title: full };
+}
+
+function _etlStableFingerprint(d) {
+    const progress = {};
+    Object.entries(d.progress || {}).forEach(([k, v]) => {
+        progress[k] = {
+            running: !!v?.running,
+            stage: v?.stage || 'idle',
+            percent: Number(v?.percent || 0),
+            progress: Number(v?.progress || 0),
+            total: Number(v?.total || 0),
+            message: String(v?.message || ''),
+        };
+    });
+    return JSON.stringify({
+        alerts: d.alerts || [],
+        progress,
+        etl: !!d.etl?.enabled,
+        mode: d.scheduler?.mode || '',
+        in_process: !!d.scheduler?.in_process,
+        watcher_primary: !!d.scheduler?.watcher_primary,
+        scheduled_ingest_enabled: d.scheduler?.scheduled_ingest_enabled !== false,
+        lock: !!d.scheduler?.pipeline_lock_held_here,
+        stuck: !!d.pipeline_health?.appears_stuck,
+        skip_streak: d.pipeline_health?.skip_streak || 0,
+        domains: d.domains?.enabled_groups || [],
+        mismatch: !!d.domains?.metadata_pm_backend_mismatch,
+        stores: (d.stores || []).map((s) => [s.store, s.row_total, s.empty, s.backend, s.error || '']),
+        jobs: (d.scheduler?.jobs || []).map((j) => [j.id, j.next_run_time || '']),
+        last_ok: d.last_ok || {},
+        errors: (d.recent_errors || []).map((r) => [r.started_at, r.sync_type, r.message]),
+        events: (d.recent_events || []).slice(0, 25).map((r) => [r.started_at, r.sync_type, r.status, r.message]),
+    });
+}
+
+function _etlSetHtmlIfChanged(el, html) {
+    if (!el) return;
+    if (el.dataset.stableHtml === html) return;
+    el.dataset.stableHtml = html;
+    el.innerHTML = html;
+}
+
 function _etlEnsureProgressCards(progress) {
     const grid = document.getElementById('etl-diag-progress');
     if (!grid) return;
     const keys = new Set([...ETL_PROGRESS_ORDER, ...Object.keys(progress || {})]);
-    const ordered = [...ETL_PROGRESS_ORDER.filter(k => keys.has(k)), ...[...keys].filter(k => !ETL_PROGRESS_ORDER.includes(k))];
+    const ordered = [
+        ...ETL_PROGRESS_ORDER.filter((k) => keys.has(k)),
+        ...[...keys].filter((k) => !ETL_PROGRESS_ORDER.includes(k)),
+    ];
     if (!grid.dataset.ready) {
-        grid.innerHTML = ordered.map(key => `
-            <div class="progress-card" id="etl-progress-card-${key}">
+        grid.innerHTML = ordered.map((key) => `
+            <div class="progress-card etl-progress-card" id="etl-progress-card-${key}">
                 <div class="progress-title">${_escapeHtml(ETL_PROGRESS_LABELS[key] || key)}</div>
                 <div class="progress-meta" id="etl-progress-meta-${key}">Idle</div>
                 <div class="progress-track"><div class="progress-fill" id="etl-progress-fill-${key}"></div></div>
@@ -189,7 +243,7 @@ function _etlEnsureProgressCards(progress) {
         `).join('');
         grid.dataset.ready = '1';
     }
-    ordered.forEach(key => {
+    ordered.forEach((key) => {
         const card = document.getElementById(`etl-progress-card-${key}`);
         const meta = document.getElementById(`etl-progress-meta-${key}`);
         const fill = document.getElementById(`etl-progress-fill-${key}`);
@@ -200,16 +254,25 @@ function _etlEnsureProgressCards(progress) {
         const percent = Math.max(0, Math.min(100, Number(data.percent || 0)));
         const p = Number(data.progress || 0);
         const total = Number(data.total || 0);
-        const message = data.message || '';
-        const updatedAt = data.updated_at || '';
-        card.classList.remove('running', 'done', 'error', 'skipped');
-        if (running || stage === 'running') card.classList.add('running');
-        else if (stage === 'error') card.classList.add('error');
-        else if (stage === 'skipped') card.classList.add('skipped');
-        else if (stage === 'done') card.classList.add('done');
-        fill.style.width = `${percent}%`;
+        const nextClass = (running || stage === 'running')
+            ? 'running'
+            : (stage === 'error' ? 'error' : (stage === 'skipped' ? 'skipped' : (stage === 'done' ? 'done' : '')));
+        const classKey = `progress-card etl-progress-card${nextClass ? ` ${nextClass}` : ''}`;
+        if (card.dataset.stageClass !== classKey) {
+            card.className = classKey;
+            card.dataset.stageClass = classKey;
+        }
+        const width = `${percent}%`;
+        if (fill.style.width !== width) fill.style.width = width;
         const counter = total > 0 ? `${p}/${total} (${percent}%)` : `${percent}%`;
-        meta.textContent = `${counter}${message ? ` - ${message}` : ''}${updatedAt ? ` [${updatedAt}]` : ''}`;
+        // Keep updated_at out of the visible line so polls don't rewrite text every tick.
+        const short = _etlShortMeta(data.message || '', '');
+        const line = `${counter}${short.text ? ` - ${short.text}` : ''}`;
+        if (meta.dataset.line !== line) {
+            meta.dataset.line = line;
+            meta.textContent = line;
+            meta.title = `${counter}${data.message ? ` - ${data.message}` : ''}${data.updated_at ? ` [${data.updated_at}]` : ''}`;
+        }
     });
 }
 
@@ -231,51 +294,51 @@ function _renderEtlKpis(d) {
         { label: 'RAM free', value: d.resources?.available_mb != null ? `${d.resources.available_mb} MB` : 'n/a', cls: '' },
         { label: 'Pressure', value: d.resources?.pressure != null ? String(d.resources.pressure) : 'n/a', cls: '' },
     ];
-    el.innerHTML = items.map(it => `
+    _etlSetHtmlIfChanged(el, items.map(it => `
         <div class="etl-kpi ${it.cls || ''}">
             <div class="etl-kpi-label">${_escapeHtml(it.label)}</div>
             <div class="etl-kpi-value">${_escapeHtml(it.value)}</div>
         </div>
-    `).join('');
+    `).join(''));
 }
 
 function _renderEtlAlerts(alerts) {
     const el = document.getElementById('etl-diag-alerts');
     if (!el) return;
     if (!alerts || !alerts.length) {
-        el.innerHTML = '<div class="etl-alert info">No active alerts.</div>';
+        _etlSetHtmlIfChanged(el, '<div class="etl-alert info">No active alerts.</div>');
         return;
     }
-    el.innerHTML = alerts.map(a => `
+    _etlSetHtmlIfChanged(el, alerts.map(a => `
         <div class="etl-alert ${_escapeHtml(a.level || 'info')}">
             <strong>${_escapeHtml((a.code || '').toUpperCase())}</strong> — ${_escapeHtml(a.message || '')}
         </div>
-    `).join('');
+    `).join(''));
 }
 
 function _renderEtlOps(ops) {
     const el = document.getElementById('etl-diag-ops');
     if (!el) return;
     const list = ops && ops.length ? ops : [];
-    el.innerHTML = list.map(op => `
+    _etlSetHtmlIfChanged(el, list.map(op => `
         <button type="button" class="btn-sync refresh" onclick="runEtlDiagOperation('${_escapeHtml(op.key)}', '${_escapeHtml(op.endpoint)}', '${_escapeHtml(op.method || 'POST')}')">
             ${_escapeHtml(op.label || op.key)}
         </button>
     `).join('') + `
         <button type="button" class="btn-sync test" onclick="testConnectivity()">Test connectivity (legacy UI)</button>
-    `;
+    `);
 }
 
 function _renderEtlDomains(domains) {
     const el = document.getElementById('etl-diag-domains');
     if (!el) return;
     if (!domains) {
-        el.textContent = 'No domain info.';
+        _etlSetHtmlIfChanged(el, 'No domain info.');
         return;
     }
     const enabled = domains.enabled_groups || [];
     const missing = domains.missing_groups || [];
-    el.innerHTML = `
+    _etlSetHtmlIfChanged(el, `
         <div><strong>Configured:</strong> ${domains.postgres_configured ? 'yes' : 'no'}</div>
         <div><strong>NCM_PG_DOMAINS:</strong> <code>${_escapeHtml(domains.ncm_pg_domains_env || '(unset = all when NCM_DATABASE_URL set)')}</code></div>
         <div class="etl-chip-row">
@@ -284,19 +347,19 @@ function _renderEtlDomains(domains) {
         ${missing.length ? `<div style="margin-top:8px;"><strong>Not on PG:</strong></div>
         <div class="etl-chip-row">${missing.map(g => `<span class="etl-chip">${_escapeHtml(g)}</span>`).join('')}</div>` : ''}
         ${domains.metadata_pm_backend_mismatch ? '<div style="margin-top:8px;color:#c0392b;"><strong>Mismatch:</strong> metadata and pm backends differ.</div>' : ''}
-    `;
+    `);
 }
 
 function _renderEtlStores(stores) {
     const el = document.getElementById('etl-diag-stores');
     if (!el) return;
     if (!stores || !stores.length) {
-        el.textContent = 'No stores surveyed.';
+        _etlSetHtmlIfChanged(el, 'No stores surveyed.');
         return;
     }
-    el.innerHTML = stores.map(s => {
+    _etlSetHtmlIfChanged(el, stores.map(s => {
         const emptyCls = s.empty ? 'empty' : 'pg';
-        const                     tables = Object.entries(s.tables || {}).slice(0, 8)
+        const tables = Object.entries(s.tables || {}).slice(0, 8)
             .map(([n, c]) => `${n}:${c}`).join(', ');
         return `
             <div class="etl-store-row">
@@ -307,31 +370,50 @@ function _renderEtlStores(stores) {
                 <div class="etl-store-meta">${s.table_count || 0} tables${tables ? ` — ${_escapeHtml(tables)}` : ''}${s.empty ? ' (EMPTY)' : ''}${s.error ? ` — ERR ${_escapeHtml(s.error)}` : ''}</div>
             </div>
         `;
-    }).join('');
+    }).join(''));
 }
 
 function _renderEtlJobs(jobs, scheduler) {
     const el = document.getElementById('etl-diag-jobs');
     if (!el) return;
     if (!scheduler?.in_process) {
-        el.innerHTML = '<div class="etl-store-meta">APScheduler is not running in this web process. Job next-run times are only visible inside the scheduler container.</div>';
+        const mode = scheduler?.mode || 'unknown';
+        const schedIngest = scheduler?.scheduled_ingest_enabled;
+        const watcherNote = scheduler?.watcher_primary
+            ? ' NCM_WATCHER_PRIMARY=1 may suppress hourly/daily cron in favor of the pull watcher.'
+            : '';
+        const ingestNote = schedIngest === false
+            ? ' Scheduled ingest is disabled for this mode — only manual triggers and watcher-driven pulls run.'
+            : '';
+        _etlSetHtmlIfChanged(el, `
+            <div class="etl-store-meta">
+                APScheduler is <strong>not</strong> running in this web process (mode: <code>${_escapeHtml(mode)}</code>).
+                Cron next-run times exist only inside the <strong>scheduler</strong> container.
+                Manual buttons on this page still work in the web process.${ingestNote}${watcherNote}
+            </div>
+            <div class="etl-store-meta" style="margin-top:8px;">
+                Check on the host: <code>docker compose ps scheduler</code> and
+                <code>docker compose logs --tail=80 scheduler</code>.
+                Web should have <code>NCM_DISABLE_SCHEDULER=1</code>; scheduler must not.
+            </div>
+        `);
         return;
     }
     if (!jobs || !jobs.length) {
-        el.textContent = 'No jobs registered.';
+        _etlSetHtmlIfChanged(el, 'No jobs registered.');
         return;
     }
     if (jobs[0]?.error) {
-        el.textContent = jobs[0].error;
+        _etlSetHtmlIfChanged(el, _escapeHtml(jobs[0].error));
         return;
     }
-    el.innerHTML = jobs.map(j => `
+    _etlSetHtmlIfChanged(el, jobs.map(j => `
         <div class="etl-store-row">
             <div><strong>${_escapeHtml(j.id || '')}</strong></div>
             <div class="etl-store-meta">${_escapeHtml(j.name || '')}</div>
             <div class="etl-store-meta">next: ${_escapeHtml(j.next_run_time || '—')}</div>
         </div>
-    `).join('');
+    `).join(''));
 }
 
 function _renderEtlLastOk(lastOk) {
@@ -339,10 +421,10 @@ function _renderEtlLastOk(lastOk) {
     if (!el) return;
     const entries = Object.entries(lastOk || {});
     if (!entries.length) {
-        el.textContent = 'No data.';
+        _etlSetHtmlIfChanged(el, 'No data.');
         return;
     }
-    el.innerHTML = entries.map(([k, row]) => {
+    _etlSetHtmlIfChanged(el, entries.map(([k, row]) => {
         if (!row) {
             return `<div class="etl-store-row"><strong>${_escapeHtml(k)}</strong><div class="etl-store-meta">never succeeded (in history window)</div></div>`;
         }
@@ -350,18 +432,17 @@ function _renderEtlLastOk(lastOk) {
             <strong>${_escapeHtml(k)}</strong>
             <div class="etl-store-meta">${_escapeHtml(row.started_at || '')} — ${_escapeHtml(row.message || '')}</div>
         </div>`;
-    }).join('');
+    }).join(''));
 }
 
 function _renderEtlEventRows(tbodyId, rows, cols) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
+    let html;
     if (!rows || !rows.length) {
-        tbody.innerHTML = `<tr><td colspan="${cols}" style="text-align:center;">No events</td></tr>`;
-        return;
-    }
-    if (tbodyId === 'etl-diag-errors') {
-        tbody.innerHTML = rows.map(r => `
+        html = `<tr><td colspan="${cols}" style="text-align:center;">No events</td></tr>`;
+    } else if (tbodyId === 'etl-diag-errors') {
+        html = rows.map(r => `
             <tr>
                 <td>${_escapeHtml(r.started_at || '')}</td>
                 <td>${_escapeHtml(r.sync_type || '')}</td>
@@ -369,20 +450,23 @@ function _renderEtlEventRows(tbodyId, rows, cols) {
                 <td title="${_escapeHtml(r.message || '')}">${_escapeHtml(r.message || '')}</td>
             </tr>
         `).join('');
-        return;
+    } else {
+        html = rows.map(r => `
+            <tr>
+                <td>${_escapeHtml(r.started_at || '')}</td>
+                <td>${_escapeHtml(r.sync_type || '')}</td>
+                <td><span class="sync-badge ${_escapeHtml(r.status || '')}">${_escapeHtml(r.status || '')}</span></td>
+                <td>${r.rows_affected != null ? r.rows_affected : '-'}</td>
+                <td title="${_escapeHtml(r.message || '')}">${_escapeHtml(r.message || '')}</td>
+            </tr>
+        `).join('');
     }
-    tbody.innerHTML = rows.map(r => `
-        <tr>
-            <td>${_escapeHtml(r.started_at || '')}</td>
-            <td>${_escapeHtml(r.sync_type || '')}</td>
-            <td><span class="sync-badge ${_escapeHtml(r.status || '')}">${_escapeHtml(r.status || '')}</span></td>
-            <td>${r.rows_affected != null ? r.rows_affected : '-'}</td>
-            <td title="${_escapeHtml(r.message || '')}">${_escapeHtml(r.message || '')}</td>
-        </tr>
-    `).join('');
+    _etlSetHtmlIfChanged(tbody, html);
 }
 
 async function loadEtlDiagnosis(force) {
+    if (etlDiagInflight && !force) return;
+    etlDiagInflight = true;
     const gen = document.getElementById('etl-diag-generated');
     try {
         const res = await fetch('/api/sync/diagnosis?limit=100');
@@ -392,12 +476,16 @@ async function loadEtlDiagnosis(force) {
             return;
         }
         const d = data.diagnosis;
+        const fp = _etlStableFingerprint(d);
         if (gen) {
             gen.textContent = `Snapshot ${d.generated_at || ''}${force ? ' (manual)' : ''}`;
         }
+        // Progress cards update in place (cheap); skip full panel rewrites when unchanged.
+        _etlEnsureProgressCards(d.progress || {});
+        if (!force && fp === etlDiagLastFingerprint) return;
+        etlDiagLastFingerprint = fp;
         _renderEtlAlerts(d.alerts || []);
         _renderEtlKpis(d);
-        _etlEnsureProgressCards(d.progress || {});
         _renderEtlOps(d.manual_operations || []);
         _renderEtlDomains(d.domains);
         _renderEtlStores(d.stores || []);
@@ -407,6 +495,8 @@ async function loadEtlDiagnosis(force) {
         _renderEtlEventRows('etl-diag-events', d.recent_events || [], 5);
     } catch (e) {
         if (gen) gen.textContent = `Error: ${e.message}`;
+    } finally {
+        etlDiagInflight = false;
     }
 }
 

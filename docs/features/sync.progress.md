@@ -6,6 +6,14 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
+## 2026-09-30 (Metadata technology column, watcher visibility, GMT+3, error export)
+
+- Root cause (metadata): loader `if_exists="replace"` rebuilt `metadata.cells_*` from CSV without `technology` / `updated_at` / unique `cell_name`; `metadata_processor.import_csv_to_cells` then failed on `technology`. Done: `db_migration.ensure_per_tech_table_shape` (adds columns, dedupes, unique index) called from both paths; processor now upserts `ON CONFLICT (cell_name)`. Verified on scratch copy of `cells_5g`.
+- Found: `sync_log` shows "Hourly orchestrator skipped: another pipeline cycle is already running" every hour for 30+ h; watcher (primary loader) holds `_pipeline_cycle_lock` and its failures only reached the container log. Done: watcher cycles now write `pull_watcher` ok/error/crash rows with duration.
+- Done: `TZ=Asia/Amman` + tzdata in Dockerfile; Postgres sessions `SET TIME ZONE` from `NCM_TIMEZONE`/`TZ` (default Asia/Amman). Rows written before deploy stay UTC.
+- Done: `GET /api/sync/errors/export?days=30` CSV + "Export 30 days" button on ETL Diagnosis → Recent errors. `sync_log` is never pruned.
+- NEXT: Rebuild primenet+scheduler; read `pull_watcher` errors to find the Nokia 4G / groups load failure.
+
 ## 2026-09-30 (Neighbor sync on Postgres)
 
 - Root cause: `load_nokia_neighbor_raw_to_db.py` / `load_huawei_neighbor_wide_to_db.py` called pandas `DataFrame.to_sql` on `PgConn`; pandas falls back to SQLite mode and probes `sqlite_master ... type IN ('table','view')` → `pandas.errors.DatabaseError` on the first table.

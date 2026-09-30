@@ -8,6 +8,10 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **NEXT:** Push/deploy `%%` KPI escape + PG `ctid` dedupe/retention; rebuild **scheduler** on 97.141; re-run Daily (`failed_files=0`). Note: unset `NCM_WATCHER_PRIMARY` defaults to **1** (watcher owns hourly/daily cron).
 
+## 2026-09-30 (Metadata shape, watcher logging, GMT+3, ETL error export)
+
+- Fixed metadata `technology` column errors; watcher cycles now logged to `sync_log`; app clock Asia/Amman; ETL Diagnosis "Export 30 days" CSV. See `docs/features/sync.progress.md`.
+
 ## 2026-09-30 (Performance area tree — numeric CAST on Postgres)
 
 - Fixed "Could not load cells for this area": `CAST('IBS' AS REAL)` now behaves like SQLite via `ncm_real` / `ncm_int`.

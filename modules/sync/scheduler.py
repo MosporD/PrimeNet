@@ -14,6 +14,7 @@ import gc
 import threading
 import sys
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from db.runtime import list_tables, open_db, store_available
@@ -1039,12 +1040,21 @@ def run_remote_pull_watcher_once():
             return
 
         logger.info('Starting remote pull watcher orchestrator (--once)...')
+        started = time.monotonic()
         proc = _run_child_script([sys.executable, script], cwd=root)
+        minutes = (time.monotonic() - started) / 60.0
         if proc.returncode != 0:
+            details = _subprocess_failure_detail(proc)
+            msg = f'Watcher cycle failed (code={proc.returncode}, {minutes:.1f} min)'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('pull_watcher', 'all', 'error', 0, msg)
             logger.error('Remote pull watcher exited with code %s', proc.returncode)
         else:
+            _log_sync('pull_watcher', 'all', 'ok', 0, f'Watcher cycle completed ({minutes:.1f} min)')
             logger.info('Remote pull watcher cycle completed.')
     except Exception as e:
+        _log_sync('pull_watcher', 'all', 'error', 0, f'Watcher cycle crashed: {e}')
         logger.exception('Remote pull watcher failed: %s', e)
     finally:
         _pipeline_cycle_lock.release()
