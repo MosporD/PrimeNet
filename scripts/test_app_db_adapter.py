@@ -61,6 +61,25 @@ class AppSqlTests(unittest.TestCase):
         self.assertIn("LIKE '%%sector%%'", out)
         self.assertTrue(out.endswith('id = %s'))
 
+    def test_numeric_casts_rewritten(self):
+        out = adapt_sqlite_app_sql('SELECT CAST(azimuth AS REAL) AS az, CAST(pci AS INTEGER) AS pci FROM c')
+        self.assertIn('public.ncm_real((azimuth)::text) AS az', out)
+        self.assertIn('public.ncm_int((pci)::text) AS pci', out)
+        self.assertNotIn('CAST', out)
+
+    def test_nested_and_text_casts(self):
+        sql = (
+            "SELECT CAST(COALESCE(NULLIF(TRIM(bcch), ''), NULLIF(TRIM(bcc), '')) AS INTEGER), "
+            "CAST(v.site_id AS TEXT), CAST(x AS DOUBLE PRECISION) FROM t "
+            "WHERE name = 'CAST(a AS REAL)'"
+        )
+        out = adapt_sqlite_app_sql(sql)
+        self.assertIn("public.ncm_int((COALESCE(NULLIF(TRIM(bcch), ''), NULLIF(TRIM(bcc), '')))::text)", out)
+        self.assertIn('CAST(v.site_id AS TEXT)', out)
+        self.assertIn('public.ncm_real((x)::text)', out)
+        self.assertIn("'CAST(a AS REAL)'", out)
+        self.assertEqual(adapt_sqlite_app_sql(out), out)
+
     def test_autoincrement(self):
         sql = 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
         out = adapt_sqlite_app_sql(sql)

@@ -8,6 +8,10 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **NEXT:** Push/deploy `%%` KPI escape + PG `ctid` dedupe/retention; rebuild **scheduler** on 97.141; re-run Daily (`failed_files=0`). Note: unset `NCM_WATCHER_PRIMARY` defaults to **1** (watcher owns hourly/daily cron).
 
+## 2026-09-30 (Performance area tree — numeric CAST on Postgres)
+
+- Fixed "Could not load cells for this area": `CAST('IBS' AS REAL)` now behaves like SQLite via `ncm_real` / `ncm_int`.
+
 ## 2026-09-30 (Neighbor sync — pandas on Postgres)
 
 - Neighbor loaders + PM retention no longer use pandas `to_sql` / `read_sql_query` directly on Postgres (shared `df_to_sql` / `read_sql_query`).

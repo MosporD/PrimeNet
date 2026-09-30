@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`postgres-runtime.md`](postgres-r
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-30 (SQLite-lenient numeric CAST)
+
+- Root cause: metadata text like azimuth `IBS` hit `CAST(x AS REAL)` → Postgres `invalid input syntax for type real` (SQLite returns 0). ~106 numeric CASTs in 10 files (Performance, Network Map, Adjacency GIS, Cell Heatmap, site catalog, neighbor agg).
+- Done: `rewrite_numeric_casts` in `db/app_sql.py` → `public.ncm_real` / `public.ncm_int` (leading numeric prefix, else 0; NULL stays NULL). Functions created once per process in `_connect_postgres`.
+- Verified: parity vs SQLite CAST 11/12 (only `'1e3'` AS INTEGER differs); `/api/performance/cells` South Jordan 13278 / West Amman 10441 on live PG; adapter tests 30 passed.
+- NEXT: Push + rebuild 97.141; smoke Performance tree, Network Map, Adjacency GIS.
+
 ## 2026-09-30 (Login 500 after `%` escape)
 
 - Root cause: `bf81e7e0` made `qmark_to_percent` non-idempotent. Callers that pre-adapt (`database_enhanced._exec`, `task_scheduler/routes.py`, `metadata_processor`) get adapted twice in `PgConn`, so `%s` → `%%s` → `the query has 0 placeholders but 1 parameters were passed` (login 500).

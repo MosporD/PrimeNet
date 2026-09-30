@@ -41,6 +41,90 @@ _SELECT_SQL_MASTER = re.compile(
 _COLLATE_NOCASE = re.compile(r'\s+COLLATE\s+NOCASE\b', re.IGNORECASE)
 
 
+_CAST_OPEN = re.compile(r'\bCAST\s*\(', re.IGNORECASE)
+_CAST_AS_TYPE = re.compile(r'^(.*)\s+AS\s+([A-Za-z]+(?:\s+PRECISION)?)\s*$', re.IGNORECASE | re.DOTALL)
+_REAL_TYPES = {'real', 'float', 'double', 'double precision', 'numeric'}
+_INT_TYPES = {'integer', 'int', 'bigint'}
+
+# SQLite CAST semantics: leading numeric prefix, else 0; NULL stays NULL.
+PG_SAFE_CAST_FUNCTIONS_SQL = (
+    "CREATE OR REPLACE FUNCTION public.ncm_real(v text) RETURNS double precision "
+    "LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $f$ SELECT CASE WHEN v IS NULL THEN NULL ELSE COALESCE("
+    "substring(v from '^\\s*([-+]?(?:[0-9]+\\.?[0-9]*|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?)')::double precision, 0) END $f$",
+    "CREATE OR REPLACE FUNCTION public.ncm_int(v text) RETURNS bigint "
+    "LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $f$ SELECT CASE WHEN v IS NULL THEN NULL ELSE COALESCE("
+    "trunc(substring(v from '^\\s*([-+]?(?:[0-9]+\\.?[0-9]*|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?)')::double precision)::bigint, 0) END $f$",
+)
+
+
+def _matching_paren(sql: str, open_idx: int) -> int:
+    """Index of the ``)`` closing the ``(`` at *open_idx*, skipping quoted text; -1 if none."""
+    depth = 0
+    quote = ''
+    i = open_idx
+    n = len(sql)
+    while i < n:
+        ch = sql[i]
+        if quote:
+            if ch == quote:
+                if i + 1 < n and sql[i + 1] == quote:
+                    i += 2
+                    continue
+                quote = ''
+        elif ch in ("'", '"'):
+            quote = ch
+        elif ch == '(':
+            depth += 1
+        elif ch == ')':
+            depth -= 1
+            if depth == 0:
+                return i
+        i += 1
+    return -1
+
+
+def rewrite_numeric_casts(sql: str) -> str:
+    """``CAST(x AS REAL|INTEGER)`` → ``public.ncm_real/ncm_int(x::text)`` (SQLite-lenient)."""
+    if not _CAST_OPEN.search(sql):
+        return sql
+    out: list[str] = []
+    quote = ''
+    i = 0
+    n = len(sql)
+    while i < n:
+        ch = sql[i]
+        if quote:
+            out.append(ch)
+            if ch == quote:
+                quote = ''
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            out.append(ch)
+            i += 1
+            continue
+        m = _CAST_OPEN.match(sql, i) if ch in 'cC' else None
+        if m and (i == 0 or not (sql[i - 1].isalnum() or sql[i - 1] == '_')):
+            open_idx = m.end() - 1
+            close_idx = _matching_paren(sql, open_idx)
+            if close_idx > 0:
+                inner = rewrite_numeric_casts(sql[open_idx + 1:close_idx])
+                typed = _CAST_AS_TYPE.match(inner)
+                kind = ' '.join(typed.group(2).lower().split()) if typed else ''
+                if kind in _REAL_TYPES:
+                    out.append(f'public.ncm_real(({typed.group(1).strip()})::text)')
+                elif kind in _INT_TYPES:
+                    out.append(f'public.ncm_int(({typed.group(1).strip()})::text)')
+                else:
+                    out.append(sql[i:open_idx + 1] + inner + ')')
+                i = close_idx + 1
+                continue
+        out.append(ch)
+        i += 1
+    return ''.join(out)
+
+
 def qmark_to_percent(sql: str) -> str:
     """Replace ``?`` placeholders with ``%s``, escaping literal ``%`` for psycopg.
 
@@ -181,6 +265,7 @@ def adapt_sqlite_app_sql(sql: str) -> str:
     if pragma is not None:
         return qmark_to_percent(pragma)
     sql = rewrite_sqlite_master(sql)
+    sql = rewrite_numeric_casts(sql)
     sql = rewrite_insert_or(sql)
     sql = _ON_CONFLICT_REPLACE.sub(r'UNIQUE (\1)', sql)
     sql = _ON_CONFLICT_REPLACE_BARE.sub('', sql)

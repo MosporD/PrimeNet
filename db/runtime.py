@@ -515,7 +515,33 @@ def _connect_postgres(schema: str) -> PgConn:
     raw.execute(f'CREATE SCHEMA IF NOT EXISTS {ident}')
     raw.execute(f'SET search_path TO {ident}, public')
     raw.commit()
+    _ensure_pg_safe_cast_functions(raw)
     return PgConn(raw, schema=schema)
+
+
+_PG_SAFE_CASTS_READY = False
+
+
+def _ensure_pg_safe_cast_functions(raw) -> None:
+    """Create ``public.ncm_real`` / ``ncm_int`` used by the numeric CAST rewrite (once per process)."""
+    global _PG_SAFE_CASTS_READY
+    if _PG_SAFE_CASTS_READY:
+        return
+    from db.app_sql import PG_SAFE_CAST_FUNCTIONS_SQL
+
+    try:
+        row = raw.execute(
+            "SELECT to_regprocedure('public.ncm_real(text)') IS NOT NULL AS r, "
+            "to_regprocedure('public.ncm_int(text)') IS NOT NULL AS i"
+        ).fetchone()
+        if not (row['r'] and row['i']):
+            for stmt in PG_SAFE_CAST_FUNCTIONS_SQL:
+                raw.execute(stmt)
+        raw.commit()
+        _PG_SAFE_CASTS_READY = True
+    except Exception as exc:
+        raw.rollback()
+        print(f'[db] could not create ncm_real/ncm_int cast helpers: {exc}', file=sys.stderr)
 
 
 def store_available(path: str | None) -> bool:
