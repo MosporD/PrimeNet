@@ -6,6 +6,14 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
+## 2026-09-30 (Neighbor sync on Postgres)
+
+- Root cause: `load_nokia_neighbor_raw_to_db.py` / `load_huawei_neighbor_wide_to_db.py` called pandas `DataFrame.to_sql` on `PgConn`; pandas falls back to SQLite mode and probes `sqlite_master ... type IN ('table','view')` → `pandas.errors.DatabaseError` on the first table.
+- Done: shared `db.runtime.df_to_sql` (COPY on Postgres; all-empty columns → TEXT, integral floats → int so chunked 4G appends fit); 33 call sites → `.pipe(df_to_sql, ...)`.
+- Done: `db.runtime.read_sql_query` for `pm_retention` + loader max-timestamp (pandas fallback returned column names as values; `PgCursor.fetchmany` was missing).
+- Verified: live PG probe (replace + drifting append + `(%)` column + empty table; chunked/non-chunked reads). No local neighbor raw to run the full loader.
+- NEXT: Push + rebuild 97.141; trigger Neighbor sync; check `[neighbor-raw]` / `[huawei-neighbor-wide]` row counts.
+
 ## 2026-09-29 (Postgres-only Daily load)
 
 - How it works on PG: orchestrators call `pipeline/load/daily/load_all.py` → `scripts/pipeline/load_raw_csv_to_databases.py` with `--scope daily`. Stores open via `open_db` into `pm_*` / `groups_*` / `metadata` schemas. Catalog checks use `table_exists` / `list_tables` (adapter rewrites legacy `sqlite_master` SQL). Child Python runs with `-u` / `PYTHONUNBUFFERED=1` so per-file `[label] failed …` lines reach Docker logs.

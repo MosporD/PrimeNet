@@ -30,7 +30,7 @@ import pandas as pd
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 from sync_config import NEIGHBOR_KPI_DB, NOKIA_NEIGHBOR_TECH_TABLES
-from db.runtime import open_db
+from db.runtime import df_to_sql, open_db
 from pipeline.paths import raw_path
 
 from modules.network_map.neighbor_raw_linking import (  # noqa: E402
@@ -189,25 +189,25 @@ def _drop_nokia_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLo
 def _write_empty_nokia_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad) -> None:
     """Create zero-row neighbor tables after a pull with no export files."""
     if load.slim:
-        pd.DataFrame(columns=_empty_2g_slim_columns()).to_sql(
+        pd.DataFrame(columns=_empty_2g_slim_columns()).pipe(df_to_sql, 
             load.tech_tables["2G"], conn, if_exists="replace", index=False, chunksize=800
         )
-        pd.DataFrame(columns=_empty_3g_slim_columns()).to_sql(
+        pd.DataFrame(columns=_empty_3g_slim_columns()).pipe(df_to_sql, 
             load.tech_tables["3G"], conn, if_exists="replace", index=False, chunksize=800
         )
         empty_4g = pd.DataFrame(columns=_empty_4g_slim_columns())
-        empty_4g.to_sql(load.intra_4g, conn, if_exists="replace", index=False, chunksize=800)
-        empty_4g.to_sql(load.inter_4g, conn, if_exists="replace", index=False, chunksize=800)
+        empty_4g.pipe(df_to_sql, load.intra_4g, conn, if_exists="replace", index=False, chunksize=800)
+        empty_4g.pipe(df_to_sql, load.inter_4g, conn, if_exists="replace", index=False, chunksize=800)
         return
 
     for table in load.tech_tables.values():
-        pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+        pd.DataFrame(columns=["_no_export_rows"]).pipe(df_to_sql, 
             table, conn, if_exists="replace", index=False, chunksize=800
         )
     empty_4g = pd.DataFrame(columns=_empty_4g_slim_columns())
-    empty_4g.to_sql(load.intra_4g, conn, if_exists="replace", index=False, chunksize=800)
-    empty_4g.to_sql(load.inter_4g, conn, if_exists="replace", index=False, chunksize=800)
-    pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+    empty_4g.pipe(df_to_sql, load.intra_4g, conn, if_exists="replace", index=False, chunksize=800)
+    empty_4g.pipe(df_to_sql, load.inter_4g, conn, if_exists="replace", index=False, chunksize=800)
+    pd.DataFrame(columns=["_no_export_rows"]).pipe(df_to_sql, 
         load.wide_4g_table, conn, if_exists="replace", index=False, chunksize=800
     )
 
@@ -411,7 +411,7 @@ def _write_merged_wide_only(conn: sqlite3.Connection, merged: pd.DataFrame, tabl
         keep = list(merged.columns[:MAX_SQLITE_COLUMNS])
         merged = merged[keep]
         print(f"[neighbor-raw] {tech}: truncated to {MAX_SQLITE_COLUMNS} columns")
-    merged.to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+    merged.pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
     n = len(merged)
     print(f"[neighbor-raw] {tech} -> {table}: {n} rows, {merged.shape[1]} columns (wide raw)")
     return n
@@ -426,7 +426,7 @@ def _write_4g_wide_chunked(
     """Stream 4G CSV chunks into nokia_neighbor_4g without holding the full file in RAM."""
     table = load.wide_4g_table
     if not tabular_names:
-        pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+        pd.DataFrame(columns=["_no_export_rows"]).pipe(df_to_sql, 
             table, conn, if_exists="replace", index=False, chunksize=800
         )
         print(f"[neighbor-raw] 4G -> {table}: 0 rows (wide raw)")
@@ -453,13 +453,13 @@ def _write_4g_wide_chunked(
                 df = df[list(df.columns[:MAX_SQLITE_COLUMNS])]
             df.insert(0, "_source_file", name)
             df.insert(1, "_ingested_at", stamp)
-            df.to_sql(table, conn, if_exists="replace" if first else "append", index=False, chunksize=800)
+            df.pipe(df_to_sql, table, conn, if_exists="replace" if first else "append", index=False, chunksize=800)
             first = False
             n_wide += len(df)
             ncols = int(df.shape[1])
             print(f"[neighbor-raw] 4G chunk {name}: +{len(df)} (total {n_wide})")
     if first:
-        pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+        pd.DataFrame(columns=["_no_export_rows"]).pipe(df_to_sql, 
             table, conn, if_exists="replace", index=False, chunksize=800
         )
         print(f"[neighbor-raw] 4G -> {table}: 0 rows (wide raw)")
@@ -479,8 +479,8 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
     if not os.path.isdir(folder):
         print(f"[neighbor-raw] skip 4G: missing folder {folder}")
         empty = pd.DataFrame(columns=_empty_4g_slim_columns())
-        empty.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
-        empty.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, intra_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, inter_table, conn, if_exists="replace", index=False, chunksize=800)
         return 0
 
     tabular_names = [
@@ -492,8 +492,8 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
     if not load.slim:
         n_wide = _write_4g_wide_chunked(conn, load, folder, tabular_names)
         empty = pd.DataFrame(columns=_empty_4g_slim_columns())
-        empty.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
-        empty.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, intra_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, inter_table, conn, if_exists="replace", index=False, chunksize=800)
         print(f"[neighbor-raw] 4G -> {intra_table}, {inter_table}: 0 rows (wide-raw mode; use {load.wide_4g_table})")
         return n_wide
 
@@ -528,8 +528,8 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
         else:
             print(f"[neighbor-raw] 4G: no tabular files in {folder}")
         empty = pd.DataFrame(columns=_empty_4g_slim_columns())
-        empty.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
-        empty.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, intra_table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, inter_table, conn, if_exists="replace", index=False, chunksize=800)
         return 0
 
     merged = pd.concat(frames, ignore_index=True, sort=False)
@@ -537,7 +537,7 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
     total = 0
     intra = _build_4g_intra_slim_dataframe(merged)
     if intra is not None and not intra.empty:
-        intra.to_sql(intra_table, conn, if_exists="replace", index=False, chunksize=800)
+        intra.pipe(df_to_sql, intra_table, conn, if_exists="replace", index=False, chunksize=800)
         n = len(intra)
         total += n
         print(
@@ -545,14 +545,14 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
             "(slim: source_lncel_name, eci_id, ho_attempts, ho_success_rate intra SR)"
         )
     else:
-        pd.DataFrame(columns=_empty_4g_slim_columns()).to_sql(
+        pd.DataFrame(columns=_empty_4g_slim_columns()).pipe(df_to_sql, 
             intra_table, conn, if_exists="replace", index=False, chunksize=800
         )
         print(f"[neighbor-raw] 4G -> {intra_table}: 0 rows (slim schema; no mappable intra rows)")
 
     inter = _build_4g_inter_slim_dataframe(merged)
     if inter is not None and not inter.empty:
-        inter.to_sql(inter_table, conn, if_exists="replace", index=False, chunksize=800)
+        inter.pipe(df_to_sql, inter_table, conn, if_exists="replace", index=False, chunksize=800)
         n = len(inter)
         total += n
         print(
@@ -560,7 +560,7 @@ def _load_4g_neighbor_tables(conn: sqlite3.Connection, load: NeighborVendorLoad)
             "(slim: source_lncel_name, eci_id, ho_attempts, ho_success_rate inter SR)"
         )
     else:
-        pd.DataFrame(columns=_empty_4g_slim_columns()).to_sql(
+        pd.DataFrame(columns=_empty_4g_slim_columns()).pipe(df_to_sql, 
             inter_table, conn, if_exists="replace", index=False, chunksize=800
         )
         print(f"[neighbor-raw] 4G -> {inter_table}: 0 rows (slim schema; no mappable inter rows)")
@@ -618,7 +618,7 @@ def _load_tech(conn: sqlite3.Connection, tech: str, table: str, load: NeighborVe
             if tech == "2G" and table.endswith("_neighbor_2g"):
                 pd.DataFrame(
                     columns=["source_cell_id", "target_cell_id", "ho_attempts", "_source_file", "_ingested_at"]
-                ).to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+                ).pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
             elif tech == "3G" and table.endswith("_neighbor_3g"):
                 pd.DataFrame(
                     columns=[
@@ -629,11 +629,11 @@ def _load_tech(conn: sqlite3.Connection, tech: str, table: str, load: NeighborVe
                         "_source_file",
                         "_ingested_at",
                     ]
-                ).to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+                ).pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
             else:
                 conn.execute(f'DROP TABLE IF EXISTS "{table}"')
         else:
-            pd.DataFrame(columns=["_no_export_rows"]).to_sql(
+            pd.DataFrame(columns=["_no_export_rows"]).pipe(df_to_sql, 
                 table, conn, if_exists="replace", index=False, chunksize=800
             )
             print(f"[neighbor-raw] {tech} -> {table}: 0 rows (wide raw)")
@@ -646,21 +646,21 @@ def _load_tech(conn: sqlite3.Connection, tech: str, table: str, load: NeighborVe
     if tech == "2G" and table.endswith("_neighbor_2g"):
         slim = _build_2g_slim_dataframe(merged)
         if slim is not None and not slim.empty:
-            slim.to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+            slim.pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
             n = len(slim)
             print(f"[neighbor-raw] {tech} -> {table}: {n} rows (slim: source_cell_id, target_cell_id, ho_attempts)")
             return n
         empty = pd.DataFrame(
             columns=["source_cell_id", "target_cell_id", "ho_attempts", "_source_file", "_ingested_at"]
         )
-        empty.to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
         print(f"[neighbor-raw] {tech} -> {table}: 0 rows (slim schema; wide merge had no mappable rows)")
         return 0
 
     if tech == "3G" and table.endswith("_neighbor_3g"):
         slim = _build_3g_slim_dataframe(merged)
         if slim is not None and not slim.empty:
-            slim.to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+            slim.pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
             n = len(slim)
             print(
                 f"[neighbor-raw] {tech} -> {table}: {n} rows "
@@ -677,7 +677,7 @@ def _load_tech(conn: sqlite3.Connection, tech: str, table: str, load: NeighborVe
                 "_ingested_at",
             ]
         )
-        empty.to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+        empty.pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
         print(f"[neighbor-raw] {tech} -> {table}: 0 rows (slim schema; wide merge had no mappable rows)")
         return 0
 
@@ -692,7 +692,7 @@ def _load_tech(conn: sqlite3.Connection, tech: str, table: str, load: NeighborVe
         ho = pd.to_numeric(merged[att_wide], errors="coerce")
         merged = merged.loc[ho.fillna(0.0) > 0].reset_index(drop=True)
 
-    merged.to_sql(table, conn, if_exists="replace", index=False, chunksize=800)
+    merged.pipe(df_to_sql, table, conn, if_exists="replace", index=False, chunksize=800)
     n = len(merged)
     print(f"[neighbor-raw] {tech} -> {table}: {n} rows, {merged.shape[1]} columns")
     return n

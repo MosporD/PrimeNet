@@ -203,6 +203,9 @@ class PgCursor:
     def fetchall(self):
         return self._raw.fetchall()
 
+    def fetchmany(self, size=None):
+        return self._raw.fetchmany(size) if size else self._raw.fetchmany()
+
     @property
     def lastrowid(self):
         return getattr(self._raw, 'lastrowid', None)
@@ -246,6 +249,137 @@ def sqlite_ident(name: str) -> str:
 def sqlite_text_lit(value: object) -> str:
     """Quote a SQL text literal (single-quoted, escaped)."""
     return "'" + str(value).replace("'", "''") + "'"
+
+
+def _pg_copy_value(v):
+    if v is None:
+        return None
+    if isinstance(v, float) and v != v:
+        return None
+    try:
+        import pandas as pd
+
+        if isinstance(v, pd.Timestamp):
+            return None if pd.isna(v) else v.to_pydatetime()
+        if v is pd.NaT or v is pd.NA:
+            return None
+    except ImportError:
+        pass
+    if not isinstance(v, (str, bytes)) and hasattr(v, 'item'):
+        v = v.item()
+        if isinstance(v, float) and v != v:
+            return None
+    # int columns with blanks arrive as floats; "2" loads into BIGINT and DOUBLE alike.
+    if isinstance(v, float) and v.is_integer():
+        return int(v)
+    return v
+
+
+def df_to_sql(df, table: str, conn, *, if_exists: str = 'fail', index: bool = False, chunksize=None) -> None:
+    """``DataFrame.to_sql`` that works on Postgres ``PgConn`` (pandas probes ``sqlite_master``).
+
+    SQLite connections go straight to pandas. On Postgres rows are streamed with COPY;
+    ``chunksize`` is accepted for call-site compatibility and ignored.
+    """
+    work = df if index is False else df.reset_index()
+    if not _is_pg_conn(conn):
+        work.to_sql(table, conn, if_exists=if_exists, index=False, chunksize=chunksize)
+        return
+
+    import pandas as pd
+
+    cols = [str(c) for c in work.columns]
+    seen: dict[bytes, str] = {}
+    for c in cols:
+        key = c.encode('utf-8')[:63].lower()
+        if key in seen:
+            raise ValueError(
+                f'Columns {seen[key]!r} and {c!r} collide in table {table!r} after '
+                'Postgres 63-byte identifier truncation'
+            )
+        seen[key] = c
+
+    def _sql_type(series) -> str:
+        # All-empty in this frame (often the first append chunk): keep TEXT so later chunks fit.
+        if len(series) and series.isna().all():
+            return 'TEXT'
+        if pd.api.types.is_bool_dtype(series):
+            return 'BOOLEAN'
+        if pd.api.types.is_integer_dtype(series):
+            return 'BIGINT'
+        if pd.api.types.is_float_dtype(series):
+            return 'DOUBLE PRECISION'
+        if pd.api.types.is_datetime64_any_dtype(series):
+            return 'TIMESTAMP'
+        return 'TEXT'
+
+    qtable = sqlite_ident(table)
+    col_defs = ', '.join(f'{sqlite_ident(c)} {_sql_type(work[c])}' for c in cols)
+    if if_exists == 'replace':
+        execute_query(conn, f'DROP TABLE IF EXISTS {qtable} CASCADE')
+        execute_query(conn, f'CREATE TABLE {qtable} ({col_defs})')
+    elif if_exists == 'append':
+        if not table_exists(conn, table):
+            execute_query(conn, f'CREATE TABLE {qtable} ({col_defs})')
+    elif if_exists == 'fail':
+        if table_exists(conn, table):
+            raise ValueError(f'Table {table} already exists')
+        execute_query(conn, f'CREATE TABLE {qtable} ({col_defs})')
+    else:
+        raise ValueError(f'Unsupported if_exists={if_exists!r}')
+
+    if work.empty or not cols:
+        return
+
+    raw = conn._raw if isinstance(conn, PgConn) else conn
+    col_sql = ', '.join(sqlite_ident(c) for c in cols)
+    try:
+        with raw.cursor() as cur:
+            with cur.copy(f'COPY {qtable} ({col_sql}) FROM STDIN') as copy:
+                for row in work.itertuples(index=False, name=None):
+                    copy.write_row([_pg_copy_value(v) for v in row])
+    except Exception as exc:
+        _translate_pg_error(exc)
+
+
+def read_sql_query(sql: str, conn, *, params=None, chunksize=None):
+    """``pandas.read_sql_query`` that works on Postgres ``PgConn``.
+
+    pandas' DBAPI fallback turns rows into tuples by iterating them; ``PgRow`` is a
+    dict, so that yields column names instead of values.
+    """
+    import pandas as pd
+
+    if not _is_pg_conn(conn):
+        return pd.read_sql_query(sql, conn, params=params, chunksize=chunksize)
+
+    from psycopg.rows import tuple_row
+
+    raw = conn._raw if isinstance(conn, PgConn) else conn
+    cur = raw.cursor(row_factory=tuple_row)
+    try:
+        cur.execute(adapt_sqlite_app_sql(sql), _pg_params(params))
+    except Exception as exc:
+        cur.close()
+        _translate_pg_error(exc)
+    cols = [d.name for d in (cur.description or ())]
+    if chunksize is None:
+        try:
+            return pd.DataFrame.from_records(cur.fetchall(), columns=cols)
+        finally:
+            cur.close()
+
+    def _chunks():
+        try:
+            while True:
+                rows = cur.fetchmany(int(chunksize))
+                if not rows:
+                    break
+                yield pd.DataFrame.from_records(rows, columns=cols)
+        finally:
+            cur.close()
+
+    return _chunks()
 
 
 def execute_query(conn, sql: str, params=None):

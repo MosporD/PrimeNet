@@ -1,7 +1,8 @@
 """
-Delete PM/group rows older than N calendar days from SQLite KPI databases.
+Delete PM/group rows older than N calendar days from KPI databases.
 
 Uses the same timestamp column detection and vendor-specific parsing as the raw loader.
+Supports SQLite (rowid) and Postgres (ctid).
 """
 
 from __future__ import annotations
@@ -11,7 +12,7 @@ import sqlite3
 import pandas as pd
 
 from modules.sync.pm_processor import _pick_best_timestamp_column
-from db.runtime import list_tables, open_db, store_available
+from db.runtime import _is_pg_conn, list_tables, open_db, read_sql_query, sqlite_ident, store_available
 
 
 def _retention_parse_label(db_path: str, label: str) -> str:
@@ -64,6 +65,7 @@ def apply_retention(db_path: str, days: int, label: str) -> int:
     except sqlite3.Error:
         pass
     try:
+        pg = _is_pg_conn(conn)
         for table in list_tables(conn):
             if table in ("groups", "group_cells"):
                 continue
@@ -75,14 +77,17 @@ def apply_retention(db_path: str, days: int, label: str) -> int:
                     print(f"[{label}] retention {table}: no timestamp column — skipped")
                     continue
 
-                row_count = int(conn.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0] or 0)
+                qtable = sqlite_ident(table)
+                qts = sqlite_ident(ts_col)
+                row_count = int(conn.execute(f"SELECT COUNT(*) FROM {qtable}").fetchone()[0] or 0)
                 if row_count == 0:
                     continue
 
-                doomed: list[int] = []
+                id_sql = "ctid::text AS _rid" if pg else "rowid AS _rid"
+                doomed: list = []
                 parsed_total = 0
-                for chunk in pd.read_sql_query(
-                    f'SELECT rowid AS _rid, "{ts_col}" AS _ts FROM "{table}"',
+                for chunk in read_sql_query(
+                    f"SELECT {id_sql}, {qts} AS _ts FROM {qtable}",
                     conn,
                     chunksize=50000,
                 ):
@@ -93,7 +98,10 @@ def apply_retention(db_path: str, days: int, label: str) -> int:
                     parsed_total += int(valid.sum())
                     mask = valid & (ts < cutoff)
                     if mask.any():
-                        doomed.extend(chunk.loc[mask, "_rid"].astype(int).tolist())
+                        if pg:
+                            doomed.extend(chunk.loc[mask, "_rid"].astype(str).tolist())
+                        else:
+                            doomed.extend(chunk.loc[mask, "_rid"].astype(int).tolist())
 
                 if not doomed:
                     print(f"[{label}] retention {table}: kept all rows (cutoff {cutoff.date()})")
@@ -117,7 +125,16 @@ def apply_retention(db_path: str, days: int, label: str) -> int:
                 for i in range(0, len(doomed), batch):
                     part = doomed[i : i + batch]
                     ph = ",".join("?" for _ in part)
-                    conn.execute(f'DELETE FROM "{table}" WHERE rowid IN ({ph})', part)
+                    if pg:
+                        conn.execute(
+                            f"DELETE FROM {qtable} WHERE ctid::text IN ({ph})",
+                            part,
+                        )
+                    else:
+                        conn.execute(
+                            f"DELETE FROM {qtable} WHERE rowid IN ({ph})",
+                            part,
+                        )
                 deleted_total += len(doomed)
                 print(
                     f"[{label}] retention {table}: deleted {len(doomed)} rows older than {cutoff.date()} "

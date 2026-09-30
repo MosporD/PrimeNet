@@ -37,6 +37,7 @@ from db.runtime import (
     execute_query,
     list_tables,
     open_db,
+    read_sql_query,
     sqlite_ident,
     table_exists,
 )
@@ -528,14 +529,27 @@ def _dedupe_table_on_cell_time(
     ts_col: str,
 ) -> int:
     """Keep one row per (cell, time); return number of rows removed."""
-    before = int(conn.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0])
-    conn.execute(
-        f'DELETE FROM "{table}" WHERE rowid NOT IN ('
-        f'  SELECT MIN(rowid) FROM "{table}"'
-        f'  GROUP BY "{cell_col}", "{ts_col}"'
-        f')'
-    )
-    after = int(conn.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0])
+    qtable = _sqlite_ident(table)
+    qcell = _sqlite_ident(cell_col)
+    qts = _sqlite_ident(ts_col)
+    before = int(conn.execute(f"SELECT COUNT(*) FROM {qtable}").fetchone()[0])
+    if _is_pg_conn(conn):
+        # Postgres has no rowid; use ctid + window to keep one row per key.
+        conn.execute(
+            f"DELETE FROM {qtable} a USING ("
+            f"  SELECT ctid AS _ctid, ROW_NUMBER() OVER ("
+            f"    PARTITION BY {qcell}, {qts} ORDER BY ctid"
+            f"  ) AS rn FROM {qtable}"
+            f") d WHERE a.ctid = d._ctid AND d.rn > 1"
+        )
+    else:
+        conn.execute(
+            f"DELETE FROM {qtable} WHERE rowid NOT IN ("
+            f"  SELECT MIN(rowid) FROM {qtable}"
+            f"  GROUP BY {qcell}, {qts}"
+            f")"
+        )
+    after = int(conn.execute(f"SELECT COUNT(*) FROM {qtable}").fetchone()[0])
     return max(0, before - after)
 
 
@@ -970,7 +984,7 @@ def _max_ts_in_column(
         return None
     best = pd.NaT
     try:
-        for chunk in pd.read_sql_query(
+        for chunk in read_sql_query(
             f'SELECT "{col}" AS v FROM "{table}"', conn, chunksize=65536
         ):
             ts = _parse_timestamp_series(chunk["v"], label, col)

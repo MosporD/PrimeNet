@@ -212,6 +212,23 @@ class PercentColumnTests(unittest.TestCase):
         )
 
 
+class PgCopyValueTests(unittest.TestCase):
+    def test_copy_value_normalisation(self):
+        import numpy as np
+        import pandas as pd
+        from db.runtime import _pg_copy_value
+
+        self.assertIsNone(_pg_copy_value(float('nan')))
+        self.assertIsNone(_pg_copy_value(np.float64('nan')))
+        self.assertIsNone(_pg_copy_value(pd.NaT))
+        self.assertIsNone(_pg_copy_value(None))
+        self.assertEqual(_pg_copy_value(np.int64(7)), 7)
+        self.assertIs(type(_pg_copy_value(np.int64(7))), int)
+        self.assertEqual(_pg_copy_value(2.0), 2)
+        self.assertEqual(_pg_copy_value(99.5), 99.5)
+        self.assertEqual(_pg_copy_value('CSSR(%)'), 'CSSR(%)')
+
+
 class DomainRoutingTests(unittest.TestCase):
     def setUp(self):
         _clear_pg_env()

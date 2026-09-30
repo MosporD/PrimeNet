@@ -30,7 +30,7 @@ import pandas as pd
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _HERE)
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB  # noqa: E402
-from db.runtime import open_db  # noqa: E402
+from db.runtime import df_to_sql, open_db  # noqa: E402
 from pipeline.paths import raw_path  # noqa: E402
 from modules.network_map.huawei_prs_tabular import read_huawei_prs_tabular  # noqa: E402
 
@@ -107,7 +107,7 @@ def _merge_tech(
     catalog_accum: dict[tuple[str, str], dict],
 ) -> int:
     if not os.path.isdir(folder):
-        _empty_export_frame().to_sql(table_name, conn, if_exists="replace", index=False, chunksize=500)
+        _empty_export_frame().pipe(df_to_sql, table_name, conn, if_exists="replace", index=False, chunksize=500)
         conn.execute(
             "INSERT OR REPLACE INTO huawei_neighbor_wide_manifest (tech, ingested_at, row_count, col_count, source_files_json) VALUES (?,?,?,?,?)",
             (tech, _utc_stamp(), 0, 0, "[]"),
@@ -155,7 +155,7 @@ def _merge_tech(
             "INSERT OR REPLACE INTO huawei_neighbor_wide_manifest (tech, ingested_at, row_count, col_count, source_files_json) VALUES (?,?,?,?,?)",
             (tech, _utc_stamp(), 0, 0, "[]"),
         )
-        _empty_export_frame().to_sql(table_name, conn, if_exists="replace", index=False, chunksize=500)
+        _empty_export_frame().pipe(df_to_sql, table_name, conn, if_exists="replace", index=False, chunksize=500)
         print(f"[huawei-neighbor-wide] {tech}: no tabular files in {folder}")
         return 0
 
@@ -165,7 +165,7 @@ def _merge_tech(
         merged = merged[keep]
         print(f"[huawei-neighbor-wide] {tech}: truncated to {_MAX_COLS} columns")
 
-    merged.to_sql(table_name, conn, if_exists="replace", index=False, chunksize=800)
+    merged.pipe(df_to_sql, table_name, conn, if_exists="replace", index=False, chunksize=800)
     n = len(merged)
     conn.execute(
         "INSERT OR REPLACE INTO huawei_neighbor_wide_manifest (tech, ingested_at, row_count, col_count, source_files_json) VALUES (?,?,?,?,?)",
