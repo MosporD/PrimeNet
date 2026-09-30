@@ -19,17 +19,17 @@ from __future__ import annotations
 import argparse
 import os
 import re
-import sqlite3
 import sys
 from datetime import datetime
 
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from db.runtime import open_db
 from sync_config import NEIGHBOR_KPI_DB
 
 
-def _ensure_legacy_neighbor_hourly_schema(conn: sqlite3.Connection) -> None:
+def _ensure_legacy_neighbor_hourly_schema(conn) -> None:
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS neighbor_hourly (
@@ -138,7 +138,7 @@ def _iter_input_files(root: str) -> list[str]:
     return sorted(out)
 
 
-def _neighbor_db_uses_slim_2g_export(conn: sqlite3.Connection) -> bool:
+def _neighbor_db_uses_slim_2g_export(conn) -> bool:
     row = conn.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='nokia_neighbor_2g'"
     ).fetchone()
@@ -155,11 +155,11 @@ def load_reports(vendor: str, technology: str, input_path: str) -> tuple[int, in
     if not files:
         raise FileNotFoundError(f"No supported files found under: {input_path}")
 
-    conn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=30)
+    conn = open_db(NEIGHBOR_KPI_DB)
     try:
         if _neighbor_db_uses_slim_2g_export(conn):
             raise RuntimeError(
-                "neighbor_kpis.db already uses slim nokia_neighbor_2g (SFTP pipeline). "
+                "neighbor store already uses slim nokia_neighbor_2g (SFTP pipeline). "
                 "Refusing to create neighbor_hourly. Use scripts/load_nokia_neighbor_raw_to_db.py instead."
             )
         _ensure_legacy_neighbor_hourly_schema(conn)

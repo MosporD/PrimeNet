@@ -11,7 +11,6 @@ Column maps below are kept as reference / used by import_local_files.py.
 """
 
 import os
-import sqlite3
 
 # Absolute path to the project root (directory containing this file).
 # All other paths are anchored here so the app works regardless of CWD.
@@ -127,114 +126,8 @@ PM_PLUS_DB = os.path.join(DATABASES_ROOT, 'pm_plus', 'pm_plus.db')
 MARKETING_DB = os.path.join(DATABASES_ROOT, 'portals', 'marketing', 'marketing.db')
 
 
-def _migrate_legacy_db_names():
-    """One-time migration from legacy root DB names to databases/* subfolders."""
-    def _sqlite_copy_db(src: str, dst: str) -> bool:
-        try:
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
-            src_conn = sqlite3.connect(src, timeout=10)
-            try:
-                dst_conn = sqlite3.connect(dst, timeout=10)
-                try:
-                    src_conn.backup(dst_conn)
-                    dst_conn.commit()
-                finally:
-                    dst_conn.close()
-            finally:
-                src_conn.close()
-            return True
-        except Exception:
-            return False
-
-    def _db_has_nonzero_rows(path: str) -> bool:
-        try:
-            conn = sqlite3.connect(path, timeout=5)
-            tables = conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-            for (table_name,) in tables:
-                try:
-                    row = conn.execute(f'SELECT COUNT(*) FROM "{table_name}"').fetchone()
-                    if row and int(row[0] or 0) > 0:
-                        conn.close()
-                        return True
-                except Exception:
-                    continue
-            conn.close()
-        except Exception:
-            return False
-        return False
-
-    def _db_total_rows(path: str) -> int:
-        try:
-            conn = sqlite3.connect(path, timeout=5)
-            total = 0
-            tables = conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-            for (table_name,) in tables:
-                try:
-                    row = conn.execute(f'SELECT COUNT(*) FROM "{table_name}"').fetchone()
-                    total += int((row[0] if row else 0) or 0)
-                except Exception:
-                    continue
-            conn.close()
-            return total
-        except Exception:
-            return 0
-
-    legacy_pairs = (
-        # PM cells DBs
-        (os.path.join(PROJECT_ROOT, 'nokia_pm.db'), NOKIA_PM_DB),
-        (os.path.join(PROJECT_ROOT, 'nokia_pm_cells.db'), NOKIA_PM_DB),
-        (os.path.join(PROJECT_ROOT, 'huawei_pm.db'), HUAWEI_PM_DB),
-        (os.path.join(PROJECT_ROOT, 'huawei_pm_cells.db'), HUAWEI_PM_DB),
-        # Metadata / app DBs
-        (os.path.join(PROJECT_ROOT, 'metadata.db'), METADATA_DB),
-        (os.path.join(PROJECT_ROOT, 'ncm_users.db'), NCMUSERS_DB),
-        (os.path.join(PROJECT_ROOT, 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
-        (os.path.join(DATABASES_ROOT, 'admin', 'ncm_users.db'), NCMUSERS_DB),
-        (os.path.join(CELLS_DB_DIR, 'metadata.db'), METADATA_DB),
-        (os.path.join(CELLS_DB_DIR, 'ncm_users.db'), NCMUSERS_DB),
-        (os.path.join(CELLS_DB_DIR, 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
-        (os.path.join(DATABASES_ROOT, 'neighbor_kpis', 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
-        # Group DBs
-        (os.path.join(PROJECT_ROOT, 'nokia_cell_groups.db'), NOKIA_GROUPS_DB),
-        (os.path.join(PROJECT_ROOT, 'huawei_cell_groups.db'), HUAWEI_GROUPS_DB),
-    )
-    for old_path, new_path in legacy_pairs:
-        if not os.path.isfile(old_path):
-            continue
-        old_has_data = _db_has_nonzero_rows(old_path)
-        if os.path.isfile(new_path):
-            # Keep non-empty target DBs; otherwise promote legacy DB if it has data.
-            if _db_has_nonzero_rows(new_path):
-                old_rows = _db_total_rows(old_path)
-                new_rows = _db_total_rows(new_path)
-                # If canonical target only has seed rows but legacy has real data, promote legacy content.
-                if not (old_rows > new_rows and new_rows <= 20):
-                    continue
-            if not old_has_data:
-                continue
-        try:
-            os.replace(old_path, new_path)
-        except OSError:
-            # If file is in use or destination exists, fallback to SQLite backup copy.
-            if not old_has_data:
-                continue
-            try:
-                if os.path.isfile(new_path) and not _db_has_nonzero_rows(new_path):
-                    os.remove(new_path)
-            except OSError:
-                pass
-            _sqlite_copy_db(old_path, new_path)
-
-
-_migrate_legacy_db_names()
-
-# ── Database backend ─────────────────────────────────────────────────────────
-# App DB (ncm_users): SQLite unless NCM_APP_DATABASE_URL is a postgresql:// URL.
-# Metadata / PM / neighbors stay SQLite.
+# Path constants above are logical store keys mapped to Postgres schemas via
+# db.pg_domains.schema_for_sqlite_path — not live SQLite files.
 
 
 def use_postgresql() -> bool:

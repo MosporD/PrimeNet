@@ -1,5 +1,5 @@
 """
-Import Femto KPI and counter catalogs into the Femto PM database.
+Import Femto KPI and counter catalogs into the Femto PM store (Postgres).
 
 This loads:
 - FEMTO_COMPUTED_KPIS: user-defined computed KPI definitions and formulas
@@ -10,30 +10,22 @@ from __future__ import annotations
 
 import csv
 import os
-import sqlite3
 import sys
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sync_config import DATABASES_ROOT
+from db.runtime import open_db
+from sync_config import FEMTO_PM_DB
 
 
-FEMTO_PM_DB = Path(DATABASES_ROOT) / "cells" / "femto_pm_cells.db"
 KPI_CSV = Path.home() / "Downloads" / "kpis.csv"
 COUNTER_CSV = Path.home() / "Downloads" / "counters.csv"
 COMPUTED_TABLE = "FEMTO_COMPUTED_KPIS"
 COUNTER_TABLE = "FEMTO_COUNTER_CATALOG"
 
 
-def _conn() -> sqlite3.Connection:
-    conn = sqlite3.connect(FEMTO_PM_DB, timeout=30)
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=NORMAL")
-    return conn
-
-
-def _ensure_tables(conn: sqlite3.Connection) -> None:
+def _ensure_tables(conn) -> None:
     conn.execute(
         f"""
         CREATE TABLE IF NOT EXISTS "{COMPUTED_TABLE}" (
@@ -118,30 +110,34 @@ def main() -> int:
     kpis = _read_kpis()
     counters = _read_counters()
 
-    FEMTO_PM_DB.parent.mkdir(parents=True, exist_ok=True)
-    conn = _conn()
-    _ensure_tables(conn)
-    conn.execute(f'DELETE FROM "{COMPUTED_TABLE}"')
-    conn.execute(f'DELETE FROM "{COUNTER_TABLE}"')
+    conn = open_db(FEMTO_PM_DB)
+    try:
+        _ensure_tables(conn)
+        conn.execute(f'DELETE FROM "{COMPUTED_TABLE}"')
+        conn.execute(f'DELETE FROM "{COUNTER_TABLE}"')
 
-    conn.executemany(
-        f"""
-        INSERT INTO "{COMPUTED_TABLE}" (code, kpi_name, category_l1, formula, unit, description, updated_at)
-        VALUES (:code, :kpi_name, :category_l1, :formula, :unit, :description, CURRENT_TIMESTAMP)
-        """,
-        kpis,
-    )
-    conn.executemany(
-        f"""
-        INSERT INTO "{COUNTER_TABLE}" (counter_name, l1, l2, l3, updated_at)
-        VALUES (:counter_name, :l1, :l2, :l3, CURRENT_TIMESTAMP)
-        """,
-        counters,
-    )
-    conn.commit()
-    conn.close()
+        conn.executemany(
+            f"""
+            INSERT INTO "{COMPUTED_TABLE}" (code, kpi_name, category_l1, formula, unit, description, updated_at)
+            VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)
+            """,
+            [
+                (r["code"], r["kpi_name"], r["category_l1"], r["formula"], r["unit"], r["description"])
+                for r in kpis
+            ],
+        )
+        conn.executemany(
+            f"""
+            INSERT INTO "{COUNTER_TABLE}" (counter_name, l1, l2, l3, updated_at)
+            VALUES (?,?,?,?,CURRENT_TIMESTAMP)
+            """,
+            [(r["counter_name"], r["l1"], r["l2"], r["l3"]) for r in counters],
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
-    print(f"[done] imported computed_kpis={len(kpis)} counters={len(counters)} db={FEMTO_PM_DB}")
+    print(f"[done] imported computed_kpis={len(kpis)} counters={len(counters)} store={FEMTO_PM_DB}")
     return 0
 
 

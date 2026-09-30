@@ -1,13 +1,13 @@
-"""Print raw neighbor files vs row counts (Nokia: neighbor_kpis.db, Huawei: huawei_neighbor_raw.db)."""
+"""Print raw neighbor files vs row counts in neighbor Postgres stores."""
 
 from __future__ import annotations
 
 import os
-import sqlite3
 import sys
 
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _HERE)
+from db.runtime import list_tables, open_db, store_available  # noqa: E402
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB, PROJECT_ROOT  # noqa: E402
 
 _TAB = (".csv", ".txt", ".tsv", ".xlsx", ".xls", ".xlsm")
@@ -32,16 +32,15 @@ def _list_raw() -> dict[str, list[str]]:
 def _summarize(db_path: str, title: str) -> None:
     print("===", title, "===")
     print("path:", db_path)
-    if not os.path.isfile(db_path):
-        print("  (missing)")
+    if not store_available(db_path):
+        print("  (store unavailable)")
         print()
         return
-    conn = sqlite3.connect(db_path)
+    conn = open_db(db_path)
     try:
-        for (t,) in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY 1"
-        ):
-            n = conn.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0]
+        for t in list_tables(conn):
+            row = conn.execute(f'SELECT COUNT(*) AS n FROM "{t}"').fetchone()
+            n = row["n"] if isinstance(row, dict) else row[0]
             print(f"  {t}: {n} rows")
     finally:
         conn.close()
@@ -60,8 +59,8 @@ def main() -> int:
     if not any(raw.values()):
         print("  (none)")
     print()
-    _summarize(NEIGHBOR_KPI_DB, "neighbor_kpis.db")
-    _summarize(HUAWEI_NEIGHBOR_RAW_DB, "huawei_neighbor_raw.db")
+    _summarize(NEIGHBOR_KPI_DB, "nokia neighbor store")
+    _summarize(HUAWEI_NEIGHBOR_RAW_DB, "huawei neighbor store")
     return 0
 
 

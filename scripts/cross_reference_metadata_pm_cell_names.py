@@ -24,13 +24,13 @@ from __future__ import annotations
 import argparse
 import csv
 import os
-import sqlite3
 import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from db.runtime import open_db, store_available
 from sync_config import (  # noqa: E402
     HUAWEI_PM_DB,
     HUAWEI_PM_DAILY_DB,
@@ -73,22 +73,23 @@ def _metadata_cells(vendor: str | None, technology: str | None) -> list[dict]:
             where.append("v.technology = ?")
             params.append(technology)
 
-    conn = sqlite3.connect(METADATA_DB, timeout=30)
-    conn.row_factory = sqlite3.Row
-    rows = conn.execute(
-        f"""
-        SELECT
-            v.cell_name,
-            v.technology,
-            v.vendor,
-            CAST(v.site_id AS TEXT) AS site_id
-        FROM ({union}) v
-        WHERE {' AND '.join(where)}
-        ORDER BY v.vendor, v.technology, v.site_id, v.cell_name
-        """,
-        params,
-    ).fetchall()
-    conn.close()
+    conn = open_db(METADATA_DB)
+    try:
+        rows = conn.execute(
+            f"""
+            SELECT
+                v.cell_name,
+                v.technology,
+                v.vendor,
+                CAST(v.site_id AS TEXT) AS site_id
+            FROM ({union}) v
+            WHERE {' AND '.join(where)}
+            ORDER BY v.vendor, v.technology, v.site_id, v.cell_name
+            """,
+            params,
+        ).fetchall()
+    finally:
+        conn.close()
     return [dict(r) for r in rows]
 
 
@@ -109,10 +110,10 @@ def _distinct_pm_names(db_path: str, vendor: str, pm_tech: str) -> tuple[str | N
     """
     Return (table, pm_cell_column, distinct_pm_names, norm->canonical).
     """
-    if not os.path.isfile(db_path):
+    if not store_available(db_path):
         return None, None, set(), {}
 
-    conn = sqlite3.connect(db_path, timeout=60)
+    conn = open_db(db_path)
     try:
         table = _resolve_pm_table_sqlite(conn, vendor, pm_tech, "", pm_table_name(pm_tech))
         if not table:
@@ -122,13 +123,14 @@ def _distinct_pm_names(db_path: str, vendor: str, pm_tech: str) -> tuple[str | N
             return table, cell_col, set(), {}
 
         canonical: dict[str, str] = {}
-        for (raw,) in conn.execute(
+        for row in conn.execute(
             f"""
             SELECT DISTINCT TRIM(CAST("{cell_col}" AS TEXT)) AS n
             FROM "{table}"
             WHERE "{cell_col}" IS NOT NULL AND TRIM(CAST("{cell_col}" AS TEXT)) != ''
             """
         ):
+            raw = row["n"] if isinstance(row, dict) else row[0]
             s = str(raw or "").strip()
             if not s:
                 continue

@@ -50,11 +50,6 @@ def is_postgresql() -> bool:
     return bool(enabled_groups())
 
 
-def use_sqlite_for_app_and_metadata() -> bool:
-    """Deprecated: always False under Postgres-only runtime."""
-    return False
-
-
 def is_app_postgresql() -> bool:
     return is_domain_postgresql('app')
 

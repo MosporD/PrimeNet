@@ -1,4 +1,4 @@
-"""Audit PM/group tables for legacy cell_name/timestamp vs vendor-native axis columns."""
+﻿"""Audit PM/group tables for legacy cell_name/timestamp vs vendor-native axis columns."""
 from __future__ import annotations
 
 import os
@@ -7,8 +7,7 @@ import sys
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
-import sqlite3
-
+from db.runtime import list_tables, open_db, store_available, table_columns
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DB,
@@ -77,70 +76,67 @@ def _check_pm_table_layout(
 
 def audit_db(label: str, vendor: str, path: str) -> list[dict]:
     issues: list[dict] = []
-    if not os.path.isfile(path):
-        return [{"db": label, "issue": "MISSING_FILE", "path": path}]
+    if not store_available(path):
+        return [{"db": label, "issue": "STORE_UNAVAILABLE", "path": path}]
 
-    conn = sqlite3.connect(path, timeout=60)
-    tables = [
-        r[0]
-        for r in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
-        ).fetchall()
-    ]
+    conn = open_db(path)
+    try:
+        tables = list_tables(conn)
 
-    for table in tables:
-        tech = _table_technology(table) or "?"
-        cols = [r[1] for r in conn.execute(f"PRAGMA table_info({_sqlite_ident(table)})").fetchall()]
-        if not cols:
-            continue
+        for table in tables:
+            tech = _table_technology(table) or "?"
+            cols = table_columns(conn, table)
+            if not cols:
+                continue
 
-        cell_col, time_col = _resolve_pm_axis_columns_sqlite(conn, table)
-        row_count = int(conn.execute(f"SELECT COUNT(*) FROM {_sqlite_ident(table)}").fetchone()[0])
+            cell_col, time_col = _resolve_pm_axis_columns_sqlite(conn, table)
+            row = conn.execute(f"SELECT COUNT(*) AS n FROM {_sqlite_ident(table)}").fetchone()
+            row_count = int((row["n"] if isinstance(row, dict) else row[0]) or 0)
 
-        legacy_cell = "cell_name" in cols
-        legacy_ts = "timestamp" in cols
-        legacy_cell_n = _axis_column_nonempty_count(conn, table, "cell_name") if legacy_cell else -1
-        legacy_ts_n = _axis_column_nonempty_count(conn, table, "timestamp") if legacy_ts else -1
+            legacy_cell = "cell_name" in cols
+            legacy_ts = "timestamp" in cols
+            legacy_cell_n = _axis_column_nonempty_count(conn, table, "cell_name") if legacy_cell else -1
+            legacy_ts_n = _axis_column_nonempty_count(conn, table, "timestamp") if legacy_ts else -1
 
-        entry = {
-            "db": label,
-            "table": table,
-            "tech": tech,
-            "rows": row_count,
-            "resolved_cell": cell_col,
-            "resolved_time": time_col,
-            "legacy_cell_nonempty": legacy_cell_n,
-            "legacy_ts_nonempty": legacy_ts_n,
-            "issues": [],
-        }
+            entry = {
+                "db": label,
+                "table": table,
+                "tech": tech,
+                "rows": row_count,
+                "resolved_cell": cell_col,
+                "resolved_time": time_col,
+                "legacy_cell_nonempty": legacy_cell_n,
+                "legacy_ts_nonempty": legacy_ts_n,
+                "issues": [],
+            }
 
-        if row_count == 0:
-            entry["issues"].append("EMPTY_TABLE")
-        if not cell_col:
-            entry["issues"].append("NO_CELL_AXIS")
-        elif _axis_column_nonempty_count(conn, table, cell_col) == 0 and row_count > 0:
-            entry["issues"].append("CELL_AXIS_EMPTY")
-        if not time_col:
-            entry["issues"].append("NO_TIME_AXIS")
-        elif _axis_column_nonempty_count(conn, table, time_col) == 0 and row_count > 0:
-            entry["issues"].append("TIME_AXIS_EMPTY")
+            if row_count == 0:
+                entry["issues"].append("EMPTY_TABLE")
+            if not cell_col:
+                entry["issues"].append("NO_CELL_AXIS")
+            elif _axis_column_nonempty_count(conn, table, cell_col) == 0 and row_count > 0:
+                entry["issues"].append("CELL_AXIS_EMPTY")
+            if not time_col:
+                entry["issues"].append("NO_TIME_AXIS")
+            elif _axis_column_nonempty_count(conn, table, time_col) == 0 and row_count > 0:
+                entry["issues"].append("TIME_AXIS_EMPTY")
 
-        if legacy_cell and legacy_cell_n == 0 and cell_col and cell_col != "cell_name" and row_count > 0:
-            entry["note"] = f"legacy cell_name empty; uses {cell_col!r}"
+            if legacy_cell and legacy_cell_n == 0 and cell_col and cell_col != "cell_name" and row_count > 0:
+                entry["note"] = f"legacy cell_name empty; uses {cell_col!r}"
 
-        if "CELLS" in table.upper() and tech in TECH_ORDER:
-            layout_issues = _check_pm_table_layout(vendor, tech, cols, cell_col, time_col, row_count)
-            static_cols, ordered = _build_pm_table_column_layout(
-                vendor, tech, cols, cell_col, time_col
-            )
-            entry["static_output"] = static_cols
-            entry["first_kpi_cols"] = ordered[len(static_cols) : len(static_cols) + 3]
-            entry["issues"].extend(layout_issues)
+            if "CELLS" in table.upper() and tech in TECH_ORDER:
+                layout_issues = _check_pm_table_layout(vendor, tech, cols, cell_col, time_col, row_count)
+                static_cols, ordered = _build_pm_table_column_layout(
+                    vendor, tech, cols, cell_col, time_col
+                )
+                entry["static_output"] = static_cols
+                entry["first_kpi_cols"] = ordered[len(static_cols) : len(static_cols) + 3]
+                entry["issues"].extend(layout_issues)
 
-        if entry["issues"]:
-            issues.append(entry)
-
-    conn.close()
+            if entry["issues"]:
+                issues.append(entry)
+    finally:
+        conn.close()
     return issues
 
 
@@ -150,25 +146,23 @@ def main() -> int:
     print("PM / groups legacy column audit\n" + "=" * 72)
     for label, vendor, path in PM_DBS:
         issues = audit_db(label, vendor, path)
-        conn = sqlite3.connect(path, timeout=60) if os.path.isfile(path) else None
+        conn = open_db(path) if store_available(path) else None
         tables_ok = []
         if conn:
-            tables = [
-                r[0]
-                for r in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
-                ).fetchall()
-            ]
-            for table in tables:
-                if "GROUP" in table.upper() and "CELL" not in table.upper():
-                    continue
-                if "CELL" not in table.upper() and table not in ("groups", "group_cells"):
-                    continue
-                tech = _table_technology(table) or "?"
-                cc, tc = _resolve_pm_axis_columns_sqlite(conn, table)
-                n = int(conn.execute(f"SELECT COUNT(*) FROM {_sqlite_ident(table)}").fetchone()[0])
-                tables_ok.append((table, tech, n, cc, tc))
-            conn.close()
+            try:
+                tables = list_tables(conn)
+                for table in tables:
+                    if "GROUP" in table.upper() and "CELL" not in table.upper():
+                        continue
+                    if "CELL" not in table.upper() and table not in ("groups", "group_cells"):
+                        continue
+                    tech = _table_technology(table) or "?"
+                    cc, tc = _resolve_pm_axis_columns_sqlite(conn, table)
+                    row = conn.execute(f"SELECT COUNT(*) AS n FROM {_sqlite_ident(table)}").fetchone()
+                    n = int((row["n"] if isinstance(row, dict) else row[0]) or 0)
+                    tables_ok.append((table, tech, n, cc, tc))
+            finally:
+                conn.close()
 
         print(f"\n{label} ({os.path.basename(path)})")
         for table, tech, n, cc, tc in tables_ok:

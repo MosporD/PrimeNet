@@ -1,16 +1,10 @@
 """
-DB Migration — Three-Database Architecture
-==========================================
-metadata.db          → sites, cells, sectors for ALL vendors (source of truth)
-nokia_pm_cells.db   → Nokia hourly KPI rows keyed by cell_name + timestamp
-huawei_pm_cells.db  → Huawei PM: same hourly tables as Nokia (2G_Hourly … 5G_Hourly)
-
-Cell linkage: cell_name is the shared key across all three DBs.
-The performance API queries metadata.db and ATTACHes the relevant PM db
-to do cross-db JOINs purely in SQLite.
+DB Migration — catalogued store schemas
+=======================================
+Logical path keys (METADATA_DB, NOKIA_PM_DB, …) map to Postgres schemas via
+db.pg_domains. Cell linkage across domains is still cell_name.
 """
 
-import sqlite3
 import logging
 import os
 import sys
@@ -18,7 +12,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from db.runtime import _is_pg_conn, execute_query, open_db, table_columns
 from sync_config import (
-    PROJECT_ROOT,
     METADATA_DB,
     NOKIA_PM_DB,
     HUAWEI_PM_DB,
@@ -215,72 +208,6 @@ def _create_cell_groups_db(db_path):
     conn.close()
 
 
-def _migrate_legacy_group_db():
-    """
-    Split legacy single DB (cell_groups.db) into Nokia/Huawei group DBs.
-    Existing vendor DB rows are preserved.
-    """
-    legacy = os.path.join(PROJECT_ROOT, 'cell_groups.db')
-    if not os.path.isfile(legacy):
-        return
-
-    old = sqlite3.connect(legacy)
-    old.row_factory = sqlite3.Row
-    try:
-        groups = old.execute('SELECT id, user_id, name, description, is_shared FROM groups').fetchall()
-        if not groups:
-            old.close()
-            return
-        rows = old.execute(
-            '''
-            SELECT gc.group_id, gc.cell_key, gc.cell_name, gc.vendor, gc.technology, gc.site_id
-            FROM group_cells gc
-            '''
-        ).fetchall()
-    except sqlite3.OperationalError:
-        old.close()
-        return
-
-    groups_by_id = {int(g['id']): dict(g) for g in groups}
-    by_vendor = {'Nokia': {}, 'Huawei': {}}
-    for r in rows:
-        v = (r['vendor'] or '').strip()
-        if v not in by_vendor:
-            continue
-        gid = int(r['group_id'])
-        if gid not in groups_by_id:
-            continue
-        by_vendor[v].setdefault(gid, {'group': groups_by_id[gid], 'cells': []})
-        by_vendor[v][gid]['cells'].append(r)
-
-    for vendor, db_path in (('Nokia', NOKIA_GROUPS_DB), ('Huawei', HUAWEI_GROUPS_DB)):
-        conn = open_db(db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        for payload in by_vendor[vendor].values():
-            g = payload['group']
-            cur.execute(
-                '''
-                INSERT INTO groups (user_id, name, description, is_shared)
-                VALUES (?,?,?,?)
-                ''',
-                (g['user_id'], g['name'], g['description'], g['is_shared']),
-            )
-            new_gid = cur.lastrowid
-            for c in payload['cells']:
-                cur.execute(
-                    '''
-                    INSERT OR REPLACE INTO group_cells
-                    (group_id, cell_key, cell_name, vendor, technology, site_id)
-                    VALUES (?,?,?,?,?,?)
-                    ''',
-                    (new_gid, c['cell_key'], c['cell_name'], c['vendor'], c['technology'], c['site_id']),
-                )
-        conn.commit()
-        conn.close()
-    old.close()
-
-
 # Per-tech CSV columns (lowercase) — single source of truth for imports.
 # cell_name first (PRIMARY KEY); importer lowercases/strips CSV headers to match.
 PER_TECH_CSV_SCHEMA = {
@@ -373,38 +300,14 @@ def ensure_per_tech_table_shape(conn, table: str) -> None:
 
 
 def ensure_per_tech_columns():
-    """
-    Add any missing columns to existing per-tech tables (SQLite has no DROP COLUMN
-    in older versions; ALTER ADD is safe for upgrades).
-    """
+    """Add any missing columns to existing per-tech metadata tables."""
     conn = open_db(METADATA_DB)
-    cursor = conn.cursor()
-    for table, cols in PER_TECH_CSV_SCHEMA.items():
-        try:
-            pragma_rows = cursor.execute(f'PRAGMA table_info("{table}")').fetchall()
-            if not pragma_rows:
-                continue
-            existing = {row[1] for row in pragma_rows}
-        except sqlite3.OperationalError:
-            continue
-        for c in cols:
-            if c == 'cell_name':
-                continue
-            if c not in existing:
-                cursor.execute(f'ALTER TABLE "{table}" ADD COLUMN "{c}" TEXT')
-                logger.debug('%s: added column "%s"', table, c)
-        # Synthetic columns on very old DBs
-        existing = {
-            row[1]
-            for row in cursor.execute(f'PRAGMA table_info("{table}")').fetchall()
-        }
-        if 'technology' not in existing:
-            cursor.execute(f'ALTER TABLE "{table}" ADD COLUMN technology TEXT')
-        if 'updated_at' not in existing:
-            # SQLite rejects non-constant defaults on ALTER ADD in some builds.
-            cursor.execute(f'ALTER TABLE "{table}" ADD COLUMN updated_at TIMESTAMP')
-    conn.commit()
-    conn.close()
+    try:
+        for table in PER_TECH_CSV_SCHEMA:
+            ensure_per_tech_table_shape(conn, table)
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def _create_per_tech_tables():
@@ -481,6 +384,5 @@ def run_migrations():
     _ensure_sync_log()
     _create_cell_groups_db(NOKIA_GROUPS_DB)
     _create_cell_groups_db(HUAWEI_GROUPS_DB)
-    _migrate_legacy_group_db()
     _log_db_path_report()
-    logger.info('All SQLite DB migrations complete.')
+    logger.info('All store schema migrations complete.')

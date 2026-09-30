@@ -19,7 +19,6 @@ from db.runtime import (
     store_available,
     table_columns,
     table_exists,
-    use_sqlite_for_app_and_metadata,
 )
 
 __all__ = [
@@ -41,5 +40,4 @@ __all__ = [
     'store_available',
     'table_columns',
     'table_exists',
-    'use_sqlite_for_app_and_metadata',
 ]

@@ -299,12 +299,5 @@ class SqliteAppDbStillWorks(unittest.TestCase):
             require_postgres_url()
         self.assertIn('NCM_DATABASE_URL', str(ctx.exception))
 
-    def test_use_sqlite_helper_always_false(self):
-        _clear_pg_env()
-        from db.runtime import use_sqlite_for_app_and_metadata
-
-        self.assertFalse(use_sqlite_for_app_and_metadata())
-
-
 if __name__ == '__main__':
     unittest.main()

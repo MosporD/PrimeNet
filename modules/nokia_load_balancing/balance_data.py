@@ -136,14 +136,14 @@ def list_nok_sectors(
     target: datetime | date | None = None,
     vendor: str | None = None,
 ) -> dict[str, Any]:
-    """Return NOK sectors with throughput summary (SQLite first)."""
+    """Return NOK sectors with throughput summary (DB first, then CSV)."""
     vendor = (vendor or config.NETWORK_BALANCE_VENDOR or "Nokia").strip() or "Nokia"
     day = _as_date(target)
 
-    if config.BALANCE_PREFER_SQLITE and db_has_data(vendor.lower()):
+    if db_has_data(vendor.lower()):
         payload = list_nok_sectors_from_db(vendor.lower(), day)
         if payload.get("success"):
-            payload["data_source"] = "sqlite"
+            payload["data_source"] = "db"
             return payload
 
     df, path, warnings = load_balance_df(target, vendor=vendor)
@@ -223,10 +223,10 @@ def sectors_from_balance(
     vendor = vendor_label.lower()
     day = _as_date(target)
 
-    if config.BALANCE_PREFER_SQLITE and db_has_data(vendor):
+    if db_has_data(vendor):
         sectors, warnings, meta = get_sectors_from_db(requested, vendor, day)
         if sectors:
-            label = f"sqlite:{meta.get('snapshot_date')} ({meta.get('source_file')})"
+            label = f"db:{meta.get('snapshot_date')} ({meta.get('source_file')})"
             return sectors, warnings, label
         if warnings and not any("No Network Balance snapshot" in w for w in warnings):
             return sectors, warnings, meta.get("source_file") if meta else None

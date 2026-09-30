@@ -20,7 +20,6 @@ STATUS_COLUMN = "New Balancing Status"
 NOK_STATUS_VALUE = "NOK"
 BALANCE_VENDORS = ("nokia", "huawei")
 BALANCE_INGEST_LOOKBACK_DAYS = int(os.environ.get("NETWORK_BALANCE_INGEST_LOOKBACK_DAYS", "14"))
-BALANCE_PREFER_SQLITE = os.environ.get("NETWORK_BALANCE_PREFER_SQLITE", "1").strip().lower() not in ("0", "false", "no")
 # Maximum date span for trend queries in the UI.
 TREND_MAX_DAYS = int(os.environ.get("NETWORK_BALANCE_TREND_MAX_DAYS", "90"))
 

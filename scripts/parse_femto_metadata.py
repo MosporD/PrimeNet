@@ -1,16 +1,15 @@
 """
 Parse Femto raw TGZ/XML files and prepare metadata tables.
 
-Output:
-- SQLite table in METADATA_DB: femto_metadata
-- SQLite table in METADATA_DB: femto_kpi_catalog
+Output (Postgres metadata schema via METADATA_DB key):
+- femto_metadata
+- femto_kpi_catalog
 """
 
 from __future__ import annotations
 
 import os
 import re
-import sqlite3
 import tarfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -18,6 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from db.runtime import open_db
 from sync_config import DATA_ROOT, METADATA_DB
 
 
@@ -117,7 +117,7 @@ def _parse_one_archive(tgz_path: Path) -> tuple[dict, set[str]] | None:
     return row, mt_names
 
 
-def _ensure_tables(conn: sqlite3.Connection) -> None:
+def _ensure_tables(conn) -> None:
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS femto_metadata (
@@ -169,79 +169,84 @@ def main() -> int:
         print(f"[warn] no tgz files found under: {RAW_FEMTO_DIR}")
         return 0
 
-    conn = sqlite3.connect(METADATA_DB, timeout=30)
-    conn.execute("PRAGMA journal_mode=WAL")
-    _ensure_tables(conn)
+    conn = open_db(METADATA_DB)
+    try:
+        _ensure_tables(conn)
 
-    upserts = 0
-    parse_fail = 0
-    all_kpis: dict[str, str] = {}
+        upserts = 0
+        parse_fail = 0
+        all_kpis: dict[str, str] = {}
 
-    for tgz in archives:
-        parsed = _parse_one_archive(tgz)
-        if not parsed:
-            parse_fail += 1
-            continue
-        row, mt_names = parsed
+        meta_cols = (
+            "archive_path", "archive_name", "member_name", "cbt", "mts", "gp_seconds",
+            "vendor_name", "system_type", "ffv", "sf", "hnb_id", "fsn", "bsr_name", "op_mode",
+            "managed_element", "neun", "nedn", "nesw", "kpi_count",
+        )
 
-        conn.execute(
-            """
-            INSERT INTO femto_metadata (
-                archive_path, archive_name, member_name, cbt, mts, gp_seconds,
-                vendor_name, system_type, ffv, sf, hnb_id, fsn, bsr_name, op_mode,
-                managed_element, neun, nedn, nesw, kpi_count, updated_at
-            ) VALUES (
-                :archive_path, :archive_name, :member_name, :cbt, :mts, :gp_seconds,
-                :vendor_name, :system_type, :ffv, :sf, :hnb_id, :fsn, :bsr_name, :op_mode,
-                :managed_element, :neun, :nedn, :nesw, :kpi_count, CURRENT_TIMESTAMP
+        for tgz in archives:
+            parsed = _parse_one_archive(tgz)
+            if not parsed:
+                parse_fail += 1
+                continue
+            row, mt_names = parsed
+
+            conn.execute(
+                f"""
+                INSERT INTO femto_metadata (
+                    {', '.join(meta_cols)}, updated_at
+                ) VALUES (
+                    {', '.join('?' for _ in meta_cols)}, CURRENT_TIMESTAMP
+                )
+                ON CONFLICT(archive_path) DO UPDATE SET
+                    archive_name=excluded.archive_name,
+                    member_name=excluded.member_name,
+                    cbt=excluded.cbt,
+                    mts=excluded.mts,
+                    gp_seconds=excluded.gp_seconds,
+                    vendor_name=excluded.vendor_name,
+                    system_type=excluded.system_type,
+                    ffv=excluded.ffv,
+                    sf=excluded.sf,
+                    hnb_id=excluded.hnb_id,
+                    fsn=excluded.fsn,
+                    bsr_name=excluded.bsr_name,
+                    op_mode=excluded.op_mode,
+                    managed_element=excluded.managed_element,
+                    neun=excluded.neun,
+                    nedn=excluded.nedn,
+                    nesw=excluded.nesw,
+                    kpi_count=excluded.kpi_count,
+                    updated_at=CURRENT_TIMESTAMP
+                """,
+                tuple(row[c] for c in meta_cols),
             )
-            ON CONFLICT(archive_path) DO UPDATE SET
-                archive_name=excluded.archive_name,
-                member_name=excluded.member_name,
-                cbt=excluded.cbt,
-                mts=excluded.mts,
-                gp_seconds=excluded.gp_seconds,
-                vendor_name=excluded.vendor_name,
-                system_type=excluded.system_type,
-                ffv=excluded.ffv,
-                sf=excluded.sf,
-                hnb_id=excluded.hnb_id,
-                fsn=excluded.fsn,
-                bsr_name=excluded.bsr_name,
-                op_mode=excluded.op_mode,
-                managed_element=excluded.managed_element,
-                neun=excluded.neun,
-                nedn=excluded.nedn,
-                nesw=excluded.nesw,
-                kpi_count=excluded.kpi_count,
-                updated_at=CURRENT_TIMESTAMP
-            """,
-            row,
-        )
-        upserts += 1
+            upserts += 1
 
-        for k in mt_names:
-            if k not in all_kpis:
-                all_kpis[k] = row["archive_path"]
+            for k in mt_names:
+                if k not in all_kpis:
+                    all_kpis[k] = row["archive_path"]
 
-    for kpi, first_archive in all_kpis.items():
-        conn.execute(
-            """
-            INSERT INTO femto_kpi_catalog (kpi_name, first_seen_archive, updated_at)
-            VALUES (?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(kpi_name) DO UPDATE SET
-                updated_at=CURRENT_TIMESTAMP
-            """,
-            (kpi, first_archive),
-        )
+        for kpi, first_archive in all_kpis.items():
+            conn.execute(
+                """
+                INSERT INTO femto_kpi_catalog (kpi_name, first_seen_archive, updated_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(kpi_name) DO UPDATE SET
+                    updated_at=CURRENT_TIMESTAMP
+                """,
+                (kpi, first_archive),
+            )
 
-    conn.commit()
-    total_kpis = conn.execute("SELECT COUNT(*) FROM femto_kpi_catalog").fetchone()[0]
-    total_rows = conn.execute("SELECT COUNT(*) FROM femto_metadata").fetchone()[0]
-    conn.close()
+        conn.commit()
+        total_kpis_row = conn.execute("SELECT COUNT(*) AS n FROM femto_kpi_catalog").fetchone()
+        total_rows_row = conn.execute("SELECT COUNT(*) AS n FROM femto_metadata").fetchone()
+        total_kpis = total_kpis_row["n"] if isinstance(total_kpis_row, dict) else total_kpis_row[0]
+        total_rows = total_rows_row["n"] if isinstance(total_rows_row, dict) else total_rows_row[0]
+    finally:
+        conn.close()
 
     print(f"[done] archives_seen={len(archives)} metadata_upserts={upserts} parse_fail={parse_fail}")
-    print(f"[done] femto_metadata_rows={total_rows} femto_kpi_catalog_rows={total_kpis} db={METADATA_DB}")
+    print(f"[done] femto_metadata_rows={total_rows} femto_kpi_catalog_rows={total_kpis} store={METADATA_DB}")
     return 0
 
 
