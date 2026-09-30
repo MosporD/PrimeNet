@@ -29,6 +29,38 @@ class AppSqlTests(unittest.TestCase):
         self.assertIn('%s', out)
         self.assertNotIn("got '%'", out)
 
+    def test_adapt_escapes_percent_in_column_names(self):
+        """PM KPI columns like Availability(%) must not become psycopg placeholders."""
+        sql = (
+            'CREATE TABLE t ("Availability(%)" TEXT, "UL_BLER_%" TEXT, '
+            '"CSSR (%)" DOUBLE PRECISION)'
+        )
+        out = adapt_sqlite_app_sql(sql)
+        self.assertIn('"Availability(%%)"', out)
+        self.assertIn('"UL_BLER_%%"', out)
+        self.assertIn('"CSSR (%%)"', out)
+        ins = 'INSERT INTO t ("Availability(%)", "UL_BLER_%") VALUES (?, ?)'
+        adapted = adapt_sqlite_app_sql(ins)
+        self.assertIn('"Availability(%%)"', adapted)
+        self.assertIn('VALUES (%s, %s)', adapted)
+
+    def test_adapt_is_idempotent(self):
+        cases = [
+            "SELECT * FROM users WHERE username = ? AND is_active = 1",
+            'INSERT INTO "t" ("cell", "CSSR(%)") VALUES (?, ?)',
+            "SELECT name FROM t WHERE name LIKE '%sector%' AND id = ?",
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 't_%'",
+            'INSERT OR REPLACE INTO "4G" (cell_name, timestamp, kpi) VALUES (?, ?, ?)',
+        ]
+        for sql in cases:
+            once = adapt_sqlite_app_sql(sql)
+            self.assertEqual(adapt_sqlite_app_sql(once), once, sql)
+
+    def test_percent_s_inside_literal_is_not_placeholder(self):
+        out = qmark_to_percent("SELECT 1 FROM t WHERE name LIKE '%sector%' AND id = ?")
+        self.assertIn("LIKE '%%sector%%'", out)
+        self.assertTrue(out.endswith('id = %s'))
+
     def test_autoincrement(self):
         sql = 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
         out = adapt_sqlite_app_sql(sql)
@@ -159,6 +191,16 @@ class PercentColumnTests(unittest.TestCase):
         self.assertEqual(
             _psycopg_final_sql(sql, params),
             'ALTER TABLE "t" ADD COLUMN "CSSR(%)" TEXT',
+        )
+
+    def test_pre_adapted_sql_keeps_placeholders(self):
+        from db.app_sql import adapt_sqlite_app_sql as adapt
+
+        self.conn.cursor().execute(adapt('SELECT * FROM users WHERE username = ?'), ('admin',))
+        sql, params = self.raw.calls[-1]
+        self.assertEqual(
+            _psycopg_final_sql(sql, params),
+            'SELECT * FROM users WHERE username = $1',
         )
 
     def test_cursor_execute_without_params(self):

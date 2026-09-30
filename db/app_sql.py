@@ -44,11 +44,10 @@ _COLLATE_NOCASE = re.compile(r'\s+COLLATE\s+NOCASE\b', re.IGNORECASE)
 def qmark_to_percent(sql: str) -> str:
     """Replace ``?`` placeholders with ``%s``, escaping literal ``%`` for psycopg.
 
-    psycopg treats ``%`` as format markers. SQL that still contains LIKE patterns
-    such as ``'t_%'`` after sqlite_master rewrites must become ``'t_%%'``.
+    Must be idempotent: callers such as ``database_enhanced._exec`` adapt SQL
+    and ``PgConn.execute`` adapts it again. Existing ``%%`` escapes are kept,
+    and ``%s`` outside single-quoted literals is kept as a placeholder.
     """
-    # Escape every literal % before introducing %s placeholders.
-    sql = sql.replace('%', '%%')
     out: list[str] = []
     in_single = False
     in_double = False
@@ -56,7 +55,18 @@ def qmark_to_percent(sql: str) -> str:
     n = len(sql)
     while i < n:
         ch = sql[i]
-        if ch == "'" and not in_double:
+        nxt = sql[i + 1] if i + 1 < n else ''
+        if ch == '%':
+            if nxt == '%':
+                out.append('%%')
+                i += 2
+                continue
+            if nxt == 's' and not in_single:
+                out.append('%s')
+                i += 2
+                continue
+            out.append('%%')
+        elif ch == "'" and not in_double:
             in_single = not in_single
             out.append(ch)
         elif ch == '"' and not in_single:

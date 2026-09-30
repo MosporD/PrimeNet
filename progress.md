@@ -6,11 +6,16 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Rebuild 97.141 with adapter + Eng Admin UI fixes; confirm scheduler container healthy; re-run Daily (`failed_files=0`). Laptop: `docker compose --profile app-db up -d postgres` + `NCM_DATABASE_URL`.
+**NEXT:** Push/deploy `%%` KPI escape + PG `ctid` dedupe/retention; rebuild **scheduler** on 97.141; re-run Daily (`failed_files=0`). Note: unset `NCM_WATCHER_PRIMARY` defaults to **1** (watcher owns hourly/daily cron).
+
+## 2026-09-30 (Login 500 — double SQL adapt)
+
+- Fixed login `Internal server error` from yesterday's `%` escape breaking pre-adapted queries (`%s` → `%%s`).
 
 ## 2026-09-29 (PM load — `%` column names on Postgres)
 
-- Fixed psycopg `got '%)'` failures on Huawei cells/groups loads (escape `%`, always pass params).
+- Fixed psycopg `got '%)'` / incomplete `%` on KPI column names (escape in `qmark_to_percent`).
+- PG-safe dedupe + retention: use `ctid` instead of SQLite `rowid`.
 
 ## 2026-09-29 (ETL Diagnosis UI)
 

@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`postgres-runtime.md`](postgres-r
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-09-30 (Login 500 after `%` escape)
+
+- Root cause: `bf81e7e0` made `qmark_to_percent` non-idempotent. Callers that pre-adapt (`database_enhanced._exec`, `task_scheduler/routes.py`, `metadata_processor`) get adapted twice in `PgConn`, so `%s` → `%%s` → `the query has 0 placeholders but 1 parameters were passed` (login 500).
+- Done: `qmark_to_percent` keeps existing `%%` and `%s` (outside single-quoted literals), escapes lone `%` only.
+- Verified: live PG — `authenticate_user` fails on `bf81e7e0` app_sql, OK after fix; adapter tests 27 passed (idempotency + pre-adapted cursor case).
+- NEXT: Push + rebuild 97.141; log in; then re-run Hourly/Daily.
+
 ## 2026-09-29 (psycopg `%` in PM column names)
 
 - Root cause: PM counter headers like `CSSR(%)` reached psycopg unescaped → `only '%s', '%b', '%t' are allowed as placeholders, got '%)'` on every Huawei cells/groups hourly+daily load.
