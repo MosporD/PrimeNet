@@ -998,7 +998,7 @@ def build_raw_neighbor_lines(
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
-                        narrow_where, narrow_params = "0", []
+                        narrow_where, narrow_params = "1=0", []
 
                 def resolve_row(row: sqlite3.Row) -> tuple[dict | None, dict | None, str, str]:
                     src = by_name.get(_norm_cell_key(row[seg_col]))
@@ -1058,7 +1058,7 @@ def build_raw_neighbor_lines(
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
-                        narrow_where, narrow_params = "0", []
+                        narrow_where, narrow_params = "1=0", []
 
                 def resolve_row(row: sqlite3.Row) -> tuple[dict | None, dict | None, str, str]:
                     src = _lookup_2g_by_cell_id_for_vendor(row[seg_col], by_cell_id, vendor)
@@ -1118,7 +1118,7 @@ def build_raw_neighbor_lines(
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
-                        narrow_where, narrow_params = "0", []
+                        narrow_where, narrow_params = "1=0", []
 
                 def resolve_row(row: sqlite3.Row) -> tuple[dict | None, dict | None, str, str]:
                     src = by_name.get(_norm_cell_key(row[sc_col]))
@@ -1196,7 +1196,7 @@ def build_raw_neighbor_lines(
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
-                        narrow_where, narrow_params = "0", []
+                        narrow_where, narrow_params = "1=0", []
 
                 def resolve_row(row: sqlite3.Row) -> tuple[dict | None, dict | None, str, str]:
                     src = _resolve_3g_source(row[sc_col], by_name, by_node_cell, by_cell_id, vendor)
@@ -1264,7 +1264,7 @@ def build_raw_neighbor_lines(
                     if sc4:
                         narrow_where, narrow_params = sc4
                     else:
-                        narrow_where, narrow_params = "0", []
+                        narrow_where, narrow_params = "1=0", []
 
                 def resolve_row(row: sqlite3.Row) -> tuple[dict | None, dict | None, str, str]:
                     cand = by_name.get(_norm_cell_key(row[src_col]))
@@ -1353,7 +1353,7 @@ def build_raw_neighbor_lines(
                     if sc4:
                         narrow_where, narrow_params = sc4
                     else:
-                        narrow_where, narrow_params = "0", []
+                        narrow_where, narrow_params = "1=0", []
 
                 def resolve_row(row: sqlite3.Row) -> tuple[dict | None, dict | None, str, str]:
                     cand = by_name.get(_norm_cell_key(row[src_col]))

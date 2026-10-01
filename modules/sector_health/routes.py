@@ -107,6 +107,7 @@ def sector_health_data():
             area=str(request.args.get('area', '') or '').strip(),
             rat=str(request.args.get('rat', '') or '').strip(),
             search=str(request.args.get('q', '') or '').strip(),
+            vendor=str(request.args.get('vendor', '') or '').strip(),
             active_only=not all_cells,
         )
     except Exception as e:

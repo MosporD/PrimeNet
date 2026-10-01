@@ -109,10 +109,47 @@ def network_health_select():
     return render_template(
         "network_health_select.html",
         user=format_user(user),
-        rats=cfg.RAT_OPTIONS,
         vendors=cfg.VENDOR_OPTIONS,
-        default_rat=cfg.DEFAULT_RAT,
         default_vendor=cfg.DEFAULT_VENDOR,
+    )
+
+
+@network_health_bp.route("/network-health/tech")
+@login_required
+def network_health_tech():
+    user = get_current_user()
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    vendor_cfg = next((v for v in cfg.VENDOR_OPTIONS if v["key"] == vendor), {})
+    rats = [
+        r for r in cfg.RAT_OPTIONS
+        if (vendor, r["key"]) not in cfg.PRECALC_SKIP_COMBOS
+    ]
+    default_rat = cfg.DEFAULT_RAT if any(r["key"] == cfg.DEFAULT_RAT for r in rats) else (rats[0]["key"] if rats else cfg.DEFAULT_RAT)
+    return render_template(
+        "network_health_tech.html",
+        user=format_user(user),
+        vendor=vendor,
+        vendor_label=vendor_cfg.get("label", vendor.title()),
+        rats=rats,
+        default_rat=default_rat,
+    )
+
+
+@network_health_bp.route("/network-health/hub")
+@login_required
+def network_health_hub():
+    user = get_current_user()
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
+    rat_cfg = cfg.rat_config(rat) or {}
+    vendor_cfg = next((v for v in cfg.VENDOR_OPTIONS if v["key"] == vendor), {})
+    return render_template(
+        "network_health_hub.html",
+        user=format_user(user),
+        vendor=vendor,
+        vendor_label=vendor_cfg.get("label", vendor.title()),
+        rat=rat,
+        rat_label=rat_cfg.get("label", rat),
     )
 
 
@@ -122,6 +159,7 @@ def network_health_view():
     user = get_current_user()
     vendor = _normalize_vendor(request.args.get("vendor"))
     rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
+    kpi = (request.args.get("kpi") or "").strip()
     rat_cfg = cfg.rat_config(rat) or {}
     vendor_cfg = next((v for v in cfg.VENDOR_OPTIONS if v["key"] == vendor), {})
     return render_template(
@@ -131,6 +169,7 @@ def network_health_view():
         vendor_label=vendor_cfg.get("label", vendor.title()),
         rat=rat,
         rat_label=rat_cfg.get("label", rat),
+        initial_kpi=kpi,
         vendors=cfg.VENDOR_OPTIONS,
         rats=cfg.RAT_OPTIONS,
         show_controller=rat in ("2G", "3G"),
@@ -170,6 +209,74 @@ def network_health_kpis():
             "precompute_max": cfg.PRECOMPUTE_KPI_MAX,
             "categories": cfg.public_category_presets(),
             "kpi_categories": {col: cfg.match_category(col) for col in columns if cfg.match_category(col)},
+        })
+    except Exception as exc:
+        return jsonify({"success": False, "error": str(exc)}), 500
+
+
+@network_health_bp.route("/api/network-health/meta")
+@login_required
+def network_health_meta():
+    """Latest dates / build stamp for the KPI hub."""
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
+    try:
+        from .precalc_store import get_build_meta
+        from modules.son_analytics.pm_helpers import vendor_pm_sources
+        from db.runtime import open_db, execute_query, list_tables
+
+        build = get_build_meta(vendor, rat) or {}
+        daily_latest = build.get("built_at") or build.get("generated_at") or ""
+        hourly_latest = ""
+        pm_tech = cfg.pm_technology_for_rat(rat)
+        try:
+            for _vlabel, db_path, table in vendor_pm_sources(vendor, pm_tech, "hourly"):
+                conn = open_db(db_path)
+                try:
+                    existing = set(list_tables(conn) or [])
+                    if table not in existing:
+                        # Prefer any partition for this RAT when monotable is a stub.
+                        prefix = f"{pm_tech}_CELLS_HOURLY"
+                        partitions = [
+                            t for t in existing
+                            if str(t).upper() == prefix or str(t).upper().startswith(prefix + "__")
+                        ]
+                        if not partitions:
+                            continue
+                        table = partitions[0]
+                    cols = [r[1] for r in execute_query(conn, f'PRAGMA table_info("{table}")').fetchall()]
+                    ts_col = None
+                    for cand in ("timestamp", "Date", "date", "PERIOD_START_TIME", "Time"):
+                        if cand in cols:
+                            ts_col = cand
+                            break
+                    if not ts_col:
+                        continue
+                    row = execute_query(
+                        conn,
+                        f'SELECT MAX("{ts_col}") AS mx FROM "{table}"',
+                        (),
+                    ).fetchone()
+                    mx = row["mx"] if row and hasattr(row, "keys") else (row[0] if row else None)
+                    if mx:
+                        hourly_latest = str(mx)
+                        break
+                finally:
+                    conn.close()
+        except Exception:
+            pass
+
+        return jsonify({
+            "success": True,
+            "vendor": vendor,
+            "rat": rat,
+            "built_at": build.get("built_at") or "",
+            "daily_latest": daily_latest or "—",
+            "hourly_latest": hourly_latest or "—",
+            "row_count": int(build.get("row_count") or 0),
         })
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500

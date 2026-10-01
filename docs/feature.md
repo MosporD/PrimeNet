@@ -228,26 +228,6 @@ offer catalog). See `docs/NEXUSCORE_VISION.md` §5.
 
 **Plan:** Tune live SFTP workers against &lt;15 min lag SLO on production hosts. Enable Huawei adapter when SFTP paths exist.
 
-### Huawei PM Query Studio
-
-| | |
-|---|---|
-| Slug | `performance-analytics` |
-| Route | `/performance-analytics` |
-| Access | admin |
-| Version | V1.0 |
-| Brief | [`features/performance-analytics.md`](features/performance-analytics.md) |
-| Progress | [`features/performance-analytics.progress.md`](features/performance-analytics.progress.md) |
-
-**User sees:** Admin queries live Huawei MAE/U2020 PM via Query Studio (not the SQLite Excel warehouse).
-
-**What it does:** Studio UI for Huawei PM tables beyond the main Explorer presets.
-
-**Progress:** [`features/performance-analytics.progress.md`](features/performance-analytics.progress.md)
-
-
-**Plan:** None parked.
-
 ### Network Coverage Heatmap
 
 | | |

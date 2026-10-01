@@ -280,7 +280,7 @@ def _generate_site_inventory(technology: str = 'all'):
     conn.close()
 
     tech_label = tech_key if tech_key in tech_filters else 'ALL'
-    pull_date = datetime.now().strftime('%Y-%m-%d')
+    pull_date = datetime.now().strftime('%Y%m%d_%H%M%S')
 
     wb = Workbook()
     hdr_fill = PatternFill(start_color='2C3E50', end_color='2C3E50', fill_type='solid')
@@ -518,7 +518,7 @@ def _generate_sector_health_excel(*, active_only: bool = True):
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
-    pull_date = datetime.now().strftime('%Y-%m-%d')
+    pull_date = datetime.now().strftime('%Y%m%d_%H%M%S')
     if active_only:
         filename = f"Sector_Health_{pull_date}.xlsx"
     else:

@@ -87,6 +87,87 @@ def load_catalog() -> list[dict[str, Any]]:
     return reports
 
 
+def save_catalog(reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Persist catalog to disk after normalizing each entry."""
+    normalized: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(reports or []):
+        report = _normalize_report(raw, index)
+        if not report or report["slug"] in seen:
+            continue
+        seen.add(report["slug"])
+        normalized.append(report)
+    normalized.sort(key=lambda item: item["title"].casefold())
+    os.makedirs(os.path.dirname(CATALOG_PATH), exist_ok=True)
+    tmp_path = CATALOG_PATH + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as fh:
+        json.dump(normalized, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+    os.replace(tmp_path, CATALOG_PATH)
+    return normalized
+
+
+def _slugify_title(title: str) -> str:
+    import re
+
+    slug = re.sub(r"[^a-z0-9]+", "-", (title or "").strip().lower()).strip("-")
+    return slug or "report"
+
+
+def add_report(
+    *,
+    title: str,
+    url: str,
+    description: str = "",
+    slug: str | None = None,
+    visibility: str = VISIBILITY_ALL,
+) -> dict[str, Any]:
+    """Add or replace a Power BI gallery card. Raises ValueError on validation failure."""
+    catalog = load_catalog()
+    desired_slug = (slug or "").strip().lower() or _slugify_title(title)
+    # Ensure uniqueness when adding a new slug that collides with another title.
+    existing_slugs = {r["slug"] for r in catalog}
+    if desired_slug in existing_slugs and not slug:
+        base = desired_slug
+        n = 2
+        while f"{base}-{n}" in existing_slugs:
+            n += 1
+        desired_slug = f"{base}-{n}"
+
+    candidate = {
+        "slug": desired_slug,
+        "title": title,
+        "url": url,
+        "description": description,
+        "visibility": visibility or VISIBILITY_ALL,
+    }
+    report = _normalize_report(candidate, len(catalog))
+    if not report:
+        raise ValueError(
+            "Invalid report: need title, description optional, and a Power BI URL "
+            f"starting with {ALLOWED_URL_PREFIXES[0]}"
+        )
+
+    # Replace same slug if present; otherwise append.
+    next_catalog = [r for r in catalog if r["slug"] != report["slug"]]
+    next_catalog.append(report)
+    save_catalog(next_catalog)
+    return report
+
+
+def remove_report(slug: str) -> bool:
+    """Remove a report by slug. Returns True if something was removed."""
+    key = str(slug or "").strip().lower()
+    if not key:
+        return False
+    catalog = load_catalog()
+    next_catalog = [r for r in catalog if r["slug"] != key]
+    if len(next_catalog) == len(catalog):
+        return False
+    save_catalog(next_catalog)
+    return True
+
+
 def reports_for_role(user_or_role) -> list[dict[str, Any]]:
     role = _role_key(user_or_role)
     return [

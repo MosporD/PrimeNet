@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — {{ vendor_label }} {{ rat_label }} Benchmark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=7.0">
+</head>
+<body class="nh-page nh-hub-page"
+      data-vendor="{{ vendor }}"
+      data-rat="{{ rat }}"
+      data-vendor-label="{{ vendor_label }}"
+      data-rat-label="{{ rat_label }}">
+    <header>
+        <div class="header-content">
+            <a href="/network-health/tech?vendor={{ vendor }}" class="back-link">Technology</a>
+            <div class="header-left">
+                <h1>{{ vendor_label }} {{ rat_label }} Benchmark Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <img src="/parameter_dictionary/static/images/{{ vendor }}_logo.png"
+                     alt="{{ vendor_label }}" class="nh-header-vendor-logo">
+                <span class="user-name">{{ user.username }}</span>
+                <button type="button" class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="nh-hub-main">
+        <div class="nh-hub-frame">
+            <div class="nh-hub-kpi-panel">
+                <div class="nh-hub-kpi-grid" id="nh-hub-kpi-grid">
+                    <p class="nh-hub-loading">Loading KPIs…</p>
+                </div>
+            </div>
+            <div class="nh-hub-side">
+                <button type="button" class="nh-hub-cell-checker" id="nh-hub-cell-checker">Cell Checker</button>
+                <div class="nh-hub-dates" id="nh-hub-dates">
+                    <div>Daily’s Latest Date: <span id="nh-hub-daily-date">—</span></div>
+                    <div>Hourly’s Latest Period: <span id="nh-hub-hourly-date">—</span></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="nh-checker-modal" id="nh-checker-modal" hidden>
+        <div class="nh-checker-dialog" role="dialog" aria-modal="true" aria-labelledby="nh-checker-title">
+            <div class="nh-checker-head">
+                <h2 id="nh-checker-title">Cell Checker</h2>
+                <button type="button" class="nh-checker-close" id="nh-checker-close" aria-label="Close">×</button>
+            </div>
+            <p class="nh-checker-hint">Search a cell by name or DN, then open daily + hourly trends.</p>
+            <div class="nh-checker-form">
+                <input type="search" id="nh-checker-q" placeholder="Cell name / DN…" autocomplete="off">
+                <select id="nh-checker-kpi" aria-label="KPI"></select>
+                <button type="button" id="nh-checker-go" class="nh-continue-btn">Load trend</button>
+            </div>
+            <div id="nh-checker-status" class="nh-checker-status"></div>
+            <div class="nh-checker-charts">
+                <canvas id="nh-checker-daily" height="160"></canvas>
+                <canvas id="nh-checker-hourly" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
+    <script src="{{ url_for('network_health.static', filename='network_health_hub.js') }}?v=1.0"></script>
+    <script>
+    async function logout() {
+        try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}
+        window.location.href = '/login';
+    }
+    </script>
+</body>
+</html>

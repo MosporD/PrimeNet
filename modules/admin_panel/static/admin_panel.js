@@ -90,6 +90,9 @@ function openAdminPage(pageName) {
     if (pageName === 'pm-plus-rules') {
         refreshPmPlusRules();
     }
+    if (pageName === 'power-bi') {
+        loadPowerBiAdminCatalog();
+    }
     if (pageName === 'ops-alerts') {
         loadRetCredentialFallbacks();
         loadCmExtractActivity();
@@ -1686,5 +1689,110 @@ async function runPmPlusRollup() {
         showNotification(data.success ? 'Rollup finished' : (data.error || 'Rollup failed'), data.success ? 'success' : 'error');
     } catch (e) {
         showNotification('Network error running rollup', 'error');
+    }
+}
+
+// --- Power BI gallery catalog (Engineering Admin) ---
+
+function _powerBiAdminMsg(text, isError) {
+    const el = document.getElementById('power-bi-admin-msg');
+    if (!el) return;
+    el.style.display = text ? 'block' : 'none';
+    el.textContent = text || '';
+    el.classList.toggle('error', Boolean(isError));
+}
+
+function _escPowerBi(v) {
+    return String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+async function loadPowerBiAdminCatalog() {
+    const body = document.getElementById('power-bi-admin-body');
+    if (!body) return;
+    body.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+        const res = await fetch('/api/admin/power-bi/reports');
+        const data = await res.json();
+        if (!data.success) {
+            body.innerHTML = `<tr><td colspan="4" style="text-align:center;">${_escPowerBi(data.error || 'Failed')}</td></tr>`;
+            return;
+        }
+        const reports = data.reports || [];
+        if (!reports.length) {
+            body.innerHTML = '<tr><td colspan="4" style="text-align:center;">No cards yet. Add one above.</td></tr>';
+            return;
+        }
+        body.innerHTML = reports.map((r) => {
+            const slug = _escPowerBi(r.slug);
+            const title = _escPowerBi(r.title);
+            const desc = _escPowerBi(r.description || '');
+            const url = _escPowerBi(r.url || '');
+            return `<tr>
+                <td><strong>${title}</strong><div class="field-hint">${slug}</div></td>
+                <td>${desc}</td>
+                <td style="max-width:280px; word-break:break-all;"><a href="${url}" target="_blank" rel="noopener">${url}</a></td>
+                <td><button type="button" class="btn-user-secondary" onclick="removePowerBiReport('${slug}')">Remove</button></td>
+            </tr>`;
+        }).join('');
+    } catch (e) {
+        body.innerHTML = '<tr><td colspan="4" style="text-align:center;">Network error</td></tr>';
+    }
+}
+
+async function addPowerBiReport(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    const title = (document.getElementById('power-bi-title')?.value || '').trim();
+    const url = (document.getElementById('power-bi-url')?.value || '').trim();
+    const description = (document.getElementById('power-bi-description')?.value || '').trim();
+    if (!title || !url) {
+        _powerBiAdminMsg('Name and URL are required.', true);
+        return false;
+    }
+    _powerBiAdminMsg('Saving...');
+    try {
+        const res = await fetch('/api/admin/power-bi/reports', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, url, description }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            _powerBiAdminMsg(data.error || 'Save failed', true);
+            showNotification(data.error || 'Save failed', 'error');
+            return false;
+        }
+        document.getElementById('power-bi-title').value = '';
+        document.getElementById('power-bi-url').value = '';
+        document.getElementById('power-bi-description').value = '';
+        _powerBiAdminMsg('Added.');
+        showNotification('Power BI card added', 'success');
+        loadPowerBiAdminCatalog();
+    } catch (e) {
+        _powerBiAdminMsg('Network error', true);
+        showNotification('Network error', 'error');
+    }
+    return false;
+}
+
+async function removePowerBiReport(slug) {
+    if (!slug) return;
+    if (!confirm(Remove Power BI card ""?)) return;
+    try {
+        const res = await fetch(/api/admin/power-bi/reports/, {
+            method: 'DELETE',
+        });
+        const data = await res.json();
+        if (!data.success) {
+            showNotification(data.error || 'Remove failed', 'error');
+            return;
+        }
+        showNotification('Power BI card removed', 'success');
+        loadPowerBiAdminCatalog();
+    } catch (e) {
+        showNotification('Network error', 'error');
     }
 }

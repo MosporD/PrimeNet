@@ -442,7 +442,14 @@ def _sector_to_payload(sec: dict, lte_bands: list[str], *, include_full_coverage
     return row
 
 
-def _filter_sectors(sectors: list[dict], *, area: str = '', rat: str = '', search: str = '') -> list[dict]:
+def _filter_sectors(
+    sectors: list[dict],
+    *,
+    area: str = '',
+    rat: str = '',
+    search: str = '',
+    vendor: str = '',
+) -> list[dict]:
     out = sectors
     if area:
         out = [s for s in out if s.get('area') == area]
@@ -463,6 +470,27 @@ def _filter_sectors(sectors: list[dict], *, area: str = '', rat: str = '', searc
         out = [s for s in out if s.get('has_lte')]
     elif rat == 'NO_LTE':
         out = [s for s in out if not s.get('has_lte')]
+    vendor_key = (vendor or '').strip().lower()
+    if vendor_key:
+        def _vendor_match(sec: dict) -> bool:
+            label = str(sec.get('vendor_label') or '').strip()
+            vendors = {
+                _normalize_vendor_name(v)
+                for v in (sec.get('vendors') or [])
+                if str(v or '').strip()
+            }
+            if vendor_key in ('thin', 'thin_layer', 'huawei_nokia_thin'):
+                return label in THIN_LAYER_LABELS or label == VENDOR_LABEL_TDD_NOKIA
+            if vendor_key == 'huawei':
+                return 'Huawei' in vendors and 'Nokia' not in vendors
+            if vendor_key == 'nokia':
+                return 'Nokia' in vendors and 'Huawei' not in vendors
+            if vendor_key in ('mix', 'mixed', 'both'):
+                return 'Huawei' in vendors and 'Nokia' in vendors
+            # Exact vendor_label match (case-insensitive)
+            return label.lower() == vendor_key or vendor_key in {v.lower() for v in vendors}
+
+        out = [s for s in out if _vendor_match(s)]
     if search:
         q = search.lower()
         out = [
@@ -548,12 +576,13 @@ def build_sector_health_api_response(
     area: str = '',
     rat: str = '',
     search: str = '',
+    vendor: str = '',
     active_only: bool = True,
 ) -> dict:
     """Summary-only API for Sector Health (no sector table)."""
     lte_bands, all_rows = build_sector_health_bundle(active_only=active_only)
     areas = sorted({s['area'] for s in all_rows if s.get('area')})
-    filtered = _filter_sectors(all_rows, area=area, rat=rat, search=search)
+    filtered = _filter_sectors(all_rows, area=area, rat=rat, search=search, vendor=vendor)
 
     return {
         'generated_at': datetime.now(timezone.utc).isoformat(),

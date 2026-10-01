@@ -1,0 +1,35 @@
+(function () {
+    'use strict';
+
+    function selectedAttr(containerId, attr, fallback) {
+        const grid = document.getElementById(containerId);
+        const sel = grid && grid.querySelector('.selected, [aria-pressed="true"]');
+        if (sel && sel.getAttribute('data-' + attr)) {
+            return sel.getAttribute('data-' + attr);
+        }
+        return fallback;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const vendor = document.body.dataset.vendor || 'nokia';
+        let rat = document.body.dataset.defaultRat || selectedAttr('nh-rat-grid', 'rat', '3G');
+        const grid = document.getElementById('nh-rat-grid');
+
+        grid?.addEventListener('click', function (ev) {
+            const card = ev.target.closest('[data-rat]');
+            if (!card) return;
+            grid.querySelectorAll('[data-rat]').forEach(function (el) {
+                const sel = el === card;
+                el.classList.toggle('selected', sel);
+                el.setAttribute('aria-pressed', sel ? 'true' : 'false');
+            });
+            rat = card.getAttribute('data-rat');
+            window.location.href = '/network-health/hub?vendor=' +
+                encodeURIComponent(vendor) + '&rat=' + encodeURIComponent(rat);
+        });
+
+        document.getElementById('nh-tech-back')?.addEventListener('click', function () {
+            window.location.href = '/network-health';
+        });
+    });
+})();

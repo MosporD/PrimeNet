@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet — Network Health — {{ rat_label }} {{ vendor_label }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
-    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=6.4">
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=7.0">
 </head>
 <body class="nh-page"
       data-vendor="{{ vendor }}"
       data-rat="{{ rat }}"
       data-vendor-label="{{ vendor_label }}"
-      data-rat-label="{{ rat_label }}">
+      data-rat-label="{{ rat_label }}"
+      data-initial-kpi="{{ initial_kpi or '' }}">
     <header>
         <div class="header-content">
-            <a href="/dashboard" class="back-link">Dashboard</a>
+            <a href="/network-health/hub?vendor={{ vendor }}&rat={{ rat }}" class="back-link">KPI Hub</a>
             <div class="header-left">
                 <h1>Network Health</h1>
                 <div class="nh-context-switcher">
@@ -31,7 +32,7 @@
                             {% for r in rats %}
                         <a class="nh-context-menu-item{% if v.key == vendor and r.key == rat %} active{% endif %}"
                            role="menuitem"
-                           href="/network-health/view?vendor={{ v.key }}&rat={{ r.key }}">
+                           href="/network-health/hub?vendor={{ v.key }}&rat={{ r.key }}">
                             <span class="nh-context-menu-rat">{{ r.label }}</span>
                             <span class="nh-context-menu-sep">·</span>
                             <span class="nh-context-menu-vendor">{{ v.label }}</span>
@@ -154,7 +155,7 @@
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
     <script src="{{ url_for('performance.static', filename='chart.umd.min.js') }}"></script>
-    <script src="{{ url_for('network_health.static', filename='network_health.js') }}?v=6.4"></script>
+    <script src="{{ url_for('network_health.static', filename='network_health.js') }}?v=6.5"></script>
     <script>
     async function logout() {
         try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}

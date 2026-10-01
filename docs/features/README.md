@@ -64,7 +64,6 @@ Cross-cutting platform work (suite launcher, shared activation, etc.) goes in
 - [Dashboard](dashboard.md) · [progress](dashboard.progress.md)
 - [Performance Explorer](performance.md) · [progress](performance.progress.md)
 - [Performance Explorer Plus](performance-explorer-plus.md) · [progress](performance-explorer-plus.progress.md)
-- [Huawei PM Query Studio](performance-analytics.md) · [progress](performance-analytics.progress.md)
 - [Network Coverage Heatmap](cell-heatmap.md) · [progress](cell-heatmap.progress.md)
 - [Network Map](network-map.md) · [progress](network-map.progress.md)
 - [Neighbor Analysis](neighbor-analysis.md) · [progress](neighbor-analysis.progress.md)

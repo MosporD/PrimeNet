@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [`performance.md`](performance.md)
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-01 (Groups not loading on Postgres)
+
+- Root cause: raw groups fallback used `<> ""` (empty double-quoted identifier on PG) → `/api/performance/groups` 500; also matched KPI “Rate” columns as technology via loose `rat` substring.
+- Done: empty-string rewrite in `db.app_sql`; groups SQL uses `''`; skip `groups`/`group_cells` in raw specs; exact tech/site column pick; per-table try/except on raw listing.
+- Note: live env `NCM_PG_DOMAINS` without `pm` → cell tree (metadata) works, KPI columns / trends need `pm` enabled.
+- NEXT: Smoke Groups mode + cell area tree on 97.141; confirm `pm` in `NCM_PG_DOMAINS` on server.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: `performance_meta_pm_conn` opens metadata schema and returns PM schema aliases (`pm_nokia_hourly`, …) for `alias."table"` SQL — no SQLite ATTACH. Table listing uses `list_tables` / adapted `sqlite_master` SQL. Data appears only after Daily/Hourly load into PG schemas.

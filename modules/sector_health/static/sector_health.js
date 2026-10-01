@@ -117,9 +117,11 @@ function buildQueryParams() {
     const p = new URLSearchParams();
     const area = document.getElementById('sh-area')?.value || '';
     const rat = document.getElementById('sh-rat')?.value || '';
+    const vendor = document.getElementById('sh-vendor')?.value || '';
     const q = document.getElementById('sh-search')?.value?.trim() || '';
     if (area) p.set('area', area);
     if (rat) p.set('rat', rat);
+    if (vendor) p.set('vendor', vendor);
     if (q) p.set('q', q);
     if (shAllCellsMode()) p.set('all_cells', '1');
     return p;
@@ -269,6 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sh-refresh')?.addEventListener('click', loadSectorHealth);
     document.getElementById('sh-area')?.addEventListener('change', scheduleLoad);
     document.getElementById('sh-rat')?.addEventListener('change', scheduleLoad);
+    document.getElementById('sh-vendor')?.addEventListener('change', scheduleLoad);
     document.getElementById('sh-search')?.addEventListener('input', scheduleLoad);
     loadSectorHealth();
 });

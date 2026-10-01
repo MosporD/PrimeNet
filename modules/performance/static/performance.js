@@ -1524,6 +1524,16 @@ async function loadCellGroups(opts = {}) {
         const data = await res.json();
         if (!_isPerfTreeLoadCurrent(token)) return;
         if (!data.success) {
+            allCellGroups = [];
+            sel.innerHTML = '<option value="">Select group...</option>';
+            const o = document.createElement('option');
+            o.value = '';
+            o.textContent = data.error || 'Failed to load groups';
+            sel.appendChild(o);
+            if (_currentSelectionType() === 'group') {
+                showGroupPicker([]);
+                _perfQueryUserMessage(data.error || 'Failed to load groups');
+            }
             return;
         }
         allCellGroups = Array.isArray(data.groups) ? data.groups : [];
@@ -2962,9 +2972,23 @@ async function applyFilters(opts = {}) {
 
     const res  = await fetch('/api/performance/cells/areas?' + params);
     if (!_isPerfTreeLoadCurrent(token)) return;
-    const data = await res.json();
+    let data = {};
+    try {
+        data = await res.json();
+    } catch (_) {
+        data = { success: false, error: `Bad response (${res.status})` };
+    }
     if (!_isPerfTreeLoadCurrent(token)) return;
-    if (!data.success) return;
+    if (!res.ok || !data.success) {
+        const msg = data.error || `Failed to load cells (${res.status})`;
+        const listEl2 = document.getElementById('cell-list');
+        if (listEl2) {
+            listEl2.innerHTML = `<p class="perf-tree-empty">${escHtml(msg)}</p>`;
+        }
+        document.getElementById('charts-title').textContent = 'Could not load cell list';
+        if (typeof showNotification === 'function') showNotification(msg, 'error');
+        return;
+    }
     // User may have switched to Groups while this cell fetch was in flight.
     if (_currentSelectionType() !== 'cell') return;
 

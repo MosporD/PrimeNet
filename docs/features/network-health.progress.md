@@ -4,8 +4,12 @@ Detailed dated log for this blueprint. Brief: [`network-health.md`](network-heal
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-01 (Wizard UI + Cell Checker)
 
----
+- Stepped flow: vendor → tech → KPI hub → detail; Cell Checker lookup (daily+hourly trend).
+- Hub shows KPI button grid + latest daily/hourly stamps (`/api/network-health/meta`).
+- NEXT: Smoke wizard on 97.141 after precalc has rows for Nokia/3G.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

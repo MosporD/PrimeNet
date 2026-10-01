@@ -27,16 +27,10 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         let vendor = document.body.dataset.defaultVendor || selectedAttr('nh-vendor-grid', 'vendor', 'nokia');
-        let rat = document.body.dataset.defaultRat || selectedAttr('nh-rat-grid', 'rat', '3G');
 
-        bindCardGroup('nh-vendor-grid', 'vendor', function (v) { vendor = v; });
-        bindCardGroup('nh-rat-grid', 'rat', function (r) { rat = r; });
-
-        document.getElementById('nh-continue-btn')?.addEventListener('click', function () {
-            vendor = selectedAttr('nh-vendor-grid', 'vendor', vendor);
-            rat = selectedAttr('nh-rat-grid', 'rat', rat);
-            window.location.href = '/network-health/view?vendor=' +
-                encodeURIComponent(vendor) + '&rat=' + encodeURIComponent(rat);
+        bindCardGroup('nh-vendor-grid', 'vendor', function (v) {
+            vendor = v;
+            window.location.href = '/network-health/tech?vendor=' + encodeURIComponent(vendor);
         });
     });
 })();

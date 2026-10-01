@@ -583,6 +583,14 @@ _FILTERS_CACHE_TTL_SEC = 180
 
 
 def _db_mtime_token(db_path: str) -> str:
+    """Cache-bust token. On Postgres use schema name (file mtime is meaningless)."""
+    try:
+        from db.pg_domains import schema_for_sqlite_path
+        schema = schema_for_sqlite_path(db_path)
+        if schema:
+            return f"pg:{schema}"
+    except Exception:
+        pass
     try:
         st = os.stat(db_path)
         return str(getattr(st, "st_mtime_ns", int(st.st_mtime * 1_000_000_000)))
@@ -1000,8 +1008,14 @@ def _table_has_column(conn: sqlite3.Connection, table: str, column: str) -> bool
     return any(str(c).strip().lower() == want for c in cols)
 
 
-def _pick_first_col(cols: list[str], keywords: tuple[str, ...]) -> str | None:
+def _pick_first_col(cols: list[str], keywords: tuple[str, ...], *, exact: bool = False) -> str | None:
     low_map = {c: _norm_col_name(c) for c in cols}
+    if exact:
+        for kw in keywords:
+            for c, low in low_map.items():
+                if low == kw:
+                    return c
+        return None
     for kw in keywords:
         for c, low in low_map.items():
             if kw in low:
@@ -1011,7 +1025,10 @@ def _pick_first_col(cols: list[str], keywords: tuple[str, ...]) -> str | None:
 
 def _raw_group_table_specs(conn: sqlite3.Connection) -> list[tuple[str, str, str | None, str | None, str | None]]:
     specs: list[tuple[str, str, str | None, str | None, str | None]] = []
+    skip = {'groups', 'group_cells'}
     for table in sorted(list_tables(conn)):
+        if str(table).strip().lower() in skip:
+            continue
         cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
         if not cols:
             continue
@@ -1019,8 +1036,8 @@ def _raw_group_table_specs(conn: sqlite3.Connection) -> list[tuple[str, str, str
         ccol = _pick_first_col(cols, ('cell name', 'cell_name', 'cellname', 'wcel', 'lncel', 'nrcel', 'bts'))
         if not gcol:
             continue
-        tcol = _pick_first_col(cols, ('technology', 'tech', 'rat'))
-        scol = _pick_first_col(cols, ('site_id', 'site id', 'site'))
+        tcol = _pick_first_col(cols, ('technology', 'tech', 'rat'), exact=True)
+        scol = _pick_first_col(cols, ('site_id', 'site id', 'site'), exact=True)
         specs.append((table, gcol, ccol, tcol, scol))
     return specs
 
@@ -2235,11 +2252,15 @@ def get_cell_groups():
             sql = (
                 f'SELECT {_sqlite_ident(gcol)} AS gname, COUNT(1) AS cell_count '
                 f'FROM {_sqlite_ident(table)} '
-                f'WHERE {_sqlite_ident(gcol)} IS NOT NULL AND TRIM(CAST({_sqlite_ident(gcol)} AS TEXT)) <> "" '
+                f'WHERE {_sqlite_ident(gcol)} IS NOT NULL AND TRIM(CAST({_sqlite_ident(gcol)} AS TEXT)) <> \'\' '
                 f'GROUP BY {_sqlite_ident(gcol)} '
                 f'ORDER BY gname'
             )
-            for r in conn.execute(sql).fetchall():
+            try:
+                raw_rows = conn.execute(sql).fetchall()
+            except Exception:
+                continue
+            for r in raw_rows:
                 gname = str(r[0] or '').strip()
                 if not gname:
                     continue
@@ -2713,7 +2734,7 @@ def _cells_filter_where(vendor, technology, site_id, cluster, area, search=''):
         q = f'%{str(search).strip().lower()}%'
         where.append('''(
             LOWER(v.cell_name) LIKE ?
-            OR LOWER(COALESCE(st.site_name, '')) LIKE ?
+            OR LOWER(COALESCE(v.site_name, '')) LIKE ?
             OR CAST(v.site_id AS TEXT) LIKE ?
             OR LOWER(COALESCE(v.technology, '')) LIKE ?
         )''')

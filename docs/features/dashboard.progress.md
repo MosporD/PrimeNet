@@ -5,11 +5,15 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 **Parked:** Dark-mode contrast browser verify.
 
-**NEXT:** Browser verify light/dark on dashboard + one radio + one standalone + login.
+**NEXT:** Browser verify Operations Panel health on server after deploy (PG size + latest timestamps).
 
 ---
+## 2026-10-01 (Operations Panel Postgres health)
 
----
+- Root cause: `pm_health` / `neighbor_health` still treated leftover `*.db` file size/mtime as live store and used SQLite `rowid` sampling for “latest data”.
+- Done: shared `db.runtime.store_health` (schema + `pg_total_relation_size`); timestamp bounds via MIN/MAX / `ctid` sample; unmapped domains report MISSING under Postgres-only runtime.
+- NEXT: Smoke Operations Panel Database Health + Neighbor Health on 97.141 after rebuild.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

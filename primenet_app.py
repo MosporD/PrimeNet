@@ -100,7 +100,6 @@ from modules.ran_features.routes import ran_features_bp
 from modules.son_analytics.routes import son_analytics_bp
 from modules.network_health.routes import network_health_bp
 from modules.sector_health.routes import sector_health_bp
-from modules.performance_analytics import performance_analytics_bp
 from modules.performance_explorer_plus import performance_explorer_plus_bp
 from modules.radio_api import radio_api_bp
 from modules.neighbor_quality import neighbor_quality_bp
@@ -154,7 +153,6 @@ app.register_blueprint(ran_features_bp)
 app.register_blueprint(son_analytics_bp)
 app.register_blueprint(network_health_bp)
 app.register_blueprint(sector_health_bp)
-app.register_blueprint(performance_analytics_bp)
 app.register_blueprint(performance_explorer_plus_bp)
 app.register_blueprint(radio_api_bp)
 app.register_blueprint(neighbor_quality_bp)

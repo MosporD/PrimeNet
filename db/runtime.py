@@ -552,6 +552,70 @@ def store_available(path: str | None) -> bool:
     return schema_for_sqlite_path(path) is not None
 
 
+def store_health(path: str | None) -> dict:
+    """
+    Health metadata for Operations Panel / audits.
+
+    Prefers the Postgres schema when the store is mapped — never reports a
+    leftover ``*.db`` file size as if it were the live backend.
+    """
+    from datetime import datetime, timezone
+
+    if not path:
+        return {'exists': False, 'path': path}
+    schema = schema_for_sqlite_path(path)
+    if schema:
+        out: dict = {
+            'exists': True,
+            'path': path,
+            'backend': 'postgres',
+            'schema': schema,
+        }
+        try:
+            conn = open_db(path, timeout=30)
+            try:
+                row = conn.execute(
+                    """
+                    SELECT ROUND(
+                        COALESCE(SUM(pg_total_relation_size(
+                            quote_ident(schemaname) || '.' || quote_ident(relname)
+                        )), 0)::numeric / (1024 * 1024),
+                        2
+                    ) AS size_mb
+                    FROM pg_catalog.pg_stat_user_tables
+                    WHERE schemaname = current_schema()
+                    """
+                ).fetchone()
+                size = row[0] if row is not None else None
+                if size is not None:
+                    out['size_mb'] = float(size)
+            finally:
+                conn.close()
+        except Exception:
+            pass
+        return out
+    # Postgres-only runtime: stale SQLite files are not a live store.
+    if postgres_url():
+        return {
+            'exists': False,
+            'path': path,
+            'backend': None,
+            'reason': 'schema_not_mapped',
+        }
+    if not os.path.isfile(path):
+        return {'exists': False, 'path': path}
+    st = os.stat(path)
+    return {
+        'exists': True,
+        'path': path,
+        'backend': 'sqlite-file',
+        'size_mb': round(st.st_size / (1024 * 1024), 2),
+        'modified_utc': datetime.fromtimestamp(st.st_mtime, tz=timezone.utc).strftime(
+            '%Y-%m-%d %H:%M:%S'
+        ),
+    }
+
+
 def open_db(db_path: str, timeout: float = 120):
     """Open the Postgres schema mapped to this canonical store path."""
     require_activation()

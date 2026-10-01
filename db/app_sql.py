@@ -39,6 +39,13 @@ _SELECT_SQL_MASTER = re.compile(
     re.IGNORECASE,
 )
 _COLLATE_NOCASE = re.compile(r'\s+COLLATE\s+NOCASE\b', re.IGNORECASE)
+# SQLite callers sometimes write empty string as "" (empty identifier on PG).
+_EMPTY_DQUOTE_COMPARE = re.compile(
+    r'(<>|!=|=)\s*""',
+)
+_EMPTY_DQUOTE_COMPARE_LEFT = re.compile(
+    r'""\s*(<>|!=|=)',
+)
 
 
 _CAST_OPEN = re.compile(r'\bCAST\s*\(', re.IGNORECASE)
@@ -259,6 +266,13 @@ def rewrite_insert_or(sql: str) -> str:
     return body + ' ON CONFLICT DO NOTHING'
 
 
+def rewrite_empty_double_quoted_literals(sql: str) -> str:
+    """Map ``= ""`` / ``<> ""`` style empty strings to proper ``''`` literals."""
+    sql = _EMPTY_DQUOTE_COMPARE.sub(r"\1 ''", sql)
+    sql = _EMPTY_DQUOTE_COMPARE_LEFT.sub(r"'' \1", sql)
+    return sql
+
+
 def adapt_sqlite_app_sql(sql: str) -> str:
     """Rewrite SQLite DDL/DML so Postgres accepts it."""
     pragma = rewrite_pragma(sql)
@@ -266,6 +280,7 @@ def adapt_sqlite_app_sql(sql: str) -> str:
         return qmark_to_percent(pragma)
     sql = rewrite_sqlite_master(sql)
     sql = rewrite_numeric_casts(sql)
+    sql = rewrite_empty_double_quoted_literals(sql)
     sql = rewrite_insert_or(sql)
     sql = _ON_CONFLICT_REPLACE.sub(r'UNIQUE (\1)', sql)
     sql = _ON_CONFLICT_REPLACE_BARE.sub('', sql)

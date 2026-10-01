@@ -694,6 +694,7 @@ def get_all_sites():
             offline AS (
                 SELECT
                     site_id,
+                    COUNT(*) AS cell_count,
                     SUM(
                         CASE WHEN LOWER(TRIM(COALESCE(activity_status, status, ''))) = 'inactive'
                              THEN 1 ELSE 0 END
@@ -726,6 +727,7 @@ def get_all_sites():
             SELECT DISTINCT
                 s.site_id, s.site_name, s.latitude, s.longitude,
                 s.region, s.site_type, s.vendor, s.status,
+                COALESCE(o.cell_count, 0) AS cell_count,
                 COALESCE(o.offline_cell_count, 0) AS offline_cell_count,
                 COALESCE(fs.full_sector_offline_count, 0) AS full_sector_offline_count
             FROM filtered f
@@ -741,6 +743,12 @@ def get_all_sites():
             cluster, area = _derive_cluster_area(s.get('site_id'))
             s['cluster'] = cluster
             s['area'] = area
+            try:
+                total = int(s.get('cell_count') or 0)
+                offline = int(s.get('offline_cell_count') or 0)
+            except (TypeError, ValueError):
+                total, offline = 0, 0
+            s['active_cell_count'] = max(0, total - offline)
         _assign_area_from_nearest_known(sites)
         conn.close()
 

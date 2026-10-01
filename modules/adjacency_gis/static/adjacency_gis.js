@@ -841,13 +841,32 @@ function applyClientFilters(sites) {
     const vendor  = document.getElementById('vendor-filter').value;
     const area    = document.getElementById('area-filter').value;
     const cluster = document.getElementById('cluster-filter').value;
+    const activity = (document.getElementById('activity-filter')?.value || 'active').toLowerCase();
 
     return sites.filter(s => {
         if (!NEIGHBOR_ONLY_MODE && vendor !== 'all' && s.vendor !== vendor) return false;
         if (area    !== 'all' && s.area            !== area)    return false;
         if (cluster !== 'all' && String(s.cluster) !== cluster) return false;
+        if (activity === 'active') {
+            const activeCount = Number(s.active_cell_count);
+            if (Number.isFinite(activeCount)) {
+                if (activeCount <= 0) return false;
+            } else {
+                const total = Number(s.cell_count);
+                const offline = Number(s.offline_cell_count) || 0;
+                if (Number.isFinite(total) && total > 0 && offline >= total) return false;
+            }
+        }
         return true;
     });
+}
+
+function activityFilterActiveOnly() {
+    return (document.getElementById('activity-filter')?.value || 'active').toLowerCase() === 'active';
+}
+
+function filterByActivity() {
+    runFilters();
 }
 
 function _zoomToSiteSearchMatches(sites) {
@@ -1290,11 +1309,15 @@ async function showSiteDetails(siteId) {
         if (!site.area) site.area = CLUSTER_AREA[site.cluster] || 'Unknown';
 
         // Filter to active tech; keep all when 'all'
-        const cells = (activeTech === 'all')
+        let cells = (activeTech === 'all')
             ? site.cells
             : site.cells.filter(cellMatchesMapTechFilter);
+        // Active-only view: hide offline cells from the list as well as wedges.
+        if (activityFilterActiveOnly()) {
+            cells = cells.filter(cellOperational);
+        }
 
-        // Wedges only for on-air cells; offline cells stay in the list panel only.
+        // Wedges only for on-air cells; offline cells stay in the list panel only (All view).
         const wedgeCells = cells.filter(cellOperational);
         lastNeighborSiteContext = { site, wedgeCells };
 
@@ -2294,7 +2317,13 @@ async function refreshNeighborOverlay() {
         }
     } catch (e) {
         console.error('Neighbor lines error:', e);
-        showNotification('Failed to load neighbor lines', 'error');
+        const detail = (e && e.message) ? String(e.message) : '';
+        showNotification(
+            detail && detail !== 'neighbors lines failed'
+                ? `Failed to load neighbor lines: ${detail}`
+                : 'Failed to load neighbor lines',
+            'error'
+        );
     }
 }
 
@@ -3646,6 +3675,7 @@ function getNetworkMapState() {
         coordLng: _val('coord-lng'),
         cellCodeSearch: _val('cell-code-search'),
         vendor: _val('vendor-filter') || 'all',
+        activity: _val('activity-filter') || 'active',
         area: _val('area-filter') || 'all',
         cluster: _val('cluster-filter') || 'all',
         techSpecific: _val('tech-specific-filter') || 'all',
@@ -3677,6 +3707,7 @@ async function applyNetworkMapState(state /* , opts */) {
     }
 
     _setIfExists('vendor-filter', state.vendor || 'all');
+    _setIfExists('activity-filter', state.activity || 'active');
     _setIfExists('area-filter', state.area || 'all');
     // Cluster list depends on area, so rebuild it before assigning.
     if (sitesData && sitesData.length) {

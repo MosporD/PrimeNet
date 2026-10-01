@@ -937,3 +937,59 @@ def api_pm_plus_rollup():
         return jsonify({'success': True, **out})
     except Exception as exc:
         return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/power-bi/reports', methods=['GET'])
+@admin_required
+def api_power_bi_reports_list():
+    from modules.power_bi.logic import load_catalog
+    return jsonify({'success': True, 'reports': load_catalog()})
+
+
+@admin_panel_bp.route('/api/admin/power-bi/reports', methods=['POST'])
+@admin_required
+def api_power_bi_reports_add():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    body = request.get_json(silent=True) or {}
+    try:
+        from modules.power_bi.logic import add_report
+        report = add_report(
+            title=str(body.get('title') or body.get('name') or ''),
+            url=str(body.get('url') or ''),
+            description=str(body.get('description') or ''),
+            slug=str(body.get('slug') or '') or None,
+            visibility=str(body.get('visibility') or 'all'),
+        )
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'power_bi_report_add',
+            f"Added Power BI card: {report.get('title')}",
+        )
+        return jsonify({'success': True, 'report': report})
+    except ValueError as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/power-bi/reports/<slug>', methods=['DELETE'])
+@admin_required
+def api_power_bi_reports_remove(slug):
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    try:
+        from modules.power_bi.logic import remove_report
+        removed = remove_report(slug)
+        if not removed:
+            return jsonify({'success': False, 'error': 'Report not found'}), 404
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'power_bi_report_remove',
+            f'Removed Power BI card: {slug}',
+        )
+        return jsonify({'success': True, 'slug': slug})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 500

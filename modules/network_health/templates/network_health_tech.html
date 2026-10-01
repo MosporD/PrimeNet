@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — Network Health — {{ vendor_label }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=7.0">
+</head>
+<body class="nh-page nh-select-page nh-wizard-page nh-tech-page"
+      data-vendor="{{ vendor }}"
+      data-default-rat="{{ default_rat }}">
+    <header>
+        <div class="header-content">
+            <a href="/network-health" class="back-link">Vendor</a>
+            <div class="header-left">
+                <h1>Network Health</h1>
+                <p>Select technology · {{ vendor_label }}</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button type="button" class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="nh-select-main nh-wizard-main nh-tech-split">
+        <section class="nh-tech-left" aria-labelledby="nh-rat-heading">
+            <h2 id="nh-rat-heading" class="nh-select-section-title">Technology</h2>
+            <div class="nh-rat-grid nh-rat-grid-row" id="nh-rat-grid" role="radiogroup" aria-label="RAT">
+                {% for r in rats %}
+                <button type="button"
+                        class="nh-rat-card{% if r.key == default_rat %} selected{% endif %}"
+                        data-rat="{{ r.key }}"
+                        aria-pressed="{{ 'true' if r.key == default_rat else 'false' }}">
+                    <span class="nh-rat-label">{{ r.label }}</span>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+        <div class="nh-tech-divider" aria-hidden="true"></div>
+        <section class="nh-tech-right">
+            <img src="/parameter_dictionary/static/images/{{ vendor }}_logo.png"
+                 alt="{{ vendor_label }}" class="nh-tech-vendor-logo">
+        </section>
+    </main>
+
+    <button type="button" class="nh-wizard-back-fab" id="nh-tech-back" title="Back to vendor" aria-label="Back">‹</button>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
+    <script src="{{ url_for('network_health.static', filename='network_health_tech.js') }}?v=1.0"></script>
+    <script>
+    async function logout() {
+        try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}
+        window.location.href = '/login';
+    }
+    </script>
+</body>
+</html>

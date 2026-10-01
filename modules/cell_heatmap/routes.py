@@ -9,7 +9,7 @@ from datetime import datetime
 import sqlite3
 import re
 
-from db.runtime import connect_metadata, connect_pm_db, execute_query, sqlite_ident
+from db.runtime import connect_metadata, connect_pm_db, execute_query, list_tables, sqlite_ident
 from database_enhanced import get_user_by_session, log_activity
 from core.elevation import coord_key as elevation_coord_key, elevation_for_points
 from sync_config import (
@@ -44,6 +44,9 @@ KPI_PRESETS = {
             "Total E-UTRAN RRC conn stp SR",
             "RRC conn stp SR (Service)",
             "RRC conn stp SR mos",
+            "RRC Success Rate (Total)(%)",
+            "RRC Success Rate (Total)",
+            "RRC Setup Success Rate(%)",
             "Comp Cont based RACH stp SR",
             "Compl RACH stp SR",
             "RACH Stp Completion SR",
@@ -383,9 +386,41 @@ def _pm_conn(cache: dict[str, sqlite3.Connection], pm_db_path: str) -> sqlite3.C
     conn = cache.get(pm_db_path)
     if conn is None:
         conn = connect_pm_db(pm_db_path)
-        conn.execute("PRAGMA query_only=ON")
+        try:
+            conn.execute("PRAGMA query_only=ON")
+        except Exception:
+            pass
         cache[pm_db_path] = conn
     return conn
+
+
+def _pm_tables_for_technology(conn, pm_tech: str, data_scope: str) -> list[str]:
+    """Return monotable + area partitions for a RAT (skip empty stub tables)."""
+    tech = "4G" if pm_tech in ("4G-FDD", "4G-TDD", "4G") else str(pm_tech or "").strip()
+    if not tech:
+        return []
+    base = pm_table_name(tech)
+    if data_scope == "daily":
+        base = base.replace("_HOURLY", "_DAILY")
+    existing = set(list_tables(conn) or [])
+    prefix = f"{tech}_CELLS_{'DAILY' if data_scope == 'daily' else 'HOURLY'}"
+    out: list[str] = []
+    for name in sorted(existing):
+        up = str(name).upper()
+        if up == prefix or up.startswith(prefix + "__"):
+            out.append(name)
+    if base in existing and base not in out:
+        out.insert(0, base)
+    # Drop stub shells (id/cell_name/timestamp only, no KPI columns).
+    usable: list[str] = []
+    for t in out:
+        try:
+            cols = [r[1] for r in execute_query(conn, f'PRAGMA table_info("{t}")').fetchall()]
+        except Exception:
+            cols = []
+        if len(cols) >= 5:
+            usable.append(t)
+    return usable or out
 
 
 def _pm_latest_values_for_cells(
@@ -635,27 +670,25 @@ def get_heatmap_points():
                 else:
                     pm_db_primary = NOKIA_PM_DAILY_DB if data_scope == "daily" else NOKIA_PM_DB
                     pm_db_fallback = NOKIA_PM_DB
-                table_name = pm_table_name(pm_tech)
-                if data_scope == "daily":
-                    table_name = table_name.replace("_HOURLY", "_DAILY")
 
-                # Try primary DB; if table is empty or missing, fall back to hourly
+                # Try primary DB; if table is empty or missing, fall back to hourly.
+                # Prefer area partitions over empty monotable shells.
                 pm_db = pm_db_primary
-                tbl = table_name
                 pm_conn = _pm_conn(pm_conns, pm_db)
-                resolved_col = _resolve_kpi_column_in_table(pm_conn, tbl, aliases)
-                if not resolved_col and data_scope == "daily":
+                tables = _pm_tables_for_technology(pm_conn, pm_tech, data_scope)
+                if not tables and data_scope == "daily":
                     pm_db = pm_db_fallback
-                    tbl = pm_table_name(pm_tech)
                     pm_conn = _pm_conn(pm_conns, pm_db)
+                    tables = _pm_tables_for_technology(pm_conn, pm_tech, "hourly")
+
+                for tbl in tables:
                     resolved_col = _resolve_kpi_column_in_table(pm_conn, tbl, aliases)
+                    if resolved_col:
+                        kpi_map.update(_pm_latest_values_for_cells(pm_conn, tbl, resolved_col, names))
 
-                if resolved_col:
-                    kpi_map.update(_pm_latest_values_for_cells(pm_conn, tbl, resolved_col, names))
-
-                size_col = _resolve_kpi_column_in_table(pm_conn, tbl, size_aliases)
-                if size_col:
-                    size_map.update(_pm_latest_values_for_cells(pm_conn, tbl, size_col, names))
+                    size_col = _resolve_kpi_column_in_table(pm_conn, tbl, size_aliases)
+                    if size_col:
+                        size_map.update(_pm_latest_values_for_cells(pm_conn, tbl, size_col, names))
         finally:
             for pm_conn in pm_conns.values():
                 try:
@@ -709,7 +742,14 @@ def get_heatmap_points():
             )
 
         details = [d for d in details if d["kpi_value"] is not None]
-        elevation_map = elevation_for_points(((d["latitude"], d["longitude"]) for d in details), fetch_missing=False)
+        elevation_map = {}
+        try:
+            elevation_map = elevation_for_points(
+                ((d["latitude"], d["longitude"]) for d in details),
+                fetch_missing=False,
+            )
+        except Exception:
+            elevation_map = {}
         for d in details:
             d["elevation_m"] = elevation_map.get(elevation_coord_key(d["latitude"], d["longitude"]))
         shown_radii = [float(d["size_radius_m"]) for d in details]

@@ -31,6 +31,7 @@
                 <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
                 <button class="admin-page-tab" data-page="api-connections" type="button" onclick="openAdminPage('api-connections')">API Connections</button>
                 <button class="admin-page-tab" data-page="pm-plus-rules" type="button" onclick="openAdminPage('pm-plus-rules')">PM Plus Rules</button>
+                <button class="admin-page-tab" data-page="power-bi" type="button" onclick="openAdminPage('power-bi')">Power BI</button>
                 <button class="admin-page-tab" data-page="ops-alerts" type="button" onclick="openAdminPage('ops-alerts')">Ops Alerts</button>
                 <button class="admin-page-tab" data-page="activity-log" type="button" onclick="openAdminPage('activity-log')">Activity Log</button>
             </div>
@@ -375,6 +376,47 @@
                     <pre id="pm-plus-rules-msg" class="inspect-output" style="display:none;"></pre>
                 </div>
             </div>
+
+            <div class="admin-page-panel" data-page="power-bi">
+                <div class="sync-section">
+                    <div class="section-title-row">
+                        <h2 class="section-title">Power BI Report Cards</h2>
+                        <button type="button" class="btn-history-reload" onclick="loadPowerBiAdminCatalog()">↻ Refresh</button>
+                    </div>
+                    <p class="api-connections-intro">
+                        Add or remove gallery cards for <code>/power-bi</code>.
+                        URL must start with <code>https://app.powerbi.com/</code> or <code>https://msit.powerbi.com/</code>.
+                    </p>
+                    <form id="power-bi-add-form" class="local-import-box" onsubmit="return addPowerBiReport(event)">
+                        <h3 class="section-subtitle">Add dashboard</h3>
+                        <div class="local-import-controls" style="flex-wrap:wrap; gap:8px;">
+                            <input id="power-bi-title" type="text" placeholder="Name" required style="min-width:180px; flex:1;">
+                            <input id="power-bi-url" type="url" placeholder="https://app.powerbi.com/…" required style="min-width:260px; flex:2;">
+                        </div>
+                        <div class="local-import-controls" style="margin-top:8px;">
+                            <input id="power-bi-description" type="text" placeholder="Description" style="width:100%; min-width:260px;">
+                        </div>
+                        <div class="local-import-controls" style="margin-top:8px;">
+                            <button type="submit" class="btn-sync import">Add card</button>
+                        </div>
+                        <pre id="power-bi-admin-msg" class="inspect-output" style="display:none; margin-top:10px;"></pre>
+                    </form>
+                    <h3 class="section-subtitle">Current cards</h3>
+                    <table class="sync-table" style="margin-top:8px;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>URL</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="power-bi-admin-body">
+                            <tr><td colspan="4" style="text-align:center;">Open this tab to load…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="admin-page-panel" data-page="ops-alerts">
                 <h2 class="section-title user-admin-title">Ops Alerts</h2>
 
@@ -430,6 +472,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
-    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.10"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.11"></script>
 </body>
 </html>

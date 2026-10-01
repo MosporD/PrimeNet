@@ -3,14 +3,13 @@ Performance PM database health checks (latest timestamps, row counts, distinct c
 """
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 import time
 from datetime import datetime, timezone
 from typing import Any
 
-from db.runtime import list_tables, open_db, store_available
+from db.runtime import list_tables, open_db, store_available, store_health, table_columns, sqlite_ident
 from sync_config import (
     HUAWEI_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DB,
@@ -42,9 +41,10 @@ _CACHE_TTL_SEC = 600
 _cache_lock = threading.Lock()
 _cache: dict[str, Any] = {"expires_at": 0.0, "payload": None}
 
-# Append-only PM tables — sample the oldest/newest rowid windows instead of
-# scanning every distinct timestamp in the table.
+# Append-only PM tables — prefer cheap MIN/MAX on the timestamp column;
+# fall back to sampling recent physical rows (rowid on SQLite, ctid on Postgres).
 _TS_SAMPLE_ROWS = 50_000
+
 
 PM_CELL_DBS = [
     ("Nokia PM hourly", NOKIA_PM_DB),
@@ -79,23 +79,22 @@ def _optional_empty_tables(label: str) -> frozenset[str]:
 
 
 def _file_health(path: str) -> dict:
-    if store_available(path) and not os.path.isfile(path):
-        return {"exists": True, "path": path, "backend": "postgres"}
-    if not os.path.isfile(path):
-        return {"exists": False, "path": path}
-    st = os.stat(path)
-    return {
-        "exists": True,
-        "path": path,
-        "size_mb": round(st.st_size / (1024 * 1024), 2),
-        "modified_utc": datetime.fromtimestamp(st.st_mtime, tz=timezone.utc).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
-    }
+    """Backward-compatible name — delegates to Postgres-aware ``store_health``."""
+    return store_health(path)
 
 
-def _column_names(conn: sqlite3.Connection, table: str) -> list[str]:
-    return [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
+def _column_names(conn, table: str) -> list[str]:
+    try:
+        return sorted(table_columns(conn, table))
+    except Exception:
+        try:
+            return [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
+        except Exception:
+            return []
+
+
+def _is_sqlite_conn(conn) -> bool:
+    return isinstance(conn, sqlite3.Connection)
 
 
 def _detect_cell_col(columns: list[str]) -> str | None:
@@ -235,7 +234,10 @@ def _parse_time_part(value: str) -> tuple[int, int, int]:
     return hour, minute, second
 
 
-def _table_rowid_range(conn: sqlite3.Connection, table: str) -> tuple[int, int] | None:
+def _table_rowid_range(conn, table: str) -> tuple[int, int] | None:
+    """SQLite-only physical row window. Returns None on Postgres."""
+    if not _is_sqlite_conn(conn):
+        return None
     try:
         row = conn.execute(f'SELECT MIN(rowid), MAX(rowid) FROM "{table}"').fetchone()
     except Exception:
@@ -259,12 +261,97 @@ def _timestamp_windows(rowids: tuple[int, int] | None) -> list[tuple[str, tuple]
     ]
 
 
+def _timestamp_bounds_via_minmax(conn, table: str, col: str, label: str) -> dict[str, Any] | None:
+    """Cheap path: parse MIN/MAX of the timestamp column (works for ISO / sortable text)."""
+    ident_t = sqlite_ident(table)
+    ident_c = sqlite_ident(col)
+    try:
+        row = conn.execute(
+            f'SELECT MIN({ident_c}), MAX({ident_c}) FROM {ident_t} '
+            f'WHERE {ident_c} IS NOT NULL AND TRIM(CAST({ident_c} AS TEXT)) <> \'\''
+        ).fetchone()
+    except Exception:
+        return None
+    if not row or (row[0] is None and row[1] is None):
+        return None
+    earliest_raw, latest_raw = row[0], row[1]
+    earliest_dt = _parse_pm_timestamp(earliest_raw, label, col) if earliest_raw is not None else None
+    latest_dt = _parse_pm_timestamp(latest_raw, label, col) if latest_raw is not None else None
+    if earliest_dt is None and latest_dt is None:
+        return None
+    return {
+        "column": col,
+        "earliest": earliest_raw,
+        "latest": latest_raw,
+        "earliest_sort": earliest_dt or latest_dt,
+        "latest_sort": latest_dt or earliest_dt,
+        "parsed_distinct_timestamps": 2 if earliest_dt and latest_dt and earliest_dt != latest_dt else 1,
+    }
+
+
+def _timestamp_bounds_via_sample(conn, table: str, col: str, label: str) -> dict[str, Any] | None:
+    """Sample recent physical rows when MIN/MAX text order is unreliable."""
+    ident_t = sqlite_ident(table)
+    ident_c = sqlite_ident(col)
+    if _is_sqlite_conn(conn):
+        order_sql = "ORDER BY rowid DESC"
+    else:
+        order_sql = "ORDER BY ctid DESC"
+    try:
+        values = conn.execute(
+            f'SELECT {ident_c} FROM {ident_t} '
+            f'WHERE {ident_c} IS NOT NULL AND TRIM(CAST({ident_c} AS TEXT)) <> \'\' '
+            f'{order_sql} LIMIT {_TS_SAMPLE_ROWS}'
+        ).fetchall()
+    except Exception:
+        return None
+    parsed_count = 0
+    earliest_dt: datetime | None = None
+    earliest_raw: Any = None
+    latest_dt: datetime | None = None
+    latest_raw: Any = None
+    for row in values:
+        raw_value = row[0]
+        parsed = _parse_pm_timestamp(raw_value, label, col)
+        if parsed is None:
+            continue
+        parsed_count += 1
+        if earliest_dt is None or parsed < earliest_dt:
+            earliest_dt = parsed
+            earliest_raw = raw_value
+        if latest_dt is None or parsed > latest_dt:
+            latest_dt = parsed
+            latest_raw = raw_value
+    if parsed_count == 0 or earliest_dt is None or latest_dt is None:
+        return None
+    return {
+        "column": col,
+        "earliest": earliest_raw,
+        "latest": latest_raw,
+        "earliest_sort": earliest_dt,
+        "latest_sort": latest_dt,
+        "parsed_distinct_timestamps": parsed_count,
+    }
+
+
 def _timestamp_bounds(
-    conn: sqlite3.Connection, table: str, columns: list[str], label: str
+    conn, table: str, columns: list[str], label: str
 ) -> dict[str, Any] | None:
     best: dict[str, Any] | None = None
     windows = _timestamp_windows(_table_rowid_range(conn, table))
     for col in _timestamp_candidates(columns):
+        # Prefer cheap MIN/MAX on Postgres (no rowid windows).
+        if not _is_sqlite_conn(conn) or windows == [("", ())]:
+            candidate = _timestamp_bounds_via_minmax(conn, table, col, label)
+            if candidate is None:
+                candidate = _timestamp_bounds_via_sample(conn, table, col, label)
+            if candidate and (
+                best is None
+                or candidate["parsed_distinct_timestamps"] > best["parsed_distinct_timestamps"]
+            ):
+                best = candidate
+            continue
+
         parsed_count = 0
         earliest_dt: datetime | None = None
         earliest_raw: Any = None
@@ -274,7 +361,7 @@ def _timestamp_bounds(
             try:
                 values = conn.execute(
                     f'SELECT DISTINCT "{col}" FROM "{table}" '
-                    f'WHERE "{col}" IS NOT NULL AND TRIM(CAST("{col}" AS TEXT)) != "" '
+                    f'WHERE "{col}" IS NOT NULL AND TRIM(CAST("{col}" AS TEXT)) != \'\' '
                     f'{extra_sql}',
                     params,
                 )
@@ -308,7 +395,7 @@ def _timestamp_bounds(
     return best
 
 
-def _table_stats(conn: sqlite3.Connection, table: str, label: str) -> dict:
+def _table_stats(conn, table: str, label: str) -> dict:
     columns = _column_names(conn, table)
     cell_col = _detect_cell_col(columns)
     ts_col = _detect_ts_col(columns)

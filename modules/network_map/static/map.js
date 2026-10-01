@@ -2017,7 +2017,13 @@ async function refreshNeighborOverlay() {
         }
     } catch (e) {
         console.error('Neighbor lines error:', e);
-        showNotification('Failed to load neighbor lines', 'error');
+        const detail = (e && e.message) ? String(e.message) : '';
+        showNotification(
+            detail && detail !== 'neighbors lines failed'
+                ? `Failed to load neighbor lines: ${detail}`
+                : 'Failed to load neighbor lines',
+            'error'
+        );
     }
 }
 

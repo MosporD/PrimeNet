@@ -4,6 +4,13 @@ Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+## 2026-09-29 (ETL Diagnosis UI stability)
+
+- Done: Fingerprint-gated poll (10s), in-place progress cards, clamp meta text — stops blink from full DOM rewrite.
+- Done: Contain `etl-two-col` (`minmax(0,1fr)` + overflow) so Scheduler jobs / Last OK stay inside the card.
+- Done: Eng Admin `--ui-zoom: 1.5`; clearer scheduler-not-in-web copy (cron lives in scheduler container).
+- NEXT: Confirm scheduler container on 97.141 (`docker compose ps/logs scheduler`); re-run Daily after `%%` LIKE adapter deploy.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). PM surveys + ETL diagnosis use `list_tables` / `store_available`; UI domain fallback is Postgres-oriented.

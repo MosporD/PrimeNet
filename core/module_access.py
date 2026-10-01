@@ -18,7 +18,6 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Dashboard", "href": "/dashboard", "visibility": "all"},
             {"label": "Performance Explorer", "href": "/performance", "visibility": "all"},
             {"label": "Performance Explorer Plus", "href": "/performance-explorer-plus", "visibility": "all"},
-            {"label": "Huawei PM Query Studio", "href": "/performance-analytics", "visibility": "admin"},
             {"label": "Network Coverage Heatmap", "href": "/cell-heatmap", "visibility": "all"},
             {"label": "Network Map", "href": "/network-map", "visibility": "all"},
             {"label": "Neighbor Analysis", "href": "/neighbor-analysis", "visibility": "all"},

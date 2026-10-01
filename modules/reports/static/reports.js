@@ -53,6 +53,22 @@ async function loadReportTypes() {
     }).join('');
 }
 
+async function downloadReportArchive(archiveId, filename) {
+    const res = await fetch(`/api/reports/download/${archiveId}`, { credentials: 'same-origin' });
+    if (!res.ok) {
+        throw new Error(`Download failed (${res.status})`);
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || `report_${archiveId}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 async function generateReport(type, label) {
     const card = document.getElementById('card-' + type);
     card.classList.add('generating');
@@ -84,7 +100,7 @@ async function generateReport(type, label) {
         if (data.success) {
             statusEl.className = 'status-message success';
             statusEl.textContent = `✓ ${label} generated (${data.rows.toLocaleString()} rows). Downloading…`;
-            window.location.href = `/api/reports/download/${data.archive_id}`;
+            await downloadReportArchive(data.archive_id, data.filename);
             loadArchive();
         } else {
             statusEl.className = 'status-message error';

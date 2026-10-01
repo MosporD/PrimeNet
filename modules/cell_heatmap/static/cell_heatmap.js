@@ -753,7 +753,18 @@
             if (lastBounds) {
                 fitToData();
             }
-            setStatus("ok", "Heatmap loaded.");
+            if (!lastDetails.length) {
+                const matched = Number(lastMeta.matched_kpi_cells || 0);
+                const fallback = Number(lastMeta.fallback_cells || 0);
+                setStatus(
+                    "err",
+                    matched === 0
+                        ? "No heatmap: KPI column not found in PM tables for this vendor/tech/scope (or PM empty). Try another KPI, technology, or Daily/Hourly."
+                        : `No heatmap points (${fallback} cells without KPI values).`,
+                );
+            } else {
+                setStatus("ok", "Heatmap loaded.");
+            }
             updateStats();
         } catch (err) {
             setStatus("err", "Network or server error.");

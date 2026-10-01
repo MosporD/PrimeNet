@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 import time
 from datetime import datetime, timezone
 from typing import Any
 
-from db.runtime import list_tables, open_db, sqlite_ident, store_available
+from db.runtime import list_tables, open_db, sqlite_ident, store_health, table_columns
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
 _CACHE_TTL_SEC = 600
@@ -36,26 +35,20 @@ _TS_KEYWORDS = (
 
 
 def _file_health(path: str) -> dict:
-    if store_available(path) and not os.path.isfile(path):
-        return {"exists": True, "path": path, "backend": "postgres"}
-    if not os.path.isfile(path):
-        return {"exists": False, "path": path}
-    st = os.stat(path)
-    return {
-        "exists": True,
-        "path": path,
-        "size_mb": round(st.st_size / (1024 * 1024), 2),
-        "modified_utc": datetime.fromtimestamp(st.st_mtime, tz=timezone.utc).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
-    }
+    return store_health(path)
 
 
 _sqlite_ident = sqlite_ident
 
 
-def _column_names(conn: sqlite3.Connection, table: str) -> list[str]:
-    return [r[1] for r in conn.execute(f"PRAGMA table_info({_sqlite_ident(table)})").fetchall()]
+def _column_names(conn, table: str) -> list[str]:
+    try:
+        return sorted(table_columns(conn, table))
+    except Exception:
+        try:
+            return [r[1] for r in conn.execute(f"PRAGMA table_info({_sqlite_ident(table)})").fetchall()]
+        except Exception:
+            return []
 
 
 def _detect_ts_col(columns: list[str]) -> str | None:
@@ -102,28 +95,38 @@ def _parse_timestamp(value: Any) -> datetime | None:
     return None
 
 
-def _latest_timestamp(conn: sqlite3.Connection, table: str, ts_col: str) -> str | None:
+def _latest_timestamp(conn, table: str, ts_col: str) -> str | None:
+    ident_t = _sqlite_ident(table)
+    ident_c = _sqlite_ident(ts_col)
+    # Prefer MIN/MAX (works on Postgres; ISO timestamps sort correctly).
     try:
-        max_rowid = conn.execute(
-            f"SELECT MAX(rowid) FROM {_sqlite_ident(table)}"
-        ).fetchone()[0]
-    except sqlite3.Error:
-        max_rowid = None
-    cutoff = max(1, int(max_rowid) - _TS_SAMPLE_ROWS) if max_rowid else None
-    sql = f"""
-        SELECT DISTINCT {_sqlite_ident(ts_col)}
-        FROM {_sqlite_ident(table)}
-        WHERE {_sqlite_ident(ts_col)} IS NOT NULL
-          AND TRIM(CAST({_sqlite_ident(ts_col)} AS TEXT)) <> ''
-    """
-    params: tuple = ()
-    if cutoff is not None:
-        sql += " AND rowid >= ?"
-        params = (cutoff,)
+        row = conn.execute(
+            f"SELECT MAX({ident_c}) FROM {ident_t} "
+            f"WHERE {ident_c} IS NOT NULL AND TRIM(CAST({ident_c} AS TEXT)) <> ''"
+        ).fetchone()
+        if row and row[0] is not None:
+            parsed = _parse_timestamp(row[0])
+            if parsed is not None:
+                return parsed.strftime("%Y-%m-%d %H:%M:%S")
+            # Unparsed but non-null — still surface the raw max for the panel.
+            return str(row[0]).strip() or None
+    except Exception:
+        pass
+
+    # Fallback: sample recent physical rows.
+    if isinstance(conn, sqlite3.Connection):
+        order_sql = "ORDER BY rowid DESC"
+    else:
+        order_sql = "ORDER BY ctid DESC"
+    sql = (
+        f"SELECT {ident_c} FROM {ident_t} "
+        f"WHERE {ident_c} IS NOT NULL AND TRIM(CAST({ident_c} AS TEXT)) <> '' "
+        f"{order_sql} LIMIT {_TS_SAMPLE_ROWS}"
+    )
     best: datetime | None = None
     try:
-        rows = conn.execute(sql, params)
-    except sqlite3.Error:
+        rows = conn.execute(sql)
+    except Exception:
         return None
     for (raw,) in rows:
         parsed = _parse_timestamp(raw)
@@ -132,7 +135,7 @@ def _latest_timestamp(conn: sqlite3.Connection, table: str, ts_col: str) -> str 
     return best.strftime("%Y-%m-%d %H:%M:%S") if best else None
 
 
-def _table_stats(conn: sqlite3.Connection, table: str) -> dict:
+def _table_stats(conn, table: str) -> dict:
     rows = int(conn.execute(f"SELECT COUNT(*) FROM {_sqlite_ident(table)}").fetchone()[0] or 0)
     columns = _column_names(conn, table)
     ts_col = _detect_ts_col(columns)

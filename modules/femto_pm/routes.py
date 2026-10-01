@@ -193,20 +193,22 @@ def _seed_computed_kpis(conn: sqlite3.Connection) -> None:
     for idx, (kpi_name, formula) in enumerate(_FORMULA_OVERRIDES.items(), start=1):
         meta = _COMPUTED_KPI_META.get(kpi_name, {})
         rows.append(
-            {
-                "code": str(idx),
-                "kpi_name": kpi_name,
-                "category_l1": meta.get("category_l1") or "Other",
-                "formula": formula,
-                "unit": meta.get("unit") or "",
-                "description": "",
-            }
+            (
+                str(idx),
+                kpi_name,
+                meta.get("category_l1") or "Other",
+                formula,
+                meta.get("unit") or "",
+                "",
+            )
         )
+    if not rows:
+        return
     conn.executemany(
         f"""
         INSERT OR IGNORE INTO "{FEMTO_COMPUTED_TABLE}"
             (code, kpi_name, category_l1, formula, unit, description, updated_at)
-        VALUES (:code, :kpi_name, :category_l1, :formula, :unit, :description, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
         """,
         rows,
     )
@@ -218,7 +220,7 @@ def _seed_counter_catalog(conn: sqlite3.Connection) -> None:
     names = [
         str(r[0]).strip()
         for r in conn.execute(
-            f'SELECT DISTINCT kpi_name FROM "{FEMTO_VALUES_TABLE}" WHERE TRIM(kpi_name) <> "" ORDER BY kpi_name'
+            f"SELECT DISTINCT kpi_name FROM \"{FEMTO_VALUES_TABLE}\" WHERE TRIM(kpi_name) <> '' ORDER BY kpi_name"
         ).fetchall()
         if str(r[0]).strip()
     ]
@@ -227,13 +229,13 @@ def _seed_counter_catalog(conn: sqlite3.Connection) -> None:
     batch = []
     for name in names:
         l1, l2, l3 = _counter_hierarchy(name)
-        batch.append({"counter_name": name, "l1": l1, "l2": l2, "l3": l3})
+        batch.append((name, l1, l2, l3))
         if len(batch) >= 500:
             conn.executemany(
                 f"""
                 INSERT OR IGNORE INTO "{FEMTO_COUNTER_TABLE}"
                     (counter_name, l1, l2, l3, updated_at)
-                VALUES (:counter_name, :l1, :l2, :l3, CURRENT_TIMESTAMP)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                 """,
                 batch,
             )
@@ -243,7 +245,7 @@ def _seed_counter_catalog(conn: sqlite3.Connection) -> None:
             f"""
             INSERT OR IGNORE INTO "{FEMTO_COUNTER_TABLE}"
                 (counter_name, l1, l2, l3, updated_at)
-            VALUES (:counter_name, :l1, :l2, :l3, CURRENT_TIMESTAMP)
+            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
             """,
             batch,
         )
