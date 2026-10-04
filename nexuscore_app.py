@@ -75,6 +75,11 @@ def create_app():
         user = auth_bp.current_user()
         if not user:
             return redirect(url_for("auth.login_page"))
+        from database_enhanced import is_password_change_required
+        from core.platform.paths import primenet_public_url
+
+        if is_password_change_required(user):
+            return redirect(f"{primenet_public_url().rstrip('/')}/change-password")
         allowed = set(user_allowed_portals(user))
         return render_template(
             "portal_select.html",

@@ -1,28 +1,37 @@
 /* Marketing Portal — builds on the NexusCore tokens in portals.css */
 
+/* Workbench register (left the cinematic gate): Soft Steel + dm-* panels */
 body.mkt-page {
-    --mkt-surface: rgba(8, 20, 52, 0.72);
-    --mkt-surface-2: rgba(12, 28, 66, 0.55);
-    --mkt-line: rgba(96, 165, 250, 0.22);
-    --mkt-line-strong: rgba(96, 165, 250, 0.45);
-    --mkt-ok: #34d399;
+    --pn-cyan: #8bc1ff;
+    --pn-cyan-soft: #7fa6c2;
+    --pn-ink: #e8eef7;
+    --pn-muted: #a9b7c9;
+    --mkt-surface: #182230;
+    --mkt-surface-2: #1b2736;
+    --mkt-line: #304258;
+    --mkt-line-strong: #3a5168;
+    --mkt-ok: #99e2b1;
     --mkt-warn: #fbbf24;
-    --mkt-bad: #f87171;
-    --mkt-live: #38bdf8;
-    --mkt-shadow: 0 10px 30px rgba(2, 6, 23, 0.45);
+    --mkt-bad: #ffb3be;
+    --mkt-live: #7fa6c2;
+    --mkt-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     min-height: 100vh;
-    background: linear-gradient(180deg, var(--pn-bg-0), var(--pn-bg-1) 70%);
+    background: #0f1722;
 }
 
 body.mkt-page:not(.dark-mode) {
+    --pn-cyan: #6d95b3;
+    --pn-cyan-soft: #7fa6c2;
+    --pn-ink: #2c3e50;
+    --pn-muted: #5c6773;
     --mkt-surface: #ffffff;
-    --mkt-surface-2: #f4f7fb;
-    --mkt-line: rgba(127, 166, 194, 0.32);
-    --mkt-line-strong: rgba(109, 149, 179, 0.6);
+    --mkt-surface-2: #f4f6f8;
+    --mkt-line: #d6e6f5;
+    --mkt-line-strong: #b4cde0;
     --mkt-ok: #0f9d6f;
     --mkt-warn: #b97e09;
     --mkt-bad: #d64545;
-    --mkt-live: #2b7fb8;
+    --mkt-live: #6d95b3;
     --mkt-shadow: 0 6px 18px rgba(44, 62, 80, 0.08);
     background: #f5f7fa;
 }
@@ -64,6 +73,13 @@ body.mkt-page:not(.dark-mode) {
 .mkt-theme-mount { position: static; }
 
 /* ---------------------------------------------------------------- layout */
+
+/* Sit above any residual fixed atmosphere layers (pointer-events:none still paints). */
+.mkt-topbar,
+.mkt-layout {
+    position: relative;
+    z-index: 1;
+}
 
 .mkt-layout { display: grid; grid-template-columns: 224px minmax(0, 1fr); align-items: start; }
 
@@ -230,9 +246,30 @@ body.mkt-page:not(.dark-mode) {
     gap: 7px;
     font-family: inherit;
 }
-.mkt-btn:hover { border-color: var(--pn-cyan); color: var(--pn-cyan); }
-.mkt-btn-primary { background: var(--pn-cyan); border-color: var(--pn-cyan); color: #04121f; }
-.mkt-btn-primary:hover { filter: brightness(1.08); color: #04121f; }
+.mkt-btn:hover { border-color: var(--mkt-live); color: var(--mkt-live); }
+.mkt-btn-primary {
+    background: #7fa6c2;
+    border-color: #7fa6c2;
+    color: #ffffff;
+}
+.mkt-btn-primary:hover {
+    background: #6d95b3;
+    border-color: #6d95b3;
+    color: #ffffff;
+    filter: none;
+}
+body.mkt-page:not(.dark-mode) .mkt-topbar {
+    background: linear-gradient(135deg, #b4cde0 0%, #8fb1ca 55%, #7fa6c2 100%);
+    border-bottom-color: transparent;
+    color: #ffffff;
+}
+body.mkt-page:not(.dark-mode) .mkt-brand-name { color: rgba(255, 255, 255, 0.82); }
+body.mkt-page:not(.dark-mode) .mkt-brand-portal,
+body.mkt-page:not(.dark-mode) .mkt-user-name { color: #ffffff; }
+body.mkt-page:not(.dark-mode) .mkt-topbar .portal-btn-ghost {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.75);
+}
 .mkt-btn-danger:hover { border-color: var(--mkt-bad); color: var(--mkt-bad); }
 .mkt-btn-sm { padding: 6px 11px; font-size: 0.8rem; }
 

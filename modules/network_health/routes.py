@@ -138,19 +138,14 @@ def network_health_tech():
 @network_health_bp.route("/network-health/hub")
 @login_required
 def network_health_hub():
-    user = get_current_user()
+    """Legacy hub URL — skip straight to the benchmarking view."""
     vendor = _normalize_vendor(request.args.get("vendor"))
     rat = _normalize_rat(request.args.get("rat") or request.args.get("technology"))
-    rat_cfg = cfg.rat_config(rat) or {}
-    vendor_cfg = next((v for v in cfg.VENDOR_OPTIONS if v["key"] == vendor), {})
-    return render_template(
-        "network_health_hub.html",
-        user=format_user(user),
-        vendor=vendor,
-        vendor_label=vendor_cfg.get("label", vendor.title()),
-        rat=rat,
-        rat_label=rat_cfg.get("label", rat),
-    )
+    kpi = (request.args.get("kpi") or "").strip()
+    args = {"vendor": vendor, "rat": rat}
+    if kpi:
+        args["kpi"] = kpi
+    return redirect(url_for("network_health.network_health_view", **args))
 
 
 @network_health_bp.route("/network-health/view")

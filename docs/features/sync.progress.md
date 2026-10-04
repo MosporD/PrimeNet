@@ -6,6 +6,12 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
+## 2026-10-04 (Neighbor lock separate from watcher)
+
+- Found: neighbor at `:30` skipped whenever watcher held `_pipeline_cycle_lock` (~26–32 min every 30 min).
+- Done: neighbor uses `_neighbor_cycle_lock` only; PM hourly/daily/watcher keep the shared pipeline lock. ETL diagnosis stuck-signal no longer treats neighbor skips as a PM lock storm.
+- NEXT: Rebuild/restart **scheduler** on 97.141; confirm next `:30` neighbor run succeeds while watcher is mid-cycle.
+
 ## 2026-09-30 (Metadata technology column, watcher visibility, GMT+3, error export)
 
 - Root cause (metadata): loader `if_exists="replace"` rebuilt `metadata.cells_*` from CSV without `technology` / `updated_at` / unique `cell_name`; `metadata_processor.import_csv_to_cells` then failed on `technology`. Done: `db_migration.ensure_per_tech_table_shape` (adds columns, dedupes, unique index) called from both paths; processor now upserts `ON CONFLICT (cell_name)`. Verified on scratch copy of `cells_5g`.

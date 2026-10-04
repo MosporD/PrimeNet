@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [`network-map.md`](network-map.md)
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-04 (Tech filter selection polish)
+
+- Done: Tech chips → instrument single-select grid: stacked label/count, tech swatch, Soft Steel selected state (not full-bleed fill), radiogroup semantics, dark-mode parity.
+- NEXT: Smoke on Network Map — upload a real planning KMZ, toggle folders, reload page (visibility + geometry should stick).
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: metadata + neighbor stores via `open_db` / `connect_metadata`; table probes use `table_exists` (adapter → `information_schema`). Map 500s after Daily failure were empty/missing metadata tables plus catalog SQL against PG — fix depends on successful Daily load + existence rewrite.

@@ -28,28 +28,52 @@
     text-transform: uppercase;
 }
 
-.admin-pages-nav {
+.admin-section-bar {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid #d6e6f5;
+    border-radius: 10px;
+    background: #f4f6f8;
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.06);
 }
 
-.admin-page-tab {
-    border: 1px solid #d9e2ec;
-    background: #fff;
+.admin-section-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5c6773;
+}
+
+.admin-section-select {
+    min-width: min(320px, 100%);
+    flex: 1 1 240px;
+    padding: 9px 12px;
+    border: 1.5px solid #d6e6f5;
+    border-radius: 8px;
+    background: #ffffff;
     color: #2c3e50;
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 0.9rem;
+    font: inherit;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
+    box-shadow: 0 1px 3px rgba(44, 62, 80, 0.06);
 }
 
-.admin-page-tab.active {
-    background: #2c7be5;
-    color: #fff;
-    border-color: #2c7be5;
+.admin-section-select:focus {
+    outline: none;
+    border-color: #7fa6c2;
+    box-shadow: 0 0 0 3px rgba(127, 166, 194, 0.25);
 }
 
 .admin-page-panel {
@@ -738,7 +762,6 @@ a.btn-history-reload { text-decoration: none; margin-left: 6px; }
 }
 
 body.dark-mode .stat-card,
-body.dark-mode .admin-page-tab,
 body.dark-mode .sync-section,
 body.dark-mode .local-import-box,
 body.dark-mode .live-progress-box,
@@ -750,16 +773,88 @@ body.dark-mode .add-user-panel {
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
 }
 
-body.dark-mode .admin-page-tab:hover,
+body.dark-mode .admin-section-bar {
+    background: #182230;
+    border-color: #304258;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .admin-section-label {
+    color: #a9b7c9;
+}
+
+body.dark-mode .admin-section-select {
+    background: #101b28;
+    color: #e8eef7;
+    border-color: #304258;
+}
+
 body.dark-mode .page-btn:hover:not(:disabled),
 body.dark-mode .btn-history-reload:hover {
     background: #1b2b40 !important;
 }
 
-body.dark-mode .admin-page-tab.active {
-    background: #173456 !important;
-    border-color: #4c83bd !important;
-    color: #9fd0ff !important;
+body.dark-mode .api-connections-section,
+body.dark-mode .api-connection-card {
+    background: #182230 !important;
+    border-color: #304258 !important;
+    color: #e8eef7 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .api-connection-card.api-ok {
+    background: #14261c !important;
+    border-color: #2f8f57 !important;
+}
+
+body.dark-mode .api-connection-card.api-error {
+    background: #2a1717 !important;
+    border-color: #c0392b !important;
+}
+
+body.dark-mode .api-connection-card.api-skipped {
+    background: #1b2736 !important;
+    border-color: #304258 !important;
+}
+
+body.dark-mode .api-connection-card.api-testing {
+    background: #152433 !important;
+    border-color: #4a90c2 !important;
+}
+
+body.dark-mode .api-connections-intro,
+body.dark-mode .api-connection-endpoint,
+body.dark-mode .api-connection-message {
+    color: #a9b7c9 !important;
+}
+
+body.dark-mode .api-connection-header h3 {
+    color: #e8eef7 !important;
+}
+
+body.dark-mode .api-status-pill {
+    background: #223246;
+    color: #a9b7c9;
+}
+
+body.dark-mode .api-status-pill.ok {
+    background: #1a3a28;
+    color: #7dcea0;
+}
+
+body.dark-mode .api-status-pill.error {
+    background: #3a1c1c;
+    color: #f5b7b1;
+}
+
+body.dark-mode .api-status-pill.skipped {
+    background: #223246;
+    color: #a9b7c9;
+}
+
+body.dark-mode .api-status-pill.testing {
+    background: #1a3348;
+    color: #8bc1ff;
 }
 
 body.dark-mode .stat-card .stat-label,
@@ -898,11 +993,6 @@ body.dark-mode #pm-plus-counter-q {
     background: #0f1419;
     color: #d7e0ea;
     border-color: #26303d;
-}
-
-/* Engineering Admin: 150% UI scale (overrides global --ui-zoom: 0.67) */
-html:has(body.admin-panel-page) {
-    --ui-zoom: 1.5;
 }
 
 body.admin-panel-page .main-content {

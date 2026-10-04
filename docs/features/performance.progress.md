@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [`performance.md`](performance.md)
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-04 (Soft Steel UI retoken)
+
+- Retokened Element/Ant blues + chart purples to Soft Steel Sky; shared header logout chip; removed title emoji; modal title h2 for heading order.
+- NEXT: Smoke Groups mode + cell area tree on 97.141; confirm `pm` in `NCM_PG_DOMAINS` on server.
+
 ## 2026-10-01 (Groups not loading on Postgres)
 
 - Root cause: raw groups fallback used `<> ""` (empty double-quoted identifier on PG) → `/api/performance/groups` 500; also matched KPI “Rate” columns as technology via loose `rat` substring.

@@ -132,6 +132,7 @@ let _kmzVisibilityTimers = {};
 let _kmzDidFitBounds = false;
 
 const LEFT_PANEL_COLLAPSE_KEY = 'networkMapLeftPanelCollapsed';
+const FILTER_FLOAT_COLLAPSE_KEY = 'networkMapFilterFloatCollapsed';
 
 function applySavedLeftPanelState() {
     try {
@@ -145,6 +146,38 @@ function applySavedLeftPanelState() {
             }
         }
     } catch (_) { /* storage blocked */ }
+    applySavedFilterFloatState();
+}
+
+function applySavedFilterFloatState() {
+    const card = document.getElementById('map-filter-float');
+    const btn = document.getElementById('map-filter-float-toggle');
+    if (!card) return;
+    let collapsed = false;
+    try {
+        collapsed = localStorage.getItem(FILTER_FLOAT_COLLAPSE_KEY) === '1';
+    } catch (_) { /* ignore */ }
+    card.classList.toggle('collapsed', collapsed);
+    if (btn) {
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btn.title = collapsed ? 'Expand filters' : 'Collapse filters';
+        btn.textContent = collapsed ? '›' : '‹';
+    }
+}
+
+function toggleMapFilterFloat() {
+    const card = document.getElementById('map-filter-float');
+    const btn = document.getElementById('map-filter-float-toggle');
+    if (!card) return;
+    const collapsed = card.classList.toggle('collapsed');
+    if (btn) {
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btn.title = collapsed ? 'Expand filters' : 'Collapse filters';
+        btn.textContent = collapsed ? '›' : '‹';
+    }
+    try {
+        localStorage.setItem(FILTER_FLOAT_COLLAPSE_KEY, collapsed ? '1' : '0');
+    } catch (_) { /* ignore */ }
 }
 
 function toggleMapLeftPanel() {
@@ -162,6 +195,8 @@ function toggleMapLeftPanel() {
     }, 320);
 }
 
+window.toggleMapFilterFloat = toggleMapFilterFloat;
+
 // ─── Initialization ──────────────────────────────────────────────────────────
 
 function initializeMap() {
@@ -172,7 +207,8 @@ function initializeMap() {
 
     if (map) { map.invalidateSize(); return; }
 
-    map = L.map('network-map', { preferCanvas: true }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    map = L.map('network-map', { preferCanvas: true, zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
     neighborLinesLayer = L.layerGroup().addTo(map);
     repeaterLayer = L.layerGroup();
     selectionPolygonLayer = L.layerGroup().addTo(map);
@@ -191,6 +227,11 @@ function initializeMap() {
     const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19
+    });
+    const darkStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+        className: 'map-tiles-dark-street'
     });
     const hot = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team',
@@ -216,6 +257,7 @@ function initializeMap() {
     L.control.layers(
         {
             'Street': street,
+            'Dark Street': darkStreet,
             'Street (HOT)': hot,
             'Topographic': topo,
             'Satellite': satellite,
@@ -384,30 +426,41 @@ function buildTechButtons(counts) {
         ? (Number(counts['2G']) || 0) + (Number(counts['3G']) || 0) + (Number(counts['4G-FDD']) || 0)
         : opts.reduce((sum, o) => sum + o.count, 0);
 
-    let html = `<button class="tech-btn${activeTech === 'all' ? ' active' : ''}" data-tech="all"
-                        onclick="setTechFilter('all')">
-                  All <span class="tech-count">${total}</span>
+    const chip = (value, label, count, color) => {
+        const isActive = activeTech === value;
+        const safeColor = escapeHtmlAttr(color || '#7fa6c2');
+        return `<button type="button" class="tech-btn${isActive ? ' active' : ''}"
+                        role="radio" aria-checked="${isActive ? 'true' : 'false'}"
+                        data-tech="${escapeHtmlAttr(value)}"
+                        style="--tc:${safeColor}"
+                        onclick="setTechFilter('${String(value).replace(/'/g, "\\'")}')">
+                  <span class="tech-swatch" aria-hidden="true"></span>
+                  <span class="tech-btn-copy">
+                    <span class="tech-label">${escapeHtml(label)}</span>
+                    <span class="tech-count">${Number(count).toLocaleString()}</span>
+                  </span>
                 </button>`;
+    };
 
+    let html = chip('all', 'All', total, '#7fa6c2');
     opts.forEach((opt) => {
         if (!opt.count) return;
-        const isActive = activeTech === opt.value ? ' active' : '';
-        html += `<button class="tech-btn${isActive}" data-tech="${opt.value}"
-                         style="--tc:${opt.color}"
-                         onclick="setTechFilter('${opt.value}')">
-                   ${opt.label} <span class="tech-count">${opt.count}</span>
-                 </button>`;
+        html += chip(opt.value, opt.label, opt.count, opt.color);
     });
 
+    container.setAttribute('role', 'radiogroup');
+    container.setAttribute('aria-label', 'Technology filter');
     container.innerHTML = html;
 }
 
 async function setTechFilter(tech) {
     activeTech = tech;
     activeTechSpecific = 'all';
-    document.querySelectorAll('.tech-btn').forEach(btn =>
-        btn.classList.toggle('active', btn.dataset.tech === tech)
-    );
+    document.querySelectorAll('.tech-btn').forEach(btn => {
+        const on = btn.dataset.tech === tech;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
     clearSectorLayers();
     clearHighlights();
     clearNeighborOverlay();
@@ -3228,17 +3281,11 @@ function _showEmptyState() {
             Then search or filter sites, open a site, and use the cell action to plot handovers.
         </div>
     `;
-    } else {
-        panel.innerHTML = `
-        <div style="color:#2c3e50;font-weight:800;margin-bottom:6px;">Map is ready</div>
-        <div style="color:#555;font-size:0.88em;line-height:1.6;">
-            Select <strong>Technology</strong>, <strong>Vendor</strong>, <strong>Area</strong> or <strong>Cluster</strong>
-            (or use <strong>SC/PCI/BCCH</strong> search) to load sites.
-            Or enable <strong>Show repeaters</strong> to plot all repeater devices on the map.
-        </div>
-    `;
+        panel.style.display = 'block';
+        return;
     }
-    panel.style.display = 'block';
+    panel.innerHTML = '';
+    panel.style.display = 'none';
 }
 
 function _wireInitialFilterListeners() {

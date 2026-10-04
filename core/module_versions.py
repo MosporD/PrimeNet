@@ -16,7 +16,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "sector-health": "V1.6",
     "sector-health-all": "V1.6",
     "conflict-map": "V1.0",
-    "adjacency-gis": "V1.5",
+    "adjacency-gis": "V1.7",
     "femto-pm": "V1.0",
     "son-analytics": "V1.1",
     "optimization-cases": "V1.0",
@@ -104,6 +104,7 @@ HREF_MODULE_IDS: dict[str, str] = {
     "/irat-border": "irat-border",
     "/admin-panel": "admin-panel",
     "/profile": "profile",
+    "/change-password": "profile",
     "/documentation": "documentation",
 }
 

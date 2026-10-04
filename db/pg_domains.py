@@ -91,9 +91,9 @@ def require_postgres_url() -> str:
     if not url_is_postgres(url):
         raise RuntimeError(
             'NCM_DATABASE_URL is required (Postgres-only runtime). '
-            'Laptop: set NCM_APP_POSTGRES_PASSWORD in .env, then '
-            '`docker compose --profile app-db up -d postgres`, then set '
-            'NCM_DATABASE_URL=postgresql://primenet:<password>@127.0.0.1:5432/primenet'
+            'Point it at the remote Postgres server, for example '
+            'NCM_DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/primenet. '
+            'Do not start a local Postgres container or create a local data volume.'
         )
     return url
 

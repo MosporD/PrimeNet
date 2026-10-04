@@ -11,7 +11,7 @@ function shAllCellsMode() {
     return Boolean(window.SH_CONFIG && window.SH_CONFIG.allCells);
 }
 
-const SH_BAND_COLOR = '#6c3483';
+const SH_BAND_COLOR = '#7fa6c2';
 const SH_OTHER_LTE_COLOR = '#dfe6e9';
 const SH_OTHER_LTE_BORDER = '#bdc3c7';
 
@@ -24,13 +24,13 @@ function shPieColors() {
         return {
             band: SH_BAND_COLOR,
             other: SH_OTHER_LTE_COLOR,
-            border: ['#512e5f', SH_OTHER_LTE_BORDER],
+            border: ['#6d95b3', SH_OTHER_LTE_BORDER],
         };
     }
     return {
-        band: '#b59cff',
+        band: '#8bc1ff',
         other: '#334155',
-        border: ['#d7caff', '#64748b'],
+        border: ['#a9b7c9', '#64748b'],
     };
 }
 

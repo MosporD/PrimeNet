@@ -73,10 +73,21 @@ function initConflictMap() {
     const mapEl = document.getElementById('conflict-map');
     if (!mapEl || typeof L === 'undefined') return;
     conflictMap = L.map('conflict-map', { preferCanvas: true }).setView([31.95, 35.93], 8);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 18,
-    }).addTo(conflictMap);
+    });
+    const darkStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 18,
+        className: 'map-tiles-dark-street',
+    });
+    street.addTo(conflictMap);
+    L.control.layers(
+        { Street: street, 'Dark Street': darkStreet },
+        {},
+        { collapsed: true }
+    ).addTo(conflictMap);
     conflictLayerGroup = L.layerGroup().addTo(conflictMap);
     const fixMapSize = () => {
         if (conflictMap) conflictMap.invalidateSize();

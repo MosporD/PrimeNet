@@ -254,12 +254,30 @@ def create_identity_blueprint(
                     data.get("next") or request.args.get("next"),
                     fallback=fallback,
                 )
+
+            must_change = False
+            password_change_url = None
+            if central:
+                from database_enhanced import is_password_change_required
+                from core.platform.paths import primenet_public_url
+
+                must_change = bool(
+                    user.get("must_change_password")
+                    if "must_change_password" in user
+                    else is_password_change_required(user)
+                )
+                if must_change:
+                    password_change_url = f"{primenet_public_url().rstrip('/')}/change-password"
+                    redirect_to = password_change_url
+
             response = make_response(
                 jsonify(
                     {
                         "success": True,
                         "message": "Login successful",
                         "redirect": redirect_to,
+                        "must_change_password": must_change,
+                        "password_change_url": password_change_url,
                         "user": {
                             "username": user.get("username"),
                             "email": user.get("email"),

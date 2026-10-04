@@ -1,0 +1,151 @@
+/* Elegant gradient atmosphere — Soft Steel workbench / Gate Cyan lobby.
+   Port of DarkGradientBg into the NexusCore CSS stack (no React/Tailwind). */
+
+.elegant-gradient-bg {
+    /* Workbench dark (default): slate navy + Soft Steel streaks */
+    --eg-base: #0f1722;
+    --eg-wash-from: #1b2736;
+    --eg-wash-to: #0f1722;
+    --eg-streak: 79, 141, 184; /* soft steel sky */
+    --eg-dot: rgba(232, 238, 247, 0.4);
+    --eg-highlight: rgba(79, 141, 184, 0.14);
+    --eg-streak-opacity: 0.2;
+    --eg-dot-opacity: 0.16;
+
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--eg-base);
+}
+
+body:not(.dark-mode) .elegant-gradient-bg {
+    --eg-base: #c9dcec; /* clearer steel field — not near-white paper */
+    --eg-wash-from: #9ec0d8;
+    --eg-wash-to: #6d9bb8;
+    --eg-streak: 36, 86, 117; /* deep instrument steel */
+    --eg-dot: rgba(30, 45, 61, 0.45);
+    --eg-highlight: rgba(47, 101, 136, 0.2);
+    --eg-streak-opacity: 0.28;
+    --eg-dot-opacity: 0.36;
+}
+
+/* Multiply keeps ribbons as ink on paper instead of bright white glare */
+body:not(.dark-mode) .elegant-gradient-bg__streaks {
+    mix-blend-mode: multiply;
+}
+
+body:not(.dark-mode) .elegant-gradient-bg__streak {
+    background: linear-gradient(
+        180deg,
+        rgba(var(--eg-streak), 0.55) 0%,
+        rgba(var(--eg-streak), 0.12) 55%,
+        rgba(var(--eg-streak), 0) 100%
+    );
+}
+
+/* Gate / lobby surfaces keep gate-cyan energy in dark mode only */
+body.auth-page.dark-mode .elegant-gradient-bg,
+body.portal-page.dark-mode .elegant-gradient-bg,
+body.tower-page.dark-mode .elegant-gradient-bg {
+    --eg-base: #020617;
+    --eg-wash-from: rgb(30, 41, 59);
+    --eg-wash-to: rgb(2, 6, 23);
+    --eg-streak: 56, 189, 248; /* gate cyan */
+    --eg-dot: rgba(226, 238, 255, 0.45);
+    --eg-highlight: rgba(56, 189, 248, 0.12);
+    --eg-streak-opacity: 0.22;
+    --eg-dot-opacity: 0.18;
+}
+
+.elegant-gradient-bg__wash {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    background: radial-gradient(100% 100% at 0% 0%, var(--eg-wash-from) 0%, var(--eg-wash-to) 100%);
+    -webkit-mask: radial-gradient(125% 100% at 0% 0%, #000 0%, rgba(0, 0, 0, 0.22) 88%, rgba(0, 0, 0, 0) 100%);
+    mask: radial-gradient(125% 100% at 0% 0%, #000 0%, rgba(0, 0, 0, 0.22) 88%, rgba(0, 0, 0, 0) 100%);
+}
+
+.elegant-gradient-bg__streaks {
+    position: absolute;
+    inset: 0;
+}
+
+.elegant-gradient-bg__streak {
+    position: absolute;
+    inset: 0;
+    opacity: var(--eg-streak-opacity);
+    background: linear-gradient(rgb(var(--eg-streak)) 0%, rgba(var(--eg-streak), 0) 100%);
+    transform: skewX(45deg);
+    transform-origin: center;
+}
+
+.elegant-gradient-bg__streak:nth-child(1) {
+    -webkit-mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #000 20%, rgba(0, 0, 0, 0) 36%, #000 55%, rgba(0, 0, 0, 0.13) 67%, #000 78%, rgba(0, 0, 0, 0) 97%);
+    mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #000 20%, rgba(0, 0, 0, 0) 36%, #000 55%, rgba(0, 0, 0, 0.13) 67%, #000 78%, rgba(0, 0, 0, 0) 97%);
+}
+
+.elegant-gradient-bg__streak:nth-child(2) {
+    -webkit-mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 11%, #000 25%, rgba(0, 0, 0, 0.55) 41%, rgba(0, 0, 0, 0.13) 67%, #000 78%, rgba(0, 0, 0, 0) 97%);
+    mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 11%, #000 25%, rgba(0, 0, 0, 0.55) 41%, rgba(0, 0, 0, 0.13) 67%, #000 78%, rgba(0, 0, 0, 0) 97%);
+}
+
+.elegant-gradient-bg__streak:nth-child(3) {
+    -webkit-mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 9%, #000 20%, rgba(0, 0, 0, 0.55) 28%, rgba(0, 0, 0, 0.42) 40%, #000 48%, rgba(0, 0, 0, 0.27) 54%, rgba(0, 0, 0, 0.13) 78%, #000 88%, rgba(0, 0, 0, 0) 97%);
+    mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 9%, #000 20%, rgba(0, 0, 0, 0.55) 28%, rgba(0, 0, 0, 0.42) 40%, #000 48%, rgba(0, 0, 0, 0.27) 54%, rgba(0, 0, 0, 0.13) 78%, #000 88%, rgba(0, 0, 0, 0) 97%);
+}
+
+.elegant-gradient-bg__streak:nth-child(4) {
+    -webkit-mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #000 17%, rgba(0, 0, 0, 0.55) 26%, #000 35%, rgba(0, 0, 0, 0) 47%, rgba(0, 0, 0, 0.13) 69%, #000 79%, rgba(0, 0, 0, 0) 97%);
+    mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #000 17%, rgba(0, 0, 0, 0.55) 26%, #000 35%, rgba(0, 0, 0, 0) 47%, rgba(0, 0, 0, 0.13) 69%, #000 79%, rgba(0, 0, 0, 0) 97%);
+}
+
+.elegant-gradient-bg__streak:nth-child(5) {
+    -webkit-mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #000 20%, rgba(0, 0, 0, 0.55) 27%, #000 42%, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, 0.13) 67%, #000 74%, #000 82%, rgba(0, 0, 0, 0.47) 88%, rgba(0, 0, 0, 0) 97%);
+    mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #000 20%, rgba(0, 0, 0, 0.55) 27%, #000 42%, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, 0.13) 67%, #000 74%, #000 82%, rgba(0, 0, 0, 0.47) 88%, rgba(0, 0, 0, 0) 97%);
+}
+
+.elegant-gradient-bg__dots {
+    position: absolute;
+    inset: 0;
+    opacity: var(--eg-dot-opacity);
+    background-image: radial-gradient(circle at 1px 1px, var(--eg-dot) 1px, transparent 0);
+    background-size: 20px 20px;
+}
+
+.elegant-gradient-bg__glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(80% 70% at 12% 8%, var(--eg-highlight), transparent 55%);
+}
+
+/* Let the atmosphere show through page chrome */
+body:has(.elegant-gradient-bg) {
+    background: transparent !important;
+}
+
+body:has(.elegant-gradient-bg) .container,
+body:has(.elegant-gradient-bg) .main-content,
+body:has(.elegant-gradient-bg) .dashboard-main,
+body:has(.elegant-gradient-bg).radio-module-page,
+body:has(.elegant-gradient-bg) .nh-select-main,
+body:has(.elegant-gradient-bg) .nh-wizard-main,
+body:has(.elegant-gradient-bg) .nh-hub-main {
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+}
+
+/* Stack: elegant (0) → canvases (1) → hud (2) → content (already ≥1) */
+body:has(.elegant-gradient-bg) #constellation-canvas,
+body:has(.elegant-gradient-bg) #tower-canvas,
+body:has(.elegant-gradient-bg) .primenet-bg-canvas,
+body:has(.elegant-gradient-bg) .dashboard-bg-canvas {
+    z-index: 1;
+}
+
+body:has(.elegant-gradient-bg) .hud-overlay {
+    z-index: 2;
+}

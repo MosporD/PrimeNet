@@ -136,6 +136,7 @@ const BCCH_ROLE_COLORS = {
 };
 
 const LEFT_PANEL_COLLAPSE_KEY = 'networkMapLeftPanelCollapsed';
+const FILTER_FLOAT_COLLAPSE_KEY = 'adjacencyGisFilterFloatCollapsed';
 const BASEMAP_PREF_KEY = 'adjacency_gis_basemap';
 
 /** Leaflet tile layers keyed by id (roadmap, street, …). */
@@ -148,6 +149,7 @@ let currentBasemapId = 'roadmap';
 const BASEMAP_LABELS = {
     roadmap: 'Roadmap',
     street: 'Street (OSM)',
+    dark: 'Dark Street',
     hot: 'Street (HOT)',
     topo: 'Topographic',
     satellite: 'Satellite',
@@ -170,8 +172,8 @@ function _syncBasemapSelect(id) {
 }
 
 /**
- * Switch the Leaflet basemap. Safe to call from the left-panel select or
- * after init. Persists the choice for Adjacency GIS.
+ * Switch the Leaflet basemap. Safe to call from the layers control or after init.
+ * Persists the choice for Adjacency GIS.
  */
 function setBasemap(id, { persist = true } = {}) {
     if (!map || !basemapLayers) return;
@@ -213,6 +215,38 @@ function applySavedLeftPanelState() {
             }
         }
     } catch (_) { /* storage blocked */ }
+    applySavedFilterFloatState();
+}
+
+function applySavedFilterFloatState() {
+    const card = document.getElementById('map-filter-float');
+    const btn = document.getElementById('map-filter-float-toggle');
+    if (!card) return;
+    let collapsed = false;
+    try {
+        collapsed = localStorage.getItem(FILTER_FLOAT_COLLAPSE_KEY) === '1';
+    } catch (_) { /* ignore */ }
+    card.classList.toggle('collapsed', collapsed);
+    if (btn) {
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btn.title = collapsed ? 'Expand filters' : 'Collapse filters';
+        btn.textContent = collapsed ? '›' : '‹';
+    }
+}
+
+function toggleMapFilterFloat() {
+    const card = document.getElementById('map-filter-float');
+    const btn = document.getElementById('map-filter-float-toggle');
+    if (!card) return;
+    const collapsed = card.classList.toggle('collapsed');
+    if (btn) {
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btn.title = collapsed ? 'Expand filters' : 'Collapse filters';
+        btn.textContent = collapsed ? '›' : '‹';
+    }
+    try {
+        localStorage.setItem(FILTER_FLOAT_COLLAPSE_KEY, collapsed ? '1' : '0');
+    } catch (_) { /* ignore */ }
 }
 
 function toggleMapLeftPanel() {
@@ -229,6 +263,8 @@ function toggleMapLeftPanel() {
         if (map) map.invalidateSize();
     }, 320);
 }
+
+window.toggleMapFilterFloat = toggleMapFilterFloat;
 
 // ─── Initialization ──────────────────────────────────────────────────────────
 
@@ -255,7 +291,7 @@ function initializeMap() {
         _setNeighborFiltersLocked(true);
     }
 
-    // Base map styles — switchable via left-panel "Map view" and Leaflet control
+    // Base map styles — always-open Leaflet layers control (top-right)
     basemapLayers = {
         roadmap: L.tileLayer(
             'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
@@ -264,6 +300,11 @@ function initializeMap() {
         street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19
+        }),
+        dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19,
+            className: 'map-tiles-dark-street'
         }),
         hot: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team',
@@ -287,7 +328,10 @@ function initializeMap() {
     Object.keys(BASEMAP_LABELS).forEach((id) => {
         controlLayers[BASEMAP_LABELS[id]] = basemapLayers[id];
     });
-    L.control.layers(controlLayers, {}, { collapsed: true }).addTo(map);
+    L.control.layers(controlLayers, {}, {
+        collapsed: false,
+        position: 'topright',
+    }).addTo(map);
 
     map.on('baselayerchange', (ev) => {
         if (!basemapLayers || !ev || !ev.layer) return;
@@ -453,14 +497,28 @@ function buildTechButtons(counts) {
     const container = document.getElementById('tech-filter');
     if (!container) return;
 
+    const chip = (value, label, count, color) => {
+        const isActive = activeTech === value;
+        const safeColor = escapeHtmlAttr(color || '#7fa6c2');
+        return `<button type="button" class="tech-btn${isActive ? ' active' : ''}"
+                        role="radio" aria-checked="${isActive ? 'true' : 'false'}"
+                        data-tech="${escapeHtmlAttr(value)}"
+                        style="--tc:${safeColor}"
+                        onclick="setTechFilter('${String(value).replace(/'/g, "\\'")}')">
+                  <span class="tech-swatch" aria-hidden="true"></span>
+                  <span class="tech-btn-copy">
+                    <span class="tech-label">${escapeHtml(label)}</span>
+                    <span class="tech-count">${Number(count).toLocaleString()}</span>
+                  </span>
+                </button>`;
+    };
+
     if (ADJACENCY_GIS_MODE) {
         const count = Number(counts['2G']) || 0;
         const color = TECH_COLORS['2G'] || '#7f8c8d';
-        container.innerHTML = `<button class="tech-btn active" data-tech="2G"
-                             style="--tc:${color}"
-                             onclick="setTechFilter('2G')">
-                       2G <span class="tech-count">${count}</span>
-                     </button>`;
+        container.setAttribute('role', 'radiogroup');
+        container.setAttribute('aria-label', 'Technology filter');
+        container.innerHTML = chip('2G', '2G', count, color);
         return;
     }
 
@@ -481,21 +539,14 @@ function buildTechButtons(counts) {
         ? (Number(counts['2G']) || 0) + (Number(counts['3G']) || 0) + (Number(counts['4G-FDD']) || 0)
         : opts.reduce((sum, o) => sum + o.count, 0);
 
-    let html = `<button class="tech-btn${activeTech === 'all' ? ' active' : ''}" data-tech="all"
-                        onclick="setTechFilter('all')">
-                  All <span class="tech-count">${total}</span>
-                </button>`;
-
+    let html = chip('all', 'All', total, '#7fa6c2');
     opts.forEach((opt) => {
         if (!opt.count) return;
-        const isActive = activeTech === opt.value ? ' active' : '';
-        html += `<button class="tech-btn${isActive}" data-tech="${opt.value}"
-                         style="--tc:${opt.color}"
-                         onclick="setTechFilter('${opt.value}')">
-                   ${opt.label} <span class="tech-count">${opt.count}</span>
-                 </button>`;
+        html += chip(opt.value, opt.label, opt.count, opt.color);
     });
 
+    container.setAttribute('role', 'radiogroup');
+    container.setAttribute('aria-label', 'Technology filter');
     container.innerHTML = html;
 }
 
@@ -503,9 +554,11 @@ async function setTechFilter(tech) {
     if (ADJACENCY_GIS_MODE) tech = '2G';
     activeTech = tech;
     activeTechSpecific = 'all';
-    document.querySelectorAll('.tech-btn').forEach(btn =>
-        btn.classList.toggle('active', btn.dataset.tech === tech)
-    );
+    document.querySelectorAll('.tech-btn').forEach((btn) => {
+        const on = btn.dataset.tech === tech;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
     clearSectorLayers();
     clearHighlights();
     clearNeighborOverlay();

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - PrimeNet</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
-    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.9">
     <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
 </head>
 <body class="perf-page">
@@ -15,11 +15,13 @@
         <div class="header-content">
             <div class="header-left">
                 <a href="/dashboard" class="back-link">Dashboard</a>
-                <h1>📈 Performance Analytics</h1>
+                <h1>Performance Analytics</h1>
             </div>
             <div class="header-right">
-                <span class="user-name">{{ user.username }}</span>
-                <button onclick="logout()" class="btn-logout">Logout</button>
+                <div class="header-actions">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" onclick="logout()" class="btn-header btn-header-outline">Logout</button>
+                </div>
             </div>
         </div>
     </header>
@@ -267,7 +269,7 @@
             <div id="time-frame-modal" class="perf-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeTimeFrameModal()">
                 <div class="perf-modal-card perf-time-frame-modal" role="dialog" aria-labelledby="time-frame-modal-title">
                     <div class="perf-modal-head">
-                        <h3 id="time-frame-modal-title">Time frame</h3>
+                        <h2 id="time-frame-modal-title">Time frame</h2>
                         <button type="button" class="perf-modal-close" onclick="closeTimeFrameModal()">&times;</button>
                     </div>
                     <p class="perf-time-frame-hint" id="time-frame-retention-hint"></p>
@@ -341,13 +343,13 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
+<script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
 <script src="{{ url_for('static', filename='js/selection_context.js') }}?v=1.0"></script>
 <script src="{{ url_for('static', filename='js/saved_views.js') }}?v=1.0"></script>
 <script>
     window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
 </script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=10.3"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=10.4"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);
@@ -389,5 +391,8 @@
         }
     });
 </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=1fdcccc0-d74b-4537-ad5c-5b4f96468180"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

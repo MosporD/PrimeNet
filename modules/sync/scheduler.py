@@ -53,12 +53,21 @@ _scheduler_mode_summary = {
     'watcher_poll_interval_sec': None,
 }
 _sync_progress_lock = threading.Lock()
+# PM pipeline (hourly / daily / watcher) — mutual exclusion for SFTP+load.
 _pipeline_cycle_lock = threading.Lock()
+# Neighbor is a separate SFTP+load path; do not share the PM lock (watcher
+# holds it ~continuously in watcher-primary mode and starves :30 neighbor).
+_neighbor_cycle_lock = threading.Lock()
 
 
 def pipeline_cycle_lock_held() -> bool:
-    """True when this process currently holds the shared hourly/daily/neighbor lock."""
+    """True when this process currently holds the shared hourly/daily/watcher lock."""
     return bool(_pipeline_cycle_lock.locked())
+
+
+def neighbor_cycle_lock_held() -> bool:
+    """True when this process currently holds the neighbor-only cycle lock."""
+    return bool(_neighbor_cycle_lock.locked())
 
 
 def _defer_pipeline_if_low_memory(job_label: str) -> bool:
@@ -389,8 +398,8 @@ def run_neighbor_sync_cycle():
         _finish_progress('neighbor_sync', False, f'missing script: {orchestrator}')
         return
 
-    if not _pipeline_cycle_lock.acquire(blocking=False):
-        msg = 'Neighbor sync skipped: another pipeline cycle is already running'
+    if not _neighbor_cycle_lock.acquire(blocking=False):
+        msg = 'Neighbor sync skipped: another neighbor sync is already running'
         _log_sync('neighbor_sync', 'all', 'error', 0, msg)
         logger.warning(msg)
         _skip_progress('neighbor_sync', msg)
@@ -434,7 +443,7 @@ def run_neighbor_sync_cycle():
         logger.exception('Neighbor sync cycle failed: %s', e)
         _finish_progress('neighbor_sync', False, str(e))
     finally:
-        _pipeline_cycle_lock.release()
+        _neighbor_cycle_lock.release()
         _trim_scheduler_memory('neighbor_sync')
 
 

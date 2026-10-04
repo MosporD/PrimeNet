@@ -53,15 +53,15 @@
             glow: 'rgba(56,189,248,'
         } : {
             dark: false,
-            bgTop: '#f7fafc', bgMid: '#eef3f8', bgBot: '#dfe9f1',
+            bgTop: '#eaf1f7', bgMid: '#d8e6f1', bgBot: '#c5d9e8',
             line: '96,128,156',
             lineStrong: '62,95,124',
             accent: '74,124,166',
             beacon: '224,93,93',
-            ground: '127,166,194',
+            ground: '79,141,184',
             star: '44,62,80',
-            panelFill: 'rgba(109,149,179,0.14)',
-            glow: 'rgba(109,149,179,'
+            panelFill: 'rgba(58,115,153,0.14)',
+            glow: 'rgba(58,115,153,'
         };
     }
 
@@ -77,6 +77,10 @@
         var ripples = [];            /* { y, r, max, a } */
         var lastPlatRipple = 0;
         var lastBeaconRipple = 0;
+        var whooshes = [];           /* Soft Steel / gate-cyan descent ribbons */
+        var prevCamY = TOP_ELEV;
+        var lastWhooshSpawn = 0;
+        var lastPlatWhoosh = -1;
         var startT = performance.now();
         var lastT = startT;
         var frameQueued = false;
@@ -173,12 +177,16 @@
         }
 
         function drawBackground(t) {
+            var hasElegant = !!document.querySelector('.elegant-gradient-bg');
             var g = ctx.createLinearGradient(0, 0, 0, vh);
             g.addColorStop(0, pal.bgTop);
             g.addColorStop(0.55, pal.bgMid);
             g.addColorStop(1, pal.bgBot);
+            /* Soft Steel / gate elegant base peeks through under the tower. */
+            ctx.globalAlpha = hasElegant ? (pal.dark ? 0.48 : 0.4) : 1;
             ctx.fillStyle = g;
             ctx.fillRect(0, 0, vw, vh);
+            ctx.globalAlpha = 1;
 
             if (pal.dark) {
                 for (var i = 0; i < stars.length; i++) {
@@ -433,6 +441,162 @@
             }
         }
 
+        function whooshPalette() {
+            /* Match tower palette — Soft Steel light / gate cyan dark. */
+            return pal.dark
+                ? [pal.lineStrong, pal.line, pal.accent, '125,211,252']
+                : [pal.accent, pal.lineStrong, pal.ground, '95,155,190'];
+        }
+
+        function spawnWhoosh(strength, yHint) {
+            var tones = whooshPalette();
+            var rgb = tones[Math.floor(Math.random() * tones.length)];
+            whooshes.push({
+                y: (yHint != null ? yHint : camY) + (Math.random() - 0.5) * 14,
+                az: Math.random() * TAU,
+                life: 1,
+                str: clamp(strength, 0.25, 1.15),
+                rgb: rgb,
+                len: 16 + Math.random() * 28,
+                twist: (0.55 + Math.random() * 0.9) * (Math.random() < 0.5 ? -1 : 1),
+                rad: 6 + Math.random() * 10,
+                width: 2.2 + Math.random() * 3.4
+            });
+            if (whooshes.length > 28) whooshes.splice(0, whooshes.length - 28);
+        }
+
+        function drawHelicalWhoosh(w, alphaMul) {
+            var steps = 22;
+            var i, u, yy, az, r, p, head = null;
+            ctx.beginPath();
+            for (i = 0; i <= steps; i++) {
+                u = i / steps;
+                yy = w.y - u * w.len * w.life;
+                az = w.az + u * w.twist * Math.PI * w.life;
+                r = halfW(Math.max(0, yy)) + w.rad + Math.sin(u * Math.PI) * 5;
+                p = project(Math.cos(az) * r, yy, Math.sin(az) * r);
+                if (i === 0) {
+                    ctx.moveTo(p.x, p.y);
+                    head = p;
+                } else {
+                    ctx.lineTo(p.x, p.y);
+                }
+            }
+            var a = alphaMul * w.str * w.life * 0.85;
+            ctx.strokeStyle = 'rgba(' + w.rgb + ',' + a.toFixed(3) + ')';
+            ctx.lineWidth = Math.max(1.2, w.width * (0.55 + w.life * 0.7));
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            if (head && w.life > 0.35) {
+                var glow = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 10 + w.width * 2);
+                glow.addColorStop(0, 'rgba(' + w.rgb + ',' + (a * 0.55).toFixed(3) + ')');
+                glow.addColorStop(1, 'rgba(' + w.rgb + ',0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(head.x, head.y, 10 + w.width * 2, 0, TAU);
+                ctx.fill();
+            }
+        }
+
+        /* Screen-space Soft Steel / gate-cyan stripes as you descend. */
+        function drawScreenWhoosh(progress, speedBoost, t) {
+            var baseA = 0.08 + progress * 0.22 + speedBoost * 0.28;
+            if (baseA < 0.04) return;
+            var tones = whooshPalette();
+            var bands = [
+                { rgb: tones[0], phase: 0.00, thick: 14, bend: 0.22 },
+                { rgb: tones[1], phase: 0.18, thick: 18, bend: 0.34 },
+                { rgb: tones[2], phase: 0.38, thick: 11, bend: 0.18 },
+                { rgb: tones[0], phase: 0.58, thick: 15, bend: 0.28 },
+                { rgb: tones[3] || tones[1], phase: 0.78, thick: 9, bend: 0.14 }
+            ];
+            var i, b, travel, y0, x0, x1, cp1x, cp1y, cp2x, cp2y, a;
+            ctx.save();
+            ctx.globalCompositeOperation = pal.dark ? 'lighter' : 'source-over';
+            for (i = 0; i < bands.length; i++) {
+                b = bands[i];
+                travel = progress * 1.15 + b.phase * 0.2 +
+                    (REDUCE_MOTION ? 0 : Math.sin(t * 0.7 + b.phase * 4) * 0.02);
+                y0 = -vh * 0.25 + travel * vh * 1.45;
+                if (y0 < -vh * 0.4 || y0 > vh * 1.35) continue;
+                x0 = -vw * 0.08;
+                x1 = vw * 1.08;
+                cp1x = vw * (0.28 + b.bend);
+                cp1y = y0 + vh * (0.08 + b.bend * 0.4) * (i % 2 ? -1 : 1);
+                cp2x = vw * (0.62 - b.bend * 0.5);
+                cp2y = y0 + vh * (0.14 + speedBoost * 0.1) * (i % 2 ? 1 : -1);
+                a = baseA * (i % 2 ? 0.85 : 1) * (pal.dark ? 1 : 0.72);
+                ctx.strokeStyle = 'rgba(' + b.rgb + ',' + a.toFixed(3) + ')';
+                ctx.lineWidth = b.thick * (0.85 + speedBoost * 0.55);
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x1, y0 + vh * 0.12);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function updateHelicalWhooshes(dt, t, st, progress, speedBoost) {
+            if (REDUCE_MOTION) return;
+            var dElev = prevCamY - camY;
+            if (dElev > 0.15 && progress > 0.02 && t - lastWhooshSpawn > 0.07) {
+                lastWhooshSpawn = t;
+                spawnWhoosh(0.35 + speedBoost * 0.8, camY + 6);
+                if (speedBoost > 0.45) spawnWhoosh(0.55 + speedBoost * 0.5, camY - 4);
+            }
+            if (st.active >= 0 && st.focus > 0.55 && st.active !== lastPlatWhoosh) {
+                lastPlatWhoosh = st.active;
+                spawnWhoosh(1.05, PLATFORMS[st.active] + 4);
+                spawnWhoosh(0.85, PLATFORMS[st.active] - 2);
+                spawnWhoosh(0.7, PLATFORMS[st.active] + 10);
+            }
+            if (st.active < 0) lastPlatWhoosh = -1;
+
+            for (var i = whooshes.length - 1; i >= 0; i--) {
+                var w = whooshes[i];
+                w.life -= dt * (0.55 + speedBoost * 0.65);
+                w.y -= dt * (8 + speedBoost * 22);
+                w.az += dt * w.twist * 0.55;
+                if (w.life <= 0) {
+                    whooshes.splice(i, 1);
+                    continue;
+                }
+                drawHelicalWhoosh(w, pal.dark ? 1 : 0.78);
+            }
+        }
+
+        function whooshMetrics(dt) {
+            var progress = clamp((TOP_ELEV - camY) / (TOP_ELEV - BASE_ELEV), 0, 1);
+            var dElev = prevCamY - camY;
+            var speedBoost = REDUCE_MOTION ? 0
+                : clamp(Math.abs(dElev) / Math.max(dt * 55, 0.001), 0, 1);
+            return { progress: progress, dElev: dElev, speedBoost: speedBoost };
+        }
+
+        function drawWhooshPass(dt, t, st, pass, metrics) {
+            if (pass === 'helix') {
+                updateHelicalWhooshes(dt, t, st, metrics.progress, metrics.speedBoost);
+                if (REDUCE_MOTION && metrics.progress > 0.08) {
+                    /* Quiet dual ribbons — identity without chase. */
+                    var tones = whooshPalette();
+                    var quiet = {
+                        y: camY + 2, az: 0.9, life: 0.55, str: 0.45,
+                        rgb: tones[0], len: 26, twist: 0.7, rad: 9, width: 2.8
+                    };
+                    drawHelicalWhoosh(quiet, 0.4);
+                    quiet.rgb = tones[1];
+                    quiet.az = 2.7;
+                    quiet.twist = -0.55;
+                    drawHelicalWhoosh(quiet, 0.35);
+                }
+                prevCamY = camY;
+            } else if (pass === 'screen') {
+                drawScreenWhoosh(metrics.progress, metrics.speedBoost, t);
+            }
+        }
+
         function drawConnector(st, t) {
             if (st.active < 0 || !st.cardEl || st.focus < 0.06 || st.side === 0) return;
             var rect = st.cardEl.getBoundingClientRect();
@@ -505,9 +669,11 @@
             FOV = vh * 2.05;
             DIST = 150 + clamp((camY - 100) / 27, 0, 1) * 42;
 
+            var zm = whooshMetrics(dt);
             drawBackground(t);
             drawGround();
             drawLattice();
+            drawWhooshPass(dt, t, st, 'helix', zm);
             for (var i = 0; i < PLATFORMS.length; i++) {
                 drawPlatform(PLATFORMS[i], i, st.active, st.focus, t);
             }
@@ -515,6 +681,7 @@
             drawParticles(dt);
             drawRipples(dt, st.active, st.focus, t);
             drawConnector(st, t);
+            drawWhooshPass(dt, t, st, 'screen', zm);
         }
 
         function loop(now) {

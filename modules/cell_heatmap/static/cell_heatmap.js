@@ -329,9 +329,10 @@
             attribution: "&copy; OpenStreetMap",
             maxZoom: 19,
         });
-        const dark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-            attribution: "&copy; OpenStreetMap &copy; CARTO",
+        const darkStreet = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap",
             maxZoom: 19,
+            className: "map-tiles-dark-street",
         });
         const satellite = L.tileLayer(
             "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -341,7 +342,7 @@
         osmLight.addTo(map);
         L.control
             .layers(
-                { Street: osmLight, "Dark (CARTO)": dark, Satellite: satellite },
+                { Street: osmLight, "Dark Street": darkStreet, Satellite: satellite },
                 {},
                 { position: "topright", collapsed: true },
             )

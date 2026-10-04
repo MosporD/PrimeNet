@@ -368,10 +368,23 @@ def dashboard():
         return _sso_login_redirect(next_url=request.url)
 
     user_data = format_user_data(user)
+    view_as_catalog = None
+    if str(user_data.get('role') or '').strip().lower() == 'admin':
+        from core.feature_access import ROLE_LABELS, ROLE_ORDER
+
+        view_as_catalog = [
+            {
+                'key': role_key,
+                'label': ROLE_LABELS.get(role_key, role_key),
+                'allowed_hrefs': allowed_hrefs_for_role(role_key),
+            }
+            for role_key in ROLE_ORDER
+        ]
     return render_template(
         'dashboard.html',
         user=user_data,
         allowed_hrefs=allowed_hrefs_for_role(user_data),
+        view_as_catalog=view_as_catalog,
         tech_site_columns=[dict(c) for c in _DEFAULT_SITE_COLUMNS],
         total_sites=0,
     )
@@ -428,7 +441,10 @@ def login():
                 'success': True,
                 'message': 'Login successful',
                 'must_change_password': must_change_password,
-                'redirect': url_for('auth.dashboard'),
+                'password_change_url': '/change-password' if must_change_password else None,
+                'redirect': (
+                    '/change-password' if must_change_password else url_for('auth.dashboard')
+                ),
                 'user': {
                     'username': (user.get('username') if isinstance(user, dict) else user[1]),
                     'email': (user.get('email') if isinstance(user, dict) else user[2]),
@@ -460,6 +476,32 @@ def navigation_allowed():
         'role': role,
         'sections': navigation_sections_for_role(role),
         'allowed_hrefs': allowed_hrefs_for_role(role),
+    })
+
+
+@auth_bp.route('/api/admin/view-as-catalog', methods=['GET'])
+def view_as_catalog():
+    """Owner-only: allowed hrefs per role for dashboard visibility diagnosis."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    role = str(
+        user.get('role') if isinstance(user, dict) else user[6]
+    ).strip().lower()
+    if role != 'admin':
+        return jsonify({'error': 'Owner access required'}), 403
+    from core.feature_access import ROLE_LABELS, ROLE_ORDER
+
+    return jsonify({
+        'success': True,
+        'roles': [
+            {
+                'key': role_key,
+                'label': ROLE_LABELS.get(role_key, role_key),
+                'allowed_hrefs': allowed_hrefs_for_role(role_key),
+            }
+            for role_key in ROLE_ORDER
+        ],
     })
 
 

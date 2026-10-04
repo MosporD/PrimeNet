@@ -5,7 +5,11 @@ Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
 
----
+## 2026-10-04 (Login gate UI polish)
+
+- Impeccable critique → polish on login: removed purple/magenta/indigo nebula chroma (gate-cyan/steel only), honest idle-scene ticker (no fake KPIs), SVG instrument icons, shorter success path under `prefers-reduced-motion`.
+- NEXT: Wave 2 portal tower / NexPulse shell cohesion pass.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

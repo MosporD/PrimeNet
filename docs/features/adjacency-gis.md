@@ -7,7 +7,7 @@
 | Route | `/adjacency-gis` |
 | Module | `modules/adjacency_gis/` |
 | Access | all |
-| Version | V1.4 |
+| Version | V1.7 |
 
 ## Purpose
 
@@ -15,7 +15,7 @@ Geographic 2G picture for adjacency / NCL work. Geometry from `metadata.db` `cel
 
 ## Approach
 
-- UI: Network Map fork (Leaflet, left filter panel, wedges) locked to **2G**; default basemap **Roadmap**, switchable via left-panel **Map view** (Street / HOT / Topo / Satellite / Terrain) + Leaflet layers control.
+- UI: Network Map fork (Leaflet, floating Soft Steel filter card, wedges) locked to **2G**; default basemap **Roadmap**, switchable via always-open top-right layers control; BCCH highlighter in its own bottom-right float.
 - Sites: Network Map `/api/map/*` with client `tech=2G`.
 - BCCH overlay: `/api/adjacency-gis/bcch-options` + `/api/adjacency-gis/bcch-map` against `cells_2g.bcch` — selected red, ARFCN−1 blue, ARFCN+1 green; Prev/Next steps integer ARFCN.
 - CM snapshot store + ingest retained for future NCL edges.

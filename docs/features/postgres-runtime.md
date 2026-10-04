@@ -15,14 +15,11 @@ One Postgres server hosts every catalogued store as its own schema (`app`, `meta
 
 ## Laptop runbook
 
-1. Set in `.env`: `NCM_APP_POSTGRES_PASSWORD`, matching `NCM_DATABASE_URL=postgresql://primenet:<password>@127.0.0.1:5432/primenet`.
-2. `docker compose --profile app-db up -d postgres`
-3. `pip install "psycopg[binary]"` if needed
-4. `python scripts/migrate_ncm_users_to_postgres.py` (users/sessions only)
-5. Leave PM/metadata empty; fill with Daily/Hourly ingest or a small CSV load
-6. Smoke: `python -c "from db.pg_domains import require_postgres_url; from db.runtime import connect_app; require_postgres_url(); c=connect_app(); print(c.execute('select current_schema()').fetchone()); c.close()"`
-
-Reset volume (destructive): `docker compose --profile app-db down -v`
+1. Set `NCM_DATABASE_URL` in `.env` to the remote Postgres server (`postgresql://USER:PASSWORD@HOST:5432/primenet`). Do not start a local Postgres container and do not create a local data volume.
+2. `pip install "psycopg[binary]"` if needed
+3. `python scripts/migrate_ncm_users_to_postgres.py` (users/sessions only) — only when the remote `app` schema is empty
+4. Leave PM/metadata empty; fill with Daily/Hourly ingest or a small CSV load
+5. Smoke: `python -c "from db.pg_domains import require_postgres_url; from db.runtime import connect_app; require_postgres_url(); c=connect_app(); print(c.execute('select current_schema()').fetchone()); c.close()"`
 
 ## Approach
 

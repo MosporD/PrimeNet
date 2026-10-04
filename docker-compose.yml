@@ -13,6 +13,8 @@
 #
 # Direct Flask ports are not published; only the proxy (PROXY_HTTP_PORT).
 # Local suite without Docker: python app.py (single listen port).
+# Postgres is external. Set NCM_DATABASE_URL in .env to the server database.
+# This stack does not create a local Postgres volume.
 #
 # Local dev (live reload, no rebuild per code change):
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
@@ -204,31 +206,10 @@ services:
     healthcheck:
       disable: true
 
-  postgres:
-    profiles: ["app-db"]
-    image: postgres:16-alpine
-    container_name: primenet-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${NCM_APP_POSTGRES_DB:-primenet}
-      POSTGRES_USER: ${NCM_APP_POSTGRES_USER:-primenet}
-      POSTGRES_PASSWORD: ${NCM_APP_POSTGRES_PASSWORD:?set NCM_APP_POSTGRES_PASSWORD in .env}
-    ports:
-      - "127.0.0.1:${NCM_APP_POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - primenet-postgres:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   primenet-data:
     driver: local
   nexuscore-data:
     driver: local
   nexpulse-data:
-    driver: local
-  primenet-postgres:
     driver: local

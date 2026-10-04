@@ -124,7 +124,7 @@ offer catalog). See `docs/NEXUSCORE_VISION.md` §5.
 **Progress:** [`features/postgres-runtime.progress.md`](features/postgres-runtime.progress.md)
 
 
-**Plan:** Server rebuild with Postgres-only gate + Daily load verify. Laptop uses Compose `app-db`. Dashboard constellation pulse may need PG-native row probes (visual only).
+**Plan:** Server rebuild with Postgres-only gate + Daily load verify. Laptop uses the remote Postgres server (`NCM_DATABASE_URL`); no local Compose volume. Dashboard constellation pulse may need PG-native row probes (visual only).
 
 ### Sync / pipeline (ETL)
 

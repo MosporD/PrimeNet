@@ -6,7 +6,17 @@ BCCH adjacent-channel highlighter on the 2G metadata map. CM NCL overlay later.
 
 ## NEXT
 
-Open `/adjacency-gis`, use **Map view** to switch basemaps; pick a BCCH and verify red/blue/green wedges. When CM pipeline is ready, overlay ADCE / G2GNCELL edges.
+Open `/adjacency-gis`: basemap list top-right (always open), BCCH panel bottom-right, no saved views. When CM pipeline is ready, overlay ADCE / G2GNCELL edges.
+
+## 2026-10-04 (BCCH / basemap chrome split)
+
+- Done: Removed saved views. BCCH adjacent-channel panel is its own bottom-right float. Basemap selection is the Leaflet layers control top-right, always expanded (not auto-collapsible). Version V1.7.
+- NEXT: Smoke layout in light + dark; confirm BCCH highlight still paints wedges.
+
+## 2026-10-04 (Filter float + tech chip parity)
+
+- Done: Matched Network Map filter treatment — collapsible floating Filters card over the map; Soft Steel instrument tech chip (stacked label/count, swatch, radiogroup); site info as bottom float; dark-mode parity. Kept Adjacency-only controls (basemap, activity, BCCH block). Version V1.6.
+- NEXT: Smoke BCCH highlight + collapse persistence after hard refresh.
 
 ## 2026-09-24 (Basemap switcher)
 

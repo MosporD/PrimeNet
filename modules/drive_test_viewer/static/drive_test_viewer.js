@@ -23,10 +23,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function initMap() {
     dtMap = L.map('driveTestMap').setView([31.9539, 35.9106], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19,
-    }).addTo(dtMap);
+    });
+    const darkStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+        className: 'map-tiles-dark-street',
+    });
+    street.addTo(dtMap);
+    L.control.layers(
+        { Street: street, 'Dark Street': darkStreet },
+        {},
+        { collapsed: true }
+    ).addTo(dtMap);
     siteLayer = L.layerGroup().addTo(dtMap);
 }
 

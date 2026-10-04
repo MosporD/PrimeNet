@@ -39,6 +39,7 @@ _SELECT_SQL_MASTER = re.compile(
     re.IGNORECASE,
 )
 _COLLATE_NOCASE = re.compile(r'\s+COLLATE\s+NOCASE\b', re.IGNORECASE)
+_IFNULL = re.compile(r'\bIFNULL\s*\(', re.IGNORECASE)
 # SQLite callers sometimes write empty string as "" (empty identifier on PG).
 _EMPTY_DQUOTE_COMPARE = re.compile(
     r'(<>|!=|=)\s*""',
@@ -291,4 +292,5 @@ def adapt_sqlite_app_sql(sql: str) -> str:
     sql = _EXCLUDED.sub('EXCLUDED.', sql)
     sql = _LAST_INSERT.sub('SELECT lastval()', sql)
     sql = _COLLATE_NOCASE.sub('', sql)
+    sql = _IFNULL.sub('COALESCE(', sql)
     return qmark_to_percent(sql)

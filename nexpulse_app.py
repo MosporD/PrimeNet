@@ -53,7 +53,7 @@ def create_app():
     from portals.marketing.providers_primenet import try_register_primenet_network_provider
 
     if try_register_primenet_network_provider():
-        print("[OK] NexPulse network footprint → PrimeNet API")
+        print("[OK] NexPulse network footprint -> PrimeNet API")
     else:
         print(
             "[INFO] NexPulse network footprint not connected "

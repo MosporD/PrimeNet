@@ -1,21 +1,11 @@
 let _profileRole = '';
 
 window.addEventListener('DOMContentLoaded', () => {
-    maybeShowForcedPasswordNotice();
     loadProfile();
     loadPreferences();
     loadVendorCredentials();
     document.getElementById('newPassword').addEventListener('input', updateStrength);
 });
-
-function maybeShowForcedPasswordNotice() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('force_password_change') === '1') {
-        alert('Password change required: you must update your password now before using other modules.');
-        const section = document.querySelector('.form-card:nth-of-type(2)');
-        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-}
 
 // ── Profile Load ──────────────────────────────────────────────────────────────
 async function loadProfile() {
@@ -138,10 +128,6 @@ async function changePassword() {
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
         updateStrength();
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('force_password_change') === '1') {
-            window.location.href = '/dashboard';
-        }
     } else {
         el.className = 'status-message error';
         el.textContent = data.error || 'Password change failed';

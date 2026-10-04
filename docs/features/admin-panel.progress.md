@@ -4,6 +4,21 @@ Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
+## 2026-10-04 (Section selector)
+
+- Done: Eng Admin section chrome — labeled **Section** `<select>` plus Soft Steel segmented tabs; URL `?section=` kept in sync.
+- NEXT: None parked.
+
+## 2026-10-04 (Drop Eng Admin local zoom)
+
+- Done: Removed `html:has(body.admin-panel-page) { --ui-zoom: 1.5 }` so Eng Admin uses the global `--ui-zoom` like other pages.
+- NEXT: None parked.
+
+## 2026-10-04 (Buttons dead — script parse error)
+
+- Done: `removePowerBiReport` confirm/fetch lost their template-string quotes, so `admin_panel.js` failed to parse and every Eng Admin `onclick` was undefined. Restored the confirm and `DELETE /api/admin/power-bi/reports/<slug>`.
+- NEXT: None parked.
+
 ## 2026-09-29 (ETL Diagnosis UI stability)
 
 - Done: Fingerprint-gated poll (10s), in-place progress cards, clamp meta text — stops blink from full DOM rewrite.

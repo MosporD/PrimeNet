@@ -184,9 +184,9 @@
     var SCENE_PALETTES = {
         radar: {
             light: {
-                bgTop: '#f5f7fa', bgBottom: '#e3edf5',
-                tint: 'rgba(127, 166, 194, 0.14)',
-                accent: '#6d95b3', accentSoft: '#8fb1ca', grid: '#7fa6c2'
+                bgTop: '#d8e8f4', bgBottom: '#9ec0d8',
+                tint: 'rgba(58, 115, 153, 0.18)',
+                accent: '#2f6588', accentSoft: '#3a7399', grid: '#3a7399'
             },
             dark: {
                 bgTop: '#020617', bgBottom: '#061336',
@@ -196,9 +196,9 @@
         },
         sonar: {
             light: {
-                bgTop: '#eef5fc', bgBottom: '#d6e6f5',
-                tint: 'rgba(143, 177, 202, 0.16)',
-                accent: '#6d95b3', accentSoft: '#8fb1ca', grid: '#7fa6c2'
+                bgTop: '#cfe3f2', bgBottom: '#8fb9d4',
+                tint: 'rgba(58, 115, 153, 0.2)',
+                accent: '#2f6588', accentSoft: '#3a7399', grid: '#3a7399'
             },
             dark: {
                 bgTop: '#021a14', bgBottom: '#042f2a',
@@ -208,9 +208,9 @@
         },
         stars: {
             light: {
-                bgTop: '#f5f7fa', bgBottom: '#e8f0f8',
-                tint: 'rgba(180, 205, 224, 0.22)',
-                accent: '#6d95b3', accentSoft: '#8fb1ca', grid: '#7fa6c2'
+                bgTop: '#dceaf4', bgBottom: '#b7d0e4',
+                tint: 'rgba(58, 115, 153, 0.2)',
+                accent: '#2f6588', accentSoft: '#3a7399', grid: '#3a7399'
             },
             dark: {
                 bgTop: '#0b0718', bgBottom: '#15082a',
@@ -220,9 +220,9 @@
         },
         hexmesh: {
             light: {
-                bgTop: '#ffffff', bgBottom: '#eef5fc',
-                tint: 'rgba(127, 166, 194, 0.1)',
-                accent: '#7fa6c2', accentSoft: '#b4cde0', grid: '#8fb1ca'
+                bgTop: '#e8eef4', bgBottom: '#9ec0d8',
+                tint: 'rgba(58, 115, 153, 0.16)',
+                accent: '#2f6588', accentSoft: '#3a7399', grid: '#3a7399'
             },
             dark: {
                 bgTop: '#020617', bgBottom: '#031028',
@@ -701,18 +701,25 @@
 
         function drawScene(scene, dt, t) {
             var pal = scenePalette(scene.id);
+            var hasElegant = !!document.querySelector('.elegant-gradient-bg');
             var bg = ctx.createLinearGradient(0, 0, 0, vh);
             bg.addColorStop(0, pal.bgTop);
             bg.addColorStop(1, pal.bgBottom);
+            /* Let Soft Steel / gate elegant base show through when present.
+               Light mode stays more opaque so steel accents stay crisp. */
+            ctx.globalAlpha = hasElegant
+                ? (document.body.classList.contains('dark-mode') ? 0.42 : 0.32)
+                : 1;
             ctx.fillStyle = bg;
             ctx.fillRect(0, 0, vw, vh);
+            ctx.globalAlpha = 1;
             ctx.save();
             var tint = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(vw, vh) * 0.8);
             tint.addColorStop(0, pal.tint);
             tint.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = tint;
             ctx.fillRect(0, 0, vw, vh);
-            if (!document.body.classList.contains('dark-mode')) ctx.globalAlpha = 0.78;
+            if (!document.body.classList.contains('dark-mode')) ctx.globalAlpha = 0.92;
             scene.draw(dt, t, pal);
             ctx.restore();
         }

@@ -114,15 +114,15 @@ Use these for new light-mode UI (aligned with dashboard / header gradient):
 
 | Token | Hex | Usage |
 |-------|-----|--------|
-| Page background | `#f5f7fa` | `body`, `.main-content` |
+| Page background | `#e8eef4` | `body`, `.main-content` |
 | Surface | `#ffffff` | Cards, panels, tables |
-| Surface elevated | `#f4f6f8` / `#eef5fc` | Toolbars, subtle strips |
-| Primary | `#7fa6c2` | Accents, links in header context |
-| Primary dark | `#6d95b3` | Button text on white header buttons |
+| Surface elevated | `#f4f6f8` / `#dceaf4` | Toolbars, subtle strips |
+| Primary | `#4f8db8` | Accents, links in header context |
+| Primary dark | `#3a7399` | Button text on white header buttons |
 | Text | `#2c3e50` | Headings, body |
 | Text muted | `#7f8c8d` / `#5c6773` | Labels, hints, captions |
-| Border | `#d6e6f5` / `#dde1e6` | Cards, inputs |
-| Header gradient | `linear-gradient(135deg, #b4cde0 0%, #8fb1ca 55%, #7fa6c2 100%)` | Top bar (from `common.css`) |
+| Border | `#9ec0d8` / `#dde1e6` | Cards, inputs |
+| Header gradient | `linear-gradient(135deg, #8fb9d4 0%, #5f9bc0 55%, #4f8db8 100%)` | Top bar (from `common.css`) |
 
 **Network Health** documents the same set as `--pn-*` in `modules/network_health/static/network_health.css` — good reference for a token-based module.
 
@@ -234,7 +234,7 @@ See `modules/sector_health/static/sector_health.js` (`shPieColors`, `primenet:th
 
 ## Header & theme toggle placement
 
-`_ensureThemeToggle()` mounts `#dark-mode-btn` into the first match:
+`_ensureThemeToggle()` mounts a pill `#dark-mode-btn.theme-toggle` (moon/sun knob, Soft Steel colors — not a text “Light Mode” chip) into the first match:
 
 1. `header .header-actions`
 2. `header .header-right`

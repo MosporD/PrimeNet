@@ -8,6 +8,22 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **NEXT:** Browser verify Operations Panel health on server after deploy (PG size + latest timestamps).
 
 ---
+## 2026-10-04 (Constellation legend + vendor dials)
+
+- Done: Radar legend chips compact single-line (dot · RAT · count · subtitle). Vendor dials show `H%/N%` with subtle blink (respects reduced-motion).
+- NEXT: Browser verify Operations Panel health on server after deploy (PG size + latest timestamps).
+
+## 2026-10-04 (Owner View-as role preview)
+
+- Done: Dashboard header **View as** (Owner / NOC SYS / RNC User / User) previews Feature Access tile + tab visibility without changing the session; banner + Exit; hides Eng Admin / Ops Panel chrome while previewing.
+- API: `GET /api/admin/view-as-catalog` (Owner-only) for the same catalog.
+- NEXT: Browser verify Operations Panel health on server after deploy (PG size + latest timestamps).
+
+## 2026-10-04 (UI critique — shell polish)
+
+- Soft Steel cohesion: global search dropdown off gate-cyan glass → paper/dm panels; dark canvas `#0f1722`; radio shell Soft Steel dark primaries + shared header logout chip.
+- NEXT: Browser verify Operations Panel health on server after deploy (PG size + latest timestamps).
+
 ## 2026-10-01 (Operations Panel Postgres health)
 
 - Root cause: `pm_health` / `neighbor_health` still treated leftover `*.db` file size/mtime as live store and used SQLite `rowid` sampling for “latest data”.

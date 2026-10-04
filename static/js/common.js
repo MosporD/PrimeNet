@@ -47,8 +47,74 @@ function _isPortalPage() {
     return p === '/portals' || p.startsWith('/portals/');
 }
 
+function _isPortalSelectPage() {
+    const p = String(window.location?.pathname || '').trim().replace(/\/+$/, '') || '/';
+    return p === '/portals';
+}
+
+function _portalsUrl() {
+    const fromWindow = String(window.NEXUS_PORTALS_URL || '').trim();
+    if (fromWindow) return fromWindow;
+    const meta = document.querySelector('meta[name="nexus-portals-url"]');
+    const fromMeta = String(meta?.getAttribute('content') || '').trim();
+    return fromMeta || '/portals';
+}
+
+function _ensurePortalsButton() {
+    if (_isPublicAuthPage() || _isPortalSelectPage()) return;
+    if (document.getElementById('portals-nav-btn') || document.getElementById('mkt-all-portals')) return;
+    if (document.body?.classList?.contains('mkt-page')) return;
+
+    const btn = document.createElement('a');
+    btn.id = 'portals-nav-btn';
+    btn.href = _portalsUrl();
+    btn.className = 'portals-nav-btn';
+    btn.textContent = 'Portals';
+    btn.title = 'Back to portal selection';
+    btn.setAttribute('aria-label', 'Back to portal selection');
+
+    // Shell escape belongs with user actions (right), not beside the page title.
+    const headerActions = document.querySelector('.header-actions');
+    if (headerActions) {
+        btn.classList.add('btn-header');
+        headerActions.insertBefore(btn, headerActions.firstChild);
+        return;
+    }
+
+    const headerRight = document.querySelector('header .header-right, .map-header .header-right');
+    if (headerRight) {
+        btn.classList.add('btn-header');
+        const logout = headerRight.querySelector('.btn-logout, .btn-header-outline');
+        if (logout) {
+            logout.insertAdjacentElement('beforebegin', btn);
+        } else {
+            headerRight.appendChild(btn);
+        }
+        return;
+    }
+
+    const customActions = document.querySelector('.mkt-topbar-actions')
+        || document.querySelector('.ch-topbar-actions')
+        || document.querySelector('.son-topbar-actions');
+    if (customActions) {
+        btn.classList.add('btn-header');
+        customActions.insertBefore(btn, customActions.firstChild);
+        return;
+    }
+
+    const customTopbar = document.querySelector('.ch-topbar')
+        || document.querySelector('.son-topbar')
+        || document.querySelector('.nh-select-header')
+        || document.querySelector('.nh-header');
+    if (customTopbar) {
+        btn.classList.add('btn-header');
+        customTopbar.appendChild(btn);
+    }
+}
+
 const CONSTELLATION_CSS_VERSION = '1.9';
 const CONSTELLATION_JS_VERSION = '2.2';
+const ELEGANT_GRADIENT_CSS_VERSION = '1.5';
 
 function _constellationBgExcluded(path) {
     return /^\/(login|register|activation|portals|network-map|neighbor-analysis|performance|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer|overshooting-detector|capacity-hotspots|sleeping-cells|layer-coverage|neighbor-quality|change-impact|radio-morning-report|mobility-explorer|alarm-impact|group-health|irat-border)(\/|$)/.test(path);
@@ -257,6 +323,46 @@ function _ensureDarkThemeFinalStylesheet() {
     (document.head || document.documentElement).appendChild(link);
 }
 
+function _themeToggleSvg(kind) {
+    if (kind === 'moon') {
+        return '<svg class="theme-toggle-icon theme-toggle-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">'
+            + '<path d="M21 14.3A8.4 8.4 0 0 1 9.7 3 7.2 7.2 0 1 0 21 14.3Z" '
+            + 'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+            + '</svg>';
+    }
+    return '<svg class="theme-toggle-icon theme-toggle-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">'
+        + '<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>'
+        + '<path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6" '
+        + 'stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+        + '</svg>';
+}
+
+function _themeToggleMarkup() {
+    return ''
+        + '<span class="theme-toggle-track" aria-hidden="true">'
+        +   '<span class="theme-toggle-thumb">'
+        +     _themeToggleSvg('moon')
+        +     _themeToggleSvg('sun')
+        +   '</span>'
+        +   '<span class="theme-toggle-slot theme-toggle-slot-moon">' + _themeToggleSvg('moon') + '</span>'
+        +   '<span class="theme-toggle-slot theme-toggle-slot-sun">' + _themeToggleSvg('sun') + '</span>'
+        + '</span>'
+        + '<span class="theme-toggle-label">Theme</span>';
+}
+
+function _syncThemeToggleButton(theme) {
+    const btn = document.getElementById('dark-mode-btn');
+    if (!btn) return;
+    const dark = theme === 'dark';
+    btn.classList.toggle('is-dark', dark);
+    btn.classList.toggle('is-light', !dark);
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    btn.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+    const label = btn.querySelector('.theme-toggle-label');
+    if (label) label.textContent = dark ? 'Light mode' : 'Dark mode';
+}
+
 function _applyTheme(theme) {
     const t = theme === 'dark' ? 'dark' : 'light';
     _ensureDarkThemeFinalStylesheet();
@@ -266,12 +372,7 @@ function _applyTheme(theme) {
         localStorage.setItem(THEME_STORAGE_KEY, t);
         localStorage.setItem('darkMode', t === 'dark' ? 'true' : 'false');
     } catch (_) { /* ignore */ }
-    const btn = document.getElementById('dark-mode-btn');
-    if (btn) {
-        btn.textContent = t === 'dark' ? 'Light Mode' : 'Dark Mode';
-        btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-        btn.title = t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-    }
+    _syncThemeToggleButton(t);
     _syncChartTheme(t);
     document.dispatchEvent(new CustomEvent('primenet:theme-change', { detail: { theme: t } }));
 }
@@ -281,15 +382,57 @@ function toggleDarkMode() {
     _applyTheme(dark ? 'light' : 'dark');
 }
 
+function _ensureElegantGradientStylesheet() {
+    if (document.querySelector('link[data-primenet-elegant-bg-css]')) return;
+    if (document.querySelector('link[href*="elegant-gradient-bg.css"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `/static/css/elegant-gradient-bg.css?v=${ELEGANT_GRADIENT_CSS_VERSION}`;
+    link.setAttribute('data-primenet-elegant-bg-css', '1');
+    document.head.appendChild(link);
+}
+
+function _ensureElegantGradientBg() {
+    if (!document.body) return;
+    // Marketing workbench owns its Soft Steel surfaces — gate atmosphere must not cover it.
+    if (document.body.classList.contains('mkt-page') || document.body.classList.contains('no-elegant-gradient-bg')) {
+        document.querySelectorAll('.elegant-gradient-bg').forEach((el) => el.remove());
+        return;
+    }
+    if (document.querySelector('.elegant-gradient-bg')) return;
+    _ensureElegantGradientStylesheet();
+    const root = document.createElement('div');
+    root.className = 'elegant-gradient-bg';
+    root.setAttribute('aria-hidden', 'true');
+    root.innerHTML = ''
+        + '<div class="elegant-gradient-bg__wash"></div>'
+        + '<div class="elegant-gradient-bg__streaks">'
+        +   '<div class="elegant-gradient-bg__streak"></div>'
+        +   '<div class="elegant-gradient-bg__streak"></div>'
+        +   '<div class="elegant-gradient-bg__streak"></div>'
+        +   '<div class="elegant-gradient-bg__streak"></div>'
+        +   '<div class="elegant-gradient-bg__streak"></div>'
+        + '</div>'
+        + '<div class="elegant-gradient-bg__dots"></div>'
+        + '<div class="elegant-gradient-bg__glow"></div>';
+    document.body.insertBefore(root, document.body.firstChild);
+}
+
 function _ensureThemeToggle() {
     if (document.getElementById('dark-mode-btn')) return;
     const btn = document.createElement('button');
     btn.id = 'dark-mode-btn';
     btn.type = 'button';
-    btn.className = 'header-theme-btn';
-    btn.textContent = 'Dark Mode';
+    btn.className = 'header-theme-btn theme-toggle';
+    btn.innerHTML = _themeToggleMarkup();
     btn.setAttribute('aria-label', 'Toggle dark mode');
     btn.addEventListener('click', toggleDarkMode);
+    btn.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleDarkMode();
+        }
+    });
 
     const mount = document.querySelector('header .header-actions')
         || document.querySelector('header .header-right')
@@ -302,12 +445,11 @@ function _ensureThemeToggle() {
         || document.querySelector('.login-theme-mount')
         || document.querySelector('.portal-theme-mount');
     if (!mount) return;
-    if (mount.classList && mount.classList.contains('header-actions')) {
-        btn.classList.add('btn-header', 'btn-header-outline');
-    } else if (mount.classList && (mount.classList.contains('login-theme-mount') || mount.classList.contains('portal-theme-mount'))) {
-        btn.className = 'login-theme-btn';
+    if (mount.classList && (mount.classList.contains('login-theme-mount') || mount.classList.contains('portal-theme-mount'))) {
+        btn.classList.add('login-theme-btn');
     }
     mount.appendChild(btn);
+    _syncThemeToggleButton(_preferredTheme());
 }
 
 function _ensureBrandFavicon() {
@@ -621,9 +763,11 @@ document.addEventListener('DOMContentLoaded', () => {
     _runPageEnterTransition();
     _wirePageTransitionRestoreGuards();
     _ensureBrandFavicon();
+    _ensureElegantGradientBg();
     _ensureFeatureNavButton();
     _ensureHeaderNavCluster();
     _ensureModuleHeaderActions();
+    _ensurePortalsButton();
     _wirePageLinkTransitions();
     _ensureThemeToggle();
     _applyTheme(_preferredTheme());
@@ -638,6 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Also inject theme-dark-final.css so it loads after module CSS (cascade win).
 try {
     _ensureDarkThemeFinalStylesheet();
+    _ensureElegantGradientBg();
     if (document.body) _applyTheme(_preferredTheme());
 } catch (_) { /* ignore */ }
 // Logout function
@@ -649,6 +794,7 @@ async function logout() {
                 try {
                     sessionStorage.removeItem(NAV_SECTIONS_STORAGE_KEY);
                     sessionStorage.removeItem(NAV_ROLE_STORAGE_KEY);
+                    sessionStorage.removeItem('primenetDashboardViewAs');
                 } catch (_) { /* ignore */ }
                 window.location.href = '/login';
             }

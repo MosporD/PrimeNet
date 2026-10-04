@@ -17,7 +17,7 @@ body.has-constellation-bg {
 }
 
 body.has-constellation-bg:not(.dark-mode) {
-    background: #f5f7fa;
+    background: #e8eef4;
 }
 
 body.has-constellation-bg .container,
@@ -247,61 +247,71 @@ body.dark-mode .constellation-deck {
 .radar-legend {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     width: 100%;
 }
 
 .radar-legend-chip {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: auto auto;
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 2px 12px;
+    gap: 8px;
     width: 100%;
-    padding: 10px 14px;
-    border-radius: 11px;
+    min-height: 0;
+    padding: 6px 10px;
+    border-radius: 8px;
     border: 1px solid rgba(96, 165, 250, 0.28);
     background: rgba(8, 22, 52, 0.6);
     color: #dbeafe;
     font: inherit;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
     text-align: left;
     cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .radar-legend-chip:hover {
     border-color: rgba(125, 211, 252, 0.6);
-    transform: translateY(-1px);
 }
 
 .radar-legend-chip.active {
     background: rgba(14, 42, 92, 0.9);
     border-color: var(--chip-color, #38bdf8);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.22);
 }
 
 .radar-legend-chip i {
-    grid-row: 1 / span 2;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    flex: 0 0 auto;
     display: inline-block;
     background: var(--chip-color, #38bdf8);
-    box-shadow: 0 0 8px var(--chip-color, #38bdf8);
+    box-shadow: 0 0 6px var(--chip-color, #38bdf8);
+}
+
+.radar-legend-chip .chip-title {
+    font-weight: 700;
+    color: #f0f9ff;
+    white-space: nowrap;
 }
 
 .radar-legend-chip .chip-count {
-    grid-row: 1 / span 2;
-    font-weight: 800;
-    color: #f0f9ff;
+    font-weight: 750;
+    color: #e0f2fe;
     font-variant-numeric: tabular-nums;
-    font-size: 1rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .radar-legend-chip .chip-sub {
+    margin-left: auto;
     font-size: 0.72rem;
-    color: rgba(147, 197, 253, 0.7);
+    color: rgba(147, 197, 253, 0.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Legacy footnote row — hidden (map stats shown via tooltip/badge only) */
@@ -410,6 +420,22 @@ body.dark-mode .constellation-deck {
     color: rgba(147, 197, 253, 0.85);
 }
 
+.vendor-dial-center .vendor-dial-pct {
+    animation: vendor-dial-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes vendor-dial-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vendor-dial-center .vendor-dial-pct {
+        animation: none;
+        opacity: 1;
+    }
+}
+
 /* ── Global search dropdown ─────────────────────────────────── */
 
 .global-search-wrap { position: relative; }
@@ -423,11 +449,16 @@ body.dark-mode .constellation-deck {
     max-height: 420px;
     overflow-y: auto;
     border-radius: 12px;
-    border: 1px solid rgba(96, 165, 250, 0.45);
-    background: rgba(6, 16, 40, 0.97);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 18px 50px rgba(2, 8, 24, 0.55);
+    border: 1px solid #9ec0d8;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(44, 62, 80, 0.16);
     padding: 6px;
+}
+
+body.dark-mode .global-search-results {
+    border-color: #304258;
+    background: #182230;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .gs-section-title {
@@ -436,8 +467,10 @@ body.dark-mode .constellation-deck {
     font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(125, 211, 252, 0.85);
+    color: #5c6773;
 }
+
+body.dark-mode .gs-section-title { color: #a9b7c9; }
 
 .gs-item {
     display: grid;
@@ -447,13 +480,15 @@ body.dark-mode .constellation-deck {
     padding: 8px 10px;
     border-radius: 8px;
     text-decoration: none;
-    color: #e0f2fe;
+    color: #2c3e50;
     font-size: 0.87rem;
 }
 
+body.dark-mode .gs-item { color: #e8eef7; }
+
 .gs-item:hover,
 .gs-item:focus {
-    background: rgba(37, 99, 235, 0.28);
+    background: rgba(79, 141, 184, 0.18);
     outline: none;
 }
 
@@ -461,13 +496,17 @@ body.dark-mode .constellation-deck {
 
 .gs-main { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.gs-main small { font-weight: 400; color: rgba(147, 197, 253, 0.8); }
+.gs-main small { font-weight: 400; color: #5c6773; }
+
+body.dark-mode .gs-main small { color: #a9b7c9; }
 
 .gs-meta {
     font-size: 0.72rem;
-    color: rgba(147, 197, 253, 0.75);
+    color: #5c6773;
     white-space: nowrap;
 }
+
+body.dark-mode .gs-meta { color: #a9b7c9; }
 
 .gs-status {
     display: inline-block;
@@ -476,14 +515,16 @@ body.dark-mode .constellation-deck {
     border-radius: 50%;
 }
 
-.gs-status-active { background: #34d399; box-shadow: 0 0 7px rgba(52, 211, 153, 0.9); }
-.gs-status-inactive { background: #ef4444; box-shadow: 0 0 7px rgba(239, 68, 68, 0.8); }
+.gs-status-active { background: #27ae60; box-shadow: none; }
+.gs-status-inactive { background: #e74c3c; box-shadow: none; }
 
 .gs-empty {
     padding: 14px 12px;
     font-size: 0.84rem;
-    color: rgba(147, 197, 253, 0.85);
+    color: #5c6773;
 }
+
+body.dark-mode .gs-empty { color: #a9b7c9; }
 
 @media (max-width: 700px) {
     .gs-meta { display: none; }
@@ -519,13 +560,12 @@ body.dark-mode .constellation-deck {
     }
 
     .radar-legend {
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: column;
+        flex-wrap: nowrap;
     }
 
     .radar-legend-chip {
-        flex: 1 1 200px;
-        width: auto;
+        width: 100%;
     }
 
     .vendor-dials {

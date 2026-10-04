@@ -159,8 +159,12 @@ def _last_ok_by_type(rows: list[dict], types: tuple[str, ...]) -> dict[str, dict
 
 
 def _pipeline_stuck_signal(rows: list[dict]) -> dict:
-    """Detect the 'another pipeline cycle is already running' storm."""
-    pipeline_types = {'db_loader', 'daily_full_sync', 'neighbor_sync'}
+    """Detect the 'another pipeline cycle is already running' storm.
+
+    Neighbor uses a separate lock from hourly/daily/watcher, so neighbor skips
+    are not counted as a PM pipeline lock storm.
+    """
+    pipeline_types = {'db_loader', 'daily_full_sync'}
     relevant = [
         r for r in rows
         if str(r.get('sync_type') or '') in pipeline_types
@@ -189,7 +193,7 @@ def _pipeline_stuck_signal(rows: list[dict]) -> dict:
         'newest_skip_in_streak': newest_skip,
         'last_non_skip': non_skip[0] if non_skip else None,
         'hint': (
-            'Hourly/daily/neighbor share an in-memory lock in the scheduler process. '
+            'Hourly/daily/watcher share an in-memory lock in the scheduler process. '
             'Restart the scheduler container to clear a hung cycle.'
             if stuck else None
         ),
@@ -227,6 +231,7 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
         get_scheduler,
         get_scheduler_mode_summary,
         get_sync_progress,
+        neighbor_cycle_lock_held,
         pipeline_cycle_lock_held,
     )
     from modules.sync.reset_mode import sync_reset_mode
@@ -372,6 +377,7 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
             **mode,
             'in_process': sched is not None,
             'pipeline_lock_held_here': bool(pipeline_cycle_lock_held()),
+            'neighbor_lock_held_here': bool(neighbor_cycle_lock_held()),
             'jobs': _scheduler_jobs_snapshot(),
         },
         'progress': progress,

@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexusCore - Sign In</title>
     <link rel="icon" type="image/png" href="/static/images/favicon-nexuscore.png?v=1" data-page-favicon>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}?v=1.6">
 </head>
 <body class="auth-page login-page">
+    {% include "_elegant_gradient_bg.html" %}
     <canvas id="constellation-canvas" aria-hidden="true"></canvas>
     <div class="hud-overlay" aria-hidden="true"></div>
     <div class="login-theme-mount" aria-label="Theme controls"></div>
@@ -21,18 +22,6 @@
                     <div class="brand-sub">Unified Telecom &amp; ISP Platform</div>
                 </div>
             </div>
-
-            <div class="telemetry-card" aria-hidden="true">
-                <div class="telemetry-head"><span class="live-dot"></span> Network constellation &middot; live sweep</div>
-                <div class="telemetry-ticker" id="telemetry-ticker">INITIALIZING RADAR SWEEP&hellip;</div>
-                <ul class="rat-chips">
-                    <li class="rat-chip"><i style="background:#fbbf24"></i>2G GSM</li>
-                    <li class="rat-chip"><i style="background:#38bdf8"></i>3G UMTS</li>
-                    <li class="rat-chip"><i style="background:#34d399"></i>4G FDD</li>
-                    <li class="rat-chip"><i style="background:#a78bfa"></i>4G TDD</li>
-                    <li class="rat-chip"><i style="background:#f472b6"></i>5G NR</li>
-                </ul>
-            </div>
         </section>
 
         <section class="card-pane">
@@ -43,7 +32,7 @@
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrap">
-                        <span class="input-icon" aria-hidden="true">&#128100;</span>
+                        <span class="input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.5-3.2 4-4.8 7-4.8s5.5 1.6 7 4.8"/></svg></span>
                         <input type="text" id="username" name="username" placeholder="operator id" required autofocus autocomplete="username">
                     </div>
                 </div>
@@ -51,11 +40,11 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrap">
-                        <span class="input-icon" aria-hidden="true">&#128273;</span>
+                        <span class="input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
                         <input type="password" id="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required autocomplete="current-password">
-                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Show password">&#128065;</button>
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></button>
                     </div>
-                    <div class="capslock-hint" id="capslock-hint">&#9888; Caps Lock is on</div>
+                    <div class="capslock-hint" id="capslock-hint">Caps Lock is on</div>
                 </div>
 
                 <div id="error-message" class="error-message" role="alert"></div>
@@ -83,36 +72,14 @@
         <div class="login-brand-transition-credit">Developed by Malek Mohammad</div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.1"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.5"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
     <script>
         // Random login scene; same scene persists for the session across app pages.
         (function () {
-            var bg = PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
-            var head = document.querySelector('.telemetry-head');
-            if (bg && head && bg.names) {
-                head.innerHTML = '<span class="live-dot"></span> ' + bg.names[bg.getScene()] + ' &middot; live sweep';
+            if (window.PrimeNetConstellation) {
+                PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
             }
-        })();
-
-        // Rotating telemetry ticker
-        (function () {
-            const lines = [
-                'SWEEP 042° · 5G NR CARRIER LOCKED',
-                'CONSTELLATION SYNC · 5 RAT LAYERS TRACKED',
-                'PCI SCAN COMPLETE · 0 CONFLICTS DETECTED',
-                'UPLINK STABLE · RTT 12 ms · JITTER 0.4 ms',
-                'NEIGHBOR AUDIT NOMINAL · HANDOVERS OK',
-                'KPI PIPELINE ONLINE · HOURLY SYNC ARMED',
-            ];
-            const el = document.getElementById('telemetry-ticker');
-            let i = 0;
-            function next() {
-                el.textContent = lines[i % lines.length];
-                i += 1;
-            }
-            next();
-            setInterval(next, 3000);
         })();
 
         // HUD clock
@@ -195,14 +162,19 @@
                     } catch (_) { /* ignore */ }
 
                     document.body.classList.add('login-success');
+                    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    const wipeDelay = reduceMotion ? 0 : 400;
+                    const navDelay = reduceMotion ? 450 : 1600;
                     setTimeout(() => {
                         if (brandTransition) brandTransition.classList.add('show');
-                    }, 1100);
+                    }, wipeDelay);
                     if (data.must_change_password) {
-                        setTimeout(() => { window.location.href = '/profile?force_password_change=1'; }, 2800);
+                        const pwDest = (data.password_change_url && String(data.password_change_url).trim())
+                            || '/change-password';
+                        setTimeout(() => { window.location.href = pwDest; }, navDelay);
                     } else {
                         const dest = (data.redirect && String(data.redirect).trim()) || '/';
-                        setTimeout(() => { window.location.href = dest; }, 2800);
+                        setTimeout(() => { window.location.href = dest; }, navDelay);
                     }
                 } else {
                     fail(data.error || 'Login failed');
@@ -212,5 +184,8 @@
             }
         });
     </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=1fdcccc0-d74b-4537-ad5c-5b4f96468180"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

@@ -7,7 +7,12 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
 
----
+## 2026-10-04 (Shell workbench hinge)
+
+- Portals.css: removed purple/magenta brand nebula (gate-cyan/steel only).
+- NexPulse shell: dropped gate HUD overlay; dark surfaces → dm-panel workbench; Soft Steel primary/topbar; accents no longer gate-cyan neon.
+- NEXT: Phase 2 remaining — campaign performance/holdout reporting, creative library, promo/quota engine.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

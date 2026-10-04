@@ -24,7 +24,7 @@
                 el.setAttribute('aria-pressed', sel ? 'true' : 'false');
             });
             rat = card.getAttribute('data-rat');
-            window.location.href = '/network-health/hub?vendor=' +
+            window.location.href = '/network-health/view?vendor=' +
                 encodeURIComponent(vendor) + '&rat=' + encodeURIComponent(rat);
         });
 

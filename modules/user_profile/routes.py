@@ -15,6 +15,7 @@ from database_enhanced import (
     get_db,
     get_user_by_session,
     hash_password,
+    is_password_change_required,
     log_activity,
     verify_password,
     _unique_constraint_error,
@@ -109,10 +110,34 @@ def _can_approve_photo(user):
 
 # ── Page ──────────────────────────────────────────────────────────────────────
 
+@user_profile_bp.route('/change-password')
+@login_required
+def change_password_page():
+    """Standalone password-gate page (forced rotation / admin reset)."""
+    user = get_current_user()
+    # Prefer portal tower after SSO; Engineering dashboard as local fallback.
+    try:
+        from core.platform.paths import nexuscore_public_url
+
+        post_redirect = f"{nexuscore_public_url().rstrip('/')}/portals"
+    except Exception:
+        try:
+            post_redirect = url_for('auth.dashboard')
+        except Exception:
+            post_redirect = '/'
+    return render_template(
+        'change_password.html',
+        user=format_user(user),
+        post_change_redirect=post_redirect,
+    )
+
+
 @user_profile_bp.route('/profile')
 @login_required
 def profile_page():
     user = get_current_user()
+    if is_password_change_required(user):
+        return redirect(url_for('user_profile.change_password_page'))
     return render_template('user_profile.html', user=format_user(user))
 
 

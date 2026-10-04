@@ -66,7 +66,12 @@ if not _configured_secret:
 @app.context_processor
 def inject_module_versions():
     from core.module_versions import MODULE_VERSIONS
-    return {'module_versions': MODULE_VERSIONS}
+    from core.platform.paths import nexuscore_entry_url
+
+    return {
+        'module_versions': MODULE_VERSIONS,
+        'nexus_portals_url': nexuscore_entry_url(),
+    }
 
 # ============================================================================
 # REGISTER BLUEPRINTS
@@ -483,7 +488,7 @@ def enforce_password_rotation():
         '/login',
         '/api/login',
         '/api/logout',
-        '/profile',
+        '/change-password',
         '/api/profile/change-password',
         '/robots.txt',
         '/health',
@@ -511,7 +516,7 @@ def enforce_password_rotation():
             'error': 'Password change required. Please update your password.',
             'password_change_required': True,
         }), 403
-    return redirect(url_for('user_profile.profile_page', force_password_change=1))
+    return redirect(url_for('user_profile.change_password_page'))
 
 
 # Inline boot: apply saved theme before first paint (avoids light-mode FOUC on nav).
@@ -542,7 +547,7 @@ def set_security_headers(resp):
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://unpkg.com; "
         "style-src 'self' 'unsafe-inline' https://unpkg.com; "
-        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.openstreetmap.fr https://server.arcgisonline.com; "
+        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.openstreetmap.fr https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com; "
         "font-src 'self' data:; "
         "connect-src 'self'; "
         "frame-ancestors 'self'; "

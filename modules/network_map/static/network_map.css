@@ -185,6 +185,113 @@ body.map-page {
     align-items: stretch;
 }
 
+.map-body.map-body-float {
+    position: relative;
+    display: block;
+    padding: 0;
+    gap: 0;
+}
+
+.map-body-float #network-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+
+.map-filter-float {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 800;
+    width: min(360px, calc(100% - 24px));
+    max-height: calc(100% - 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #d6e6f5;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(44, 62, 80, 0.18);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+}
+
+.map-filter-float-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #d6e6f5;
+    background: #f4f6f8;
+}
+
+.map-filter-float-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5c6773;
+}
+
+.map-filter-float-toggle {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d6e6f5;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.map-filter-float-toggle:hover {
+    background: #eef5fc;
+    border-color: #7fa6c2;
+}
+
+.map-filter-float-body {
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: min(72vh, calc(100vh - 140px));
+}
+
+.map-filter-float.collapsed .map-filter-float-body {
+    display: none;
+}
+
+.map-filter-float.collapsed {
+    width: auto;
+}
+
+.map-body-float .map-controls {
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    padding: 0;
+    border-radius: 0;
+}
+
+.map-body-float .tech-filter {
+    box-shadow: none;
+}
+
+.site-info-float {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 800;
+    width: min(360px, calc(100% - 24px));
+    max-height: min(42vh, 420px);
+    overflow-y: auto;
+}
+
 #network-map {
     position: relative;
     width: 100%;
@@ -360,38 +467,92 @@ body.map-page {
 /* ── Tech filter bar ───────────────────────────────────── */
 
 .tech-filter {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(6px);
-    padding: 10px;
+    background: #ffffff;
+    border: 1px solid #d6e6f5;
+    padding: 8px;
     border-radius: 10px;
-    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 .tech-btn {
-    padding: 5px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 20px;
-    background: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1.5px solid #dde1e6;
+    border-radius: 8px;
+    background: #f4f6f8;
     cursor: pointer;
+    font-family: inherit;
     font-weight: 600;
     font-size: 0.82em;
-    transition: all 0.18s;
-    color: #555;
+    line-height: 1.15;
+    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+    color: #2c3e50;
     --tc: #7fa6c2;
+    text-align: left;
+}
+
+.tech-swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    flex: 0 0 auto;
+    background: var(--tc);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc) 22%, transparent);
+}
+
+.tech-btn-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.tech-label {
+    font-size: 0.95em;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tech-count {
+    font-size: 0.78em;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #5c6773;
 }
 
 .tech-btn:hover {
-    border-color: var(--tc);
-    color: var(--tc);
+    border-color: color-mix(in srgb, var(--tc) 55%, #dde1e6);
+    background: #eef5fc;
+    color: #2c3e50;
+}
+
+.tech-btn:focus-visible {
+    outline: 2px solid #7fa6c2;
+    outline-offset: 2px;
 }
 
 .tech-btn.active {
-    background: var(--tc);
-    border-color: var(--tc);
-    color: white;
+    background: color-mix(in srgb, #7fa6c2 18%, #ffffff);
+    border-color: #7fa6c2;
+    color: #2c3e50;
+    box-shadow: inset 0 -2px 0 0 var(--tc), 0 1px 4px rgba(127, 166, 194, 0.28);
+}
+
+.tech-btn.active .tech-count {
+    color: #6d95b3;
+}
+
+.tech-btn.active .tech-swatch {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tc) 28%, transparent);
 }
 
 .tech-btn[data-tech="all"]        { --tc: #7fa6c2; }
@@ -401,11 +562,14 @@ body.map-page {
 .tech-btn[data-tech="4G-FDD"]     { --tc: #1a5276; }
 .tech-btn[data-tech="4G-TDD"]     { --tc: #148f77; }
 .tech-btn[data-tech="5G"]         { --tc: #9b59b6; }
+.tech-btn[data-tech="2G-2G"]      { --tc: #7f8c8d; }
+.tech-btn[data-tech="3G-3G"]      { --tc: #27ae60; }
+.tech-btn[data-tech="4G-4G"]      { --tc: #1a5276; }
 
-.tech-count {
-    font-size: 0.8em;
-    opacity: 0.85;
-    margin-left: 3px;
+@media (max-width: 420px) {
+    .tech-filter {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 /* ── Network stats (Sites only) ─────────────────────────── */
@@ -1652,11 +1816,33 @@ body.dark-mode.map-page .left-panel-drawer,
 body.dark-mode.map-page .map-controls,
 body.dark-mode.map-page .tech-filter,
 body.dark-mode.map-page #site-info-panel,
-body.dark-mode.map-page #neighbor-explorer-panel {
+body.dark-mode.map-page #neighbor-explorer-panel,
+body.dark-mode.map-page .map-filter-float {
     background: rgba(17, 27, 39, 0.97) !important;
     color: #e8edf3 !important;
     border-color: #314257 !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+}
+
+body.dark-mode.map-page .map-filter-float-head {
+    background: #182230 !important;
+    border-bottom-color: #304258 !important;
+}
+
+body.dark-mode.map-page .map-filter-float-title {
+    color: #a9b7c9 !important;
+}
+
+body.dark-mode.map-page .map-filter-float-toggle {
+    background: #101b28 !important;
+    color: #e8eef7 !important;
+    border-color: #304258 !important;
+}
+
+body.dark-mode.map-page .map-body-float .map-controls,
+body.dark-mode.map-page .map-body-float .tech-filter {
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
 body.dark-mode.map-page .left-panel-tab {
@@ -1690,10 +1876,20 @@ body.dark-mode.map-page .tech-btn {
     border-color: #3f536b !important;
 }
 
+body.dark-mode.map-page .tech-btn .tech-count {
+    color: #a9b7c9 !important;
+    opacity: 1;
+}
+
 body.dark-mode.map-page .tech-btn.active {
-    background: var(--tc) !important;
-    border-color: var(--tc) !important;
-    color: #ffffff !important;
+    background: color-mix(in srgb, #7fa6c2 22%, #101c2b) !important;
+    border-color: #7fa6c2 !important;
+    color: #e8eef7 !important;
+    box-shadow: inset 0 -2px 0 0 var(--tc), 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode.map-page .tech-btn.active .tech-count {
+    color: #8bc1ff !important;
 }
 
 body.dark-mode.map-page .tech-btn:hover:not(.active) {
@@ -1702,9 +1898,8 @@ body.dark-mode.map-page .tech-btn:hover:not(.active) {
     color: #eef3f8 !important;
 }
 
-body.dark-mode.map-page .tech-count {
-    color: inherit !important;
-    opacity: 0.9;
+body.dark-mode.map-page .tech-btn:focus-visible {
+    outline-color: #8bc1ff;
 }
 
 body.dark-mode.map-page .refresh-btn,
@@ -2024,6 +2219,25 @@ body.dark-mode.map-page #kpi-content .kpi-modal-val {
         padding: 8px;
     }
 
+    .map-body.map-body-float {
+        display: block;
+        padding: 0;
+        grid-template-rows: none;
+    }
+
+    .map-filter-float {
+        width: min(320px, calc(100% - 16px));
+        top: 8px;
+        left: 8px;
+        max-height: calc(100% - 16px);
+    }
+
+    .site-info-float {
+        left: 8px;
+        bottom: 8px;
+        width: min(320px, calc(100% - 16px));
+    }
+
     .left-panel-shell {
         min-height: 0;
         width: 100%;
@@ -2035,6 +2249,10 @@ body.dark-mode.map-page #kpi-content .kpi-modal-val {
 
     #network-map {
         min-height: 320px;
+    }
+
+    .map-body-float #network-map {
+        min-height: 0;
     }
 
     .kpi-grid {

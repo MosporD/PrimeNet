@@ -273,8 +273,8 @@ const DUPLICATE_KPI_KEYS = new Set([
 const META_KPI_KEYWORD_RE = /\b(cell|site|nodeb|enodeb|nrbts|nrcel|rnc|wbts|wcel|id|index|name|integrity|duplex|indication)\b/i;
 
 const _CHART_COLORS = [
-    '#3498db','#27ae60','#e74c3c','#9b59b6','#f39c12',
-    '#1abc9c','#e67e22','#2980b9','#8e44ad','#d35400',
+    '#7fa6c2','#27ae60','#e74c3c','#5c6773','#f39c12',
+    '#1abc9c','#e67e22','#6d95b3','#7f8c8d','#d35400',
     '#34495e','#7f8c8d','#16a085','#c0392b','#2ecc71',
 ];
 
@@ -4857,7 +4857,7 @@ window.applyCustomTimeFrame = applyCustomTimeFrame;
 const PERF_COMPARE_MAX_CELLS = 6;
 const PERF_COMPARE_COLORS = [
     '#1f77b4', '#e74c3c', '#27ae60', '#f39c12',
-    '#9b59b6', '#16a085', '#34495e', '#d35400',
+    '#5c6773', '#16a085', '#34495e', '#d35400',
 ];
 
 async function addCompareTabFromLastQuery() {

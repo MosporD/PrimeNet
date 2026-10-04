@@ -6,7 +6,27 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Push/deploy `%%` KPI escape + PG `ctid` dedupe/retention; rebuild **scheduler** on 97.141; re-run Daily (`failed_files=0`). Note: unset `NCM_WATCHER_PRIMARY` defaults to **1** (watcher owns hourly/daily cron).
+**NEXT:** Push/deploy neighbor lock split + rebuild **scheduler** on 97.141; confirm neighbor runs at `:30` while watcher is active.
+
+## 2026-10-04 (Neighbor sync no longer shares watcher lock)
+
+- Neighbor cycle uses its own lock; watcher/hourly/daily keep the PM pipeline lock. See `docs/features/sync.progress.md`.
+
+## 2026-10-04 (no local Postgres volume)
+
+- Compose no longer creates a Postgres data volume. Local runtime uses the remote server via `NCM_DATABASE_URL`.
+
+## 2026-10-04 (UI critique schedule — login → portals → modules)
+
+- Full journey polished vs DESIGN.md Ops Constellation: login/portals de-purpled; NexPulse workbench hinge; dashboard/radio Soft Steel; Performance/NH/SH retokened. See feature `.progress.md` files.
+
+## 2026-10-04 (Dashboard View-as)
+
+- Owner can preview dashboard tile visibility as NOC / RNC / User. See `docs/features/dashboard.progress.md`.
+
+## 2026-10-04 (Engineering Admin buttons)
+
+- Eng Admin buttons were dead because `admin_panel.js` failed to parse. See `docs/features/admin-panel.progress.md`.
 
 ## 2026-10-01 (Performance module fixes batch)
 

@@ -1,0 +1,179 @@
+/* Pill theme toggle (injected by common.js on every page with a mount) */
+#dark-mode-btn.theme-toggle,
+#dark-mode-btn.header-theme-btn.theme-toggle {
+    --tt-w: 64px;
+    --tt-h: 32px;
+    --tt-pad: 4px;
+    --tt-knob: 24px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tt-w);
+    height: var(--tt-h);
+    min-width: var(--tt-w);
+    padding: var(--tt-pad);
+    border-radius: 999px;
+    border: 1px solid #9ec0d8;
+    background: #ffffff;
+    color: #2c3e50;
+    cursor: pointer;
+    line-height: 1;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.12);
+    transition: background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+#dark-mode-btn.theme-toggle:hover {
+    border-color: #4f8db8;
+    box-shadow: 0 2px 8px rgba(79, 141, 184, 0.28);
+}
+
+#dark-mode-btn.theme-toggle:focus-visible {
+    outline: 2px solid #4f8db8;
+    outline-offset: 2px;
+}
+
+#dark-mode-btn.theme-toggle.is-dark,
+body.dark-mode #dark-mode-btn.theme-toggle {
+    background: #0f1722;
+    border-color: #304258;
+    color: #e8eef7;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode #dark-mode-btn.theme-toggle:hover {
+    border-color: #4f8db8;
+}
+
+.theme-toggle-track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.theme-toggle-thumb {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: var(--tt-knob);
+    height: var(--tt-knob);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Light: sun knob on the right (matches the reference pill) */
+    transform: translate(calc(var(--tt-w) - var(--tt-pad) * 2 - var(--tt-knob)), -50%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background 0.28s ease, color 0.28s ease;
+    background: #e8eef4;
+    color: #5c6773;
+    z-index: 2;
+}
+
+#dark-mode-btn.theme-toggle.is-dark .theme-toggle-thumb,
+body.dark-mode #dark-mode-btn.theme-toggle .theme-toggle-thumb {
+    /* Dark: moon knob on the left */
+    transform: translate(0, -50%);
+    background: #223246;
+    color: #e8eef7;
+}
+
+/* Active icon on the knob */
+#dark-mode-btn.theme-toggle.is-light .theme-toggle-thumb .theme-toggle-icon-moon,
+body:not(.dark-mode) #dark-mode-btn.theme-toggle .theme-toggle-thumb .theme-toggle-icon-moon {
+    display: none;
+}
+
+#dark-mode-btn.theme-toggle.is-dark .theme-toggle-thumb .theme-toggle-icon-sun,
+body.dark-mode #dark-mode-btn.theme-toggle .theme-toggle-thumb .theme-toggle-icon-sun {
+    display: none;
+}
+
+.theme-toggle-slot {
+    position: absolute;
+    top: 50%;
+    width: var(--tt-knob);
+    height: var(--tt-knob);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.55;
+}
+
+/* Idle moon left (light mode); idle sun right (dark mode) */
+.theme-toggle-slot-moon { left: 0; color: #7f8c8d; }
+.theme-toggle-slot-sun {
+    right: 0;
+    left: auto;
+    color: #a9b7c9;
+}
+
+/* Hide idle icon under the knob */
+#dark-mode-btn.theme-toggle.is-light .theme-toggle-slot-sun,
+body:not(.dark-mode) #dark-mode-btn.theme-toggle .theme-toggle-slot-sun,
+#dark-mode-btn.theme-toggle.is-dark .theme-toggle-slot-moon,
+body.dark-mode #dark-mode-btn.theme-toggle .theme-toggle-slot-moon {
+    opacity: 0;
+}
+
+.theme-toggle-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.theme-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Keep pill shape even when older pages also apply btn-header classes */
+.header-actions #dark-mode-btn.theme-toggle.btn-header,
+.header-actions #dark-mode-btn.theme-toggle.btn-header-outline {
+    padding: var(--tt-pad);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #2c3e50;
+    border: 1px solid #9ec0d8;
+}
+
+body.dark-mode .header-actions #dark-mode-btn.theme-toggle.btn-header,
+body.dark-mode .header-actions #dark-mode-btn.theme-toggle.btn-header-outline {
+    background: #0f1722;
+    color: #e8eef7;
+    border-color: #304258;
+}
+
+.login-theme-mount #dark-mode-btn.theme-toggle,
+.portal-theme-mount #dark-mode-btn.theme-toggle,
+#dark-mode-btn.theme-toggle.login-theme-btn {
+    width: var(--tt-w);
+    height: var(--tt-h);
+    min-width: var(--tt-w);
+    border-radius: 999px;
+}
+
+.ch-topbar-actions #dark-mode-btn.theme-toggle,
+.son-topbar-actions #dark-mode-btn.theme-toggle,
+.nh-header-right #dark-mode-btn.theme-toggle,
+.nh-select-header #dark-mode-btn.theme-toggle {
+    height: var(--tt-h);
+    padding: var(--tt-pad);
+}
+
+@media (max-width: 768px) {
+    #dark-mode-btn.theme-toggle,
+    #dark-mode-btn.header-theme-btn.theme-toggle {
+        width: var(--tt-w);
+        max-width: var(--tt-w);
+    }
+}

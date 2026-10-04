@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.7">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=6.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=6.3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.7">
 </head>
 <body class="has-constellation-bg">
     {%- macro module_version_badge(module_id) -%}
@@ -29,8 +29,16 @@
                         <span class="user-greeting">Welcome, <strong>{{ user.username }}</strong></span>
                         <div class="header-actions">
                             <a href="{{ url_for('user_profile.profile_page') }}" class="btn-header">Settings</a>
-                            {% if user.role == 'admin' %}
-                            <a href="/admin-panel?section=data-sync" class="btn-header btn-header-admin">Eng Admin</a>
+                            {% if user.role == 'admin' and view_as_catalog %}
+                            <label class="view-as-control" title="Preview tile visibility for another role">
+                                <span class="view-as-label">View as</span>
+                                <select id="dashboard-view-as" aria-label="Preview dashboard as another user type">
+                                    {% for entry in view_as_catalog %}
+                                    <option value="{{ entry.key }}">{{ entry.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <a href="/admin-panel?section=data-sync" class="btn-header btn-header-admin" data-owner-only>Eng Admin</a>
                             {% endif %}
                             <button type="button" onclick="logout()" class="btn-header btn-header-outline">Logout</button>
                         </div>
@@ -40,6 +48,15 @@
         </header>
 
         <main class="dashboard-main">
+            {% if user.role == 'admin' and view_as_catalog %}
+            <div id="view-as-banner" class="view-as-banner" hidden role="status">
+                <span>
+                    Viewing dashboard as <strong id="view-as-banner-role">User</strong>
+                    — tile visibility preview only (your session stays Owner).
+                </span>
+                <button type="button" class="view-as-exit" onclick="setDashboardViewAs('admin')">Exit preview</button>
+            </div>
+            {% endif %}
 
             <section class="constellation-deck constellation-deck-full" aria-label="Network constellation map">
                 <div class="constellation-radar-wrap">
@@ -75,7 +92,7 @@
             </section>
 
             {% if user.role == 'admin' %}
-            <button type="button" class="operations-panel-toggle" onclick="toggleOperationsPanel(true)">
+            <button type="button" class="operations-panel-toggle" data-owner-only onclick="toggleOperationsPanel(true)">
                 Operations Panel
             </button>
             {% endif %}
@@ -525,8 +542,8 @@
     </div>
 
     {% if user.role == 'admin' %}
-    <div class="operations-panel-backdrop" id="operations-panel-backdrop" onclick="toggleOperationsPanel(false)" hidden></div>
-    <aside class="operations-panel-drawer" id="operations-panel-drawer" aria-label="Operations panel" aria-hidden="true">
+    <div class="operations-panel-backdrop" id="operations-panel-backdrop" data-owner-only onclick="toggleOperationsPanel(false)" hidden></div>
+    <aside class="operations-panel-drawer" id="operations-panel-drawer" data-owner-only aria-label="Operations panel" aria-hidden="true">
         <div class="operations-panel-header">
             <div>
                 <h2>Operations Panel</h2>
@@ -688,7 +705,7 @@
 
     <script id="radar-bootstrap-data" type="application/json">{{ {'columns': tech_site_columns, 'total': total_sites} | tojson }}</script>
     <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.2"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.9"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
     <script>
         // Jordan (UTC+3) clock — inlined so a stale cached common.js cannot break it.
         function formatDashboardClock(date = new Date()) {
@@ -738,7 +755,7 @@
             legend.innerHTML = (columns || []).map(col => `
                 <button type="button" class="radar-legend-chip" data-rat="${col.key}" style="--chip-color:${colors[col.key] || '#38bdf8'}">
                     <i></i>
-                    <span>${col.title}</span>
+                    <span class="chip-title">${col.title}</span>
                     <span class="chip-count">${Number(col.count || 0).toLocaleString()}</span>
                     <span class="chip-sub">${col.subtitle || ''}</span>
                 </button>
@@ -862,7 +879,7 @@
                     </svg>
                     <div class="vendor-dial-center">
                         <strong>${entry.key}</strong>
-                        <span>${total ? Math.round(hPct) + '/' + Math.round(100 - hPct) : '—'}</span>
+                        <span class="vendor-dial-pct">${total ? `${Math.round(hPct)}%/${Math.round(100 - hPct)}%` : '—'}</span>
                     </div>
                 </div>`;
             }).join('');
@@ -1185,7 +1202,13 @@
         }
 
         const DASHBOARD_ALLOWED_HREFS = {{ allowed_hrefs | tojson }};
+        const DASHBOARD_VIEW_AS_CATALOG = {{ (view_as_catalog or []) | tojson }};
+        const DASHBOARD_VIEW_AS_STORAGE_KEY = 'primenetDashboardViewAs';
         const MODULE_VERSIONS = {{ module_versions | tojson }};
+        let dashboardEffectiveAllowed = Array.isArray(DASHBOARD_ALLOWED_HREFS)
+            ? DASHBOARD_ALLOWED_HREFS.slice()
+            : [];
+        let dashboardViewAsRole = 'admin';
 
         function applyModuleVersionBadges(root) {
             const scope = root || document;
@@ -1215,17 +1238,46 @@
 
         function dashboardHrefAllowed(href) {
             const target = normalizeDashboardHref(href);
-            const allowed = (DASHBOARD_ALLOWED_HREFS || []).map(normalizeDashboardHref);
+            const allowed = (dashboardEffectiveAllowed || []).map(normalizeDashboardHref);
             if (allowed.includes(target)) return true;
             return allowed.some((root) => root !== '/' && target.startsWith(`${root}/`));
+        }
+
+        function viewAsEntry(roleKey) {
+            const key = String(roleKey || 'admin').trim().toLowerCase();
+            return (DASHBOARD_VIEW_AS_CATALOG || []).find((entry) => entry.key === key) || null;
+        }
+
+        function setDashboardViewAs(roleKey) {
+            if (!DASHBOARD_VIEW_AS_CATALOG || !DASHBOARD_VIEW_AS_CATALOG.length) return;
+            const key = String(roleKey || 'admin').trim().toLowerCase();
+            const entry = viewAsEntry(key) || viewAsEntry('admin');
+            if (!entry) return;
+            dashboardViewAsRole = entry.key;
+            dashboardEffectiveAllowed = Array.isArray(entry.allowed_hrefs)
+                ? entry.allowed_hrefs.slice()
+                : [];
+            try {
+                if (entry.key === 'admin') sessionStorage.removeItem(DASHBOARD_VIEW_AS_STORAGE_KEY);
+                else sessionStorage.setItem(DASHBOARD_VIEW_AS_STORAGE_KEY, entry.key);
+            } catch (e) { /* ignore */ }
+            const select = document.getElementById('dashboard-view-as');
+            if (select && select.value !== entry.key) select.value = entry.key;
+            const banner = document.getElementById('view-as-banner');
+            const bannerRole = document.getElementById('view-as-banner-role');
+            const previewing = entry.key !== 'admin';
+            if (banner) banner.hidden = !previewing;
+            if (bannerRole) bannerRole.textContent = entry.label || entry.key;
+            document.body.classList.toggle('dashboard-view-as-preview', previewing);
+            applyDashboardModuleAccess();
         }
 
         function applyDashboardModuleAccess() {
             document.querySelectorAll('.function-card[data-module-href]').forEach((card) => {
                 const href = card.dataset.moduleHref || card.getAttribute('href') || '';
-                if (!dashboardHrefAllowed(href)) {
-                    card.hidden = true;
-                }
+                const allowed = dashboardHrefAllowed(href);
+                card.hidden = !allowed;
+                card.style.display = allowed ? '' : 'none';
             });
 
             document.querySelectorAll('.dashboard-primary-tab[aria-controls]').forEach((tab) => {
@@ -1233,7 +1285,23 @@
                 const panel = panelId ? document.getElementById(panelId) : null;
                 const hasVisibleCards = panel && panel.querySelector('.function-card[data-module-href]:not([hidden])');
                 tab.hidden = !hasVisibleCards;
+                tab.style.display = hasVisibleCards ? '' : 'none';
             });
+
+            const previewing = dashboardViewAsRole && dashboardViewAsRole !== 'admin';
+            document.querySelectorAll('[data-owner-only]').forEach((el) => {
+                el.hidden = Boolean(previewing);
+                el.style.display = previewing ? 'none' : '';
+                if (previewing && el.id === 'operations-panel-drawer') {
+                    el.setAttribute('aria-hidden', 'true');
+                }
+            });
+            if (previewing && typeof toggleOperationsPanel === 'function') {
+                const drawer = document.getElementById('operations-panel-drawer');
+                if (drawer && drawer.getAttribute('aria-hidden') === 'false') {
+                    toggleOperationsPanel(false);
+                }
+            }
 
             const activeTab = document.querySelector('.dashboard-primary-tab.active:not([hidden])');
             if (!activeTab) {
@@ -2047,8 +2115,17 @@
             }
         }
 
+        window.setDashboardViewAs = setDashboardViewAs;
+
         document.addEventListener('DOMContentLoaded', () => {
             applyDashboardModuleAccess();
+            const viewAsSelect = document.getElementById('dashboard-view-as');
+            if (viewAsSelect && DASHBOARD_VIEW_AS_CATALOG && DASHBOARD_VIEW_AS_CATALOG.length) {
+                let saved = 'admin';
+                try { saved = sessionStorage.getItem(DASHBOARD_VIEW_AS_STORAGE_KEY) || 'admin'; } catch (e) {}
+                viewAsSelect.addEventListener('change', () => setDashboardViewAs(viewAsSelect.value));
+                setDashboardViewAs(saved);
+            }
             applyModuleVersionBadges();
             startDashboardClock();
             const bgCanvas = document.getElementById('primenet-bg-canvas');
@@ -2098,46 +2175,8 @@
         });
     </script>
 
-    <script id="allowed-hrefs-data" type="application/json">{{ allowed_hrefs | tojson }}</script>
-    <script>
-    // Hide tool tiles the current role isn't allowed to see (configurable via
-    // Admin Panel → Feature Access), then hide any primary tab left with no
-    // visible tiles. Owner sees everything.
-    (function () {
-        "use strict";
-        var allowed;
-        try { allowed = JSON.parse(document.getElementById('allowed-hrefs-data').textContent) || []; }
-        catch (e) { return; }
-        var allowedSet = {};
-        allowed.forEach(function (h) { allowedSet[h] = true; });
-
-        function norm(h) { return (h || '').split('?')[0].replace(/\/+$/, '') || '/'; }
-        function isAllowed(href) {
-            href = norm(href);
-            if (allowedSet[href]) return true;
-            // allow sub-paths of an allowed root
-            for (var i = 0; i < allowed.length; i++) {
-                if (allowed[i] !== '/' && href.indexOf(allowed[i] + '/') === 0) return true;
-            }
-            return false;
-        }
-
-        document.querySelectorAll('.function-card[data-module-href]').forEach(function (card) {
-            if (!isAllowed(card.getAttribute('data-module-href'))) card.style.display = 'none';
-        });
-
-        // Hide a primary tab if its section panel has no visible tiles.
-        document.querySelectorAll('.section-panel').forEach(function (panel) {
-            var cards = panel.querySelectorAll('.function-card[data-module-href]');
-            if (cards.length === 0) return;
-            var anyVisible = Array.prototype.some.call(cards, function (c) { return c.style.display !== 'none'; });
-            if (!anyVisible) {
-                var id = panel.getAttribute('data-page') || (panel.id || '').replace('section-', '');
-                var tab = document.getElementById('tab-' + id);
-                if (tab) tab.style.display = 'none';
-            }
-        });
-    })();
-    </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=1fdcccc0-d74b-4537-ad5c-5b4f96468180"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

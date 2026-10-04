@@ -1008,6 +1008,13 @@ body.nh-page .nh-kpi-footer {
 .nh-select-page {
     overflow: auto;
     background: var(--pn-bg);
+    /* Select/tech wizard has no KPI footer strip */
+    padding-bottom: 0;
+    --nh-kpi-footer-h: 0px;
+}
+body.nh-select-page:has(.elegant-gradient-bg),
+body.nh-wizard-page:has(.elegant-gradient-bg) {
+    background: transparent;
 }
 
 .nh-select-title {
@@ -1022,6 +1029,15 @@ body.nh-page .nh-kpi-footer {
     max-width: 880px;
     margin: 0 auto;
     padding: 2rem 1.25rem 3rem;
+}
+
+/* Wizard shell must be full-bleed; constraining width left a dark column
+   with elegant-gradient side strips and made the vendor picker look broken. */
+.nh-wizard-page .nh-select-main.nh-wizard-main {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .nh-select-section {
@@ -1092,28 +1108,36 @@ body.nh-page .nh-kpi-footer {
 }
 
 .nh-rat-card {
-    border: 2px solid var(--pn-border);
+    border: 1.5px solid var(--pn-border, #d6e6f5);
     border-radius: 10px;
-    background: var(--pn-surface);
-    color: var(--pn-text);
-    padding: 1.1rem 0.5rem;
-    font-size: 1rem;
+    background: var(--pn-surface, #fff);
+    color: var(--pn-text, #2c3e50);
+    padding: 1.15rem 0.75rem;
+    min-height: 64px;
+    font-size: 1.05rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: var(--pn-shadow);
-    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.08);
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .nh-rat-card:hover {
-    border-color: var(--pn-primary);
-    background: var(--pn-surface-soft);
+    border-color: #7fa6c2;
+    background: #eef5fc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(127, 166, 194, 0.22);
 }
 
 .nh-rat-card.selected {
-    border-color: var(--pn-primary);
-    background: var(--pn-gradient);
+    border-color: #6d95b3;
+    background: linear-gradient(165deg, #7fa6c2 0%, #6d95b3 100%);
     color: #fff;
-    box-shadow: var(--pn-shadow-card);
+    box-shadow: 0 4px 16px rgba(109, 149, 179, 0.35);
+}
+
+.nh-rat-card:focus-visible {
+    outline: 2px solid #6d95b3;
+    outline-offset: 2px;
 }
 
 .nh-select-actions {
@@ -1193,19 +1217,21 @@ body.dark-mode .nh-score-card.ok {
 }
 
 body.dark-mode .nh-rat-card {
-    background: var(--pn-surface);
-    border-color: var(--pn-border);
-    color: var(--pn-text);
+    background: var(--dm-panel, #182230);
+    border-color: var(--dm-border, #304258);
+    color: var(--dm-text, #e8eef7);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 body.dark-mode .nh-rat-card:hover {
-    background: var(--pn-surface-soft);
+    background: var(--dm-panel-3, #223246);
+    border-color: #7fa6c2;
 }
 
 body.dark-mode .nh-rat-card.selected {
-    background: #173456;
-    border-color: #4c83bd;
-    color: #9fd0ff;
+    background: linear-gradient(165deg, #3d5f78 0%, #2f4d63 100%);
+    border-color: #7fa6c2;
+    color: #e8eef7;
 }
 
 body.dark-mode .nh-context-menu {
@@ -1247,14 +1273,15 @@ body.dark-mode .nh-export-btn {
     color: var(--dm-text, #e8eef7);
 }
 
-/* ---- Wizard / hub flow (vendor -> tech -> KPI hub -> detail) ---- */
+/* ---- Wizard / hub flow (vendor -> tech -> detail) ---- */
 .nh-wizard-page .nh-wizard-main {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    background: linear-gradient(120deg, #6d95b3 0%, #8fb1ca 45%, #a8c5d8 100%);
+    width: 100%;
+    background: linear-gradient(165deg, #eef5fc 0%, #f5f7fa 55%, #e8eef4 100%);
 }
 .nh-vendor-grid-hero {
     display: flex;
@@ -1301,6 +1328,46 @@ body.dark-mode .nh-export-btn {
     padding: 1.75rem;
     box-shadow: var(--pn-shadow-card);
 }
+.nh-tech-panel {
+    width: min(720px, 100%);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d6e6f5;
+    border-radius: 14px;
+    padding: 1.5rem 1.75rem 1.75rem;
+    box-shadow: 0 8px 28px rgba(44, 62, 80, 0.14);
+}
+.nh-tech-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #d6e6f5;
+}
+.nh-tech-panel-copy {
+    min-width: 0;
+}
+.nh-tech-panel .nh-select-section-title {
+    margin: 0 0 0.25rem;
+    font-size: 1.15rem;
+    color: #2c3e50;
+}
+.nh-tech-panel-sub {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5c6773;
+    line-height: 1.4;
+}
+.nh-tech-vendor-mark {
+    width: 112px;
+    height: 48px;
+    object-fit: contain;
+    flex-shrink: 0;
+    background: #f4f6f8;
+    border: 1px solid #dde1e6;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
 .nh-tech-divider {
     width: 2px;
     align-self: stretch;
@@ -1308,8 +1375,8 @@ body.dark-mode .nh-export-btn {
     opacity: 0.55;
 }
 .nh-rat-grid-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: 0.75rem;
 }
 .nh-tech-vendor-logo {
@@ -1347,7 +1414,7 @@ body.dark-mode .nh-export-btn {
     max-width: 1200px;
     margin: 0 auto;
     background: rgba(255,255,255,0.9);
-    border: 2px solid #4c83bd;
+    border: 2px solid #7fa6c2;
     border-radius: 12px;
     padding: 1rem;
     min-height: 70vh;
@@ -1373,7 +1440,7 @@ body.dark-mode .nh-export-btn {
 }
 .nh-hub-kpi-btn:hover { background: #2c3e50; }
 .nh-hub-side {
-    border-left: 2px solid #4c83bd;
+    border-left: 2px solid #7fa6c2;
     padding-left: 1rem;
     display: flex;
     flex-direction: column;
@@ -1453,10 +1520,25 @@ body.dark-mode .nh-export-btn {
 .nh-checker-status { font-size: 0.85rem; color: var(--pn-text-muted); min-height: 1.2em; }
 body.dark-mode .nh-vendor-card-hero,
 body.dark-mode .nh-tech-split,
+body.dark-mode .nh-tech-panel,
 body.dark-mode .nh-hub-frame,
 body.dark-mode .nh-checker-dialog {
     background: var(--dm-panel, #182230);
     color: var(--dm-text, #e8eef7);
+    border-color: var(--dm-border, #304258);
+}
+body.dark-mode .nh-tech-panel-head {
+    border-bottom-color: var(--dm-border, #304258);
+}
+body.dark-mode .nh-tech-panel .nh-select-section-title {
+    color: var(--dm-text, #e8eef7);
+}
+body.dark-mode .nh-tech-panel-sub {
+    color: var(--dm-muted, #a9b7c9);
+}
+body.dark-mode .nh-tech-vendor-mark {
+    background: var(--dm-panel-2, #1b2736);
+    border-color: var(--dm-border, #304258);
 }
 body.dark-mode .nh-hub-kpi-btn,
 body.dark-mode .nh-hub-cell-checker {
@@ -1466,6 +1548,24 @@ body.dark-mode .nh-hub-cell-checker {
     .nh-tech-split { grid-template-columns: 1fr; }
     .nh-tech-divider { width: 100%; height: 2px; }
     .nh-hub-frame { grid-template-columns: 1fr; }
-    .nh-hub-side { border-left: none; border-top: 2px solid #4c83bd; padding-left: 0; padding-top: 1rem; }
+    .nh-hub-side { border-left: none; border-top: 2px solid #7fa6c2; padding-left: 0; padding-top: 1rem; }
     .nh-checker-form { grid-template-columns: 1fr; }
+}
+
+
+/* Soft Steel workbench dark remap for hub/wizard washes.
+   When elegant-gradient-bg is mounted, keep shells transparent so the
+   atmosphere shows through (same coexistence contract as dashboard). */
+body.dark-mode.nh-page .nh-hub-main,
+body.dark-mode.nh-wizard-page .nh-wizard-main {
+    background: #0f1722 !important;
+}
+body.dark-mode.nh-page:has(.elegant-gradient-bg) .nh-hub-main,
+body.dark-mode.nh-wizard-page:has(.elegant-gradient-bg) .nh-wizard-main,
+body.nh-wizard-page:has(.elegant-gradient-bg) .nh-wizard-main {
+    background: transparent !important;
+}
+body.dark-mode.nh-page .nh-hub-frame {
+    background: #182230 !important;
+    border-color: #304258 !important;
 }

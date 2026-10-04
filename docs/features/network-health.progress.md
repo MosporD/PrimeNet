@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [`network-health.md`](network-heal
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-04 (Soft Steel hub dark remap)
+
+- Hub/wizard dark wash → `#0f1722` panels; `#4c83bd` borders → Soft Steel `#7fa6c2`.
+- NEXT: Smoke wizard on 97.141 after precalc has rows for Nokia/3G.
+
 ## 2026-10-01 (Wizard UI + Cell Checker)
 
 - Stepped flow: vendor → tech → KPI hub → detail; Cell Checker lookup (daily+hourly trend).

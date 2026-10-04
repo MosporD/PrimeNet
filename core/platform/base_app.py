@@ -27,6 +27,29 @@ _THEME_BOOT_SCRIPT = (
 )
 
 
+def _shell_boot_script() -> str:
+    """Inline shell config (theme + portals URL) injected after ``<body>``."""
+    try:
+        from core.platform.paths import nexuscore_entry_url
+
+        portals = nexuscore_entry_url()
+    except Exception:
+        portals = "/portals"
+    safe = (
+        str(portals or "/portals")
+        .replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("<", "")
+        .replace(">", "")
+    )
+    return (
+        _THEME_BOOT_SCRIPT
+        + '<script data-nexus-shell="1">'
+        f'window.NEXUS_PORTALS_URL="{safe}";'
+        "</script>"
+    )
+
+
 def env_true(key: str, default: bool = False) -> bool:
     raw = (os.getenv(key) or "").strip().lower()
     if not raw:
@@ -83,9 +106,16 @@ def create_base_app(
         try:
             from core.module_versions import MODULE_VERSIONS
 
-            return {"module_versions": MODULE_VERSIONS}
+            payload = {"module_versions": MODULE_VERSIONS}
         except Exception:
-            return {"module_versions": {}}
+            payload = {"module_versions": {}}
+        try:
+            from core.platform.paths import nexuscore_entry_url
+
+            payload["nexus_portals_url"] = nexuscore_entry_url()
+        except Exception:
+            payload["nexus_portals_url"] = "/portals"
+        return payload
 
     def _wants_json_error() -> bool:
         path = request.path or ""
@@ -240,7 +270,7 @@ def create_base_app(
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' https://unpkg.com; "
             "style-src 'self' 'unsafe-inline' https://unpkg.com; "
-            "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.openstreetmap.fr https://server.arcgisonline.com; "
+            "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.openstreetmap.fr https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com; "
             "font-src 'self' data:; "
             "connect-src 'self'; "
             "frame-ancestors 'self'; "
@@ -258,13 +288,43 @@ def create_base_app(
                 if data and "data-primenet-theme-boot" not in data:
                     data2, n = re.subn(
                         r"(<body\b[^>]*>)",
-                        r"\1" + _THEME_BOOT_SCRIPT,
+                        r"\1" + _shell_boot_script(),
                         data,
                         count=1,
                         flags=re.IGNORECASE,
                     )
                     if n:
                         resp.set_data(data2)
+                elif data and "data-nexus-shell" not in data and "data-primenet-theme-boot" in data:
+                    # Older responses already had theme boot; still inject portals URL.
+                    boot = _shell_boot_script()
+                    # Prefer appending after existing theme boot marker.
+                    marker = 'data-primenet-theme-boot="1"'
+                    idx = data.find(marker)
+                    if idx >= 0:
+                        end = data.find("</script>", idx)
+                        if end >= 0:
+                            end += len("</script>")
+                            # _shell_boot_script includes theme+shell; inject shell-only bit.
+                            try:
+                                from core.platform.paths import nexuscore_entry_url
+
+                                portals = nexuscore_entry_url()
+                            except Exception:
+                                portals = "/portals"
+                            safe = (
+                                str(portals or "/portals")
+                                .replace("\\", "\\\\")
+                                .replace('"', '\\"')
+                                .replace("<", "")
+                                .replace(">", "")
+                            )
+                            shell = (
+                                '<script data-nexus-shell="1">'
+                                f'window.NEXUS_PORTALS_URL="{safe}";'
+                                "</script>"
+                            )
+                            resp.set_data(data[:end] + shell + data[end:])
         except Exception:
             pass
         return resp

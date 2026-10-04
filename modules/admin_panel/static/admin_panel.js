@@ -50,10 +50,13 @@ const ETL_PROGRESS_LABELS = {
 
 document.addEventListener('DOMContentLoaded', () => {
     const sectionFromUrl = new URLSearchParams(window.location.search).get('section');
-    const firstTab = document.querySelector('.admin-page-tab.active');
-    let defaultPage = sectionFromUrl || (firstTab ? firstTab.getAttribute('data-page') : 'data-sync');
+    let defaultPage = sectionFromUrl || 'data-sync';
     if (defaultPage === 'user-admin' || defaultPage === 'feature-access') {
         defaultPage = 'data-sync';
+    }
+    const sectionSelect = document.getElementById('admin-section-select');
+    if (sectionSelect) {
+        sectionSelect.addEventListener('change', () => openAdminPage(sectionSelect.value));
     }
     openAdminPage(defaultPage || 'data-sync');
     loadRetCredentialFallbacks();
@@ -66,13 +69,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function openAdminPage(pageName) {
-    document.querySelectorAll('.admin-page-tab').forEach(tab => {
-        const isActive = tab.getAttribute('data-page') === pageName;
-        tab.classList.toggle('active', isActive);
-    });
     document.querySelectorAll('.admin-page-panel').forEach(panel => {
         panel.classList.toggle('active', panel.getAttribute('data-page') === pageName);
     });
+    const sectionSelect = document.getElementById('admin-section-select');
+    if (sectionSelect && sectionSelect.value !== pageName) {
+        const hasOption = Array.from(sectionSelect.options).some((opt) => opt.value === pageName);
+        if (hasOption) sectionSelect.value = pageName;
+    }
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('section', pageName);
+        window.history.replaceState({}, '', url);
+    } catch (_) { /* ignore */ }
     if (pageName === 'data-sync') {
         startProgressPolling();
     } else {
@@ -1780,9 +1789,9 @@ async function addPowerBiReport(ev) {
 
 async function removePowerBiReport(slug) {
     if (!slug) return;
-    if (!confirm(Remove Power BI card ""?)) return;
+    if (!confirm(`Remove Power BI card "${slug}"?`)) return;
     try {
-        const res = await fetch(/api/admin/power-bi/reports/, {
+        const res = await fetch(`/api/admin/power-bi/reports/${encodeURIComponent(slug)}`, {
             method: 'DELETE',
         });
         const data = await res.json();

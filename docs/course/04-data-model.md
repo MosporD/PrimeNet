@@ -11,8 +11,8 @@ Files: `sync_config.py`, `db/runtime.py`, `core/radio/pm.py`,
 
 ## 4.1 Postgres schemas (required)
 
-PrimeNet is **Postgres-only**. Set ``NCM_DATABASE_URL`` (laptop: Compose profile
-``app-db``). Each catalogued store from `sync_config.py` maps to its own Postgres
+PrimeNet is **Postgres-only**. Set ``NCM_DATABASE_URL`` to the remote Postgres
+server (no local Compose volume). Each catalogued store from `sync_config.py` maps to its own Postgres
 schema via `db/pg_domains.py` (`pm_nokia_hourly`, `metadata`, `app`, …). Path
 constants still end in `.db` as **logical store IDs**; `open_db()` never opens
 SQLite files for those paths.

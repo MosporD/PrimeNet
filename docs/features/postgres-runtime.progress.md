@@ -4,6 +4,11 @@ Detailed dated log for this blueprint. Brief: [`postgres-runtime.md`](postgres-r
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-04 (no local Postgres volume)
+
+- Done: Removed the Compose `app-db` Postgres service and `primenet-postgres` volume. Local and server stacks use `NCM_DATABASE_URL` on the remote Postgres host. This laptop already points at `192.168.238.222:5432`.
+- NEXT: Keep Daily load on that server database. Do not recreate a local volume.
+
 ## 2026-09-30 (SQLite-lenient numeric CAST)
 
 - Root cause: metadata text like azimuth `IBS` hit `CAST(x AS REAL)` → Postgres `invalid input syntax for type real` (SQLite returns 0). ~106 numeric CASTs in 10 files (Performance, Network Map, Adjacency GIS, Cell Heatmap, site catalog, neighbor agg).
