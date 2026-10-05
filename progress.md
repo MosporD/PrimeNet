@@ -21,6 +21,10 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 - Events post MessageCards to Teams (`NCM_TEAMS_WEBHOOK_URL`); embed approver emails from users DB.
 - Per-user `can_approve` assigned in Platform Admin; shown on Profile; RET live apply gated. See platform-admin / user-profile / sync progress.
 
+## 2026-10-05 (Conflict Map active-only)
+
+- Conflict study excludes Inactive cells (vendor on-air rules). See conflict-map progress.
+
 ## 2026-10-05 (Conflict Map 2G BCCH)
 
 - Conflict Map + Conflict Report: 2G co-channel and adjacent (±1), selectable; shared strictness profiles; no band split. See conflict-map / reports progress.

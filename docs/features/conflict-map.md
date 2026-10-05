@@ -19,6 +19,7 @@ Logic in `logic.py`. Map UI is local templates/static. Do not fold this into Net
 
 - **3G/4G/5G:** co-channel PCI/PSC reuse with coband key from cell name; standard distance/azimuth strictness.
 - **2G:** BCCH co-channel and adjacent (±1 ARFCN), selectable mode; no band split (all L900); same strictness profiles as 3G–5G.
+- Study scope: **on-air cells only** (vendor active_state / admin_state via `metadata_active_sql`).
 - Excel report: Reports → Conflict Report (same engine).
 
 ## Progress

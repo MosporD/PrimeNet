@@ -5,6 +5,7 @@ Shared SQLite helpers for metadata inventory UNION queries (reports + conflict m
 import re
 
 from db.runtime import execute_query
+from modules.sync.metadata_active_sql import LEGACY_CELLS_ACTIVITY_CASE_SQL, PER_TABLE_ACTIVE_WHERE
 
 _CELL_SUFFIX_RE = re.compile(r'[-_][A-Za-z]\d*$')
 
@@ -43,11 +44,14 @@ def resolve_site_name(*site_name_candidates: str | None, cell_name: str | None =
     return site_name_from_cell_name(cell_name)
 
 
-def _metadata_inventory_union_sql(conn) -> str:
+def _metadata_inventory_union_sql(conn, *, active_only: bool = False) -> str:
     """
     Build a normalized UNION over per-technology metadata tables.
     We do not rely on the legacy `cells` table because recent loaders may keep
     data only in canonical tables (`cells_2g`, `cells_3g`, ...).
+
+    ``status`` is vendor-normalized Active/Inactive (see metadata_active_sql).
+    When ``active_only`` is True, only on-air cells are included.
     """
     specs = [
         ('cells_2g', '2G', ['site_id', 'bcf id', 'bts id']),
@@ -83,7 +87,6 @@ def _metadata_inventory_union_sql(conn) -> str:
         area_col = _pick_col(['area', 'region', 'market'], low_to_real)
         et_col = _pick_col(['electrical_tilt', 'electrical tilt', 'e_tilt'], low_to_real)
         mt_col = _pick_col(['mechanical_tilt', 'mechanical tilt', 'm_tilt'], low_to_real)
-        status_col = _pick_col(['status', 'activity_status'], low_to_real)
         cluster_col = _pick_col(['cluster'], low_to_real)
         lat_col = _pick_col(['lat', 'latitude'], low_to_real)
         lng_col = _pick_col(['long', 'longitude', 'lng', 'lon'], low_to_real)
@@ -99,13 +102,15 @@ def _metadata_inventory_union_sql(conn) -> str:
         area_expr = _sql_ident(area_col) if area_col else 'NULL'
         et_expr = _sql_ident(et_col) if et_col else 'NULL'
         mt_expr = _sql_ident(mt_col) if mt_col else 'NULL'
-        status_expr = _sql_ident(status_col) if status_col else "''"
+        activity_case = LEGACY_CELLS_ACTIVITY_CASE_SQL.get(table)
+        status_expr = f'({activity_case})' if activity_case else "'Inactive'"
         cluster_expr = _sql_ident(cluster_col) if cluster_col else 'NULL'
         lat_expr = _sql_ident(lat_col) if lat_col else 'NULL'
         lng_expr = _sql_ident(lng_col) if lng_col else 'NULL'
         rnc_expr = _sql_ident(rnc_col) if rnc_col else 'NULL'
         bsc_expr = _sql_ident(bsc_col) if bsc_col else 'NULL'
         controller_expr = f'COALESCE({rnc_expr}, {bsc_expr})'
+        where_sql = PER_TABLE_ACTIVE_WHERE.get(table, '1=1') if active_only else '1=1'
 
         parts.append(
             f"""
@@ -126,6 +131,7 @@ def _metadata_inventory_union_sql(conn) -> str:
                 {lng_expr} AS longitude,
                 {controller_expr} AS controller
             FROM {_sql_ident(table)}
+            WHERE {where_sql}
             """
         )
 

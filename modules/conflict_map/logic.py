@@ -489,7 +489,7 @@ def _build_pci_psc_pairs(rows: list, tech_req: str, dist_build_max_km: float) ->
 def build_conflict_base_pairs(technology: str = '4G'):
     """Return pair geometry + code grouping; no risk tier (that depends on strictness)."""
     conn = _meta()
-    inv_union = _metadata_inventory_union_sql(conn)
+    inv_union = _metadata_inventory_union_sql(conn, active_only=True)
     site_col_names = _metadata_table_columns(conn, 'sites')
     site_low_to_real = {str(c).strip().lower(): c for c in site_col_names}
     site_area_col = _pick_col(['area', 'region', 'market'], site_low_to_real)
@@ -522,11 +522,7 @@ def build_conflict_base_pairs(technology: str = '4G'):
           AND TRIM(CAST(v.cell_name AS TEXT)) <> ''
           AND v.pci IS NOT NULL
           AND TRIM(CAST(v.pci AS TEXT)) <> ''
-          AND (
-                v.status IS NULL
-                OR TRIM(COALESCE(v.status, '')) = ''
-                OR LOWER(TRIM(COALESCE(v.status, ''))) = 'active'
-          )
+          AND LOWER(TRIM(COALESCE(v.status, ''))) = 'active'
           AND v.technology IN ({filter_sql})
         ORDER BY v.pci, s.site_name
     ''',

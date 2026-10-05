@@ -5,6 +5,11 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
 
+## 2026-10-05 (active-only study)
+
+- Done: Conflict pairs use on-air cells only (`PER_TABLE_ACTIVE_WHERE` / vendor active_state·admin_state). Dropped null/empty status pass-through that was letting Inactive 2G/3G/4G/5G into the pool.
+- NEXT: Refresh conflict cache on `/conflict-map` and confirm pair counts drop vs previous Inactive-heavy runs.
+
 ## 2026-10-05 (2G BCCH co + adjacent)
 
 - Done: 2G on Conflict Map + Conflict Report. Selectable co-channel / adjacent (±1) / both. No band filter (all L900). Same strictness profiles as 3G–5G (not the wider set). Excel + KML carry conflict type. Version V1.1.
