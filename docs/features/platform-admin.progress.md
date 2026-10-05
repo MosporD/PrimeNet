@@ -5,6 +5,12 @@ Root journal (topics only): [../../progress.md](../../progress.md).
 
 ---
 
+## 2026-10-05 (CM Approver flag)
+
+- Done: `users.can_approve` column; Platform Admin Users table **Approver** checkbox; `PUT /api/platform-admin/users/<id>/approve`.
+- Owners always count as approvers (checkbox disabled). Flagged emails feed Teams MessageCards via `list_approver_emails()`.
+- NEXT: Assign Approver on real accounts; set `NCM_TEAMS_WEBHOOK_URL` and smoke an ETL finish card.
+
 ---
 ## 2026-09-29 (Postgres-only)
 

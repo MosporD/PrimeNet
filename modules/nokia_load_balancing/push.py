@@ -10,6 +10,8 @@ from core.cm_extractor.nokia_excel_reimport import _upload_to_omc
 
 from .logic import load_preview, preview_xml, write_preview_xml
 
+from core.cm_write_safety import assert_change_cap
+
 
 def apply_preview_to_oss(
     username: str,
@@ -20,6 +22,7 @@ def apply_preview_to_oss(
 ) -> dict[str, Any]:
     preview = load_preview(username, token)
     changes = preview.get("changes") or []
+    assert_change_cap(len(changes))
     if not changes:
         raise ValueError("No parameter changes in preview.")
 

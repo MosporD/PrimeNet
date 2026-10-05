@@ -6,6 +6,12 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 ---
 
 ---
+## 2026-10-05 (Discovery catalogs on shared volume)
+
+- Done: Nokia + Huawei discovery JSON moved to `NCM_DATA_ROOT/var/cm_catalogs/` so Docker scheduler and web share inventories; legacy `data/` still read.
+- Tests: `core/cm_extractor/test_catalog_store.py`.
+- NEXT: After server rebuild, trigger NetAct + U2020 discovery once.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

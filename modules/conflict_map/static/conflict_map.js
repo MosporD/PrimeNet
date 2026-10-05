@@ -99,6 +99,7 @@ function initConflictMap() {
 
 function bindFilters() {
     const techEl = document.getElementById('conf-tech');
+    const modeEl = document.getElementById('conf-mode');
     const strictEl = document.getElementById('conf-strictness');
     const areaEl = document.getElementById('conf-area');
     const queryBtn = document.getElementById('conf-refresh');
@@ -106,6 +107,7 @@ function bindFilters() {
     const exportBtn = document.getElementById('conf-export-kml');
     const panelToggleBtn = document.getElementById('conf-panel-toggle');
     if (techEl) techEl.addEventListener('change', () => loadOptionsForTechnology());
+    if (modeEl) modeEl.addEventListener('change', () => refreshBandOptionsForArea());
     if (strictEl) strictEl.addEventListener('change', () => refreshBandOptionsForArea());
     if (areaEl) areaEl.addEventListener('change', () => refreshBandOptionsForArea());
     if (queryBtn) queryBtn.addEventListener('click', () => loadConflictMapData());
@@ -120,6 +122,49 @@ function bindFilters() {
             syncPanelAnchors();
         });
     }
+    syncConflictModeVisibility();
+}
+
+function syncConflictModeVisibility() {
+    const tech = document.getElementById('conf-tech')?.value || '';
+    const modeEl = document.getElementById('conf-mode');
+    const modeLabel = document.getElementById('conf-mode-label');
+    const bandEl = document.getElementById('conf-band');
+    const bandLabel = document.querySelector('label[for="conf-band"]');
+    const is2g = tech === '2G';
+    if (modeEl) {
+        modeEl.style.display = is2g ? '' : 'none';
+        modeEl.disabled = !is2g;
+    }
+    if (modeLabel) modeLabel.style.display = is2g ? '' : 'none';
+    if (bandEl) {
+        bandEl.style.display = is2g ? 'none' : '';
+        bandEl.disabled = is2g;
+        if (is2g) bandEl.value = 'all';
+    }
+    if (bandLabel) bandLabel.style.display = is2g ? 'none' : '';
+}
+
+function refillConflictModeSelect(modes, defaultId) {
+    const sel = document.getElementById('conf-mode');
+    if (!sel || !modes || !modes.length) return;
+    const current = sel.value;
+    sel.innerHTML = modes
+        .map((m) => `<option value="${attrEscape(m.id)}">${attrEscape(m.label)}</option>`)
+        .join('');
+    const pick = current && [...sel.options].some((o) => o.value === current) ? current : defaultId || modes[0].id;
+    if (pick && [...sel.options].some((o) => o.value === pick)) sel.value = pick;
+}
+
+function codeLabelForTech(tech, apiLabel) {
+    if (apiLabel) return apiLabel;
+    return tech === '2G' ? 'BCCH' : 'PCI/PSC';
+}
+
+function conflictTypeLabel(ctype) {
+    const t = String(ctype || 'co').toLowerCase();
+    if (t === 'adjacent') return 'Adjacent';
+    return 'Co-channel';
 }
 
 function attrEscape(s) {
@@ -148,9 +193,14 @@ async function refreshBandOptionsForArea() {
     const statsEl = document.getElementById('conf-map-stats');
     const technology = document.getElementById('conf-tech')?.value || '';
     const strictness = document.getElementById('conf-strictness')?.value || 'standard';
+    const conflictMode = document.getElementById('conf-mode')?.value || 'both';
     const risk = document.getElementById('conf-risk')?.value || 'all';
     const areas = selectedAreas();
     if (!technology) return;
+    if (technology === '2G') {
+        if (statsEl) statsEl.textContent = 'Select conflict type, strictness, risk, and area, then click Query.';
+        return;
+    }
     try {
         const qs = new URLSearchParams();
         qs.set('technology', technology);
@@ -162,6 +212,7 @@ async function refreshBandOptionsForArea() {
             qs.set('area', 'all');
         }
         qs.set('band', 'all');
+        if (technology === '2G') qs.set('conflict_mode', conflictMode);
         const res = await fetch(`/api/conflict-map/data?${qs.toString()}`);
         const data = await res.json();
         if (!data.success) return;
@@ -256,15 +307,20 @@ function buildQueryParams(requireComplete = false) {
     const technology = document.getElementById('conf-tech')?.value || '';
     const strictness = document.getElementById('conf-strictness')?.value || '';
     const risk = document.getElementById('conf-risk')?.value || '';
-    const band = document.getElementById('conf-band')?.value || '';
+    const conflictMode = document.getElementById('conf-mode')?.value || 'both';
+    const is2g = technology === '2G';
+    const band = is2g ? 'all' : (document.getElementById('conf-band')?.value || '');
     const includeElevation = !!document.getElementById('conf-elev')?.checked;
     const areas = selectedAreas();
-    if (requireComplete && (!technology || !strictness || !risk || !band || !areas.length)) return null;
+    const needBand = !is2g;
+    if (requireComplete && (!technology || !strictness || !risk || (needBand && !band) || !areas.length)) return null;
+    if (requireComplete && is2g && !conflictMode) return null;
     const qs = new URLSearchParams();
     if (technology) qs.set('technology', technology);
     if (strictness) qs.set('strictness', strictness);
     if (risk) qs.set('risk', risk);
     if (band) qs.set('band', band);
+    if (is2g && conflictMode) qs.set('conflict_mode', conflictMode);
     if (includeElevation) qs.set('include_elevation', '1');
     if (areas.length) {
         areas.forEach((a) => qs.append('area', a));
@@ -279,11 +335,16 @@ async function loadOptionsForTechnology() {
     const statsEl = document.getElementById('conf-map-stats');
     const technology = document.getElementById('conf-tech')?.value || '';
     if (!technology) return;
+    syncConflictModeVisibility();
     try {
         if (statsEl) statsEl.textContent = 'Loading filter options...';
         const qs = new URLSearchParams({ technology, risk: 'all', area: 'all', band: 'all' });
         const defSt = 'standard';
         qs.set('strictness', defSt);
+        if (technology === '2G') {
+            const mode = document.getElementById('conf-mode')?.value || 'both';
+            qs.set('conflict_mode', mode);
+        }
         const res = await fetch(`/api/conflict-map/data?${qs.toString()}`);
         const data = await res.json();
         if (!data.success) {
@@ -297,23 +358,43 @@ async function loadOptionsForTechnology() {
         } else if (stEl && !stEl.value && [...stEl.options].some((o) => o.value === defSt)) {
             stEl.value = defSt;
         }
+        if (technology === '2G') {
+            refillConflictModeSelect(
+                data.filters?.conflict_modes || [
+                    { id: 'both', label: 'Co-channel + Adjacent' },
+                    { id: 'co', label: 'Co-channel' },
+                    { id: 'adjacent', label: 'Adjacent (±1)' },
+                ],
+                data.filters?.conflict_mode_default || 'both'
+            );
+        }
         refillAreaSelect(data.filters?.areas || []);
         const bands = data.filters?.bands || [];
         refillBandSelect(bands);
         const bandEl = document.getElementById('conf-band');
         if (bandEl) {
-            if (technology === '5G') {
-                // 5G scope has a single band in this deployment; auto-select it for convenience.
+            if (technology === '2G') {
+                bandEl.value = 'all';
+                bandEl.disabled = true;
+            } else if (technology === '5G') {
                 if (bands.length === 1) {
                     bandEl.value = String(bands[0]);
                 }
+                bandEl.disabled = bands.length <= 1;
+            } else {
+                bandEl.disabled = false;
             }
-            bandEl.disabled = (technology === '5G' && bands.length <= 1);
         }
         const riskEl = document.getElementById('conf-risk');
         if (riskEl && !riskEl.value) riskEl.selectedIndex = 0;
-        if (statsEl) statsEl.textContent = 'Select strictness, risk, area, and band, then click Query.';
+        const codeLbl = codeLabelForTech(technology, data.filters?.code_label);
+        if (statsEl) {
+            statsEl.textContent = technology === '2G'
+                ? `Select conflict type, strictness, risk, and area, then click Query. (${codeLbl})`
+                : `Select strictness, risk, area, and band, then click Query. (${codeLbl})`;
+        }
         if (conflictLayerGroup) conflictLayerGroup.clearLayers();
+        syncConflictModeVisibility();
         syncPanelAnchors();
     } catch (_) {
         if (statsEl) statsEl.textContent = 'Could not load filter options.';
@@ -325,7 +406,12 @@ async function loadConflictMapData() {
     const statsEl = document.getElementById('conf-map-stats');
     const qs = buildQueryParams(true);
     if (!qs) {
-        if (statsEl) statsEl.textContent = 'Please select technology, strictness, risk, area, and band, then click Query.';
+        const tech = document.getElementById('conf-tech')?.value || '';
+        if (statsEl) {
+            statsEl.textContent = tech === '2G'
+                ? 'Please select technology, conflict type, strictness, risk, and area, then click Query.'
+                : 'Please select technology, strictness, risk, area, and band, then click Query.';
+        }
         return;
     }
 
@@ -338,15 +424,19 @@ async function loadConflictMapData() {
             return;
         }
         refillAreaSelect(data.filters?.areas || []);
-        refillBandSelect(data.filters?.bands || []);
-        renderRows(data.rows || []);
+        if (data.technology !== '2G') refillBandSelect(data.filters?.bands || []);
+        renderRows(data.rows || [], data.technology, data.filters?.code_label);
         if (statsEl) {
             const st = data.strictness || '';
             const pool = Number(data.candidate_total ?? data.total ?? 0).toLocaleString();
-            const pciNote = data.pci ? ` PCI/PSC ${data.pci} filter.` : '';
+            const codeLbl = codeLabelForTech(data.technology, data.filters?.code_label);
+            const pciNote = data.pci ? ` ${codeLbl} ${data.pci} filter.` : '';
+            const modeNote = data.technology === '2G' && data.conflict_mode
+                ? ` mode=${data.conflict_mode}`
+                : '';
             statsEl.textContent = `Showing ${Number(data.filtered_total || 0).toLocaleString()} of ${Number(
                 data.total || 0
-            ).toLocaleString()} links (${data.technology}, ${st}).${pciNote} Pool: ${pool} pair candidates within max distance.`;
+            ).toLocaleString()} links (${data.technology}${modeNote}, ${st}).${pciNote} Pool: ${pool} pair candidates within max distance.`;
         }
         syncPanelAnchors();
     } catch (_) {
@@ -355,10 +445,11 @@ async function loadConflictMapData() {
     }
 }
 
-function renderRows(rows) {
+function renderRows(rows, technology, codeLabel) {
     if (!conflictMap || !conflictLayerGroup) return;
     conflictLayerGroup.clearLayers();
     const bounds = [];
+    const codeLbl = codeLabelForTech(technology, codeLabel);
     (rows || []).forEach((r, idx) => {
         const aLat = Number(r.a_lat);
         const aLng = Number(r.a_lng);
@@ -370,16 +461,18 @@ function renderRows(rows) {
         const aElevId = `conf-elev-${idx}-a`;
         const bElevId = `conf-elev-${idx}-b`;
         const dElevId = `conf-elev-${idx}-delta`;
+        const typeLbl = conflictTypeLabel(r.conflict_type);
         const line = L.polyline([[aLat, aLng], [bLat, bLng]], { color, weight: 3, opacity: 0.85 });
         line.bindPopup(`
             <strong>${r.risk} Risk</strong> (${r.strictness || '—'} strictness)<br>
             Technology: ${r.technology || '-'}<br>
-            PCI/PSC: ${r.pci} | CoBand: ${r.coband}<br>
+            Type: ${typeLbl}<br>
+            ${codeLbl}: ${r.pci}${r.coband ? ` | CoBand: ${r.coband}` : ''}<br>
             Distance: ${r.distance_km} km<br>
             Az vs bore A→B / B→A: ${r.a_to_b_diff ?? '-'}° / ${r.b_to_a_diff ?? '-'}°<br>
             Elev A/B/Δ: <span id="${aElevId}">loading...</span> / <span id="${bElevId}">loading...</span> / <span id="${dElevId}">loading...</span><br>
-            A: ${r.a_name} (${r.a_site})<br>
-            B: ${r.b_name} (${r.b_site})
+            A: ${r.a_name} (${r.a_site})${r.a_code != null ? ` · ${r.a_code}` : ''}<br>
+            B: ${r.b_name} (${r.b_site})${r.b_code != null ? ` · ${r.b_code}` : ''}
         `);
         line.on('popupopen', () => conflictFillElevationPair(aElevId, bElevId, dElevId, aLat, aLng, bLat, bLng));
         conflictLayerGroup.addLayer(line);
@@ -395,11 +488,12 @@ function renderRows(rows) {
                 Cell: ${r.a_name || '-'}<br>
                 Site: ${r.a_site || '-'}<br>
                 Technology: ${r.technology || '-'}<br>
+                Type: ${typeLbl}<br>
                 Area: ${r.a_area || '-'}<br>
                 Band: ${r.a_band || '-'}<br>
                 Elevation: <span id="${wedgeAElevId}">loading...</span><br>
                 Azimuth: ${r.a_az ?? '-'}<br>
-                PCI/PSC: ${r.pci || '-'}<br>
+                ${codeLbl}: ${r.pci || '-'}<br>
                 Risk: ${r.risk || '-'}
             `);
             wedgeA.on('popupopen', () => conflictFillElevation(wedgeAElevId, aLat, aLng));
@@ -413,11 +507,12 @@ function renderRows(rows) {
                 Cell: ${r.b_name || '-'}<br>
                 Site: ${r.b_site || '-'}<br>
                 Technology: ${r.technology || '-'}<br>
+                Type: ${typeLbl}<br>
                 Area: ${r.b_area || '-'}<br>
                 Band: ${r.b_band || '-'}<br>
                 Elevation: <span id="${wedgeBElevId}">loading...</span><br>
                 Azimuth: ${r.b_az ?? '-'}<br>
-                PCI/PSC: ${r.pci || '-'}<br>
+                ${codeLbl}: ${r.pci || '-'}<br>
                 Risk: ${r.risk || '-'}
             `);
             wedgeB.on('popupopen', () => conflictFillElevation(wedgeBElevId, bLat, bLng));
@@ -495,9 +590,15 @@ async function applyDeepLinkFromUrl() {
         areaEl.value = area;
     }
 
+    const modeEl = document.getElementById('conf-mode');
+    const mode = params.get('conflict_mode') || params.get('mode') || '';
+    if (modeEl && mode && [...modeEl.options].some((o) => o.value === mode)) {
+        modeEl.value = mode;
+    }
+
     const bandEl = document.getElementById('conf-band');
     const band = params.get('band') || 'all';
-    if (bandEl && [...bandEl.options].some((o) => o.value === band)) {
+    if (bandEl && tech !== '2G' && [...bandEl.options].some((o) => o.value === band)) {
         bandEl.value = band;
     }
 

@@ -5,11 +5,25 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 **Parked:** Hologram polish browser smoke; ground reach from performance/TA (needs per-cell PM + RET↔cell map) — geometric h/tan(tilt) clamped 100–1000 m for now.
 
-**NEXT:** Browser smoke hologram after hard-refresh.
+**NEXT:** Rebuild/restart scheduler + primenet so CM catalogs land on shared `/data`; trigger Nokia inventory once; confirm site 54792 in RET search; then hologram smoke + preview→apply.
 
 ---
 
 ---
+## 2026-10-05 (CM inventory path — RET picker)
+
+- Root cause: NetAct inventory refresh wrote `/app/data/…` inside scheduler container; RET Management on web read a different stale copy. Shared volume is `/data` only.
+- Fix lives in `core/cm_extractor/catalog_store.py` + nokia/huawei discovery (see sync.progress).
+- NEXT: After deploy, search 54792 in RET Management; if still missing, NetAct PLMN/MRBTS query does not return that NE.
+
+## 2026-10-05 (CM write safety gate)
+
+- Done: Preview endpoints + mandatory `preview_id` + phrase `APPLY RET CHANGES` before live apply (Huawei + Nokia).
+- Done: Cap via `NCM_CM_MAX_CELLS_PER_PUSH`; before-snapshot + `audit_write` (`core/cm_write_safety.py`).
+- Done: Live apply requires Approver (`can_approve` or Owner) via `@cm_approve_required`.
+- UI: `ret_management.js` preview-then-apply (`?v=1.27`).
+- NEXT: Hard-refresh RET page; exercise one Nokia + one Huawei change with confirm prompt.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

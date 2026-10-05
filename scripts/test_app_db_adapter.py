@@ -155,6 +155,12 @@ class AppSqlTests(unittest.TestCase):
         out = adapt_sqlite_app_sql(sql)
         self.assertIn('ON CONFLICT DO NOTHING', out)
 
+    def test_group_concat_distinct(self):
+        sql = 'SELECT GROUP_CONCAT(DISTINCT technology) AS technologies FROM t'
+        out = adapt_sqlite_app_sql(sql)
+        self.assertIn('string_agg(DISTINCT technology::text', out)
+        self.assertNotIn('GROUP_CONCAT', out)
+
 
 class _RecordingRaw:
     def __init__(self):

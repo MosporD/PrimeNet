@@ -5,6 +5,11 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
 
+## 2026-10-05 (2G BCCH co + adjacent)
+
+- Done: 2G on Conflict Map + Conflict Report. Selectable co-channel / adjacent (±1) / both. No band filter (all L900). Same strictness profiles as 3G–5G (not the wider set). Excel + KML carry conflict type. Version V1.1.
+- NEXT: Smoke `/conflict-map` 2G both modes and Reports Conflict Report download after metadata load.
+
 ---
 ## 2026-09-29 (Postgres-only)
 

@@ -754,7 +754,7 @@
             const resp = await fetch('/api/nokia-load-balancing/apply', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: previewToken, confirmation: applyConfirmation, wait: true }),
+                body: JSON.stringify({ token: previewToken, preview_id: previewToken, confirmation: applyConfirmation, wait: true }),
             });
             const data = await resp.json();
             if (!resp.ok || !data.success) {

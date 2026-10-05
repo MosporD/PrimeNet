@@ -151,7 +151,7 @@ def get_profile():
     _ensure_profile_photo_schema(conn)
     row = execute_query(conn, '''
         SELECT id, username, email, full_name, department, role, created_at, last_login,
-               password_changed_at, force_password_change, profile_photo_path
+               password_changed_at, force_password_change, profile_photo_path, can_approve
         FROM users WHERE id = ?
     ''', (user['id'],)).fetchone()
     conn.close()
@@ -169,6 +169,8 @@ def get_profile():
     profile = dict(row)
     profile['activity_count'] = activity_count
     profile['password_change_required'] = bool(profile.get('force_password_change'))
+    from database_enhanced import user_can_approve
+    profile['can_approve'] = user_can_approve(profile)
     return jsonify({'success': True, 'profile': profile})
 
 

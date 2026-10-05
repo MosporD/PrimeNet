@@ -43,16 +43,35 @@ jobs:
         run: |
           mkdir -p "$NCM_DATA_ROOT"
           pytest core modules -q
+      - name: SQL adapter regression tests
+        run: python scripts/test_app_db_adapter.py
 
   wiring:
     name: app wiring
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: primenet
+          POSTGRES_PASSWORD: primenet_ci
+          POSTGRES_DB: primenet
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U primenet -d primenet"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       NCM_SKIP_ACTIVATION: "1"
       NCM_BOOTSTRAP_ON_IMPORT: "0"
       NCM_DISABLE_SCHEDULER: "1"
+      NCM_ENABLE_ETL: "0"
       FLASK_SECRET_KEY: ci-fixed-secret
       NCM_DATA_ROOT: ${{ github.workspace }}/.ci-data
+      NCM_DATABASE_URL: postgresql://primenet:primenet_ci@127.0.0.1:5432/primenet
+      NCM_CI_ADMIN_PASSWORD: ci-smoke-admin-pass
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -65,3 +84,7 @@ jobs:
         run: |
           mkdir -p "$NCM_DATA_ROOT"
           python scripts/ci_check_wiring.py
+      - name: SQLite-ism audit (report)
+        run: python scripts/audit_sqlite_isms.py
+      - name: Module page smoke (no HTTP 500)
+        run: python scripts/ci_smoke_routes.py

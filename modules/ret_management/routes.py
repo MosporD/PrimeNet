@@ -13,6 +13,14 @@ from core.cm_extractor.extraction import build_nokia_client
 from core.cm_extractor.huawei_client import HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.nokia_operations_client import NokiaOperationsError
+from core.cm_write_safety import (
+    CmWriteSafetyError,
+    assert_change_cap,
+    audit_write,
+    create_preview,
+    max_cells_per_push,
+    require_preview_token,
+)
 from core.user_vendor_credentials import list_user_vendor_credential_status
 from database_enhanced import get_user_by_session, log_activity
 from modules.ret_management import logic as ret_logic
@@ -24,6 +32,8 @@ from modules.ret_management.credentials import (
 from modules.ret_management.export import build_ret_workbook
 from modules.ret_management.site_layout import fetch_site_layout
 from core.platform.session import get_session_token
+
+RET_CONFIRMATION_PHRASE = 'APPLY RET CHANGES'
 
 ret_management_bp = Blueprint(
     'ret_management',
@@ -87,6 +97,11 @@ def _cm_write_allowed(user) -> bool:
     return bool(user)
 
 
+def _cm_approve_allowed(user) -> bool:
+    from database_enhanced import user_can_approve
+    return user_can_approve(user)
+
+
 def cm_write_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -95,6 +110,21 @@ def cm_write_required(f):
             return jsonify({'error': 'Unauthorized'}), 401
         if not _cm_write_allowed(user):
             return jsonify({'error': 'CM write actions are currently restricted.'}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+
+def cm_approve_required(f):
+    """Live apply (not preview) — must be flagged can_approve or Owner."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({'error': 'Unauthorized'}), 401
+        if not _cm_approve_allowed(user):
+            return jsonify({
+                'error': 'Approver role required. Ask an Owner to enable Approver on your account in Platform Admin.',
+            }), 403
         return f(*args, **kwargs)
     return decorated
 
@@ -225,10 +255,10 @@ def huawei_ret_list():
         return jsonify({'error': str(exc)}), 500
 
 
-@ret_management_bp.route('/api/ret-management/huawei/rets/update', methods=['POST'])
+@ret_management_bp.route('/api/ret-management/huawei/rets/preview', methods=['POST'])
 @login_required
 @cm_write_required
-def huawei_ret_update():
+def huawei_ret_preview():
     if not _huawei_feature_enabled():
         return jsonify({'error': 'Huawei CM is not enabled.'}), 403
     if not huawei_configured():
@@ -241,6 +271,64 @@ def huawei_ret_update():
         device_no = str(data.get('device_no') or data.get('deviceNo') or '')
         subunit_no = str(data.get('subunit_no') or data.get('subunitNo') or '')
         tilt = str(data.get('tilt') or '')
+        change = {
+            'site_id': site_id,
+            'ne_name': ne_name,
+            'device_no': device_no,
+            'subunit_no': subunit_no,
+            'tilt': tilt,
+        }
+        preview = create_preview(
+            module='ret_huawei',
+            username=_username(user),
+            changes=[change],
+            before_snapshot={'vendor': 'huawei', 'change': change},
+            meta={'confirmation_phrase': RET_CONFIRMATION_PHRASE},
+        )
+        return jsonify({
+            'success': True,
+            'confirmation_phrase': RET_CONFIRMATION_PHRASE,
+            'max_cells': max_cells_per_push(),
+            **preview,
+        })
+    except CmWriteSafetyError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except (HuaweiCmError, ValueError) as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
+
+
+@ret_management_bp.route('/api/ret-management/huawei/rets/update', methods=['POST'])
+@login_required
+@cm_write_required
+@cm_approve_required
+def huawei_ret_update():
+    if not _huawei_feature_enabled():
+        return jsonify({'error': 'Huawei CM is not enabled.'}), 403
+    if not huawei_configured():
+        return jsonify({'error': 'Huawei U2020 CM is not configured.'}), 400
+    data = _json_body()
+    try:
+        user = get_current_user()
+        preview_id = str(data.get('preview_id') or '').strip()
+        confirmation = str(data.get('confirmation') or '').strip()
+        if confirmation != RET_CONFIRMATION_PHRASE:
+            return jsonify({
+                'error': f'Type {RET_CONFIRMATION_PHRASE!r} to apply these changes to the network.',
+            }), 400
+        preview = require_preview_token(
+            preview_id,
+            module='ret_huawei',
+            username=_username(user),
+            consume=True,
+        )
+        change = (preview.get('changes') or [{}])[0]
+        site_id = str(change.get('site_id') or '').strip()
+        ne_name = str(change.get('ne_name') or '').strip()
+        device_no = str(change.get('device_no') or '')
+        subunit_no = str(change.get('subunit_no') or '')
+        tilt = str(change.get('tilt') or '')
 
         def _apply(client):
             client.login()
@@ -261,7 +349,7 @@ def huawei_ret_update():
             ),
             operation=_apply,
         )
-        log_activity(
+        audit_write(
             _user_id(user),
             'ret_management_huawei_mod',
             (
@@ -269,8 +357,12 @@ def huawei_ret_update():
                 f'tilt={tilt}'
                 + _cred_activity_suffix(cred_meta)
             ),
+            preview_id=preview_id,
+            cell_count=1,
         )
-        return jsonify({'success': True, **result, **cred_meta})
+        return jsonify({'success': True, 'preview_id': preview_id, **result, **cred_meta})
+    except CmWriteSafetyError as exc:
+        return jsonify({'error': str(exc)}), 400
     except HuaweiCmError as exc:
         body: dict[str, Any] = {'error': str(exc)}
         payload = getattr(exc, 'payload', None)
@@ -327,11 +419,10 @@ def nokia_retu_list():
         return jsonify({'error': str(exc)}), 500
 
 
-@ret_management_bp.route('/api/ret-management/nokia/retu/update', methods=['POST'])
-@ret_management_bp.route('/api/ret-management/nokia/lncel/update', methods=['POST'])  # legacy alias
+@ret_management_bp.route('/api/ret-management/nokia/retu/preview', methods=['POST'])
 @login_required
 @cm_write_required
-def nokia_retu_update():
+def nokia_retu_preview():
     if not nokia_configured():
         return jsonify({'error': 'Nokia NetAct CM is not configured.'}), 400
     data = _json_body()
@@ -346,6 +437,59 @@ def nokia_retu_update():
                     item['site_id'] = site_id
         user = get_current_user()
         mo_class = str(data.get('mo_class') or '').strip() or None
+        if not mo_class:
+            try:
+                mo_class = ret_logic.resolve_nokia_retu_mo_class(build_nokia_client())
+            except Exception:
+                mo_class = ret_logic.NOKIA_MO_CLASS_FALLBACK
+        assert_change_cap(len(updates))
+        preview = create_preview(
+            module='ret_nokia',
+            username=_username(user),
+            changes=list(updates),
+            before_snapshot={'vendor': 'nokia', 'mo_class': mo_class, 'updates': updates},
+            meta={'mo_class': mo_class, 'confirmation_phrase': RET_CONFIRMATION_PHRASE},
+        )
+        return jsonify({
+            'success': True,
+            'mo_class': mo_class,
+            'confirmation_phrase': RET_CONFIRMATION_PHRASE,
+            'max_cells': max_cells_per_push(),
+            **preview,
+        })
+    except CmWriteSafetyError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except (NokiaCmError, ValueError) as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
+
+
+@ret_management_bp.route('/api/ret-management/nokia/retu/update', methods=['POST'])
+@ret_management_bp.route('/api/ret-management/nokia/lncel/update', methods=['POST'])  # legacy alias
+@login_required
+@cm_write_required
+@cm_approve_required
+def nokia_retu_update():
+    if not nokia_configured():
+        return jsonify({'error': 'Nokia NetAct CM is not configured.'}), 400
+    data = _json_body()
+    try:
+        user = get_current_user()
+        preview_id = str(data.get('preview_id') or '').strip()
+        confirmation = str(data.get('confirmation') or '').strip()
+        if confirmation != RET_CONFIRMATION_PHRASE:
+            return jsonify({
+                'error': f'Type {RET_CONFIRMATION_PHRASE!r} to apply these changes to the network.',
+            }), 400
+        preview = require_preview_token(
+            preview_id,
+            module='ret_nokia',
+            username=_username(user),
+            consume=True,
+        )
+        updates = list(preview.get('changes') or [])
+        mo_class = str((preview.get('meta') or {}).get('mo_class') or data.get('mo_class') or '').strip() or None
         if not mo_class:
             try:
                 mo_class = ret_logic.resolve_nokia_retu_mo_class(build_nokia_client())
@@ -367,15 +511,25 @@ def nokia_retu_update():
             action=f'RETU angle update ({len(updates)} change(s)) on {mo_class}',
             operation=_apply,
         )
-        log_activity(
+        audit_write(
             _user_id(user),
             'ret_management_nokia_angle',
             (
                 f'Updated RETU angle via RETU_R read ({len(updates)} change(s)) on {mo_class}'
                 + _cred_activity_suffix(cred_meta)
             ),
+            preview_id=preview_id,
+            cell_count=len(updates),
         )
-        return jsonify({'success': True, 'mo_class': mo_class, **result, **cred_meta})
+        return jsonify({
+            'success': True,
+            'mo_class': mo_class,
+            'preview_id': preview_id,
+            **result,
+            **cred_meta,
+        })
+    except CmWriteSafetyError as exc:
+        return jsonify({'error': str(exc)}), 400
     except (NokiaCmError, NokiaOperationsError, ValueError, RuntimeError) as exc:
         return jsonify({'error': str(exc)}), 400
     except OSError as exc:

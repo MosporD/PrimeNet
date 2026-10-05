@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sqlite3
 from functools import wraps
 
 from flask import Blueprint, jsonify, redirect, render_template, request, send_file, url_for
@@ -70,12 +71,20 @@ def _username(user) -> str:
     return str(user[1] or '').strip()
 
 
+def _optional_build_meta(fetch):
+    """Page shell should load when a snapshot schema is disabled or empty."""
+    try:
+        return fetch()
+    except (RuntimeError, sqlite3.OperationalError):
+        return None
+
+
 @configuration_dashboard_bp.route('/configuration-dashboard')
 @login_required
 def configuration_dashboard_page():
     user = format_user_data(get_current_user())
-    rmod_meta = rru_store.get_build_meta()
-    wncelg_meta = wncelg_store.get_build_meta()
+    rmod_meta = _optional_build_meta(rru_store.get_build_meta)
+    wncelg_meta = _optional_build_meta(wncelg_store.get_build_meta)
     tab = (request.args.get('tab') or 'hardware').strip().lower()
     if tab not in ('hardware', 'wncelg'):
         tab = 'hardware'

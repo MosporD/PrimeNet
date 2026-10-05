@@ -17,6 +17,8 @@ Build downloadable performance reports from metadata + PM; archive rows live in 
 
 App-table writes go through `connect_app()` / `execute_query` (Postgres-safe). Sector coverage is metadata, not Sleeping Cells overlay.
 
+Conflict Report delegates to `conflict_map.logic` (PCI/PSC/BCCH; 2G supports co/adjacent mode).
+
 ## Progress
 
 Dated work log: [`reports.progress.md`](reports.progress.md). Do not duplicate long history here — update the progress file when this feature changes. Keep **Plans** as the module NEXT.

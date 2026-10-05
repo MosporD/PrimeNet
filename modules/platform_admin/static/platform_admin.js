@@ -195,7 +195,7 @@ function displayUsers(users) {
     const tbody = document.getElementById("users-table-body");
 
     if (!users || users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No users found</td></tr>';
         renderPagination("users-pagination", 0, USERS_PAGE_SIZE, 1, "goToUsersPage");
         return;
     }
@@ -210,6 +210,14 @@ function displayUsers(users) {
             <td><strong>${_escapeHtml(user.username)}</strong></td>
             <td>${_escapeHtml(user.email)}</td>
             <td><span class="role-badge ${_escapeHtml(user.role)}">${_escapeHtml(user.role_label || ROLE_LABELS[user.role] || user.role)}</span></td>
+            <td>
+                <label class="approver-toggle" title="CM / change approver — receives Teams alerts">
+                    <input type="checkbox" ${user.can_approve || user.role === "admin" ? "checked" : ""}
+                        ${user.role === "admin" ? "disabled" : ""}
+                        onchange="toggleApprover(${Number(user.id)}, this.checked)">
+                    ${user.role === "admin" ? "Owner" : (user.can_approve ? "Yes" : "No")}
+                </label>
+            </td>
             <td class="portal-cell">${_escapeHtml((user.portal_labels || user.allowed_portals || []).join(", ") || "—")}</td>
             <td><span class="status-badge ${user.is_active ? "active" : "inactive"}">
                 ${user.is_active ? "Active" : "Inactive"}
@@ -267,6 +275,27 @@ async function toggleRole(userId, currentRole) {
         }
     } catch (error) {
         showNotification("Error updating role", "error");
+    }
+}
+
+async function toggleApprover(userId, enabled) {
+    try {
+        const response = await fetch(`${API}/users/${userId}/approve`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ can_approve: !!enabled }),
+        });
+        const data = await response.json();
+        if (data.success) {
+            showNotification(enabled ? "Approver enabled" : "Approver removed", "success");
+            loadAllUsers();
+        } else {
+            showNotification(data.error || "Failed to update approver flag", "error");
+            loadAllUsers();
+        }
+    } catch (error) {
+        showNotification("Error updating approver flag", "error");
+        loadAllUsers();
     }
 }
 

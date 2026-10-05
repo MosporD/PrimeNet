@@ -5,6 +5,11 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
 
+## 2026-10-05 (Conflict Report 2G BCCH)
+
+- Done: Conflict Report tech includes 2G; conflict-type selector (co / adjacent / both) when 2G. Same strictness profiles as Conflict Map (shared with 3G–5G).
+- NEXT: Smoke Excel download for 2G both modes.
+
 ---
 ## 2026-09-29 (Postgres-only)
 

@@ -6,6 +6,19 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 **Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
 
 ---
+## 2026-10-05 (Nokia/Huawei CM catalog on shared volume)
+
+- Bug: `nokia_netact_inventory.json` / Huawei NE catalog lived under `/app/data` (image tree). Scheduler refreshed its private copy; PrimeNet web kept the baked-in stale file — RET / CM pickers missed new NetAct sites (e.g. 54792).
+- Done: catalogs write to `NCM_DATA_ROOT/var/cm_catalogs/` (`core/cm_extractor/catalog_store.py`); legacy `<repo>/data/…` still read as fallback.
+- NEXT: Rebuild/restart **scheduler + primenet**; trigger Nokia CM inventory once; confirm 54792 (or any new MRBTS) appears in RET Management search.
+
+## 2026-10-05 (Teams webhook + Approver emails)
+
+- Done: `core/events.py` posts Teams MessageCards to `NCM_TEAMS_WEBHOOK_URL` (fallback `NCM_EVENTS_WEBHOOK_URL`); embeds emails of users with `can_approve` (+ Owners).
+- Done: Scheduler still emits `etl.{hourly,daily,neighbor}.{finished,failed}`; JSONL under `var/platform_events.jsonl`.
+- Done: `GET /healthz` (+ `/api/healthz`) via `core/platform_health.py` — PM/neighbor freshness; debounced `platform.data_stale`.
+- NEXT: Set `NCM_TEAMS_WEBHOOK_URL` on server; flag Approvers in Platform Admin; confirm one ETL finish card in Teams.
+
 ## 2026-10-04 (Neighbor lock separate from watcher)
 
 - Found: neighbor at `:30` skipped whenever watcher held `_pipeline_cycle_lock` (~26–32 min every 30 min).

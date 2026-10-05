@@ -309,6 +309,9 @@ def init_db():
     ''')
 
     _try_add_column(conn, cursor, 'ALTER TABLE users ADD COLUMN profile_photo_path TEXT')
+    _try_add_column(
+        conn, cursor, 'ALTER TABLE users ADD COLUMN can_approve BOOLEAN DEFAULT 0'
+    )
 
     _exec(cursor, '''
         CREATE TABLE IF NOT EXISTS feature_access (
@@ -554,7 +557,7 @@ def get_all_users():
     cursor = conn.cursor()
     cursor.execute('''
         SELECT id, username, email, full_name, department, role, 
-               created_at, last_login, is_active, allowed_portals
+               created_at, last_login, is_active, allowed_portals, can_approve
         FROM users 
         ORDER BY created_at DESC
     ''')
@@ -564,8 +567,76 @@ def get_all_users():
     for user in users:
         row = dict(user)
         row['allowed_portals'] = user_allowed_portals(row)
+        row['can_approve'] = bool(row.get('can_approve'))
         out.append(row)
     return out
+
+
+def update_user_can_approve(user_id, can_approve: bool) -> bool:
+    """Set whether a user is a change/CM approver (Teams notify + write gate)."""
+    init_db()
+    conn = get_db()
+    cursor = conn.cursor()
+    _exec(
+        cursor,
+        'UPDATE users SET can_approve = ? WHERE id = ?',
+        (1 if can_approve else 0, user_id),
+    )
+    affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return affected > 0
+
+
+def list_approver_emails() -> list[dict]:
+    """Active users flagged can_approve (plus always include active admins)."""
+    init_db()
+    conn = get_db()
+    cursor = conn.cursor()
+    _exec(
+        cursor,
+        '''
+        SELECT id, username, email, full_name, role, can_approve
+        FROM users
+        WHERE is_active = 1
+          AND email IS NOT NULL
+          AND TRIM(email) <> ''
+          AND (can_approve = 1 OR role = 'admin')
+        ORDER BY username
+        ''',
+    )
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def user_can_approve(user) -> bool:
+    """True if user may approve CM / change actions."""
+    if not user:
+        return False
+    if isinstance(user, dict):
+        role = str(user.get('role') or '').strip().lower()
+        flag = user.get('can_approve')
+        uid = user.get('id')
+    else:
+        role = str(user[6] if len(user) > 6 else '').strip().lower()
+        flag = None
+        uid = user[0] if user else None
+    if role == 'admin':
+        return True
+    if flag is not None:
+        return bool(flag)
+    if uid is None:
+        return False
+    init_db()
+    conn = get_db()
+    cursor = conn.cursor()
+    _exec(cursor, 'SELECT can_approve FROM users WHERE id = ?', (uid,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return False
+    return bool(row['can_approve'] if isinstance(row, dict) else row[0])
 
 
 def update_user_portals(user_id, portals) -> bool:

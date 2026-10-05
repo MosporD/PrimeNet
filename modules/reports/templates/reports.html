@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}?v=1.4">
+    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}?v=1.5">
 </head>
 <body class="reports-page">
 <div class="container">
@@ -40,11 +40,18 @@
                 </select>
             </div>
             <div class="report-options-row">
-                <label for="pci-conflict-tech">PCI Conflict Technology:</label>
+                <label for="pci-conflict-tech">Conflict Technology:</label>
                 <select id="pci-conflict-tech">
                     <option value="4G" selected>4G</option>
+                    <option value="2G">2G (BCCH)</option>
                     <option value="3G">3G</option>
                     <option value="5G">5G</option>
+                </select>
+                <label for="pci-conflict-mode" id="pci-conflict-mode-label" style="display:none">2G type:</label>
+                <select id="pci-conflict-mode" style="display:none" title="2G: co-channel and/or adjacent (±1 ARFCN)">
+                    <option value="both" selected>Co-channel + Adjacent</option>
+                    <option value="co">Co-channel</option>
+                    <option value="adjacent">Adjacent (±1)</option>
                 </select>
                 <label for="pci-conflict-strictness">Strictness:</label>
                 <select id="pci-conflict-strictness" title="Same profiles as Conflict Map — edit modules/conflict_map/logic.py">
@@ -76,7 +83,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
-<script src="{{ url_for('reports.static', filename='reports.js') }}?v=1.7"></script>
+<script src="{{ url_for('reports.static', filename='reports.js') }}?v=1.9"></script>
 <script>
 async function logout() {
     if (confirm('Logout?')) {

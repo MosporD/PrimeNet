@@ -8,6 +8,13 @@ from flask import Blueprint, Response, jsonify, render_template, request
 
 from core.cm_extractor.config import nokia_configured, nokia_export_ssh_settings
 from core.cm_extractor.nokia_excel_reimport import CONFIRMATION_PHRASE
+from core.cm_write_safety import (
+    CmWriteSafetyError,
+    assert_change_cap,
+    audit_write,
+    max_cells_per_push,
+    store_before_snapshot,
+)
 from core.radio.web import admin_required, format_user, get_current_user
 
 from . import config
@@ -397,10 +404,14 @@ def nokia_apply_to_oss():
     """Upload RAML plan to NetAct and trigger CM Operations actualImport (admin only)."""
     user = get_current_user()
     body = request.get_json(silent=True) or {}
-    token = (body.get("token") or "").strip()
+    # preview_id preferred; token kept for existing Analyze UI
+    token = (body.get("preview_id") or body.get("token") or "").strip()
     confirmation = (body.get("confirmation") or "").strip()
     if not token:
-        return jsonify({"success": False, "error": "Missing preview token. Run Analyze first."}), 400
+        return jsonify({
+            "success": False,
+            "error": "Missing preview_id. Run Analyze first to create a preview.",
+        }), 400
     dry_run = str(body.get("dry_run") or "").strip().lower() in ("1", "true", "yes", "on")
     if confirmation != CONFIRMATION_PHRASE:
         return jsonify({
@@ -413,11 +424,45 @@ def nokia_apply_to_oss():
             "error": "OSS push is not configured. Set NOKIA_CM_SSH_* (or NOKIA_PM_*) and reimport path in .env.",
         }), 503
 
-    wait = str(body.get("wait") or "").strip().lower() in ("1", "true", "yes", "on")
     try:
-        result = apply_preview_to_oss(user["username"], token, wait=wait, dry_run=dry_run)
+        preview = load_preview(user["username"], token)
+        changes = preview.get("changes") or []
+        assert_change_cap(len(changes))
     except FileNotFoundError:
         return jsonify({"success": False, "error": "Preview not found or expired."}), 404
+    except CmWriteSafetyError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+
+    wait = str(body.get("wait") or "").strip().lower() in ("1", "true", "yes", "on")
+    try:
+        # Persist before/backup XML for rollback before any live push
+        try:
+            backup_xml = preview_backup_xml(user["username"], token)
+        except Exception:
+            backup_xml = preview_xml(user["username"], token)
+        snap_path = store_before_snapshot(
+            kind="nokia_load_balancing",
+            user=user["username"],
+            targets={"preview_id": token, "change_count": len(changes)},
+            blob={"backup_xml": backup_xml, "changes": changes},
+            preview_id=token,
+        )
+        result = apply_preview_to_oss(user["username"], token, wait=wait, dry_run=dry_run)
+        if not dry_run:
+            audit_write(
+                user.get("id"),
+                "nokia_load_balancing_apply",
+                f"OSS apply {len(changes)} change(s) preview={token[:12]}",
+                preview_id=token,
+                cell_count=len(changes),
+            )
+        result["preview_id"] = token
+        result["before_snapshot"] = str(snap_path)
+        result["max_cells"] = max_cells_per_push()
+    except FileNotFoundError:
+        return jsonify({"success": False, "error": "Preview not found or expired."}), 404
+    except CmWriteSafetyError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
     except ValueError as exc:
         return jsonify({"success": False, "error": str(exc)}), 400
     except Exception as exc:

@@ -1,6 +1,6 @@
 const REPORT_META = {
     site_inventory:      { icon: '🏗️', desc: 'All active sites and cells with location, azimuth, PCI, tilt, and band data.' },
-    pci_conflicts:       { icon: '⚠️', desc: 'Directional PCI/PSC conflict candidates (conflict_map module): technology, distance, azimuth vs. bearing, strictness.' },
+    pci_conflicts:       { icon: '⚠️', desc: 'Directional PCI/PSC/BCCH conflicts (Conflict Map): co-channel; 2G also adjacent ±1. Distance + azimuth vs bearing, shared strictness profiles.' },
     config_versions:     { icon: '📋', desc: 'Full log of all XML configuration versions uploaded to the version history module.' },
     sector_health:       { icon: '📡', desc: 'Per-sector FDD layer matrix (L18/L18+/L9/L21). Vendor: Thin / TDD Thin / TDD+Nokia mix labels.' },
     sector_health_all:   { icon: '📋', desc: 'All configured layers with Active/Inactive; Vendor: Huawei/Nokia Thin, Huawei TDD/Nokia Thin, or Huawei TDD/Nokia.' },
@@ -32,7 +32,24 @@ function escJs(v) {
 window.addEventListener('DOMContentLoaded', () => {
     loadReportTypes();
     loadArchive();
+    const pciTech = document.getElementById('pci-conflict-tech');
+    if (pciTech) {
+        pciTech.addEventListener('change', syncPciConflictModeVisibility);
+        syncPciConflictModeVisibility();
+    }
 });
+
+function syncPciConflictModeVisibility() {
+    const tech = document.getElementById('pci-conflict-tech')?.value || '';
+    const modeEl = document.getElementById('pci-conflict-mode');
+    const modeLabel = document.getElementById('pci-conflict-mode-label');
+    const is2g = tech === '2G';
+    if (modeEl) {
+        modeEl.style.display = is2g ? '' : 'none';
+        modeEl.disabled = !is2g;
+    }
+    if (modeLabel) modeLabel.style.display = is2g ? '' : 'none';
+}
 
 async function loadReportTypes() {
     const res  = await fetch('/api/reports/types');
@@ -86,8 +103,12 @@ async function generateReport(type, label) {
         } else if (type === 'pci_conflicts') {
             const pciTechSel = document.getElementById('pci-conflict-tech');
             const pciStrictSel = document.getElementById('pci-conflict-strictness');
+            const pciModeSel = document.getElementById('pci-conflict-mode');
             payload.technology = (pciTechSel && pciTechSel.value) ? pciTechSel.value : '4G';
             payload.strictness = (pciStrictSel && pciStrictSel.value) ? pciStrictSel.value : 'standard';
+            if (payload.technology === '2G' && pciModeSel && pciModeSel.value) {
+                payload.conflict_mode = pciModeSel.value;
+            }
         }
 
         const res  = await fetch('/api/reports/generate', {

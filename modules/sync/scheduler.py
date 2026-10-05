@@ -623,6 +623,33 @@ def _finish_progress(job_key: str, ok: bool, message: str) -> None:
         progress=total,
         message=message,
     )
+    _emit_etl_event(job_key, ok, message)
+
+
+def _emit_etl_event(job_key: str, ok: bool, message: str) -> None:
+    """Push ETL cycle outcome to n8n via core.events (never raises)."""
+    kind_map = {
+        'hourly_full': ('etl.hourly.finished', 'etl.hourly.failed'),
+        'daily_full': ('etl.daily.finished', 'etl.daily.failed'),
+        'neighbor_sync': ('etl.neighbor.finished', 'etl.neighbor.failed'),
+    }
+    pair = kind_map.get(str(job_key or '').strip())
+    if not pair:
+        return
+    kind = pair[0] if ok else pair[1]
+    try:
+        from core.events import emit
+
+        emit(
+            kind,
+            {
+                'job_key': job_key,
+                'ok': bool(ok),
+                'detail': str(message or '')[:2000],
+            },
+        )
+    except Exception as exc:
+        logger.debug('ETL event emit skipped: %s', exc)
 
 
 def _skip_progress(job_key: str, message: str) -> None:

@@ -4,8 +4,9 @@ Discover the Nokia NetAct inventory (NEs) directly from the CM Open API.
 Instead of listing sites from the PrimeNet metadata DB, the picker can be filled
 from what actually exists in NetAct (the PLMN tree). The discovered inventory is
 then enriched with cluster/area by joining each site_id to the metadata
-``cluster -> area`` mapping. Results are cached in memory and persisted to disk so
-the UI is instant and resilient across restarts; a background job refreshes it.
+``cluster -> area`` mapping. Results are cached in memory and persisted under
+``NCM_DATA_ROOT/var/cm_catalogs`` so the Docker scheduler and PrimeNet web share
+the same file; a background job refreshes it.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from core.cm_extractor.catalog_store import cm_catalog_path, cm_catalog_read_candidates
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.cm_extractor.site_catalog import (
     _known_nokia_metadata_site_ids,
@@ -29,11 +31,16 @@ from core.cm_extractor.site_catalog import (
     site_cluster_map,
 )
 
-_CATALOG_PATH = Path(__file__).resolve().parents[2] / 'data' / 'nokia_netact_inventory.json'
+_CATALOG_FILENAME = 'nokia_netact_inventory.json'
 _CACHE_TTL_SEC = 6 * 3600
 # Bump when metadata enrichment rules change (e.g. NetAct 50801 -> metadata 801,
 # or longest-suffix mapping 53308 -> 3308 instead of 308, or canonical area names).
 _METADATA_ENRICHMENT_VERSION = 4
+
+
+def _catalog_path() -> Path:
+    """Shared volume path so scheduler writes are visible to PrimeNet web."""
+    return cm_catalog_path(_CATALOG_FILENAME)
 
 # MO paths that enumerate site-level NEs per scope (all PLMNs).
 _MRBTS_MO_PATH = '/NetActCommon:PLMN/MRBTS as $m'
@@ -189,7 +196,7 @@ def _apply_cache(payload: dict[str, Any]) -> None:
         _CACHE['fetched_at'] = float(payload.get('fetched_at') or time.time())
         _CACHE['metadata_enrichment'] = int(payload.get('metadata_enrichment') or 0)
         try:
-            _CACHE['disk_mtime'] = _CATALOG_PATH.stat().st_mtime
+            _CACHE['disk_mtime'] = _catalog_path().stat().st_mtime
         except OSError:
             _CACHE['disk_mtime'] = 0.0
 
@@ -202,23 +209,31 @@ def save_inventory_to_disk(payload: dict[str, Any] | None = None) -> Path:
     }
     if 'metadata_enrichment' not in data:
         data['metadata_enrichment'] = int(_CACHE.get('metadata_enrichment') or _METADATA_ENRICHMENT_VERSION)
-    _CATALOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    _CATALOG_PATH.write_text(json.dumps(data, indent=2), encoding='utf-8')
+    path = _catalog_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2), encoding='utf-8')
     try:
         with _CACHE_LOCK:
-            _CACHE['disk_mtime'] = _CATALOG_PATH.stat().st_mtime
+            _CACHE['disk_mtime'] = path.stat().st_mtime
     except OSError:
         pass
-    return _CATALOG_PATH
+    return path
 
 
 def reload_inventory_from_disk(*, force: bool = False) -> bool:
     """Load or refresh in-memory inventory from disk when the file changes."""
-    if not _CATALOG_PATH.is_file():
-        return False
-    try:
-        disk_mtime = _CATALOG_PATH.stat().st_mtime
-    except OSError:
+    path: Path | None = None
+    disk_mtime = 0.0
+    for candidate in cm_catalog_read_candidates(_CATALOG_FILENAME):
+        if not candidate.is_file():
+            continue
+        try:
+            disk_mtime = candidate.stat().st_mtime
+        except OSError:
+            continue
+        path = candidate
+        break
+    if path is None:
         return False
     with _CACHE_LOCK:
         if (
@@ -228,12 +243,24 @@ def reload_inventory_from_disk(*, force: bool = False) -> bool:
         ):
             return True
     try:
-        payload = json.loads(_CATALOG_PATH.read_text(encoding='utf-8'))
+        payload = json.loads(path.read_text(encoding='utf-8'))
     except (OSError, json.JSONDecodeError):
         return False
     if not payload.get('scopes'):
         return False
     _apply_cache(payload)
+    # Prefer the shared-volume mtime when the primary file exists; otherwise
+    # keep the legacy file's mtime so we do not thrash-reload every request.
+    try:
+        primary = _catalog_path()
+        if primary.is_file():
+            with _CACHE_LOCK:
+                _CACHE['disk_mtime'] = primary.stat().st_mtime
+        else:
+            with _CACHE_LOCK:
+                _CACHE['disk_mtime'] = disk_mtime
+    except OSError:
+        pass
     return True
 
 

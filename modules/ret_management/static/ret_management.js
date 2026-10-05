@@ -1227,6 +1227,67 @@
         };
     }
 
+    function askRetConfirmation(changeCount) {
+        const phrase = 'APPLY RET CHANGES';
+        const typed = window.prompt(
+            `Confirm ${changeCount} RET change(s) to the live network.\nType exactly: ${phrase}`,
+            '',
+        );
+        return (typed || '').trim() === phrase ? phrase : null;
+    }
+
+    async function previewThenApplyNokia(body) {
+        const previewRes = await fetch('/api/ret-management/nokia/retu/preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        const preview = await previewRes.json();
+        if (!previewRes.ok) throw new Error(preview.error || 'Nokia preview failed');
+        const confirmation = askRetConfirmation(preview.change_count || (body.updates || []).length || 1);
+        if (!confirmation) throw new Error('Confirmation cancelled.');
+        const res = await fetch('/api/ret-management/nokia/retu/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                preview_id: preview.preview_id,
+                confirmation,
+                wait: body.wait !== false,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Nokia update failed');
+        return data;
+    }
+
+    async function previewThenApplyHuawei(payload) {
+        const previewRes = await fetch('/api/ret-management/huawei/rets/preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const preview = await previewRes.json();
+        if (!previewRes.ok) throw new Error(preview.error || 'Huawei preview failed');
+        const confirmation = askRetConfirmation(1);
+        if (!confirmation) throw new Error('Confirmation cancelled.');
+        const res = await fetch('/api/ret-management/huawei/rets/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                preview_id: preview.preview_id,
+                confirmation,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            const detail = data.vendor_request
+                ? ` ${JSON.stringify(data.vendor_request.body)}`
+                : '';
+            throw new Error((data.error || 'Huawei MOD failed') + detail);
+        }
+        return data;
+    }
+
     async function saveSingleRow(row, index, tr) {
         const ne = selectedNe();
         if (!ne) return;
@@ -1237,21 +1298,15 @@
             return;
         }
         saveBtn.disabled = true;
-        setStatus(loadStatus, 'Applying change…');
+        setStatus(loadStatus, 'Previewing change…');
         try {
             if (vendor === 'nokia') {
-                const res = await fetch('/api/ret-management/nokia/retu/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mo_class: nokiaMoClass || undefined,
-                        site_id: ne.site_id,
-                        updates: [nokiaUpdatePayload(row, tiltValue, ne)],
-                        wait: true,
-                    }),
+                const data = await previewThenApplyNokia({
+                    mo_class: nokiaMoClass || undefined,
+                    site_id: ne.site_id,
+                    updates: [nokiaUpdatePayload(row, tiltValue, ne)],
+                    wait: true,
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Nokia update failed');
                 showCredentialFallbackNotice(data);
             } else {
                 const payload = {
@@ -1261,18 +1316,7 @@
                     subunit_no: resolveHuaweiField(row, 'Subunit No.'),
                     tilt: tiltValue,
                 };
-                const res = await fetch('/api/ret-management/huawei/rets/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    const detail = data.vendor_request
-                        ? ` ${JSON.stringify(data.vendor_request.body)}`
-                        : '';
-                    throw new Error((data.error || 'Huawei MOD failed') + detail);
-                }
+                const data = await previewThenApplyHuawei(payload);
                 showCredentialFallbackNotice(data);
             }
             setStatus(loadStatus, 'Change applied successfully', 'ok');
@@ -1467,25 +1511,19 @@
         if (!ne || pendingChanges.size === 0) return;
 
         saveBtn.disabled = true;
-        setStatus(loadStatus, 'Applying changes…');
+        setStatus(loadStatus, 'Previewing changes…');
         try {
             if (vendor === 'nokia') {
                 const updates = [];
                 pendingChanges.forEach(({ row, value }) => {
                     updates.push(nokiaUpdatePayload(row, value, ne));
                 });
-                const res = await fetch('/api/ret-management/nokia/retu/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        updates,
-                        wait: true,
-                        mo_class: nokiaMoClass || undefined,
-                        site_id: ne.site_id,
-                    }),
+                const data = await previewThenApplyNokia({
+                    updates,
+                    wait: true,
+                    mo_class: nokiaMoClass || undefined,
+                    site_id: ne.site_id,
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Nokia update failed');
                 showCredentialFallbackNotice(data);
             } else {
                 for (const { row, value } of pendingChanges.values()) {
@@ -1496,13 +1534,7 @@
                         subunit_no: resolveHuaweiField(row, 'Subunit No.'),
                         tilt: value,
                     };
-                    const res = await fetch('/api/ret-management/huawei/rets/update', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error || 'Huawei MOD failed');
+                    const data = await previewThenApplyHuawei(payload);
                     showCredentialFallbackNotice(data);
                 }
             }

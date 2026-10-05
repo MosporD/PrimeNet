@@ -33,6 +33,7 @@ from database_enhanced import (
     log_activity,
     reset_user_password,
     set_user_force_password_change,
+    update_user_can_approve as db_update_user_can_approve,
     update_user_portals as db_update_user_portals,
     update_user_role as db_update_user_role,
     update_user_status as db_update_user_status,
@@ -225,6 +226,8 @@ def get_users():
                     "role_label": ROLE_LABELS.get(
                         str(u.get("role", "")).strip().lower(), u.get("role", "")
                     ),
+                    "can_approve": bool(u.get("can_approve"))
+                    or str(u.get("role", "")).strip().lower() == "admin",
                     "last_activity": u["last_login"],
                     "allowed_portals": portals,
                     "portal_labels": [PORTAL_LABELS.get(p, p) for p in portals],
@@ -404,6 +407,45 @@ def update_user_role(user_id):
             f"Changed user {user_id} role to {new_role}",
         )
         return jsonify({"success": True, "message": f"Role updated to {new_role}"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@platform_admin_bp.route("/api/platform-admin/users/<int:user_id>/approve", methods=["PUT"])
+def update_user_approve(user_id):
+    """Toggle CM / change approver flag (Teams notify list + write gate)."""
+    user = get_current_user()
+    if not _can_access_user_admin(user):
+        return jsonify({"error": "Owner or NOC SYS access required"}), 403
+
+    try:
+        data = request.get_json() or {}
+        can_approve = bool(data.get("can_approve"))
+
+        targets = [u for u in get_all_users() if int(u["id"]) == int(user_id)]
+        if not targets:
+            return jsonify({"error": "User not found"}), 404
+        target = targets[0]
+        if str(target.get("role", "")).strip().lower() == "admin":
+            return jsonify({
+                "success": True,
+                "can_approve": True,
+                "message": "Owners are always approvers",
+            })
+
+        if not db_update_user_can_approve(user_id, can_approve):
+            return jsonify({"error": "User not found"}), 404
+
+        log_activity(
+            (user.get("id") if isinstance(user, dict) else user[0]),
+            "admin_change_approver",
+            f"Set user {user_id} can_approve={int(can_approve)}",
+        )
+        return jsonify({
+            "success": True,
+            "can_approve": can_approve,
+            "message": "Approver flag updated",
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

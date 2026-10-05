@@ -1,5 +1,5 @@
 """
-Conflict map UI and APIs (PCI reuse by distance + azimuth vs. bearing).
+Conflict map UI and APIs (PCI/PSC/BCCH reuse by distance + azimuth vs. bearing).
 """
 
 from __future__ import annotations
@@ -13,14 +13,17 @@ from flask import Blueprint, jsonify, render_template, request, send_file
 from modules.reports.routes import _coord_key, _elevation_for_points, format_user, get_current_user, login_required
 
 from .logic import (
+    DEFAULT_CONFLICT_MODE,
     DEFAULT_CONFLICT_STRICTNESS,
     _safe_float,
     apply_strictness_to_pairs,
+    conflict_mode_options_public,
     conflict_strictness_profiles_public,
     filter_conflict_rows,
     get_cached_conflict_base,
     get_cached_conflict_pairs,
     kmlline_style_id,
+    normalize_conflict_mode,
     normalize_conflict_tech,
     normalize_strictness,
     wedge_polygon_coords,
@@ -35,6 +38,26 @@ conflict_map_bp = Blueprint(
 )
 
 
+def _request_conflict_filters():
+    technology = str(request.args.get('technology', '4G') or '4G')
+    tech_norm = normalize_conflict_tech(technology)
+    strictness = normalize_strictness(request.args.get('strictness', DEFAULT_CONFLICT_STRICTNESS), tech_norm)
+    conflict_mode = normalize_conflict_mode(
+        request.args.get('conflict_mode', request.args.get('mode', DEFAULT_CONFLICT_MODE)),
+        tech_norm,
+    )
+    risk = str(request.args.get('risk', 'all') or 'all').strip().lower()
+    area_values = [str(v).strip() for v in request.args.getlist('area') if str(v).strip()]
+    if not area_values:
+        single = str(request.args.get('area', 'all') or 'all').strip()
+        if single:
+            area_values = [single]
+    # 2G is all L900 — band filter is ignored (always all).
+    band = 'all' if tech_norm == '2G' else str(request.args.get('band', 'all') or 'all').strip()
+    pci = str(request.args.get('pci', '') or '').strip()
+    return tech_norm, strictness, conflict_mode, risk, area_values, band, pci
+
+
 @conflict_map_bp.route('/conflict-map')
 @login_required
 def conflict_map_page():
@@ -45,19 +68,10 @@ def conflict_map_page():
 @conflict_map_bp.route('/api/conflict-map/data')
 @login_required
 def pci_conflicts_map_data():
-    technology = str(request.args.get('technology', '4G') or '4G')
-    strictness = normalize_strictness(request.args.get('strictness', DEFAULT_CONFLICT_STRICTNESS))
-    risk = str(request.args.get('risk', 'all') or 'all').strip().lower()
-    area_values = [str(v).strip() for v in request.args.getlist('area') if str(v).strip()]
-    if not area_values:
-        single = str(request.args.get('area', 'all') or 'all').strip()
-        if single:
-            area_values = [single]
-    band = str(request.args.get('band', 'all') or 'all').strip()
-    pci = str(request.args.get('pci', '') or '').strip()
+    tech_req, strictness, conflict_mode, risk, area_values, band, pci = _request_conflict_filters()
     include_elevation = str(request.args.get('include_elevation', '0')).strip().lower() in ('1', 'true', 'yes', 'on')
-    tech_req, base_rows, generated_at, refreshed = get_cached_conflict_base(technology, force_refresh=False)
-    rows = apply_strictness_to_pairs(base_rows, strictness)
+    _, base_rows, generated_at, refreshed = get_cached_conflict_base(tech_req, force_refresh=False)
+    rows = apply_strictness_to_pairs(base_rows, strictness, tech_req)
 
     filtered = filter_conflict_rows(
         rows,
@@ -65,9 +79,13 @@ def pci_conflicts_map_data():
         area_values=area_values,
         band=band,
         pci=pci or None,
+        conflict_mode=conflict_mode,
+        technology=tech_req,
     )
     areas = sorted({str(v) for r in base_rows for v in (r.get('a_area'), r.get('b_area')) if v})
     bands = sorted({str(v) for r in base_rows for v in (r.get('a_band'), r.get('b_band')) if v})
+    # Candidate pool respects mode (before risk/area/band filters).
+    mode_pool = filter_conflict_rows(rows, conflict_mode=conflict_mode, technology=tech_req)
 
     if include_elevation and filtered:
         pts = []
@@ -100,16 +118,21 @@ def pci_conflicts_map_data():
             'success': True,
             'technology': tech_req,
             'strictness': strictness,
+            'conflict_mode': conflict_mode,
             'pci': pci or None,
-            'candidate_total': len(base_rows),
-            'total': len(rows),
+            'candidate_total': len(mode_pool),
+            'total': len(mode_pool),
             'filtered_total': len(filtered),
             'filters': {
                 'areas': areas,
-                'bands': bands,
+                'bands': bands if tech_req != '2G' else [],
+                'band_required': tech_req != '2G',
                 'risk': ['High', 'Medium', 'Low'],
-                'strictness_profiles': conflict_strictness_profiles_public(),
+                'strictness_profiles': conflict_strictness_profiles_public(tech_req),
                 'strictness_default': DEFAULT_CONFLICT_STRICTNESS,
+                'conflict_modes': conflict_mode_options_public(tech_req),
+                'conflict_mode_default': DEFAULT_CONFLICT_MODE if tech_req == '2G' else 'co',
+                'code_label': 'BCCH' if tech_req == '2G' else 'PCI/PSC',
             },
             'cache': {
                 'generated_at': generated_at.isoformat() + 'Z' if generated_at else None,
@@ -126,7 +149,7 @@ def pci_conflicts_map_data():
 def refresh_conflict_map_data():
     payload = request.get_json(silent=True) or {}
     tech_req = str(payload.get('technology', 'all') or 'all').strip().upper()
-    targets = ['3G', '4G', '5G'] if tech_req == 'ALL' else [normalize_conflict_tech(tech_req)]
+    targets = ['2G', '3G', '4G', '5G'] if tech_req == 'ALL' else [normalize_conflict_tech(tech_req)]
     out = {}
     for t in targets:
         _, base_rows, generated_at, _ = get_cached_conflict_base(t, force_refresh=True)
@@ -140,17 +163,10 @@ def refresh_conflict_map_data():
 @conflict_map_bp.route('/api/conflict-map/export-kml')
 @login_required
 def export_conflict_map_kml():
-    technology = str(request.args.get('technology', '4G') or '4G')
-    strictness = normalize_strictness(request.args.get('strictness', DEFAULT_CONFLICT_STRICTNESS))
-    risk = str(request.args.get('risk', 'all') or 'all').strip().lower()
-    area_values = [str(v).strip() for v in request.args.getlist('area') if str(v).strip()]
-    if not area_values:
-        single = str(request.args.get('area', 'all') or 'all').strip()
-        if single:
-            area_values = [single]
-    band = str(request.args.get('band', 'all') or 'all').strip()
-    pci = str(request.args.get('pci', '') or '').strip()
-    tech_req, rows, _, _ = get_cached_conflict_pairs(technology, strictness, force_refresh=False)
+    tech_req, strictness, conflict_mode, risk, area_values, band, pci = _request_conflict_filters()
+    _, rows, _, _ = get_cached_conflict_pairs(
+        tech_req, strictness, force_refresh=False, conflict_mode=conflict_mode
+    )
 
     filtered = filter_conflict_rows(
         rows,
@@ -158,11 +174,14 @@ def export_conflict_map_kml():
         area_values=area_values,
         band=band,
         pci=pci or None,
+        conflict_mode=conflict_mode,
+        technology=tech_req,
     )
+    code_label = 'BCCH' if tech_req == '2G' else 'PCI/PSC'
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<kml xmlns="http://www.opengis.net/kml/2.2"><Document>',
-        f'<name>{xml_escape(f"Conflict_Map_{tech_req}_{strictness}")}</name>',
+        f'<name>{xml_escape(f"Conflict_Map_{tech_req}_{conflict_mode}_{strictness}")}</name>',
         '<Style id="risk-high"><LineStyle><color>ff2b2bc0</color><width>3</width></LineStyle><PolyStyle><color>552b2bc0</color></PolyStyle></Style>',
         '<Style id="risk-medium"><LineStyle><color>ff12a3f3</color><width>3</width></LineStyle><PolyStyle><color>5512a3f3</color></PolyStyle></Style>',
         '<Style id="risk-low"><LineStyle><color>ffb98029</color><width>3</width></LineStyle><PolyStyle><color>55b98029</color></PolyStyle></Style>',
@@ -174,9 +193,14 @@ def export_conflict_map_kml():
         if None in (a_lat, a_lng, b_lat, b_lng):
             continue
         style_id = kmlline_style_id(r.get('risk'))
-        name = xml_escape(f"{r.get('risk', 'Risk')} | {r.get('pci', '')} | {r.get('a_site', '')} -> {r.get('b_site', '')}")
+        ctype = str(r.get('conflict_type') or 'co')
+        name = xml_escape(
+            f"{r.get('risk', 'Risk')} | {ctype} | {r.get('pci', '')} | {r.get('a_site', '')} -> {r.get('b_site', '')}"
+        )
         desc = xml_escape(
             f"Technology: {r.get('technology', '-')}\n"
+            f"Type: {ctype}\n"
+            f"{code_label}: {r.get('pci', '-')}\n"
             f"Distance(km): {r.get('distance_km', '-')}\n"
             f"A: {r.get('a_name', '')} ({r.get('a_site', '')})\n"
             f"B: {r.get('b_name', '')} ({r.get('b_site', '')})"
@@ -202,6 +226,6 @@ def export_conflict_map_kml():
     return send_file(
         io.BytesIO(payload),
         as_attachment=True,
-        download_name=f'Conflict_Map_{tech_req}_{strictness}_{datetime.now().strftime("%Y%m%d_%H%M")}.kml',
+        download_name=f'Conflict_Map_{tech_req}_{conflict_mode}_{strictness}_{datetime.now().strftime("%Y%m%d_%H%M")}.kml',
         mimetype='application/vnd.google-earth.kml+xml',
     )

@@ -28,6 +28,13 @@ async function loadProfile() {
     document.getElementById('memberSince').textContent  = p.created_at ? p.created_at.slice(0, 10) : '—';
     document.getElementById('lastLogin').textContent    = p.last_login ? p.last_login.slice(0, 16) : '—';
     document.getElementById('activityCount').textContent = (p.activity_count || 0).toLocaleString();
+    const approverEl = document.getElementById('approverStatus');
+    if (approverEl) {
+        approverEl.textContent = p.can_approve ? 'Yes' : 'No';
+        approverEl.title = p.can_approve
+            ? 'You are flagged as a CM / change approver (assigned in Platform Admin).'
+            : 'Not an approver — ask an Owner to enable Approver in Platform Admin.';
+    }
     applyProfileEditPermissions();
 }
 

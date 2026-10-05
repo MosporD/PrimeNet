@@ -5,6 +5,11 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
 
+## 2026-10-05 (CM Approver status)
+
+- Done: Profile avatar card shows read-only **CM Approver** Yes/No from `can_approve` (Owners always Yes). Assignment stays in Platform Admin.
+- NEXT: None for this slice.
+
 ---
 ## 2026-09-29 (Postgres-only)
 

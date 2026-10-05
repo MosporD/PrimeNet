@@ -155,6 +155,14 @@ def create_base_app(
     def health_check():
         return jsonify({"status": "ok", "service": service_name}), 200
 
+    @app.route("/healthz")
+    @app.route("/api/healthz")
+    def healthz():
+        from core.platform_health import build_healthz_payload
+
+        payload, status = build_healthz_payload(service=service_name)
+        return jsonify(payload), status
+
     @app.route("/robots.txt")
     def robots_txt():
         body = (

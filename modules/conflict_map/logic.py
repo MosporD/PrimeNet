@@ -1,5 +1,6 @@
 """
-PCI / PSC directional conflict logic: co-band reuse, distance, azimuth vs. inter-site bearing.
+PCI / PSC / BCCH directional conflict logic: co-channel (and 2G adjacent) reuse,
+distance, azimuth vs. inter-site bearing.
 
 Tune thresholds in CONFLICT_STRICTNESS_PROFILES below.
 """
@@ -65,21 +66,56 @@ CONFLICT_STRICTNESS_PROFILES: dict[str, dict[str, object]] = {
         'az_near_deg': 65.0,
     },
 }
+
 DEFAULT_CONFLICT_STRICTNESS = 'standard'
+
+# 2G conflict pairing modes (selectable in UI / report).
+CONFLICT_MODES = ('co', 'adjacent', 'both')
+DEFAULT_CONFLICT_MODE = 'both'
+CONFLICT_MODE_LABELS = {
+    'co': 'Co-channel',
+    'adjacent': 'Adjacent (±1)',
+    'both': 'Co-channel + Adjacent',
+}
 
 
 def normalize_conflict_tech(technology: str = '4G') -> str:
     t = str(technology or '4G').strip().upper()
-    return t if t in ('3G', '4G', '5G') else '4G'
+    return t if t in ('2G', '3G', '4G', '5G') else '4G'
 
 
-def conflict_build_max_km() -> float:
-    return max(float(p['dist_max_km']) for p in CONFLICT_STRICTNESS_PROFILES.values())
+def normalize_conflict_mode(mode: str | None, technology: str | None = None) -> str:
+    """Return co | adjacent | both. Non-2G always co (adjacent BCCH is GSM-only)."""
+    tech = normalize_conflict_tech(technology or '4G')
+    if tech != '2G':
+        return 'co'
+    m = str(mode or '').strip().lower()
+    if m in CONFLICT_MODES:
+        return m
+    return DEFAULT_CONFLICT_MODE
 
 
-def normalize_strictness(slug: str | None) -> str:
+def conflict_mode_options_public(technology: str | None = None) -> list[dict[str, object]]:
+    tech = normalize_conflict_tech(technology or '4G')
+    if tech != '2G':
+        return [{'id': 'co', 'label': CONFLICT_MODE_LABELS['co']}]
+    return [{'id': k, 'label': CONFLICT_MODE_LABELS[k]} for k in CONFLICT_MODES]
+
+
+def strictness_profiles_for_tech(technology: str | None = None) -> dict[str, dict[str, object]]:
+    """Same distance/azimuth profiles for all RATs (including 2G)."""
+    return CONFLICT_STRICTNESS_PROFILES
+
+
+def conflict_build_max_km(technology: str | None = None) -> float:
+    profiles = strictness_profiles_for_tech(technology)
+    return max(float(p['dist_max_km']) for p in profiles.values())
+
+
+def normalize_strictness(slug: str | None, technology: str | None = None) -> str:
+    profiles = strictness_profiles_for_tech(technology)
     k = str(slug or '').strip().lower()
-    if k in CONFLICT_STRICTNESS_PROFILES:
+    if k in profiles:
         return k
     return DEFAULT_CONFLICT_STRICTNESS
 
@@ -91,6 +127,8 @@ def filter_conflict_rows(
     area_values: list[str] | None = None,
     band: str = 'all',
     pci: str | None = None,
+    conflict_mode: str | None = None,
+    technology: str | None = None,
 ) -> list[dict]:
     """Apply UI filters to strictness-scored conflict pair rows."""
     area_values = area_values or []
@@ -98,9 +136,15 @@ def filter_conflict_rows(
     band_norm = str(band or 'all').strip()
     risk_norm = str(risk or 'all').strip().lower()
     pci_norm = str(pci).strip() if pci not in (None, '') else ''
+    mode = normalize_conflict_mode(conflict_mode, technology)
 
     out: list[dict] = []
     for r in rows:
+        ctype = str(r.get('conflict_type') or 'co').strip().lower()
+        if mode == 'co' and ctype != 'co':
+            continue
+        if mode == 'adjacent' and ctype != 'adjacent':
+            continue
         if risk_norm in ('high', 'medium', 'low') and str(r.get('risk', '')).lower() != risk_norm:
             continue
         if area_set:
@@ -113,14 +157,21 @@ def filter_conflict_rows(
             band_b = str(r.get('b_band') or '')
             if band_norm not in (band_a, band_b):
                 continue
-        if pci_norm and str(r.get('pci') or '').strip() != pci_norm:
-            continue
+        if pci_norm:
+            pci_val = str(r.get('pci') or '').strip()
+            if ctype == 'adjacent':
+                parts = [p.strip() for p in pci_val.split('/') if p.strip()]
+                if pci_norm not in parts and pci_norm != pci_val:
+                    continue
+            elif pci_val != pci_norm:
+                continue
         out.append(dict(r))
     return out
 
 
-def _conflict_profile_thresholds(slug: str) -> dict[str, float]:
-    p = CONFLICT_STRICTNESS_PROFILES[normalize_strictness(slug)]
+def _conflict_profile_thresholds(slug: str, technology: str | None = None) -> dict[str, float]:
+    profiles = strictness_profiles_for_tech(technology)
+    p = profiles[normalize_strictness(slug, technology)]
     return {
         'dist_max_km': float(p['dist_max_km']),
         'dist_high_km': float(p['dist_high_km']),
@@ -145,9 +196,9 @@ def _conflict_risk_for_metrics(
     return 'Low'
 
 
-def conflict_strictness_profiles_public() -> list[dict[str, object]]:
+def conflict_strictness_profiles_public(technology: str | None = None) -> list[dict[str, object]]:
     out: list[dict[str, object]] = []
-    for key, p in CONFLICT_STRICTNESS_PROFILES.items():
+    for key, p in strictness_profiles_for_tech(technology).items():
         out.append({
             'id': key,
             'label': str(p.get('label', key.title())),
@@ -159,9 +210,13 @@ def conflict_strictness_profiles_public() -> list[dict[str, object]]:
     return out
 
 
-def apply_strictness_to_pairs(base_rows: list[dict], strictness: str | None) -> list[dict]:
-    slug = normalize_strictness(strictness)
-    thr = _conflict_profile_thresholds(slug)
+def apply_strictness_to_pairs(
+    base_rows: list[dict],
+    strictness: str | None,
+    technology: str | None = None,
+) -> list[dict]:
+    slug = normalize_strictness(strictness, technology)
+    thr = _conflict_profile_thresholds(slug, technology)
     dmax = thr['dist_max_km']
     out: list[dict] = []
     for r in base_rows:
@@ -175,7 +230,14 @@ def apply_strictness_to_pairs(base_rows: list[dict], strictness: str | None) -> 
         rr['strictness'] = slug
         out.append(rr)
     risk_rank = {'High': 0, 'Medium': 1, 'Low': 2}
-    out.sort(key=lambda x: (risk_rank.get(x['risk'], 9), x['distance_km'], str(x.get('pci') or '')))
+    out.sort(
+        key=lambda x: (
+            risk_rank.get(x['risk'], 9),
+            x['distance_km'],
+            str(x.get('conflict_type') or ''),
+            str(x.get('pci') or ''),
+        )
+    )
     return out
 
 
@@ -194,6 +256,18 @@ def _extract_coband_key(cell_name: str) -> str:
         return ''
     hits = re.findall(r'(\d+)', s)
     return hits[-1] if hits else ''
+
+
+def _parse_code_int(v) -> int | None:
+    try:
+        if v is None:
+            return None
+        s = str(v).strip()
+        if not s:
+            return None
+        return int(float(s))
+    except (TypeError, ValueError):
+        return None
 
 
 def _haversine_km(lat1, lon1, lat2, lon2) -> float | None:
@@ -243,8 +317,177 @@ def _meta():
     return reports_meta()
 
 
+def _pair_row(
+    *,
+    code_label: str,
+    coband: str,
+    conflict_type: str,
+    technology,
+    a: dict,
+    b: dict,
+    dist_km: float,
+    brg_ab: float | None,
+    brg_ba: float | None,
+    d_a: float | None,
+    d_b: float | None,
+) -> dict:
+    return {
+        'pci': code_label,
+        'coband': coband,
+        'conflict_type': conflict_type,
+        'technology': technology or a.get('technology') or b.get('technology'),
+        'distance_km': round(dist_km, 3),
+        'bearing_ab': None if brg_ab is None else round(brg_ab, 1),
+        'bearing_ba': None if brg_ba is None else round(brg_ba, 1),
+        'a_name': a.get('cell_name'),
+        'a_site': a.get('site_name') or a.get('site_id'),
+        'a_az': a.get('azimuth'),
+        'a_band': a.get('frequency_band'),
+        'a_area': a.get('cell_area') or a.get('site_area'),
+        'a_cluster': a.get('site_cluster'),
+        'a_lat': _safe_float(a.get('latitude')),
+        'a_lng': _safe_float(a.get('longitude')),
+        'a_code': _parse_code_int(a.get('pci')),
+        'b_name': b.get('cell_name'),
+        'b_site': b.get('site_name') or b.get('site_id'),
+        'b_az': b.get('azimuth'),
+        'b_band': b.get('frequency_band'),
+        'b_area': b.get('cell_area') or b.get('site_area'),
+        'b_cluster': b.get('site_cluster'),
+        'b_lat': _safe_float(b.get('latitude')),
+        'b_lng': _safe_float(b.get('longitude')),
+        'b_code': _parse_code_int(b.get('pci')),
+        'a_to_b_diff': None if d_a is None else round(d_a, 1),
+        'b_to_a_diff': None if d_b is None else round(d_b, 1),
+        '_d_a': d_a,
+        '_d_b': d_b,
+    }
+
+
+def _emit_pair_if_near(
+    pair_rows: list[dict],
+    *,
+    a: dict,
+    b: dict,
+    code_label: str,
+    coband: str,
+    conflict_type: str,
+    technology,
+    dist_build_max_km: float,
+) -> None:
+    if str(a.get('site_id') or '') == str(b.get('site_id') or ''):
+        return
+    dist_km = _haversine_km(a.get('latitude'), a.get('longitude'), b.get('latitude'), b.get('longitude'))
+    if dist_km is None or dist_km > dist_build_max_km:
+        return
+    brg_ab = _bearing_deg(a.get('latitude'), a.get('longitude'), b.get('latitude'), b.get('longitude'))
+    brg_ba = _bearing_deg(b.get('latitude'), b.get('longitude'), a.get('latitude'), a.get('longitude'))
+    d_a = _az_diff_deg(a.get('azimuth'), brg_ab)
+    d_b = _az_diff_deg(b.get('azimuth'), brg_ba)
+    pair_rows.append(
+        _pair_row(
+            code_label=code_label,
+            coband=coband,
+            conflict_type=conflict_type,
+            technology=technology,
+            a=a,
+            b=b,
+            dist_km=dist_km,
+            brg_ab=brg_ab,
+            brg_ba=brg_ba,
+            d_a=d_a,
+            d_b=d_b,
+        )
+    )
+
+
+def _build_2g_pairs(rows: list, dist_build_max_km: float) -> list[dict]:
+    """Co-channel (same BCCH) and adjacent (|ΔBCCH|==1). No band split — all L900."""
+    by_bcch: dict[int, list] = {}
+    for r in rows:
+        rd = dict(r)
+        code = _parse_code_int(rd.get('pci'))
+        if code is None:
+            continue
+        by_bcch.setdefault(code, []).append(rd)
+
+    pair_rows: list[dict] = []
+    # Co-channel
+    for bcch, grp in by_bcch.items():
+        if len({g.get('site_id') for g in grp}) < 2:
+            continue
+        for a, b in combinations(grp, 2):
+            _emit_pair_if_near(
+                pair_rows,
+                a=a,
+                b=b,
+                code_label=str(bcch),
+                coband='',
+                conflict_type='co',
+                technology='2G',
+                dist_build_max_km=dist_build_max_km,
+            )
+
+    # Adjacent: pair BCCH N with N+1 only (avoids double-count)
+    for bcch in sorted(by_bcch.keys()):
+        upper = bcch + 1
+        if upper not in by_bcch:
+            continue
+        grp_lo = by_bcch[bcch]
+        grp_hi = by_bcch[upper]
+        label = f'{bcch}/{upper}'
+        for a in grp_lo:
+            for b in grp_hi:
+                _emit_pair_if_near(
+                    pair_rows,
+                    a=a,
+                    b=b,
+                    code_label=label,
+                    coband='',
+                    conflict_type='adjacent',
+                    technology='2G',
+                    dist_build_max_km=dist_build_max_km,
+                )
+
+    pair_rows.sort(
+        key=lambda r: (r['distance_km'], str(r.get('conflict_type') or ''), str(r.get('pci') or ''))
+    )
+    return pair_rows
+
+
+def _build_pci_psc_pairs(rows: list, tech_req: str, dist_build_max_km: float) -> list[dict]:
+    """3G/4G/5G co-channel PCI/PSC reuse with coband key from cell name."""
+    groups: dict[tuple[str, str], list] = {}
+    for r in rows:
+        rd = dict(r)
+        coband = _extract_coband_key(rd.get('cell_name'))
+        if not coband:
+            continue
+        key = (str(rd.get('pci')).strip(), coband)
+        groups.setdefault(key, []).append(rd)
+
+    pair_rows: list[dict] = []
+    for (pci, coband), grp in groups.items():
+        if len({g['site_id'] for g in grp}) < 2:
+            continue
+        for a, b in combinations(grp, 2):
+            _emit_pair_if_near(
+                pair_rows,
+                a=a,
+                b=b,
+                code_label=pci,
+                coband=coband,
+                conflict_type='co',
+                technology=a.get('technology') or b.get('technology') or tech_req,
+                dist_build_max_km=dist_build_max_km,
+            )
+
+    pair_rows.sort(key=lambda r: (r['distance_km'], str(r.get('pci') or '')))
+    return pair_rows
+
+
 def build_conflict_base_pairs(technology: str = '4G'):
-    """Return pair geometry + co-PCI grouping; no risk tier (that depends on strictness)."""
+    """Return pair geometry + code grouping; no risk tier (that depends on strictness)."""
     conn = _meta()
     inv_union = _metadata_inventory_union_sql(conn)
     site_col_names = _metadata_table_columns(conn, 'sites')
@@ -255,7 +498,9 @@ def build_conflict_base_pairs(technology: str = '4G'):
     site_cluster_expr = f"s.{_sql_ident(site_cluster_col)}" if site_cluster_col else 'NULL'
 
     tech_req = normalize_conflict_tech(technology)
-    if tech_req == '3G':
+    if tech_req == '2G':
+        tech_filter = ('2G',)
+    elif tech_req == '3G':
         tech_filter = ('3G',)
     elif tech_req == '4G':
         tech_filter = ('4G-FDD', '4G-TDD')
@@ -289,63 +534,11 @@ def build_conflict_base_pairs(technology: str = '4G'):
     ).fetchall()
     conn.close()
 
-    groups: dict[tuple[str, str], list] = {}
-    for r in rows:
-        rd = dict(r)
-        coband = _extract_coband_key(rd.get('cell_name'))
-        if not coband:
-            continue
-        key = (str(rd.get('pci')).strip(), coband)
-        groups.setdefault(key, []).append(rd)
-
-    dist_build_max_km = conflict_build_max_km()
-    pair_rows = []
-    for (pci, coband), grp in groups.items():
-        if len({g['site_id'] for g in grp}) < 2:
-            continue
-        for a, b in combinations(grp, 2):
-            if str(a.get('site_id') or '') == str(b.get('site_id') or ''):
-                continue
-            dist_km = _haversine_km(a.get('latitude'), a.get('longitude'), b.get('latitude'), b.get('longitude'))
-            if dist_km is None or dist_km > dist_build_max_km:
-                continue
-            brg_ab = _bearing_deg(a.get('latitude'), a.get('longitude'), b.get('latitude'), b.get('longitude'))
-            brg_ba = _bearing_deg(b.get('latitude'), b.get('longitude'), a.get('latitude'), a.get('longitude'))
-            d_a = _az_diff_deg(a.get('azimuth'), brg_ab)
-            d_b = _az_diff_deg(b.get('azimuth'), brg_ba)
-
-            pair_rows.append(
-                {
-                    'pci': pci,
-                    'coband': coband,
-                    'technology': a.get('technology') or b.get('technology'),
-                    'distance_km': round(dist_km, 3),
-                    'bearing_ab': None if brg_ab is None else round(brg_ab, 1),
-                    'bearing_ba': None if brg_ba is None else round(brg_ba, 1),
-                    'a_name': a.get('cell_name'),
-                    'a_site': a.get('site_name') or a.get('site_id'),
-                    'a_az': a.get('azimuth'),
-                    'a_band': a.get('frequency_band'),
-                    'a_area': a.get('cell_area') or a.get('site_area'),
-                    'a_cluster': a.get('site_cluster'),
-                    'a_lat': _safe_float(a.get('latitude')),
-                    'a_lng': _safe_float(a.get('longitude')),
-                    'b_name': b.get('cell_name'),
-                    'b_site': b.get('site_name') or b.get('site_id'),
-                    'b_az': b.get('azimuth'),
-                    'b_band': b.get('frequency_band'),
-                    'b_area': b.get('cell_area') or b.get('site_area'),
-                    'b_cluster': b.get('site_cluster'),
-                    'b_lat': _safe_float(b.get('latitude')),
-                    'b_lng': _safe_float(b.get('longitude')),
-                    'a_to_b_diff': None if d_a is None else round(d_a, 1),
-                    'b_to_a_diff': None if d_b is None else round(d_b, 1),
-                    '_d_a': d_a,
-                    '_d_b': d_b,
-                }
-            )
-
-    pair_rows.sort(key=lambda r: (r['distance_km'], str(r.get('pci') or '')))
+    dist_build_max_km = conflict_build_max_km(tech_req)
+    if tech_req == '2G':
+        pair_rows = _build_2g_pairs(rows, dist_build_max_km)
+    else:
+        pair_rows = _build_pci_psc_pairs(rows, tech_req, dist_build_max_km)
     return tech_req, pair_rows
 
 
@@ -363,9 +556,17 @@ def get_cached_conflict_base(technology: str, force_refresh: bool = False):
     return tech_req, base_rows, generated_at, True
 
 
-def get_cached_conflict_pairs(technology: str, strictness: str | None = None, force_refresh: bool = False):
+def get_cached_conflict_pairs(
+    technology: str,
+    strictness: str | None = None,
+    force_refresh: bool = False,
+    conflict_mode: str | None = None,
+):
     tech, base_rows, gen, ref = get_cached_conflict_base(technology, force_refresh=force_refresh)
-    rows = apply_strictness_to_pairs(base_rows, strictness)
+    rows = apply_strictness_to_pairs(base_rows, strictness, tech)
+    mode = normalize_conflict_mode(conflict_mode, tech)
+    if mode != 'both':
+        rows = [r for r in rows if str(r.get('conflict_type') or 'co') == mode]
     return tech, rows, gen, ref
 
 
@@ -405,26 +606,34 @@ def wedge_polygon_coords(lat, lng, azimuth, width_deg=40.0, distance_km=0.8, seg
     return pts
 
 
-def generate_pci_conflicts_workbook(technology: str = '4G', strictness: str | None = None):
-    """Return (BytesIO xlsx, filename, row_count) for the PCI conflict Excel report."""
+def generate_pci_conflicts_workbook(
+    technology: str = '4G',
+    strictness: str | None = None,
+    conflict_mode: str | None = None,
+):
+    """Return (BytesIO xlsx, filename, row_count) for the conflict Excel report."""
     try:
         from openpyxl import Workbook
         from openpyxl.styles import Font, PatternFill
     except ImportError as e:
         raise RuntimeError('openpyxl required') from e
 
-    st = normalize_strictness(strictness)
     tech_req, base_rows, _, _ = get_cached_conflict_base(technology, force_refresh=False)
-    pair_rows = apply_strictness_to_pairs(base_rows, st)
+    st = normalize_strictness(strictness, tech_req)
+    mode = normalize_conflict_mode(conflict_mode, tech_req)
+    pair_rows = apply_strictness_to_pairs(base_rows, st, tech_req)
+    pair_rows = filter_conflict_rows(pair_rows, conflict_mode=mode, technology=tech_req)
 
     wb = Workbook()
     ws = wb.active
-    ws.title = 'PCI Conflicts'
+    code_hdr = 'BCCH' if tech_req == '2G' else 'PCI'
+    ws.title = 'BCCH Conflicts' if tech_req == '2G' else 'PCI Conflicts'
 
     headers = [
         'Strictness',
+        'Conflict_Type',
         'Risk',
-        'PCI',
+        code_hdr,
         'CoBand',
         'Distance_km',
         'Bearing_A_to_B_deg',
@@ -436,6 +645,7 @@ def generate_pci_conflicts_workbook(technology: str = '4G', strictness: str | No
         'Azimuth_A',
         'A_to_B_Azimuth_Diff_deg',
         'Band_A',
+        'Code_A',
         'Cell_B',
         'Site_B',
         'Area_B',
@@ -443,6 +653,7 @@ def generate_pci_conflicts_workbook(technology: str = '4G', strictness: str | No
         'Azimuth_B',
         'B_to_A_Azimuth_Diff_deg',
         'Band_B',
+        'Code_B',
     ]
     hdr_fill = PatternFill(start_color='C0392B', end_color='C0392B', fill_type='solid')
     hdr_font = Font(color='FFFFFF', bold=True)
@@ -451,13 +662,16 @@ def generate_pci_conflicts_workbook(technology: str = '4G', strictness: str | No
         cell.fill = hdr_fill
         cell.font = hdr_font
 
+    type_labels = {'co': 'Co-channel', 'adjacent': 'Adjacent'}
     for r in pair_rows:
+        ctype = str(r.get('conflict_type') or 'co')
         ws.append(
             [
                 r.get('strictness', st),
+                type_labels.get(ctype, ctype),
                 r['risk'],
                 r['pci'],
-                r['coband'],
+                r.get('coband') or '',
                 r['distance_km'],
                 r['bearing_ab'],
                 r['bearing_ba'],
@@ -468,6 +682,7 @@ def generate_pci_conflicts_workbook(technology: str = '4G', strictness: str | No
                 r['a_az'],
                 r['a_to_b_diff'],
                 r['a_band'],
+                r.get('a_code'),
                 r['b_name'],
                 r['b_site'],
                 r['b_area'],
@@ -475,11 +690,14 @@ def generate_pci_conflicts_workbook(technology: str = '4G', strictness: str | No
                 r['b_az'],
                 r['b_to_a_diff'],
                 r['b_band'],
+                r.get('b_code'),
             ]
         )
 
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
-    fn = f'PCI_Conflicts_{tech_req}_{st}_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
+    prefix = 'BCCH_Conflicts' if tech_req == '2G' else 'PCI_Conflicts'
+    mode_tag = mode if tech_req == '2G' else 'co'
+    fn = f'{prefix}_{tech_req}_{mode_tag}_{st}_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
     return buf, fn, len(pair_rows)

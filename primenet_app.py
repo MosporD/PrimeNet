@@ -328,6 +328,18 @@ def health_check():
     return jsonify(payload), 200
 
 
+@app.route('/healthz')
+@app.route('/api/healthz')
+def healthz():
+    """Readiness + Ops Panel data freshness (PM/neighbor) for n8n / operators."""
+    from core.platform_health import build_healthz_payload
+
+    payload, status = build_healthz_payload(
+        service=app.config.get('SERVICE_NAME', 'primenet'),
+    )
+    return jsonify(payload), status
+
+
 @app.route("/robots.txt")
 def robots_txt():
     """Public crawler policy — this platform is internal, not for indexing."""
@@ -359,6 +371,8 @@ def enforce_monthly_operator_activation():
         '/api/health',
         '/health/live',
         '/api/health/live',
+        '/healthz',
+        '/api/healthz',
         '/robots.txt',
     }
     if path in allowed:

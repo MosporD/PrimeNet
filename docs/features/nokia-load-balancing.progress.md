@@ -6,6 +6,12 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 ---
 
 ---
+## 2026-10-05 (CM write safety on OSS apply)
+
+- Done: Apply requires Analyze preview token (`preview_id`/`token`) + confirmation; enforces `NCM_CM_MAX_CELLS_PER_PUSH`.
+- Done: Before-snapshot of backup/plan XML under `var/cm_before_snapshots/nokia_load_balancing/`; `log_activity` audit on live apply.
+- NEXT: Smoke apply dry_run + over-cap rejection; browser-verify with NetAct when ready.
+
 ## 2026-09-29 (Postgres-only)
 
 - How it works on PG: catalogued stores open via `open_db` / `open_store` into Postgres schemas (`NCM_DATABASE_URL` required). No SQLite file fallback for this module's data plane.

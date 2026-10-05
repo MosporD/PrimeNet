@@ -323,11 +323,15 @@ def _generate_site_inventory(technology: str = 'all'):
     return buf, f"Cells_{tech_label}_{pull_date}.xlsx", total_rows
 
 
-def _generate_pci_conflicts(technology: str = '4G', strictness: str | None = None):
-    """Excel: co-band PCI conflict candidates (delegates to conflict_map.logic)."""
+def _generate_pci_conflicts(
+    technology: str = '4G',
+    strictness: str | None = None,
+    conflict_mode: str | None = None,
+):
+    """Excel: PCI/PSC/BCCH conflict candidates (delegates to conflict_map.logic)."""
     from modules.conflict_map.logic import generate_pci_conflicts_workbook
 
-    return generate_pci_conflicts_workbook(technology, strictness)
+    return generate_pci_conflicts_workbook(technology, strictness, conflict_mode)
 
 
 def _generate_config_versions_report():
@@ -567,7 +571,8 @@ def generate_report():
         elif report_type == 'pci_conflicts':
             technology = str(data.get('technology', '4G') or '4G')
             pci_strict = str(data.get('strictness', '') or '').strip() or None
-            buf, filename, row_count = generator(technology, pci_strict)
+            conflict_mode = str(data.get('conflict_mode', '') or '').strip() or None
+            buf, filename, row_count = generator(technology, pci_strict, conflict_mode)
         else:
             buf, filename, row_count = generator()
     except Exception as e:

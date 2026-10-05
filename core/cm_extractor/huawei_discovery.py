@@ -13,12 +13,18 @@ import time
 from pathlib import Path
 from typing import Any
 
+from core.cm_extractor.catalog_store import cm_catalog_path, cm_catalog_read_candidates
 from core.cm_extractor.http_util import request_json
 from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.huawei_mml_discovery import discover_commands_by_product
 
 _DISCOVERY_RETRY_STATUSES = {429, 500, 502, 503, 504}
-_CATALOG_PATH = Path(__file__).resolve().parents[2] / 'data' / 'huawei_u2020_ne_catalog.json'
+_CATALOG_FILENAME = 'huawei_u2020_ne_catalog.json'
+
+
+def _catalog_path() -> Path:
+    """Shared volume path so scheduler writes are visible to PrimeNet web."""
+    return cm_catalog_path(_CATALOG_FILENAME)
 
 _SITE_ID_RE = re.compile(r'^(\d+)-')
 _CACHE: dict[str, Any] = {
@@ -370,9 +376,10 @@ def save_discovery_to_disk(result: dict[str, Any] | None = None) -> Path:
         'fetched_at': _CACHE.get('fetched_at') or time.time(),
         'ne_count': len(_CACHE.get('nes') or []),
     }
-    _CATALOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    _CATALOG_PATH.write_text(json.dumps(payload, indent=2), encoding='utf-8')
-    return _CATALOG_PATH
+    path = _catalog_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
+    return path
 
 
 def load_discovery_from_disk() -> bool:
@@ -380,7 +387,8 @@ def load_discovery_from_disk() -> bool:
     if _CACHE.get('nes'):
         return True
 
-    candidates = [_CATALOG_PATH, Path('reports/huawei_u2020_discovery.json')]
+    candidates = list(cm_catalog_read_candidates(_CATALOG_FILENAME))
+    candidates.append(Path('reports/huawei_u2020_discovery.json'))
     for path in candidates:
         if not path.is_file():
             continue

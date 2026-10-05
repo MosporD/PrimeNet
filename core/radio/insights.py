@@ -58,6 +58,17 @@ def capacity_hotspots(*, vendor: str = "all", technology: str = "all", area: str
             source_url="/capacity-hotspots",
         ))
     rows = _limit(sorted(issues, key=lambda r: -float(r.get("score") or 0)), limit)
+    try:
+        from core.detector_events import emit_new_offenders
+
+        emit_new_offenders(
+            "capacity_hotspots",
+            rows,
+            event_kind="detector.capacity_hotspots.new",
+            critical_only=True,
+        )
+    except Exception:
+        pass
     return {"generated_at": utc_now_iso(), "summary": summarize(rows), "issues": rows}
 
 

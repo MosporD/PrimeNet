@@ -130,6 +130,17 @@ def detect_sleeping_cells(
     except Exception as exc:
         alarm_notes = [str(exc)]
 
+    try:
+        from core.detector_events import emit_new_offenders
+
+        emit_new_offenders(
+            "sleeping_cells",
+            issues,
+            event_kind="detector.sleeping_cells.new",
+        )
+    except Exception:
+        pass
+
     return {
         "generated_at": utc_now_iso(),
         "summary": summarize(issues),
