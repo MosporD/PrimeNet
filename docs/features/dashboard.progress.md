@@ -5,9 +5,16 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 **Parked:** Dark-mode contrast browser verify.
 
-**NEXT:** Browser verify Operations Panel health on server after deploy (PG size + latest timestamps).
+**NEXT:** Browser verify My Day light/dark on server after deploy; wire watchlist KPI movers when baselines exist.
 
 ---
+## 2026-10-05 (My Day personalization strip)
+
+- Done: My Day strip above pinned tools — Needs you (Optimization Cases), Since last visit, Watchlist (prefs, no fake KPIs), Continue (activity_log). First-run checklist + pin empty-state nudge.
+- API: `GET /api/dashboard/my-day` (`core/dashboard_my_day.py`). Honest empties only.
+- Files: `templates/dashboard.html`, `static/css/dashboard.css` v6.4, `static/js/dashboard_my_day.js`, `routes/auth_routes.py`.
+- NEXT: Browser verify My Day light/dark on server after deploy; wire watchlist KPI movers when baselines exist.
+
 ## 2026-10-04 (Constellation legend + vendor dials)
 
 - Done: Radar legend chips compact single-line (dot · RAT · count · subtitle). Vendor dials show `H%/N%` with subtle blink (respects reduced-motion).

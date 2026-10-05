@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — My Day mock</title>
+    <!-- Real PrimeNet styles (serve from repo root so these resolve) -->
+    <link rel="stylesheet" href="../static/css/common.css?v=2.3">
+    <link rel="stylesheet" href="../static/css/dashboard.css?v=6.3">
+    <link rel="stylesheet" href="../static/css/constellation.css?v=2.7">
+    <style>
+        /* ── Mock-only chrome ───────────────────────────────── */
+        .mock-banner {
+            position: sticky;
+            top: 0;
+            z-index: 10050;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px 16px;
+            padding: 8px 18px;
+            background: #1a3348;
+            color: #e8eef7;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .mock-banner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+        }
+
+        .mock-banner-actions label {
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #8fb3dd;
+            margin-right: 2px;
+        }
+
+        .mock-controls-row {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .mock-chip {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8eef7;
+            border-radius: 999px;
+            padding: 5px 11px;
+            font: inherit;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .mock-chip[aria-pressed="true"] {
+            background: #4f8db8;
+            border-color: #4f8db8;
+            color: #fff;
+        }
+
+        /* Override earlier floating panel rules if any remain unused */
+
+        /* Stub constellation without live JS canvas paint */
+        .mock-radar-placeholder {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(79, 141, 184, 0.2), transparent 55%),
+                repeating-radial-gradient(circle at 50% 50%, transparent 0 22px, rgba(79, 141, 184, 0.1) 22px 23px);
+            pointer-events: none;
+        }
+
+        .constellation-radar-wrap {
+            position: relative;
+            min-height: 220px;
+        }
+
+        .constellation-radar-wrap canvas {
+            display: none;
+        }
+
+        /* ── My Day strip (new surface on PrimeNet tokens) ── */
+        .my-day {
+            margin: 0 0 22px;
+        }
+
+        .my-day-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .day-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
+            padding: 18px 18px 16px;
+            background: white;
+            border: 1px solid #dde1e6;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            animation: dashboard-function-card-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .day-card:nth-child(1) { animation-delay: 0.08s; }
+        .day-card:nth-child(2) { animation-delay: 0.14s; }
+        .day-card:nth-child(3) { animation-delay: 0.2s; }
+        .day-card:nth-child(4) { animation-delay: 0.26s; }
+
+        .day-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(79, 141, 184, 0.2);
+            border-color: #9ec0d8;
+        }
+
+        .day-card.is-urgent {
+            border-color: #4f8db8;
+            background: linear-gradient(180deg, rgba(79, 141, 184, 0.08), #fff 40%);
+        }
+
+        body.dark-mode .day-card {
+            background: #182230;
+            border-color: #304258;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+            color: #e8eef7;
+        }
+
+        body.dark-mode .day-card.is-urgent {
+            background: linear-gradient(180deg, rgba(139, 193, 255, 0.12), #182230 42%);
+            border-color: #8bc1ff;
+        }
+
+        .day-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .day-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-size: 1em;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .day-card-title { color: #e8eef7; }
+
+        .day-card-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: rgba(79, 141, 184, 0.14);
+            color: #3a7399;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .day-card-icon {
+            background: rgba(139, 193, 255, 0.14);
+            color: #8bc1ff;
+        }
+
+        .day-card-icon svg { width: 16px; height: 16px; }
+
+        .day-badge {
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: #4f8db8;
+            color: #fff;
+            font-size: 0.8em;
+            font-weight: 700;
+            display: none;
+            place-items: center;
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+        }
+
+        body[data-state="busy"] .day-badge { display: inline-grid; }
+
+        body.dark-mode .day-badge {
+            background: #8bc1ff;
+            color: #0f1722;
+        }
+
+        .state-panel { display: none; }
+
+        body[data-state="busy"] .day-card .state-panel.state-busy,
+        body[data-state="empty"] .day-card .state-panel.state-empty,
+        body[data-state="first-run"] .day-card .state-panel.state-empty {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .day-card-body {
+            flex: 1;
+            font-size: 0.9em;
+            color: #5c6773;
+            line-height: 1.4;
+        }
+
+        body.dark-mode .day-card-body { color: #a9b7c9; }
+
+        .day-card-body strong { color: #2c3e50; font-weight: 700; }
+        body.dark-mode .day-card-body strong { color: #e8eef7; }
+
+        .day-metric {
+            margin: 0 0 8px;
+            font-size: 1.05em;
+            font-weight: 700;
+            color: #2c3e50;
+            font-variant-numeric: tabular-nums;
+        }
+
+        body.dark-mode .day-metric { color: #e8eef7; }
+
+        .day-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 7px;
+        }
+
+        .day-list li {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .day-list a {
+            font-weight: 600;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .day-list a:hover { color: #3a7399; text-decoration: underline; }
+        body.dark-mode .day-list a { color: #e8eef7; }
+        body.dark-mode .day-list a:hover { color: #8bc1ff; }
+
+        .day-list .meta {
+            font-size: 0.82em;
+            color: #7f8c8d;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .day-list .meta { color: #a9b7c9; }
+
+        .day-list .meta.spark-delta {
+            color: #c0392b;
+            font-weight: 700;
+        }
+
+        .day-list .meta.spark-delta.up { color: #27ae60; }
+
+        .day-empty { display: grid; gap: 8px; }
+
+        .day-cta {
+            margin-top: 12px;
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: #4f8db8;
+            color: #fff !important;
+            font-size: 0.82em;
+            font-weight: 700;
+            text-decoration: none !important;
+            border: 1px solid #4f8db8;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .day-cta:hover {
+            background: #3a7399;
+            border-color: #3a7399;
+            transform: translateY(-1px);
+        }
+
+        .day-cta-ghost {
+            background: transparent;
+            color: #3a7399 !important;
+            border-color: #9ec0d8;
+        }
+
+        .day-cta-ghost:hover {
+            background: rgba(79, 141, 184, 0.1);
+        }
+
+        body.dark-mode .day-cta {
+            background: #8bc1ff;
+            border-color: #8bc1ff;
+            color: #0f1722 !important;
+        }
+
+        body.dark-mode .day-cta-ghost {
+            background: transparent;
+            color: #8bc1ff !important;
+            border-color: #304258;
+        }
+
+        .spark-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 6px 0 4px;
+        }
+
+        .spark-row svg {
+            flex: 1;
+            height: 36px;
+            overflow: visible;
+        }
+
+        .spark-delta {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: #c0392b;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .spark-delta.up { color: #27ae60; }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .filter-chip {
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #dceaf4;
+            color: #5c6773;
+            font-size: 0.72em;
+            font-weight: 600;
+        }
+
+        body.dark-mode .filter-chip {
+            background: #223246;
+            color: #a9b7c9;
+        }
+
+        .continue-item {
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dde1e6;
+        }
+
+        .continue-item:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        body.dark-mode .continue-item { border-bottom-color: #304258; }
+
+        .continue-item a {
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .continue-item a:hover { color: #3a7399; text-decoration: underline; }
+        body.dark-mode .continue-item a { color: #e8eef7; }
+
+        /* First-run checklist */
+        .first-run {
+            display: none;
+            margin: 0 0 22px;
+            padding: 18px 20px;
+            background: white;
+            border: 1px solid #9ec0d8;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: dashboard-function-card-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        body[data-state="first-run"] .first-run { display: block; }
+
+        body.dark-mode .first-run {
+            background: #182230;
+            border-color: #304258;
+        }
+
+        .first-run h2 {
+            margin: 0 0 4px;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .first-run h2 { color: #e8eef7; }
+
+        .first-run > p {
+            margin: 0 0 12px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        body.dark-mode .first-run > p { color: #a9b7c9; }
+
+        .checklist {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f4f8fb;
+            border: 1px solid #dde1e6;
+        }
+
+        body.dark-mode .checklist li {
+            background: #223246;
+            border-color: #304258;
+        }
+
+        .check-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            border: 1.5px solid #9ec0d8;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .check-box {
+            background: #101b28;
+            border-color: #304258;
+        }
+
+        .checklist .step-body { flex: 1; min-width: 0; }
+
+        .checklist .step-body strong {
+            display: block;
+            font-size: 0.92em;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .checklist .step-body strong { color: #e8eef7; }
+
+        .checklist .step-body span {
+            font-size: 0.82em;
+            color: #7f8c8d;
+        }
+
+        body.dark-mode .checklist .step-body span { color: #a9b7c9; }
+
+        .checklist .step-link {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: #3a7399;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .checklist .step-link { color: #8bc1ff; }
+
+        /* Pin nudge uses dashboard search-card language */
+        .pin-nudge {
+            display: none;
+            margin-bottom: 20px;
+            padding: 18px 20px;
+            background: white;
+            border: 1px dashed #9ec0d8;
+            border-radius: 15px;
+        }
+
+        body.dark-mode .pin-nudge {
+            background: #182230;
+            border-color: #304258;
+        }
+
+        .pin-nudge h3 {
+            margin: 0 0 4px;
+            font-size: 1.05em;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .pin-nudge h3 { color: #e8eef7; }
+
+        .pin-nudge > p {
+            margin: 0 0 12px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        body.dark-mode .pin-nudge > p { color: #a9b7c9; }
+
+        .suggest-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .suggest-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #f4f8fb;
+            border: 1px solid #dde1e6;
+            text-decoration: none;
+            color: #2c3e50;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .suggest-card:hover {
+            border-color: #4f8db8;
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+
+        body.dark-mode .suggest-card {
+            background: #223246;
+            border-color: #304258;
+            color: #e8eef7;
+        }
+
+        .suggest-star {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: rgba(79, 141, 184, 0.14);
+            color: #4f8db8;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .suggest-star { color: #8bc1ff; }
+
+        .suggest-star svg { width: 14px; height: 14px; }
+
+        .suggest-card strong { display: block; font-size: 0.9em; }
+        .suggest-card span { font-size: 0.76em; color: #7f8c8d; }
+        body.dark-mode .suggest-card span { color: #a9b7c9; }
+
+        /* State: pinned vs nudge */
+        body[data-state="busy"] #dashboard-pinned-tools { display: block; }
+        body[data-state="busy"] .pin-nudge { display: none; }
+
+        body[data-state="empty"] #dashboard-pinned-tools,
+        body[data-state="first-run"] #dashboard-pinned-tools { display: none !important; }
+
+        body[data-state="empty"] .pin-nudge,
+        body[data-state="first-run"] .pin-nudge { display: block; }
+
+        .tile-stub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            opacity: 0.45;
+            pointer-events: none;
+            margin-top: 8px;
+        }
+
+        .tile-stub {
+            min-height: 100px;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode .tile-stub { background: #182230; }
+
+        @media (max-width: 900px) {
+            .my-day-grid,
+            .suggest-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .my-day-grid,
+            .suggest-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="has-constellation-bg" data-state="busy">
+    <div class="mock-banner" role="status">
+        <span><strong>MOCK</strong> — sample data · real PrimeNet CSS</span>
+        <div class="mock-banner-actions">
+            <label>Theme</label>
+            <div class="mock-controls-row" role="group" aria-label="Theme">
+                <button type="button" class="mock-chip" data-theme="light" aria-pressed="true">Light</button>
+                <button type="button" class="mock-chip" data-theme="dark" aria-pressed="false">Dark</button>
+            </div>
+            <label>State</label>
+            <div class="mock-controls-row" role="group" aria-label="Persona state">
+                <button type="button" class="mock-chip" data-state="busy" aria-pressed="true">Busy</button>
+                <button type="button" class="mock-chip" data-state="empty" aria-pressed="false">Empty</button>
+                <button type="button" class="mock-chip" data-state="first-run" aria-pressed="false">First-run</button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="primenet-bg-canvas" class="primenet-bg-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="brand-title">
+                        <img src="../static/images/favicon.png?v=4" alt="PrimeNet logo" class="brand-title-logo">
+                        <span class="brand-title-name">PrimeNet</span>
+                    </h1>
+                    <p class="brand-tagline">Radio Network Performance &amp; Configuration Platform</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="user-greeting" id="greeting-line">Welcome, <strong>Malek</strong></span>
+                        <div class="header-actions">
+                            <a href="#" class="btn-header" onclick="return false;">Settings</a>
+                            <button type="button" class="btn-header btn-header-outline" onclick="return false;">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <section class="constellation-deck constellation-deck-full" aria-label="Network constellation map">
+                <div class="constellation-radar-wrap">
+                    <canvas id="network-radar-canvas"></canvas>
+                    <div class="mock-radar-placeholder" aria-hidden="true"></div>
+                    <div class="radar-center-total map-total-badge">
+                        <strong>4,812</strong>
+                        <span>on-air sites</span>
+                    </div>
+                </div>
+                <div class="constellation-side">
+                    <div class="constellation-head">
+                        <div class="constellation-title"><span class="live-dot"></span>Zain Jordan Network</div>
+                        <div class="constellation-head-actions">
+                            <div class="constellation-clock">UTC+3 12:30:00</div>
+                            <button type="button" class="constellation-refresh-btn" disabled>Refresh</button>
+                        </div>
+                    </div>
+                    <div class="radar-legend" role="group" aria-label="Technology layers">
+                        <span style="font-size:0.86em;color:#7f8c8d;">Constellation stub — live radar stays on the real dashboard. My Day sits below the tools row.</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-tools-toolbar" aria-label="Dashboard module tools">
+                <div class="dashboard-tool-search-wrap global-search-wrap">
+                    <label class="dashboard-tool-search-label" for="dashboard-tool-search">Find anything</label>
+                    <input id="dashboard-tool-search" class="dashboard-tool-search" type="search"
+                           placeholder="Search tools, sites, cells, PCI, parameters…" disabled>
+                </div>
+                <div class="dashboard-layout-controls">
+                    <button type="button" class="dashboard-layout-toggle" aria-pressed="false" disabled>
+                        Customize layout
+                    </button>
+                </div>
+            </section>
+
+            <section class="first-run" aria-label="Getting started">
+                <h2>Get set up for your day</h2>
+                <p>Three steps for RF engineers. Linked to the onboarding course when this ships.</p>
+                <ol class="checklist">
+                    <li>
+                        <span class="check-box" aria-hidden="true"></span>
+                        <div class="step-body">
+                            <strong>Pin Sector Health</strong>
+                            <span>Keep your daily tools one click away</span>
+                        </div>
+                        <a class="step-link" href="#" onclick="return false;">Pin now</a>
+                    </li>
+                    <li>
+                        <span class="check-box" aria-hidden="true"></span>
+                        <div class="step-body">
+                            <strong>Set a watchlist</strong>
+                            <span>Cluster, region, or site list you own</span>
+                        </div>
+                        <a class="step-link" href="#" onclick="return false;">Choose area</a>
+                    </li>
+                    <li>
+                        <span class="check-box" aria-hidden="true"></span>
+                        <div class="step-body">
+                            <strong>Open a case</strong>
+                            <span>Track work through Optimization Cases</span>
+                        </div>
+                        <a class="step-link" href="#" onclick="return false;">Course: Cases</a>
+                    </li>
+                </ol>
+            </section>
+
+            <section class="my-day" aria-label="My Day">
+                <div class="dashboard-section-title-row">
+                    <h2>My Day</h2>
+                    <span id="my-day-sub">Personal to you · updated for this login</span>
+                </div>
+
+                <div class="my-day-grid">
+                    <article class="day-card is-urgent" id="card-needs">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M12 3 3 7.5 12 12l9-4.5L12 3Z"/>
+                                        <path d="M3 12.5 12 17l9-4.5"/>
+                                        <path d="M3 17.5 12 22l9-4.5"/>
+                                    </svg>
+                                </span>
+                                Needs you
+                            </h3>
+                            <span class="day-badge">4</span>
+                        </div>
+                        <div class="state-panel state-busy">
+                            <div class="day-card-body">
+                                <ul class="day-list">
+                                    <li><a href="#" onclick="return false;">Cases assigned</a><span class="meta">2 open</span></li>
+                                    <li><a href="#" onclick="return false;">Awaiting verification</a><span class="meta">1</span></li>
+                                    <li><a href="#" onclick="return false;">Approvals pending</a><span class="meta">1</span></li>
+                                </ul>
+                            </div>
+                            <a class="day-cta" href="#" onclick="return false;">Open Optimization Cases</a>
+                        </div>
+                        <div class="state-panel state-empty">
+                            <div class="day-card-body day-empty">
+                                <p class="day-metric">Clear</p>
+                                <p>Nothing assigned to you right now.</p>
+                            </div>
+                            <a class="day-cta day-cta-ghost" href="#" onclick="return false;">Browse cases</a>
+                        </div>
+                    </article>
+
+                    <article class="day-card">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <circle cx="12" cy="12" r="8"/>
+                                        <path d="M12 8v4.5l3 1.5"/>
+                                    </svg>
+                                </span>
+                                Since last visit
+                            </h3>
+                        </div>
+                        <div class="state-panel state-busy">
+                            <div class="day-card-body">
+                                <p class="day-metric">Away 18h</p>
+                                <ul class="day-list">
+                                    <li><span><strong>12</strong> new sleeping cells in Amman East</span></li>
+                                    <li><span><strong>3</strong> cases closed on your watch</span></li>
+                                    <li><span>Huawei 4G ETL finished <strong>06:10</strong></span></li>
+                                </ul>
+                            </div>
+                            <a class="day-cta day-cta-ghost" href="#" onclick="return false;">Review sleeping cells</a>
+                        </div>
+                        <div class="state-panel state-empty">
+                            <div class="day-card-body day-empty">
+                                <p>No network changes logged since your last visit.</p>
+                                <p>Last login was earlier today.</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="day-card">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M3 11.5 12 4l9 7.5"/>
+                                        <path d="M6 10.5V19h12v-8.5"/>
+                                        <path d="M10 19v-5h4v5"/>
+                                    </svg>
+                                </span>
+                                My watchlist
+                            </h3>
+                        </div>
+                        <div class="state-panel state-busy">
+                            <div class="day-card-body">
+                                <p><strong>Amman East</strong> · cluster · vs 7-day baseline</p>
+                                <div class="spark-row" aria-hidden="true">
+                                    <svg viewBox="0 0 120 36" preserveAspectRatio="none">
+                                        <polyline fill="none" stroke="#4f8db8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            points="0,22 12,20 24,24 36,18 48,16 60,19 72,12 84,14 96,8 108,10 120,6"/>
+                                        <polyline fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="3 3" opacity="0.7"
+                                            points="0,14 120,14"/>
+                                    </svg>
+                                    <span class="spark-delta">DL thr −6.2%</span>
+                                </div>
+                                <ul class="day-list">
+                                    <li><span>CSSR</span><span class="meta spark-delta up">+0.4 pp</span></li>
+                                    <li><span>Drop rate</span><span class="meta spark-delta">+0.2 pp</span></li>
+                                </ul>
+                            </div>
+                            <a class="day-cta" href="#" onclick="return false;">Open in Network Health</a>
+                        </div>
+                        <div class="state-panel state-empty">
+                            <div class="day-card-body day-empty">
+                                <p>Set a cluster, region, or site list to watch.</p>
+                                <p>Movers will show here against your baseline.</p>
+                            </div>
+                            <a class="day-cta" href="#" onclick="return false;">Set watchlist</a>
+                        </div>
+                    </article>
+
+                    <article class="day-card">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M5 12h12"/>
+                                        <path d="m12 6 6 6-6 6"/>
+                                    </svg>
+                                </span>
+                                Continue
+                            </h3>
+                        </div>
+                        <div class="state-panel state-busy">
+                            <div class="day-card-body">
+                                <div class="continue-item">
+                                    <a href="#" onclick="return false;">Performance Explorer</a>
+                                    <div class="filter-chips">
+                                        <span class="filter-chip">Huawei</span>
+                                        <span class="filter-chip">LTE</span>
+                                        <span class="filter-chip">Amman</span>
+                                    </div>
+                                </div>
+                                <div class="continue-item">
+                                    <a href="#" onclick="return false;">Sleeping Cell Detector</a>
+                                    <div class="filter-chips">
+                                        <span class="filter-chip">Amman East</span>
+                                        <span class="filter-chip">Last 24h</span>
+                                    </div>
+                                </div>
+                                <div class="continue-item">
+                                    <a href="#" onclick="return false;">Optimization Cases</a>
+                                    <div class="filter-chips">
+                                        <span class="filter-chip">Assigned to me</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="state-panel state-empty">
+                            <div class="day-card-body day-empty">
+                                <p>Tools you open will show up here.</p>
+                                <p>Last filters are restored so you skip the setup clicks.</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="dashboard-pinned-tools" id="dashboard-pinned-tools" aria-label="Pinned tools">
+                <div class="dashboard-section-title-row">
+                    <h2>Pinned Tools</h2>
+                    <span>Favorites saved to your profile</span>
+                </div>
+                <div class="function-grid pinned-tools-grid">
+                    <a href="#" class="function-card pinned-tool-card" onclick="return false;">
+                        <span class="favorite-toggle" aria-hidden="true">★</span>
+                        <div class="function-icon">📡</div>
+                        <div class="function-name">Sector Health</div>
+                    </a>
+                    <a href="#" class="function-card pinned-tool-card" onclick="return false;">
+                        <span class="favorite-toggle" aria-hidden="true">★</span>
+                        <div class="function-icon">💤</div>
+                        <div class="function-name">Sleeping Cells</div>
+                    </a>
+                    <a href="#" class="function-card pinned-tool-card" onclick="return false;">
+                        <span class="favorite-toggle" aria-hidden="true">★</span>
+                        <div class="function-icon">📋</div>
+                        <div class="function-name">Optimization Cases</div>
+                    </a>
+                </div>
+            </section>
+
+            <div class="pin-nudge" id="pin-nudge">
+                <h3>Pin the tools you use daily</h3>
+                <p>RF engineers in your role most often pin these three. Star any tool on the deck to keep it here.</p>
+                <div class="suggest-grid">
+                    <a class="suggest-card" href="#" onclick="return false;">
+                        <span class="suggest-star" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="m12 3.5 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16.2 7.2 18.4l.9-5.4-3.9-3.8 5.4-.8L12 3.5Z"/>
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Sector Health</strong>
+                            <span>Suggested for RF</span>
+                        </span>
+                    </a>
+                    <a class="suggest-card" href="#" onclick="return false;">
+                        <span class="suggest-star" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="m12 3.5 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16.2 7.2 18.4l.9-5.4-3.9-3.8 5.4-.8L12 3.5Z"/>
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Sleeping Cells</strong>
+                            <span>Suggested for RF</span>
+                        </span>
+                    </a>
+                    <a class="suggest-card" href="#" onclick="return false;">
+                        <span class="suggest-star" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="m12 3.5 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16.2 7.2 18.4l.9-5.4-3.9-3.8 5.4-.8L12 3.5Z"/>
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Optimization Cases</strong>
+                            <span>Suggested for RF</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="dashboard-primary-tabs" role="tablist" aria-label="Main sections">
+                <button type="button" role="tab" class="dashboard-primary-tab active" aria-selected="true">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">📈</span>
+                    <span class="dashboard-primary-tab-text">Performance</span>
+                    <span class="dashboard-primary-tab-desc">Analytics, maps &amp; reports</span>
+                </button>
+                <button type="button" role="tab" class="dashboard-primary-tab" aria-selected="false">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">⚙️</span>
+                    <span class="dashboard-primary-tab-text">Configuration</span>
+                    <span class="dashboard-primary-tab-desc">Parameters, XML &amp; tooling</span>
+                </button>
+                <button type="button" role="tab" class="dashboard-primary-tab" aria-selected="false">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">⚠</span>
+                    <span class="dashboard-primary-tab-text">Fault Management</span>
+                    <span class="dashboard-primary-tab-desc">Alarms, faults &amp; assurance</span>
+                </button>
+                <button type="button" role="tab" class="dashboard-primary-tab" aria-selected="false">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">📡</span>
+                    <span class="dashboard-primary-tab-text">Radio Optimization</span>
+                    <span class="dashboard-primary-tab-desc">RF, neighbors &amp; coverage</span>
+                </button>
+                <button type="button" role="tab" class="dashboard-primary-tab" aria-selected="false">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">🔗</span>
+                    <span class="dashboard-primary-tab-text">External Tools</span>
+                    <span class="dashboard-primary-tab-desc">OSS, NMS &amp; network portals</span>
+                </button>
+            </div>
+
+            <div class="tile-stub-grid" aria-hidden="true">
+                <div class="tile-stub"></div>
+                <div class="tile-stub"></div>
+                <div class="tile-stub"></div>
+                <div class="tile-stub"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../static/js/common.js"></script>
+    <script src="../static/js/constellation.js"></script>
+    <script>
+        (function () {
+            const body = document.body;
+            const greeting = document.getElementById('greeting-line');
+            const sub = document.getElementById('my-day-sub');
+            const needsCard = document.getElementById('card-needs');
+
+            const hour = new Date().getHours();
+            const hello = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+            greeting.innerHTML = hello + ', <strong>Malek</strong>';
+
+            function setTheme(theme) {
+                if (typeof _applyTheme === 'function') {
+                    _applyTheme(theme);
+                } else {
+                    body.classList.toggle('dark-mode', theme === 'dark');
+                    try {
+                        localStorage.setItem('primenet-theme', theme);
+                        localStorage.setItem('darkMode', theme === 'dark' ? 'true' : 'false');
+                    } catch (e) {}
+                }
+                document.querySelectorAll('[data-theme]').forEach((btn) => {
+                    btn.setAttribute('aria-pressed', String(btn.dataset.theme === theme));
+                });
+            }
+
+            function replayCardMotion() {
+                document.querySelectorAll('.day-card').forEach((card) => {
+                    card.style.animation = 'none';
+                    void card.offsetWidth;
+                    card.style.animation = '';
+                });
+            }
+
+            function setState(state) {
+                body.dataset.state = state;
+                document.querySelectorAll('.mock-chip[data-state]').forEach((btn) => {
+                    btn.setAttribute('aria-pressed', String(btn.dataset.state === state));
+                });
+
+                if (state === 'busy') {
+                    sub.textContent = 'Personal to you · updated for this login';
+                    needsCard.classList.add('is-urgent');
+                } else if (state === 'empty') {
+                    sub.textContent = 'Quiet day · cards stay honest when there is nothing to show';
+                    needsCard.classList.remove('is-urgent');
+                } else {
+                    sub.textContent = 'First visit setup · checklist + pin suggestions for RF';
+                    needsCard.classList.remove('is-urgent');
+                }
+                replayCardMotion();
+            }
+
+            document.querySelectorAll('[data-theme]').forEach((btn) => {
+                btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+            });
+            document.querySelectorAll('.mock-chip[data-state]').forEach((btn) => {
+                btn.addEventListener('click', () => setState(btn.dataset.state));
+            });
+
+            setTheme(localStorage.getItem('primenet-theme') === 'dark' ? 'dark' : 'light');
+            setState('busy');
+        })();
+    </script>
+</body>
+</html>

@@ -554,6 +554,23 @@ def dashboard_pm_health():
         return jsonify({'success': False, 'error': 'PM health check failed'}), 500
 
 
+@auth_bp.route('/api/dashboard/my-day', methods=['GET'])
+def dashboard_my_day():
+    """Personal My Day strip payload for the signed-in user."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        from core.dashboard_my_day import build_my_day
+
+        user_data = format_user_data(user) or {}
+        payload = build_my_day(user_data)
+        return jsonify({'success': True, **payload})
+    except Exception:
+        logger.exception('My Day payload failed')
+        return jsonify({'success': False, 'error': 'My Day unavailable'}), 500
+
+
 @auth_bp.route('/api/dashboard/neighbor-health', methods=['GET'])
 def dashboard_neighbor_health():
     """Neighbor database health (Owner / admin only)."""

@@ -27,7 +27,7 @@ Dated work log: [`dashboard.progress.md`](dashboard.progress.md). Do not duplica
 
 ## Plans
 
-UI unification in `checklist.md` mostly checked (2026-09-06). Remaining: browser verify light/dark on dashboard + one radio + one standalone + login.
+My Day watchlist KPI movers (real baselines) + richer “since last visit” deltas from sleeping-cells / ETL once those signals are queryable per user region. Browser verify light/dark My Day on server after deploy.
 
 ## Watch-outs
 

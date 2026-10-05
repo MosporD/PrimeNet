@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.3">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=6.3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=6.4">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.7">
 </head>
 <body class="has-constellation-bg">
@@ -123,6 +123,74 @@
                 </div>
             </section>
 
+            <section class="dashboard-first-run" id="dashboard-first-run" aria-label="Getting started" hidden>
+                <h2>Get set up for your day</h2>
+                <p>Three steps to make the dashboard personal. Linked to the onboarding course when available.</p>
+                <ol class="checklist" data-first-run-steps></ol>
+            </section>
+
+            <section class="my-day" id="dashboard-my-day" aria-label="My Day">
+                <div class="dashboard-section-title-row">
+                    <h2>My Day</h2>
+                    <span id="my-day-sub">Loading your day…</span>
+                </div>
+                <div class="my-day-grid">
+                    <article class="day-card" id="my-day-needs">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 3 7.5 12 12l9-4.5L12 3Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 17.5 12 22l9-4.5"/></svg>
+                                </span>
+                                Needs you
+                            </h3>
+                            <span class="day-badge" data-my-day-badge hidden>0</span>
+                        </div>
+                        <div data-my-day-body>
+                            <div class="day-card-body day-empty"><p>Loading…</p></div>
+                        </div>
+                    </article>
+                    <article class="day-card" id="my-day-since">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.5"/></svg>
+                                </span>
+                                Since last visit
+                            </h3>
+                        </div>
+                        <div data-my-day-body>
+                            <div class="day-card-body day-empty"><p>Loading…</p></div>
+                        </div>
+                    </article>
+                    <article class="day-card" id="my-day-watchlist">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M6 10.5V19h12v-8.5"/><path d="M10 19v-5h4v5"/></svg>
+                                </span>
+                                My watchlist
+                            </h3>
+                        </div>
+                        <div data-my-day-body>
+                            <div class="day-card-body day-empty"><p>Loading…</p></div>
+                        </div>
+                    </article>
+                    <article class="day-card" id="my-day-continue">
+                        <div class="day-card-top">
+                            <h3 class="day-card-title">
+                                <span class="day-card-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h12"/><path d="m12 6 6 6-6 6"/></svg>
+                                </span>
+                                Continue
+                            </h3>
+                        </div>
+                        <div data-my-day-body>
+                            <div class="day-card-body day-empty"><p>Loading…</p></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
             <section class="dashboard-pinned-tools" id="dashboard-pinned-tools" aria-label="Pinned tools" hidden>
                 <div class="dashboard-section-title-row">
                     <h2>Pinned Tools</h2>
@@ -130,6 +198,12 @@
                 </div>
                 <div class="function-grid pinned-tools-grid" id="pinned-tools-grid"></div>
             </section>
+
+            <div class="dashboard-pin-nudge" id="dashboard-pin-nudge" hidden>
+                <h3>Pin the tools you use daily</h3>
+                <p>Star tools on the deck to keep them here. Suggestions below are common for your role.</p>
+                <div class="suggest-grid" data-pin-suggestions></div>
+            </div>
 
             <div class="dashboard-primary-tabs" role="tablist" aria-label="Main sections">
                 <button type="button" role="tab" class="dashboard-primary-tab active" id="tab-performance"
@@ -706,6 +780,7 @@
     <script id="radar-bootstrap-data" type="application/json">{{ {'columns': tech_site_columns, 'total': total_sites} | tojson }}</script>
     <script src="{{ url_for('static', filename='js/constellation.js') }}?v=2.2"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
+    <script src="{{ url_for('static', filename='js/dashboard_my_day.js') }}?v=1.0"></script>
     <script>
         // Jordan (UTC+3) clock — inlined so a stale cached common.js cannot break it.
         function formatDashboardClock(date = new Date()) {
@@ -1463,6 +1538,9 @@
             }
             applyDashboardLayout();
             applyDashboardDefaultTab();
+            if (typeof loadDashboardMyDay === 'function') {
+                loadDashboardMyDay();
+            }
         }
 
         async function saveDashboardPreferences() {
@@ -1586,6 +1664,9 @@
             applyDashboardFavorites();
             try {
                 await saveDashboardPreferences();
+                if (typeof loadDashboardMyDay === 'function') {
+                    loadDashboardMyDay();
+                }
             } catch (err) {
                 alert(err.message || 'Could not save favorite');
                 await loadDashboardPreferences();
@@ -2174,9 +2255,5 @@
             setTimeout(showOnce, 700);
         });
     </script>
-
-<!-- impeccable-live-start -->
-<script src="http://localhost:8400/live.js?token=1fdcccc0-d74b-4537-ad5c-5b4f96468180"></script>
-<!-- impeccable-live-end -->
 </body>
 </html>

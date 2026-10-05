@@ -6,7 +6,28 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
 
-**NEXT:** Push/deploy neighbor lock split + rebuild **scheduler** on 97.141; confirm neighbor runs at `:30` while watcher is active.
+**NEXT:** Rebuild/restart scheduler + primenet; one Nokia CM inventory refresh; confirm new MRBTS (e.g. 54792) in RET Management; then Teams webhook + Approver smoke.
+
+## 2026-10-05 (Dashboard My Day)
+
+- My Day strip on `/dashboard`: cases needs-you, since-last-visit, watchlist prefs, continue-from activity. See dashboard progress.
+
+## 2026-10-05 (CM catalogs on shared volume)
+
+- Scheduler Nokia/Huawei discovery catalogs now persist under `NCM_DATA_ROOT/var/cm_catalogs/` so web sees refreshes. See sync / ret-management progress.
+
+## 2026-10-05 (Teams-only events + Approver profiles)
+
+- Events post MessageCards to Teams (`NCM_TEAMS_WEBHOOK_URL`); embed approver emails from users DB.
+- Per-user `can_approve` assigned in Platform Admin; shown on Profile; RET live apply gated. See platform-admin / user-profile / sync progress.
+
+## 2026-10-05 (Conflict Map 2G BCCH)
+
+- Conflict Map + Conflict Report: 2G co-channel and adjacent (±1), selectable; shared strictness profiles; no band split. See conflict-map / reports progress.
+
+## 2026-10-05 (Push alerts + CM write safety)
+
+- Platform events → n8n webhook; `/healthz` + stale emit; Sleeping Cells / Capacity Hotspots fingerprints; RET + Nokia LB preview/cap/snapshot/audit. See sync / ret-management / nokia-load-balancing progress.
 
 ## 2026-10-04 (Neighbor sync no longer shares watcher lock)
 
