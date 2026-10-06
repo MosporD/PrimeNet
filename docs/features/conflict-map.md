@@ -7,7 +7,7 @@ PCI / PSC / BCCH conflicts on a map (co-channel; 2G also adjacent ±1).
 | Route | `/conflict-map` |
 | Module | `modules/conflict_map/` (`routes.py`, `logic.py`) |
 | Access | all |
-| Version | V1.1 |
+| Version | V1.2 |
 
 ## Purpose
 
@@ -17,8 +17,9 @@ Detect identifier collisions from metadata (and related CM fields).
 
 Logic in `logic.py`. Map UI is local templates/static. Do not fold this into Network Map without an explicit ask.
 
-- **3G/4G/5G:** co-channel PCI/PSC reuse with coband key from cell name; standard distance/azimuth strictness.
+- **3G/4G/5G:** co-channel PCI/PSC reuse with coband key from cell name; distance/azimuth strictness (plus **Distance only**).
 - **2G:** BCCH co-channel and adjacent (±1 ARFCN), selectable mode; no band split (all L900); same strictness profiles as 3G–5G.
+- Strictness **Distance only**: ignore antenna azimuth; High/Medium/Low by inter-site distance only.
 - Study scope: **on-air cells only** (vendor active_state / admin_state via `metadata_active_sql`).
 - Excel report: Reports → Conflict Report (same engine).
 

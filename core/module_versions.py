@@ -15,7 +15,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "cell-heatmap": "V1.0",
     "sector-health": "V1.6",
     "sector-health-all": "V1.6",
-    "conflict-map": "V1.1",
+    "conflict-map": "V1.2",
     "adjacency-gis": "V1.7",
     "femto-pm": "V1.0",
     "son-analytics": "V1.1",

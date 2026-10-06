@@ -5,6 +5,11 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
 
+## 2026-10-06 (Distance only strictness)
+
+- Done: New strictness profile `distance` — azimuth ignored; High ≤4 km, Medium to midpoint, Low within 6 km. Map + Conflict Report. Version V1.2.
+- NEXT: Smoke Distance only on `/conflict-map` vs Standard for the same PCI/BCCH.
+
 ## 2026-10-05 (active-only study)
 
 - Done: Conflict pairs use on-air cells only (`PER_TABLE_ACTIVE_WHERE` / vendor active_state·admin_state). Dropped null/empty status pass-through that was letting Inactive 2G/3G/4G/5G into the pool.

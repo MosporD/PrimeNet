@@ -30,12 +30,18 @@ _CONFLICT_CACHE: dict[str, dict] = {}
 # Pair candidates are built once up to max(dist_max_km) across all profiles, then
 # each profile filters by its own dist_max_km and recomputes High / Medium / Low.
 #
-# Rules (same for every profile; only thresholds change):
+# Directional profiles (azimuth matters):
 #   - d_a / d_b = |azimuth − geographic bearing toward the other site| (wrapped 0–180°).
 #   - "Aligned" for a side means d ≤ az_near_deg.
 #   - High: both sides aligned AND distance_km ≤ dist_high_km.
 #   - Medium: both aligned OR exactly one side aligned (and not High).
 #   - Low: neither side aligned.
+#
+# Distance-only profile (`distance_only: True`):
+#   - Azimuth is ignored.
+#   - High: distance_km ≤ dist_high_km.
+#   - Medium: between dist_high_km and midpoint(dist_high_km, dist_max_km).
+#   - Low: remainder within dist_max_km.
 CONFLICT_STRICTNESS_PROFILES: dict[str, dict[str, object]] = {
     'strict': {
         'label': 'Strict',
@@ -64,6 +70,14 @@ CONFLICT_STRICTNESS_PROFILES: dict[str, dict[str, object]] = {
         'dist_max_km': 10.0,
         'dist_high_km': 7.0,
         'az_near_deg': 65.0,
+    },
+    'distance': {
+        'label': 'Distance only',
+        'hint': 'Ignore antenna azimuth — draw and score pairs by inter-site distance only (6 km cap, High ≤4 km).',
+        'dist_max_km': 6.0,
+        'dist_high_km': 4.0,
+        'az_near_deg': 0.0,
+        'distance_only': True,
     },
 }
 
@@ -169,13 +183,14 @@ def filter_conflict_rows(
     return out
 
 
-def _conflict_profile_thresholds(slug: str, technology: str | None = None) -> dict[str, float]:
+def _conflict_profile_thresholds(slug: str, technology: str | None = None) -> dict[str, float | bool]:
     profiles = strictness_profiles_for_tech(technology)
     p = profiles[normalize_strictness(slug, technology)]
     return {
         'dist_max_km': float(p['dist_max_km']),
         'dist_high_km': float(p['dist_high_km']),
-        'az_near_deg': float(p['az_near_deg']),
+        'az_near_deg': float(p.get('az_near_deg') or 0.0),
+        'distance_only': bool(p.get('distance_only')),
     }
 
 
@@ -183,10 +198,20 @@ def _conflict_risk_for_metrics(
     dist_km: float,
     d_a: float | None,
     d_b: float | None,
-    thresholds: dict[str, float],
+    thresholds: dict[str, float | bool],
 ) -> str:
-    az = float(thresholds['az_near_deg'])
     dh = float(thresholds['dist_high_km'])
+    if thresholds.get('distance_only'):
+        # Azimuth ignored — tier purely by distance within the profile radius.
+        if dist_km <= dh:
+            return 'High'
+        dmax = float(thresholds['dist_max_km'])
+        mid = (dh + dmax) / 2.0
+        if dist_km <= mid:
+            return 'Medium'
+        return 'Low'
+
+    az = float(thresholds['az_near_deg'])
     both_aligned = d_a is not None and d_b is not None and d_a <= az and d_b <= az
     one_aligned = (d_a is not None and d_a <= az) or (d_b is not None and d_b <= az)
     if both_aligned and dist_km <= dh:
@@ -199,13 +224,15 @@ def _conflict_risk_for_metrics(
 def conflict_strictness_profiles_public(technology: str | None = None) -> list[dict[str, object]]:
     out: list[dict[str, object]] = []
     for key, p in strictness_profiles_for_tech(technology).items():
+        distance_only = bool(p.get('distance_only'))
         out.append({
             'id': key,
             'label': str(p.get('label', key.title())),
             'hint': str(p.get('hint', '')),
             'dist_max_km': float(p['dist_max_km']),
             'dist_high_km': float(p['dist_high_km']),
-            'az_near_deg': float(p['az_near_deg']),
+            'az_near_deg': None if distance_only else float(p.get('az_near_deg') or 0.0),
+            'distance_only': distance_only,
         })
     return out
 

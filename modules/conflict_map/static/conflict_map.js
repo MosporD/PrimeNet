@@ -178,12 +178,14 @@ function refillStrictnessSelect(profiles, defaultId) {
     sel.innerHTML =
         '<option value="" disabled>Select strictness</option>' +
         profiles
-            .map(
-                (p) =>
-                    `<option value="${attrEscape(p.id)}" title="${attrEscape(p.hint)} (${attrEscape(
-                        p.dist_max_km
-                    )} km max, ±${attrEscape(p.az_near_deg)}°)">${attrEscape(p.label)}</option>`
-            )
+            .map((p) => {
+                const azBit = p.distance_only
+                    ? 'distance only'
+                    : `±${attrEscape(p.az_near_deg)}°`;
+                return `<option value="${attrEscape(p.id)}" title="${attrEscape(p.hint)} (${attrEscape(
+                    p.dist_max_km
+                )} km max, ${azBit})">${attrEscape(p.label)}</option>`;
+            })
             .join('');
     const pick = current && [...sel.options].some((o) => o.value === current) ? current : defaultId || '';
     if (pick && [...sel.options].some((o) => o.value === pick)) sel.value = pick;
