@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}?v=1.5">
+    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}?v=1.7">
 </head>
 <body class="reports-page">
 <div class="container">
@@ -25,51 +25,83 @@
 
     <main class="main-content">
 
-        <!-- Report Type Cards -->
         <section class="section">
             <h2>Generate Report</h2>
-            <p class="section-description">Click a report type to generate and download an Excel file instantly.</p>
-            <div class="report-options-row">
-                <label for="site-inventory-tech">Site Inventory Technology:</label>
-                <select id="site-inventory-tech">
-                    <option value="all" selected>All Technologies</option>
-                    <option value="2G">2G</option>
-                    <option value="3G">3G</option>
-                    <option value="4G">4G (FDD + TDD)</option>
-                    <option value="5G">5G</option>
-                </select>
-            </div>
-            <div class="report-options-row">
-                <label for="pci-conflict-tech">Conflict Technology:</label>
-                <select id="pci-conflict-tech">
-                    <option value="4G" selected>4G</option>
-                    <option value="2G">2G (BCCH)</option>
-                    <option value="3G">3G</option>
-                    <option value="5G">5G</option>
-                </select>
-                <label for="pci-conflict-mode" id="pci-conflict-mode-label" style="display:none">2G type:</label>
-                <select id="pci-conflict-mode" style="display:none" title="2G: co-channel and/or adjacent (±1 ARFCN)">
-                    <option value="both" selected>Co-channel + Adjacent</option>
-                    <option value="co">Co-channel</option>
-                    <option value="adjacent">Adjacent (±1)</option>
-                </select>
-                <label for="pci-conflict-strictness">Strictness:</label>
-                <select id="pci-conflict-strictness" title="Same profiles as Conflict Map — Distance only ignores azimuth">
-                    <option value="strict">Strict</option>
-                    <option value="standard" selected>Standard</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="relaxed">Relaxed</option>
-                    <option value="distance">Distance only</option>
-                </select>
-            </div>
+            <p class="section-description">Click a report card to open its settings, then generate. Configuration Log has no settings and runs immediately.</p>
             <div class="report-cards" id="reportCards">
                 <!-- Populated by JS -->
+            </div>
+
+            <div id="report-settings" class="conflict-report-settings" hidden>
+                <div class="conflict-report-settings-head">
+                    <h3 id="report-settings-title">Report settings</h3>
+                    <button type="button" class="btn-secondary small-btn" id="report-settings-cancel">Close</button>
+                </div>
+
+                <div id="settings-panel-site_inventory" class="report-settings-panel" hidden>
+                    <p class="conflict-report-hint">Choose which technologies to include in the inventory workbook.</p>
+                    <div class="conflict-report-fields">
+                        <label for="site-inventory-tech">Technology</label>
+                        <select id="site-inventory-tech">
+                            <option value="all" selected>All Technologies</option>
+                            <option value="2G">2G</option>
+                            <option value="3G">3G</option>
+                            <option value="4G">4G (FDD + TDD)</option>
+                            <option value="5G">5G</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="settings-panel-pci_conflicts" class="report-settings-panel" hidden>
+                    <p class="conflict-report-hint">
+                        Leave distance or azimuth empty to ignore that filter.
+                        When azimuth is set, <strong>both</strong> cells must be within that many degrees of the bearing to each other (1–180°).
+                    </p>
+                    <div class="conflict-report-fields">
+                        <label for="pci-conflict-tech">Technology</label>
+                        <select id="pci-conflict-tech">
+                            <option value="4G" selected>4G</option>
+                            <option value="2G">2G (BCCH)</option>
+                            <option value="3G">3G</option>
+                            <option value="5G">5G</option>
+                        </select>
+
+                        <label for="pci-conflict-mode" id="pci-conflict-mode-label" style="display:none">2G conflict type</label>
+                        <select id="pci-conflict-mode" style="display:none" title="2G: co-channel and/or adjacent (±1 ARFCN)">
+                            <option value="both" selected>Co-channel + Adjacent</option>
+                            <option value="co">Co-channel</option>
+                            <option value="adjacent">Adjacent (±1)</option>
+                        </select>
+
+                        <label for="pci-conflict-distance">Max distance (km)</label>
+                        <input id="pci-conflict-distance" type="number" min="0.1" step="any" placeholder="Empty = any distance" inputmode="decimal">
+
+                        <label for="pci-conflict-azimuth">Azimuth window (°)</label>
+                        <input id="pci-conflict-azimuth" type="number" min="1" max="180" step="1" placeholder="Empty = ignore azimuth (1–180)" inputmode="numeric">
+                    </div>
+                </div>
+
+                <div id="settings-panel-sector_health" class="report-settings-panel" hidden>
+                    <p class="conflict-report-hint">
+                        Active only = on-air cells. All cells = every configured layer with Active/Inactive status marked.
+                    </p>
+                    <div class="conflict-report-fields">
+                        <label for="sector-health-scope">Cell scope</label>
+                        <select id="sector-health-scope">
+                            <option value="active" selected>Active cells only</option>
+                            <option value="all">All cells (Active + Inactive)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="conflict-report-actions">
+                    <button type="button" class="btn-primary" id="report-settings-generate">Generate report</button>
+                </div>
             </div>
         </section>
 
         <div id="generateStatus" class="status-message"></div>
 
-        <!-- Archive -->
         <section class="section">
             <div class="section-header">
                 <h2>Report Archive</h2>
@@ -84,7 +116,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
-<script src="{{ url_for('reports.static', filename='reports.js') }}?v=1.9"></script>
+<script src="{{ url_for('reports.static', filename='reports.js') }}?v=2.2"></script>
 <script>
 async function logout() {
     if (confirm('Logout?')) {

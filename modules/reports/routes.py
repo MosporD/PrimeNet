@@ -325,13 +325,51 @@ def _generate_site_inventory(technology: str = 'all'):
 
 def _generate_pci_conflicts(
     technology: str = '4G',
-    strictness: str | None = None,
     conflict_mode: str | None = None,
+    distance_km: float | None = None,
+    azimuth_deg: float | None = None,
 ):
-    """Excel: PCI/PSC/BCCH conflict candidates (delegates to conflict_map.logic)."""
+    """Excel: PCI/PSC/BCCH conflicts with optional distance (km) and azimuth (°) filters."""
     from modules.conflict_map.logic import generate_pci_conflicts_workbook
 
-    return generate_pci_conflicts_workbook(technology, strictness, conflict_mode)
+    return generate_pci_conflicts_workbook(
+        technology=technology,
+        conflict_mode=conflict_mode,
+        distance_km=distance_km,
+        azimuth_deg=azimuth_deg,
+    )
+
+
+def _parse_optional_conflict_distance(raw) -> float | None:
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    if not s:
+        return None
+    try:
+        val = float(s)
+    except (TypeError, ValueError) as e:
+        raise ValueError('Distance must be a number in km') from e
+    if val <= 0:
+        raise ValueError('Distance must be greater than 0 km')
+    if val > 5000:
+        raise ValueError('Distance must be at most 5000 km')
+    return val
+
+
+def _parse_optional_conflict_azimuth(raw) -> float | None:
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    if not s:
+        return None
+    try:
+        val = float(s)
+    except (TypeError, ValueError) as e:
+        raise ValueError('Azimuth must be a number between 1 and 180') from e
+    if val < 1 or val > 180:
+        raise ValueError('Azimuth must be between 1 and 180 degrees')
+    return val
 
 
 def _generate_config_versions_report():
@@ -546,6 +584,14 @@ REPORT_TYPES = {
     'sector_health_all':  ('Sector Health (All Cells)', _generate_sector_health_all),
 }
 
+# Shown as dashboard cards (sector_health_all is a settings choice under Sector Health).
+REPORT_CARD_TYPES = (
+    'site_inventory',
+    'pci_conflicts',
+    'config_versions',
+    'sector_health',
+)
+
 # Legacy report type id from before rename
 _REPORT_TYPE_ALIASES = {'sector_coverage': 'sector_health'}
 
@@ -570,9 +616,18 @@ def generate_report():
             buf, filename, row_count = generator(technology)
         elif report_type == 'pci_conflicts':
             technology = str(data.get('technology', '4G') or '4G')
-            pci_strict = str(data.get('strictness', '') or '').strip() or None
             conflict_mode = str(data.get('conflict_mode', '') or '').strip() or None
-            buf, filename, row_count = generator(technology, pci_strict, conflict_mode)
+            try:
+                distance_km = _parse_optional_conflict_distance(data.get('distance_km'))
+                azimuth_deg = _parse_optional_conflict_azimuth(data.get('azimuth_deg'))
+            except ValueError as e:
+                return jsonify({'error': str(e)}), 400
+            buf, filename, row_count = generator(
+                technology,
+                conflict_mode,
+                distance_km,
+                azimuth_deg,
+            )
         else:
             buf, filename, row_count = generator()
     except Exception as e:
@@ -666,5 +721,9 @@ def delete_report(report_id):
 def report_types():
     return jsonify({
         'success': True,
-        'types': [{'id': k, 'label': v[0]} for k, v in REPORT_TYPES.items()]
+        'types': [
+            {'id': k, 'label': REPORT_TYPES[k][0]}
+            for k in REPORT_CARD_TYPES
+            if k in REPORT_TYPES
+        ],
     })

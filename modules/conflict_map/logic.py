@@ -400,12 +400,14 @@ def _emit_pair_if_near(
     coband: str,
     conflict_type: str,
     technology,
-    dist_build_max_km: float,
+    dist_build_max_km: float | None,
 ) -> None:
     if str(a.get('site_id') or '') == str(b.get('site_id') or ''):
         return
     dist_km = _haversine_km(a.get('latitude'), a.get('longitude'), b.get('latitude'), b.get('longitude'))
-    if dist_km is None or dist_km > dist_build_max_km:
+    if dist_km is None:
+        return
+    if dist_build_max_km is not None and dist_km > float(dist_build_max_km):
         return
     brg_ab = _bearing_deg(a.get('latitude'), a.get('longitude'), b.get('latitude'), b.get('longitude'))
     brg_ba = _bearing_deg(b.get('latitude'), b.get('longitude'), a.get('latitude'), a.get('longitude'))
@@ -428,7 +430,7 @@ def _emit_pair_if_near(
     )
 
 
-def _build_2g_pairs(rows: list, dist_build_max_km: float) -> list[dict]:
+def _build_2g_pairs(rows: list, dist_build_max_km: float | None) -> list[dict]:
     """Co-channel (same BCCH) and adjacent (|ΔBCCH|==1). No band split — all L900."""
     by_bcch: dict[int, list] = {}
     for r in rows:
@@ -482,7 +484,7 @@ def _build_2g_pairs(rows: list, dist_build_max_km: float) -> list[dict]:
     return pair_rows
 
 
-def _build_pci_psc_pairs(rows: list, tech_req: str, dist_build_max_km: float) -> list[dict]:
+def _build_pci_psc_pairs(rows: list, tech_req: str, dist_build_max_km: float | None) -> list[dict]:
     """3G/4G/5G co-channel PCI/PSC reuse with coband key from cell name."""
     groups: dict[tuple[str, str], list] = {}
     for r in rows:
@@ -513,8 +515,19 @@ def _build_pci_psc_pairs(rows: list, tech_req: str, dist_build_max_km: float) ->
     return pair_rows
 
 
-def build_conflict_base_pairs(technology: str = '4G'):
-    """Return pair geometry + code grouping; no risk tier (that depends on strictness)."""
+def build_conflict_base_pairs(
+    technology: str = '4G',
+    *,
+    dist_max_km: float | None = None,
+    unlimited_distance: bool = False,
+):
+    """Return pair geometry + code grouping; no risk tier (that depends on strictness).
+
+    Distance cap:
+      - default: max across strictness profiles for the technology
+      - ``dist_max_km``: explicit cap in km
+      - ``unlimited_distance=True``: no distance filter (report use)
+    """
     conn = _meta()
     inv_union = _metadata_inventory_union_sql(conn, active_only=True)
     site_col_names = _metadata_table_columns(conn, 'sites')
@@ -557,7 +570,12 @@ def build_conflict_base_pairs(technology: str = '4G'):
     ).fetchall()
     conn.close()
 
-    dist_build_max_km = conflict_build_max_km(tech_req)
+    if unlimited_distance:
+        dist_build_max_km: float | None = None
+    elif dist_max_km is not None:
+        dist_build_max_km = float(dist_max_km)
+    else:
+        dist_build_max_km = conflict_build_max_km(tech_req)
     if tech_req == '2G':
         pair_rows = _build_2g_pairs(rows, dist_build_max_km)
     else:
@@ -631,21 +649,51 @@ def wedge_polygon_coords(lat, lng, azimuth, width_deg=40.0, distance_km=0.8, seg
 
 def generate_pci_conflicts_workbook(
     technology: str = '4G',
-    strictness: str | None = None,
     conflict_mode: str | None = None,
+    distance_km: float | None = None,
+    azimuth_deg: float | None = None,
+    strictness: str | None = None,  # unused — kept for call-site compat
 ):
-    """Return (BytesIO xlsx, filename, row_count) for the conflict Excel report."""
+    """Excel conflict report with optional distance (km) and azimuth (°) filters.
+
+    Empty/None filters are not applied. Azimuth, when set, requires *both* sides'
+    azimuth-vs-bearing difference ≤ the threshold (1–180).
+    """
     try:
         from openpyxl import Workbook
         from openpyxl.styles import Font, PatternFill
     except ImportError as e:
         raise RuntimeError('openpyxl required') from e
 
-    tech_req, base_rows, _, _ = get_cached_conflict_base(technology, force_refresh=False)
-    st = normalize_strictness(strictness, tech_req)
+    tech_req = normalize_conflict_tech(technology)
     mode = normalize_conflict_mode(conflict_mode, tech_req)
-    pair_rows = apply_strictness_to_pairs(base_rows, st, tech_req)
-    pair_rows = filter_conflict_rows(pair_rows, conflict_mode=mode, technology=tech_req)
+
+    dist_filter = float(distance_km) if distance_km is not None else None
+    az_filter = float(azimuth_deg) if azimuth_deg is not None else None
+
+    if dist_filter is not None:
+        _, pair_rows = build_conflict_base_pairs(tech_req, dist_max_km=dist_filter)
+    else:
+        _, pair_rows = build_conflict_base_pairs(tech_req, unlimited_distance=True)
+
+    out_rows: list[dict] = []
+    for r in pair_rows:
+        ctype = str(r.get('conflict_type') or 'co').strip().lower()
+        if mode == 'co' and ctype != 'co':
+            continue
+        if mode == 'adjacent' and ctype != 'adjacent':
+            continue
+        dist = r.get('distance_km')
+        if dist_filter is not None and (dist is None or float(dist) > dist_filter):
+            continue
+        if az_filter is not None:
+            da = r.get('_d_a')
+            db = r.get('_d_b')
+            if da is None or db is None:
+                continue
+            if float(da) > az_filter or float(db) > az_filter:
+                continue
+        out_rows.append({k: v for k, v in r.items() if not str(k).startswith('_')})
 
     wb = Workbook()
     ws = wb.active
@@ -653,9 +701,9 @@ def generate_pci_conflicts_workbook(
     ws.title = 'BCCH Conflicts' if tech_req == '2G' else 'PCI Conflicts'
 
     headers = [
-        'Strictness',
+        'Filter_Distance_km',
+        'Filter_Azimuth_deg',
         'Conflict_Type',
-        'Risk',
         code_hdr,
         'CoBand',
         'Distance_km',
@@ -686,13 +734,15 @@ def generate_pci_conflicts_workbook(
         cell.font = hdr_font
 
     type_labels = {'co': 'Co-channel', 'adjacent': 'Adjacent'}
-    for r in pair_rows:
+    dist_label = dist_filter if dist_filter is not None else 'any'
+    az_label = az_filter if az_filter is not None else 'any'
+    for r in out_rows:
         ctype = str(r.get('conflict_type') or 'co')
         ws.append(
             [
-                r.get('strictness', st),
+                dist_label,
+                az_label,
                 type_labels.get(ctype, ctype),
-                r['risk'],
                 r['pci'],
                 r.get('coband') or '',
                 r['distance_km'],
@@ -722,5 +772,21 @@ def generate_pci_conflicts_workbook(
     buf.seek(0)
     prefix = 'BCCH_Conflicts' if tech_req == '2G' else 'PCI_Conflicts'
     mode_tag = mode if tech_req == '2G' else 'co'
-    fn = f'{prefix}_{tech_req}_{mode_tag}_{st}_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
-    return buf, fn, len(pair_rows)
+    dist_tag = f'd{dist_filter:g}km' if dist_filter is not None else 'dAny'
+    az_tag = f'az{az_filter:g}' if az_filter is not None else 'azAny'
+    fn = f'{prefix}_{tech_req}_{mode_tag}_{dist_tag}_{az_tag}_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
+    return buf, fn, len(out_rows)
+
+
+# Kept for compatibility; dual pack replaced by UI distance/azimuth settings.
+BCCH_DUAL_AZ_MAX_DEG = 50.0
+
+
+def generate_bcch_conflict_dual_workbook():
+    """Deprecated: use generate_pci_conflicts_workbook with distance/azimuth filters."""
+    return generate_pci_conflicts_workbook(
+        technology='2G',
+        conflict_mode='both',
+        distance_km=None,
+        azimuth_deg=None,
+    )

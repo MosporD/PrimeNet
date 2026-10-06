@@ -10,7 +10,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "performance-explorer-plus": "V1.0",
     "network-map": "V1.0",
     "neighbor-analysis": "V1.0",
-    "reports": "V1.4",
+    "reports": "V1.6",
     "power-bi": "V1.0",
     "cell-heatmap": "V1.0",
     "sector-health": "V1.6",

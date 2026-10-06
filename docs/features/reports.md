@@ -7,7 +7,7 @@ Report builder / archive.
 | Route | `/reports` |
 | Module | `modules/reports/` (`routes.py`, `metadata_helpers.py`, `sector_coverage_data.py`) |
 | Access | all |
-| Version | V1.3 |
+| Version | V1.6 |
 
 ## Purpose
 
@@ -17,7 +17,7 @@ Build downloadable performance reports from metadata + PM; archive rows live in 
 
 App-table writes go through `connect_app()` / `execute_query` (Postgres-safe). Sector coverage is metadata, not Sleeping Cells overlay.
 
-Conflict Report delegates to `conflict_map.logic` (PCI/PSC/BCCH; 2G supports co/adjacent mode).
+Settings → Generate for Site Inventory (technology), Conflict Report (tech / 2G mode / optional distance km / optional azimuth 1–180° both sides), and Sector Health (Active only vs All cells). Empty Conflict filters = ignore. Configuration Log still generates immediately.
 
 ## Progress
 
