@@ -26,7 +26,6 @@ CATALOG = ROOT / 'data' / 'huawei_u2020_ne_catalog.json'
 
 
 def _nbi_open(host: str, port: int, timeout: float = 8) -> bool:
-    sock = socket.create_connection
     try:
         with socket.create_connection((host, port), timeout=timeout):
             return True

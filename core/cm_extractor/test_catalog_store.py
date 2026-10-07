@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
 
 from core.cm_extractor.catalog_store import cm_catalog_path, cm_catalog_read_candidates
 

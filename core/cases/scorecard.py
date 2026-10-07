@@ -205,9 +205,6 @@ def build_scorecard(
         baseline_signals.append(_signal_from_pm_row(pm_row))
 
     has_execution = bool(str(execution_ref or "").strip())
-    now = datetime.now(timezone.utc)
-    post_elapsed = (now - anchor).total_seconds() / 86400.0
-    post_ready = has_execution and post_elapsed >= 0.0  # allow same-day pull after execute
 
     controls = _control_neighbors(cells_n, limit=config.CONTROL_NEIGHBOR_LIMIT)
 

@@ -705,7 +705,7 @@ def reset_user_password(user_id: int, new_password: str, *, force_password_chang
         SET password_hash = ?, password_changed_at = ?, force_password_change = ?
         WHERE id = ?
         ''',
-        (password_hash, datetime.now(), int(bool(force_password_change)), user_id),
+        (password_hash, datetime.now(), bool(force_password_change), user_id),
     )
     affected = cursor.rowcount
     conn.commit()

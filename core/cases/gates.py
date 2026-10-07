@@ -6,7 +6,6 @@ import re
 from typing import Any
 
 from core.cases import identity, store
-from core.cases.config import STATES
 
 
 _TOKEN = re.compile(r"[a-z0-9_]{3,}")

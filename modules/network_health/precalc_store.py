@@ -5,8 +5,12 @@ from __future__ import annotations
 import json
 import os
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 from sync_config import NH_PRECALC_DB
+
+if TYPE_CHECKING:
+    import sqlite3
 
 from . import config as cfg
 

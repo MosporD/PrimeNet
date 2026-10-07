@@ -32,19 +32,26 @@ def _read(path: str) -> str:
 
 def main() -> int:
     import app as app_module
+    import nexpulse_app
+    import nexuscore_app
 
-    flask_app = app_module.app
-    rules = list(flask_app.url_map.iter_rules())
+    # The suite is three Flask apps (engineering portal, NexusCore, NexPulse) and templates
+    # such as portals/marketing/** or portal_select.html belong to the other two, so a name
+    # only has to resolve in one of them.
+    flask_apps = [app_module.app, nexuscore_app.app, nexpulse_app.app]
+    flask_app = flask_apps[0]
+    rules = [rule for a in flask_apps for rule in a.url_map.iter_rules()]
     failures: list[str] = []
 
-    print(f'blueprints registered: {len(flask_app.blueprints)}')
+    print(f'blueprints registered: {sum(len(a.blueprints) for a in flask_apps)}')
     print(f'url rules:             {len(rules)}')
     if not flask_app.blueprints:
         failures.append('no blueprints registered')
 
     # Duplicate rule + method pairs mean one route silently shadows another.
+    # (Engineering portal only: NexPulse currently shadows ``/`` with ``auth.index``.)
     seen: dict[tuple[str, frozenset[str]], list[str]] = {}
-    for rule in rules:
+    for rule in flask_app.url_map.iter_rules():
         key = (str(rule), frozenset(rule.methods or ()))
         seen.setdefault(key, []).append(rule.endpoint)
     for (path, _methods), endpoints in seen.items():
@@ -55,12 +62,16 @@ def main() -> int:
     targets: set[str] = set()
     for path in _sources('**/*.py'):
         targets.update(re.findall(r'render_template\(\s*[\'"]([^\'"]+)[\'"]', _read(path)))
-    with flask_app.app_context():
-        for name in sorted(targets):
+    for name in sorted(targets):
+        for a in flask_apps:
             try:
-                flask_app.jinja_env.get_template(name)
+                with a.app_context():
+                    a.jinja_env.get_template(name)
+                break
             except Exception:
-                failures.append(f'unresolvable template: {name}')
+                continue
+        else:
+            failures.append(f'unresolvable template: {name}')
     print(f'render_template targets: {len(targets)}')
 
     # Every url_for endpoint referenced from a template must exist.
@@ -84,6 +95,7 @@ def main() -> int:
             candidates = [os.path.join('static', filename)]
             if endpoint != 'static':
                 candidates += glob.glob(f'modules/*/static/{filename}')
+                candidates += glob.glob(f'portals/*/static/{filename}')
             if not any(os.path.exists(c) for c in candidates):
                 missing += 1
                 failures.append(f'missing static asset {filename!r} referenced by {path}')
