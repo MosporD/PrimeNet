@@ -1,4 +1,4 @@
-"""Unit tests for PM Plus parser, ingest, KPI, rollup (SQLite)."""
+"""Unit tests for PM Plus parser, ingest, KPI, rollup (Postgres)."""
 
 from __future__ import annotations
 
@@ -8,11 +8,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-# Isolate SQLite before importing pm_plus config consumers
 _TMP = tempfile.mkdtemp(prefix="pm_plus_test_")
-os.environ["PM_PLUS_SQLITE_PATH"] = str(Path(_TMP) / "test.db")
 os.environ.pop("PM_PLUS_DATABASE_URL", None)
-os.environ.pop("NCM_DATABASE_URL", None)
 
 from core.pm_plus import config  # noqa: E402
 from core.pm_plus.file_meta import parse_filename  # noqa: E402
@@ -36,9 +33,9 @@ class PmPlusTests(unittest.TestCase):
         cls.gz = gz
         cls.result = ingest_local_file(gz, host="test", stream="14", bucket="b1")
 
-    def test_backend_sqlite(self):
-        self.assertFalse(config.use_postgres())
-        self.assertEqual(self.result["backend"], "sqlite")
+    def test_backend_postgres(self):
+        self.assertTrue(config.use_postgres())
+        self.assertEqual(self.result["backend"], "postgres")
 
     def test_parse_counts(self):
         parsed = parse_file(SAMPLE)

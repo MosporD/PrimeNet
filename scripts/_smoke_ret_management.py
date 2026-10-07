@@ -113,7 +113,7 @@ def _check_page(s: requests.Session) -> None:
         "/ret-management/static/ret_hologram.js?v=2.0",
         "/ret-management/static/ret_management.js?v=1.18",
     ):
-        ar = _get(s, asset.split("?")[0])
+        _get(s, asset.split("?")[0])
         # query stripped — flask ignores unknown qs; hit with qs too
         ar2 = s.get(f"{s.base}{asset}", timeout=60)
         ok = ar2.status_code == 200 and len(ar2.content) > 500

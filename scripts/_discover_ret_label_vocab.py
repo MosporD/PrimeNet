@@ -34,7 +34,6 @@ from core.cm_extractor.extraction import build_huawei_client, build_nokia_client
 from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.nokia_semantics import (
     build_mo_path,
-    query_parameters_individually,
     query_selected_parameters,
 )
 from modules.ret_management import logic as ret_logic

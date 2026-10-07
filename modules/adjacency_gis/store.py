@@ -5,9 +5,13 @@ from __future__ import annotations
 import json
 import os
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 from typing import Any
 
 from sync_config import ADJACENCY_GIS_DB
+
+if TYPE_CHECKING:
+    import sqlite3
 
 _STORE_DB = ADJACENCY_GIS_DB
 _STORE_DIR = os.path.dirname(_STORE_DB)

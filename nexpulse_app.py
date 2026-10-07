@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 
-from flask import redirect, request
+from flask import redirect
 
 from core.platform.base_app import create_base_app, run_dev_server
 from core.platform.identity import create_identity_blueprint

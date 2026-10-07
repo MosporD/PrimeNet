@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from contextlib import contextmanager
 from typing import Any, Iterator
 
@@ -23,7 +24,23 @@ def connect(*, dict_rows: bool = True) -> Iterator[Any]:
         conn.close()
 
 
+_NAMED_PARAM = re.compile(r"(?<!:):([A-Za-z_][A-Za-z0-9_]*)")
+
+
+def _positional(sql: str, params: dict) -> tuple[str, tuple]:
+    """Rewrite ``:name`` placeholders to ``?`` (the Postgres adapter only understands those)."""
+    values: list[Any] = []
+
+    def _sub(match: re.Match) -> str:
+        values.append(params[match.group(1)])
+        return "?"
+
+    return _NAMED_PARAM.sub(_sub, sql), tuple(values)
+
+
 def execute(conn, sql: str, params: tuple | list | dict | None = None):
+    if isinstance(params, dict):
+        sql, params = _positional(sql, params)
     cur = conn.cursor()
     cur.execute(sql, params or ())
     return cur

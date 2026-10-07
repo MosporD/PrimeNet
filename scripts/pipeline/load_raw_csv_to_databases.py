@@ -23,7 +23,6 @@ from __future__ import annotations
 import hashlib
 import argparse
 import os
-import warnings
 import re
 import sqlite3
 import sys
@@ -1239,7 +1238,7 @@ def _load_folder_tabular_to_db(
                 if use_chunked:
                     table = _canonical_table_for_label(label, fn, scope=scope)
                     if not table:
-                        reason = f"could not infer technology for canonical table"
+                        reason = "could not infer technology for canonical table"
                         print(f"[{label}] failed {fn}: {reason}")
                         last_fail_reason = f"[{label}] failed {fn}: {reason}"
                         failed += 1
@@ -1249,7 +1248,7 @@ def _load_folder_tabular_to_db(
                     df = _read_tabular_as_is(full_path)
                     table = _canonical_table_for_label(label, fn, list(df.columns), scope=scope)
                     if label != "metadata" and not table:
-                        reason = f"could not infer technology for canonical table"
+                        reason = "could not infer technology for canonical table"
                         print(f"[{label}] failed {fn}: {reason}")
                         last_fail_reason = f"[{label}] failed {fn}: {reason}"
                         failed += 1

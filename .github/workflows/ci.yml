@@ -24,10 +24,26 @@ jobs:
   test:
     name: pytest
     runs-on: ubuntu-latest
+    # The runtime is Postgres-only, so the unit tests need a database too.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: primenet
+          POSTGRES_PASSWORD: primenet_ci
+          POSTGRES_DB: primenet
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U primenet -d primenet"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       # Keep the runner away from checked-in database files; conftest.py supplies
       # the activation/bootstrap flags the suite needs.
       NCM_DATA_ROOT: ${{ github.workspace }}/.ci-data
+      NCM_DATABASE_URL: postgresql://primenet:primenet_ci@127.0.0.1:5432/primenet
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 
 import modules.adjacency_gis.store as store
 
@@ -44,7 +43,6 @@ def test_replace_and_load_snapshot(tmp_path, monkeypatch):
     )
     assert meta['sector_count'] == 1
     assert meta['edge_count'] == 1
-    assert os.path.isfile(str(db))
     loaded_s = store.load_sectors('nokia')
     loaded_e = store.load_edges('nokia')
     assert loaded_s[0]['cell_name'] == 'CELL_A'

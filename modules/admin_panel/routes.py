@@ -550,7 +550,6 @@ def _test_nokia_cm_connection() -> dict:
 
 
 def _test_huawei_cm_connection() -> dict:
-    import os
 
     row = _api_connection_row('Huawei CM API', configured=huawei_configured())
     cfg = huawei_defaults()

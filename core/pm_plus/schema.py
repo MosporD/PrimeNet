@@ -566,9 +566,17 @@ def _migrate_postgres(conn) -> None:
     )
 
 
+_PG_READY: set[str] = set()
+
+
 def init_schema() -> dict:
     """Create schema/tables. Returns backend info."""
     if config.use_postgres():
+        # init_schema() is called from nearly every ingest/query entry point. The ALTER TABLE
+        # statements below take ACCESS EXCLUSIVE locks even when the column already exists, so
+        # re-running them while another connection holds an open write transaction deadlocks.
+        if config.PM_PLUS_SCHEMA in _PG_READY:
+            return {"backend": "postgres", "schema": config.PM_PLUS_SCHEMA, "url_set": True}
         with connect() as conn:
             cur = conn.cursor()
             cur.execute(f'CREATE SCHEMA IF NOT EXISTS "{config.PM_PLUS_SCHEMA}"')
@@ -593,6 +601,7 @@ def init_schema() -> dict:
                 f'ON {prefix}fact_values_hour(counter_id, bucket_ts)'
             )
             conn.commit()
+        _PG_READY.add(config.PM_PLUS_SCHEMA)
         return {"backend": "postgres", "schema": config.PM_PLUS_SCHEMA, "url_set": True}
 
     with connect() as conn:

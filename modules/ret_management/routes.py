@@ -324,7 +324,6 @@ def huawei_ret_update():
             consume=True,
         )
         change = (preview.get('changes') or [{}])[0]
-        site_id = str(change.get('site_id') or '').strip()
         ne_name = str(change.get('ne_name') or '').strip()
         device_no = str(change.get('device_no') or '')
         subunit_no = str(change.get('subunit_no') or '')

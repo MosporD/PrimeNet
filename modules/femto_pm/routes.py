@@ -2,7 +2,6 @@
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for
 from functools import wraps
-import os
 import re
 import sqlite3
 import ast

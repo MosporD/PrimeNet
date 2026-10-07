@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from functools import wraps
-from typing import Any
 
-from flask import Blueprint, jsonify, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, jsonify, redirect, request, send_file, url_for
 
 from core.cm_extractor.config import nokia_configured
 from core.platform.session import get_session_token

@@ -305,7 +305,6 @@ def create_base_app(
                         resp.set_data(data2)
                 elif data and "data-nexus-shell" not in data and "data-primenet-theme-boot" in data:
                     # Older responses already had theme boot; still inject portals URL.
-                    boot = _shell_boot_script()
                     # Prefer appending after existing theme boot marker.
                     marker = 'data-primenet-theme-boot="1"'
                     idx = data.find(marker)

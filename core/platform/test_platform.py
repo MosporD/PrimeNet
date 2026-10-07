@@ -18,13 +18,13 @@ def central_users(monkeypatch):
     monkeypatch.delenv("NEXUS_COOKIE_DOMAIN", raising=False)
     monkeypatch.delenv("NCM_ALLOW_LOCAL_LOGIN", raising=False)
 
-    import sync_config
     import db.runtime as runtime
 
-    monkeypatch.setattr(sync_config, "NCMUSERS_DB", users_db)
+    # Only repoint the runtime: patching sync_config too would make the temp path a canonical
+    # path and send these users into the real (shared) app schema.
     monkeypatch.setattr(runtime, "NCMUSERS_DB", users_db)
 
-    from database_enhanced import create_user, init_db
+    from database_enhanced import create_user, init_db, reset_user_password
 
     init_db()
     ok, uid = create_user(
@@ -43,6 +43,9 @@ def central_users(monkeypatch):
         allowed_portals=["primenet"],
     )
     assert ok2, uid2
+    # New accounts are forced through /change-password; clear that so logins reach the portals.
+    assert reset_user_password(uid, "sso-secret", force_password_change=False)
+    assert reset_user_password(uid2, "eng-secret", force_password_change=False)
     return {"root": root, "users_db": users_db}
 
 
