@@ -446,7 +446,14 @@ def _is_no_change_row(row: dict, *, tolerance: float | None = None) -> bool:
 
 def _sort_kpi_cell_rows(rows: list[dict], sort_mode: str) -> list[dict]:
     mode = (sort_mode or "increased").strip().lower()
-    if mode == "decreased":
+    if mode == "highest":
+        rows.sort(
+            key=lambda x: (
+                -float(x.get("post") if x.get("post") is not None else float("-inf")),
+                str(x.get("cell_name") or ""),
+            )
+        )
+    elif mode == "decreased":
         rows.sort(
             key=lambda x: (
                 float(x.get("delta") or 0),
@@ -485,7 +492,10 @@ def get_kpi_cells(
 
     rows: list[dict] = []
     if load_precalc_meta(vendor, rat):
-        sql_limit = None if top_n >= 50000 else top_n
+        # The store returns rows in cell_name order, so a SQL LIMIT is only safe
+        # when the caller also wants name order; otherwise sort first, then cut.
+        sorted_view = bool((sort_mode or "").strip())
+        sql_limit = None if top_n >= 50000 or sorted_view else top_n
         rows = [
             dict(r)
             for r in load_kpi_rows(

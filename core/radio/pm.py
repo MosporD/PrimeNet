@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from modules.network_health import config as nh_config
-from modules.network_health.logic import get_kpi_cells, list_kpi_columns
+from modules.network_health.logic import _sort_kpi_cell_rows, get_kpi_cells, list_kpi_columns
 from modules.son_analytics.pm_helpers import PM_DATA_SCOPE, collect_degraded_cells
 
 
@@ -134,7 +134,9 @@ def _top_kpi_rows_uncached(recipe: str, vendor: str, rat: str, top_n: int, sort_
                 item["kpi"] = kpi
                 item["recipe"] = recipe
                 out.append(item)
-    return out[: max(1, top_n)]
+    # Rank across every vendor x RAT before cutting, so the first combo scanned
+    # (Nokia 2G) cannot crowd out worse cells elsewhere.
+    return _sort_kpi_cell_rows(out, sort_mode)[: max(1, top_n)]
 
 
 def degraded_cells(vendor: str = "all", technology: str = "4G", limit: int = 200) -> list[dict]:

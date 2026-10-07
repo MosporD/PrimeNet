@@ -18,7 +18,8 @@ def capacity_hotspots(*, vendor: str = "all", technology: str = "all", area: str
     from modules.network_health.config import CATEGORY_PRESETS
 
     util_preset = CATEGORY_PRESETS["Utilization"]
-    util_rows = pm.top_kpi_rows(recipe="utilization", vendor=vendor, rat=technology, top_n=limit, sort_mode="increased")
+    # Most loaded cells first (latest-day utilization), not the biggest day-over-day swing.
+    util_rows = pm.top_kpi_rows(recipe="utilization", vendor=vendor, rat=technology, top_n=limit, sort_mode="highest")
     cell_meta = metadata.cell_index()
     issues: list[dict] = []
     for row in util_rows:
@@ -26,10 +27,11 @@ def capacity_hotspots(*, vendor: str = "all", technology: str = "all", area: str
         meta = cell_meta.get(cell.lower(), {})
         if area and area.lower() != "all" and str(meta.get("area") or "").lower() != area.lower():
             continue
-        delta = abs(float(row.get("delta") or 0))
+        # Only growth in load is capacity pressure; a drop points at coverage or availability.
+        growth = max(0.0, float(row.get("delta") or 0))
         post = to_float(row.get("post"))
         target_score = score_vs_preset(post, util_preset)
-        score = bounded_score(target_score, min(30.0, delta * 1.5))
+        score = bounded_score(target_score, min(30.0, growth * 1.5))
         if score < 20:
             continue
         issues.append(issue(
@@ -176,7 +178,7 @@ def neighbor_quality(*, vendor: str = "all", technology: str = "all", area: str 
         "summary": summarize(rows),
         "issues": _limit(rows, limit),
         "freshness": neighbor.neighbor_freshness(),
-        "note": "HO SR, attempts, distance, azimuth, and reciprocal gaps. TA/MR samples are not in the neighbor DBs.",
+        "note": "HO SR, attempts, distance and azimuth on the busiest relations. Reciprocity is not scored: PM exports cannot show an unused reverse relation. TA/MR samples are not in the neighbor DBs.",
     }
 
 

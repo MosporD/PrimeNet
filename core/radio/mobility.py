@@ -43,17 +43,15 @@ def mobility_explorer(*, vendor: str = "all", technology: str = "all", area: str
         sr = to_float(row.get("ho_success_rate"))
         failures = to_float(row.get("ho_failures"))
         distance = to_float(row.get("distance_km"))
-        missing_recip = (tgt.lower(), src.lower()) not in pair_set
+        # Sampled busiest relations only: an unseen reverse relation is unknown, not absent.
+        reverse_seen = (tgt.lower(), src.lower()) in pair_set
         sr_pen = score_vs_preset(sr, mobility_preset) * 0.40 if sr is not None else 6.0
         fail_pen = min(30.0, (failures or 0) / max(1.0, attempts) * 100) if failures is not None else 0.0
-        recip_pen = 18.0 if missing_recip else 0.0
-        score = bounded_score(sr_pen, fail_pen, recip_pen, min(15.0, attempts / 200.0))
+        score = bounded_score(sr_pen, fail_pen, min(15.0, attempts / 200.0))
         labels = []
         if sr is not None:
             labels.append(f"HO SR {sr:.1f}%")
         labels.append(f"{attempts:.0f} attempts")
-        if missing_recip:
-            labels.append("one-way")
         if distance is not None:
             labels.append(f"{distance:.1f} km")
         issues.append(issue(
@@ -74,7 +72,7 @@ def mobility_explorer(*, vendor: str = "all", technology: str = "all", area: str
                 "distance_km": distance,
                 "source_azimuth": row.get("source_azimuth"),
                 "target_azimuth": row.get("target_azimuth"),
-                "one_way": missing_recip,
+                "reverse_relation": "seen" if reverse_seen else "unknown",
                 "target_vendor": row.get("target_vendor"),
                 "ta_mr_available": False,
                 "threshold_bad": mobility_preset.get("threshold_bad"),

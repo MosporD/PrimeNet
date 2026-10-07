@@ -106,16 +106,18 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
         sr = row.get("ho_success_rate")
         failures = row.get("ho_failures")
         distance = row.get("distance_km")
-        missing_recip = (
+        # The lines are only the busiest relations per vendor x RAT, so a reverse
+        # relation absent from them may still exist: report "seen" or "unknown",
+        # never "missing", and do not score it.
+        reverse_seen = (
             str(row.get("target_cell") or "").lower(),
             str(row.get("source_cell") or "").lower(),
-        ) not in pair_set
+        ) in pair_set
         sr_penalty = score_vs_preset(sr, mobility_preset) * 0.45 if sr is not None else 10.0
         failure_penalty = min(35.0, float(failures or 0) / max(1.0, attempts) * 100.0) if failures is not None else 0.0
         distance_penalty = 20.0 if distance is not None and float(distance) >= 12 else 0.0
-        recip_penalty = 15.0 if missing_recip else 0.0
         cross_vendor_penalty = 8.0 if row.get("target_vendor") and row.get("target_vendor") != row.get("vendor") else 0.0
-        score = bounded_score(sr_penalty, failure_penalty, distance_penalty, recip_penalty, cross_vendor_penalty)
+        score = bounded_score(sr_penalty, failure_penalty, distance_penalty, cross_vendor_penalty)
         if score < 25:
             continue
         labels = []
@@ -123,8 +125,6 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
             labels.append(f"HO SR {float(sr):.1f}% (target {ho_floor:g}%)")
         if failures is not None:
             labels.append(f"{float(failures):.0f} failed HOs")
-        if missing_recip:
-            labels.append("missing reciprocal")
         if distance is not None and float(distance) >= 12:
             labels.append(f"{float(distance):.1f} km")
         summary = ", ".join(labels) or "Neighbor relation needs review"
@@ -145,7 +145,7 @@ def build_quality_issues(vendor: str = "all", technology: str = "all", *, min_at
                 "distance_km": distance,
                 "source_azimuth": row.get("source_azimuth"),
                 "target_azimuth": row.get("target_azimuth"),
-                "missing_reciprocal": missing_recip,
+                "reverse_relation": "seen" if reverse_seen else "unknown",
                 "target_vendor": row.get("target_vendor"),
                 "ta_mr_available": False,
                 "threshold_bad": ho_floor,
