@@ -241,6 +241,26 @@ def sqlite_ident(name: str) -> str:
     return '"' + str(name).replace('"', '""') + '"'
 
 
+def postgres_ident_truncate(name: str, max_bytes: int = 63) -> str:
+    """Match Postgres identifier truncation (NAMEDATALEN-1 = 63 bytes, UTF-8 safe).
+
+    Long Nokia KPI headers (e.g. 94-byte names) are silently truncated by PG on
+    CREATE. Python must use the same truncated form for COPY / ALTER / compare,
+    or multi-chunk loads fail with ``column ... already exists``.
+    """
+    text = str(name)
+    raw = text.encode("utf-8")
+    if len(raw) <= max_bytes:
+        return text
+    trunc = raw[:max_bytes]
+    while trunc:
+        try:
+            return trunc.decode("utf-8")
+        except UnicodeDecodeError:
+            trunc = trunc[:-1]
+    return text[:max_bytes]
+
+
 def sqlite_text_lit(value: object) -> str:
     """Quote a SQL text literal (single-quoted, escaped)."""
     return "'" + str(value).replace("'", "''") + "'"
@@ -283,16 +303,24 @@ def df_to_sql(df, table: str, conn, *, if_exists: str = 'fail', index: bool = Fa
 
     import pandas as pd
 
-    cols = [str(c) for c in work.columns]
+    # Align Python names with what Postgres will store (63-byte ident limit).
+    rename_map: dict[str, str] = {}
     seen: dict[bytes, str] = {}
-    for c in cols:
-        key = c.encode('utf-8')[:63].lower()
-        if key in seen:
+    for c in [str(x) for x in work.columns]:
+        trunc = postgres_ident_truncate(c)
+        key = trunc.encode('utf-8')[:63].lower()
+        if key in seen and seen[key] != trunc:
             raise ValueError(
                 f'Columns {seen[key]!r} and {c!r} collide in table {table!r} after '
                 'Postgres 63-byte identifier truncation'
             )
-        seen[key] = c
+        seen[key] = trunc
+        if trunc != c:
+            rename_map[c] = trunc
+    if rename_map:
+        work = work.rename(columns=rename_map)
+
+    cols = [str(c) for c in work.columns]
 
     def _sql_type(series) -> str:
         # All-empty in this frame (often the first append chunk): keep TEXT so later chunks fit.

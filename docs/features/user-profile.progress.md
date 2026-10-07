@@ -8,6 +8,10 @@ Root journal (topics only): [`../../progress.md`](../../progress.md).
 ## 2026-10-05 (CM Approver status)
 
 - Done: Profile avatar card shows read-only **CM Approver** Yes/No from `can_approve` (Owners always Yes). Assignment stays in Platform Admin.
+
+## 2026-10-07 (CM Live Write label)
+
+- Done: Profile shows **CM Live Write** Yes/No; tooltip points to Engineering Admin → CM Live Write.
 - NEXT: None for this slice.
 
 ---

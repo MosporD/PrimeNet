@@ -32,8 +32,8 @@ async function loadProfile() {
     if (approverEl) {
         approverEl.textContent = p.can_approve ? 'Yes' : 'No';
         approverEl.title = p.can_approve
-            ? 'You are flagged as a CM / change approver (assigned in Platform Admin).'
-            : 'Not an approver — ask an Owner to enable Approver in Platform Admin.';
+            ? 'You may apply live CM changes (e.g. RET). Assigned in Engineering Admin → CM Live Write.'
+            : 'Not authorized for live CM — ask an Owner to enable CM Live Write in Engineering Admin.';
     }
     applyProfileEditPermissions();
 }

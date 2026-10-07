@@ -53,8 +53,8 @@
     const DEFAULT_TILT_DEG = 4;
     /**
      * Working ground-reach window for the hologram (metres).
-     * Geometry is still h/tan(tilt); result is clamped here until a future
-     * performance/TA pipeline can supply measured cell distance.
+     * Prefer PM UE-distance (measured_reach_m) when present; else h/tan(tilt).
+     * Both paths clamp into this window before scene scaling.
      */
     const MIN_GROUND_DISTANCE_M = 100;
     const MAX_GROUND_DISTANCE_M = 1000;
@@ -82,12 +82,12 @@
     /** Mechanical downtilt weight vs RET (metadata mtilt is 3× as effective). */
     const MECH_TILT_WEIGHT = 3;
     /**
-     * Analytical pattern detail (reference polar plot ratios):
-     * main = 1.0, back ≈ 0.55 @ 180°, two sides ≈ 0.20 @ ±90°.
+     * Analytical pattern detail (cos^n main + reference side/back ratios):
+     * main = 1.0, back ≈ 0.42 @ 180°, two sides ≈ 0.28 @ ±75° (narrower petals).
      */
-    const BACK_LOBE_REL_LENGTH = 0.55;
-    const SIDE_LOBE_REL_LENGTH = 0.20;
-    const SIDE_LOBE_AZ_OFFSET = 90;
+    const BACK_LOBE_REL_LENGTH = 0.42;
+    const SIDE_LOBE_REL_LENGTH = 0.28;
+    const SIDE_LOBE_AZ_OFFSET = 75;
     const BACK_LOBE_AZ_OFFSET = 180;
 
     function latticeHalfW(y) {
@@ -135,7 +135,7 @@
         return Math.max(MIN_TILT_FOR_DISTANCE, ret + MECH_TILT_WEIGHT * mech);
     }
 
-    /** Ground reach (m) for electrical downtilt under the horizon plane. */
+    /** Geometric ground reach (m) for downtilt under the horizon plane. */
     function groundDistance(heightM, tiltDeg) {
         const height = Number.isFinite(heightM) && heightM > 0 ? heightM : 25;
         const raw = Number.isFinite(tiltDeg) ? Math.abs(tiltDeg) : DEFAULT_TILT_DEG;
@@ -144,12 +144,30 @@
         return clamp(distance, MIN_GROUND_DISTANCE_M, MAX_GROUND_DISTANCE_M);
     }
 
+    /** Prefer measured PM UE distance; fall back to geometric h/tan(tilt). */
+    function resolveReachM(heightM, tiltDeg, measuredReachM) {
+        if (Number.isFinite(measuredReachM) && measuredReachM > 0) {
+            return clamp(measuredReachM, MIN_GROUND_DISTANCE_M, MAX_GROUND_DISTANCE_M);
+        }
+        return groundDistance(heightM, tiltDeg);
+    }
+
+    function reachSourceLabel(measuredReachM, measuredReachSource) {
+        if (!(Number.isFinite(measuredReachM) && measuredReachM > 0)) {
+            return 'geometric h/tan(tilt)';
+        }
+        if (measuredReachSource === 'pm_ta') {
+            return 'measured (PM TA index)';
+        }
+        return 'measured (PM UE distance)';
+    }
+
     /**
      * Map clamped reach [100, 1000] m linearly into scene units, then apply
      * band coverage so L900 stays longer than L2100 inside that window.
      */
-    function lobeLength(heightM, tiltDeg, tech) {
-        const reachM = groundDistance(heightM, tiltDeg);
+    function lobeLength(heightM, tiltDeg, tech, measuredReachM) {
+        const reachM = resolveReachM(heightM, tiltDeg, measuredReachM);
         const t = (reachM - MIN_GROUND_DISTANCE_M)
             / (MAX_GROUND_DISTANCE_M - MIN_GROUND_DISTANCE_M);
         const base = SCENE_LENGTH_AT_MIN_M
@@ -197,7 +215,9 @@
         const n = patternExponent(hpbwDeg);
         const thetaSteps = 16;
         const phiSteps = 28;
-        const minGain = 0.08;
+        // Contour slightly above null so the wireframe reads as a cos^n petal,
+        // not a filled cone collapsed into the antenna.
+        const minGain = 0.12;
         const thetaMax = Math.min(Math.PI / 2 - 0.02, Math.acos(Math.pow(minGain, 1 / Math.max(n, 1e-6))));
         const positions = [];
         const indices = [];
@@ -207,7 +227,8 @@
 
         for (let ti = 1; ti <= thetaSteps; ti += 1) {
             const theta = (ti / thetaSteps) * thetaMax;
-            const gain = Math.pow(Math.max(0, Math.cos(theta)), n);
+            // Soft floor keeps far rings from collapsing to a needle point.
+            const gain = Math.max(minGain, Math.pow(Math.max(0, Math.cos(theta)), n));
             const r = length * gain;
             for (let pi = 0; pi < phiSteps; pi += 1) {
                 const phi = (pi / phiSteps) * Math.PI * 2;
@@ -683,7 +704,10 @@
             const retTilt = ghost ? sector.baselineTiltDeg : sector.tiltDeg;
             const effTilt = effectiveTiltDeg(retTilt, sector.mechanicalTilt);
             const height = sector.height || state.site.antenna_height;
-            const length = lobeLength(height, effTilt, tech);
+            const measured = Number.isFinite(sector.measuredReachM)
+                ? sector.measuredReachM
+                : NaN;
+            const length = lobeLength(height, effTilt, tech, measured);
             const hpbw = Number.isFinite(sector.beamwidth) ? sector.beamwidth : HPBW_DEG;
             const sectorKey = sector.sectorKey || String(sector.key || '').split('::')[0];
             const selected = state.selected && state.selected === sectorKey;
@@ -721,8 +745,9 @@
                 ];
                 const backOpacity = dimmed ? 0.22 : 0.78;
                 const sideOpacity = dimmed ? 0.2 : 0.88;
-                const backHpbw = Math.min(90, hpbw * 1.15);  // slightly fatter back
-                const sideHpbw = Math.max(22, hpbw * 0.55);  // narrower petals
+                // Back lobe: wider / shorter. Side petals: tighter HPBW via cos^n.
+                const backHpbw = Math.min(100, hpbw * 1.35);
+                const sideHpbw = Math.max(18, hpbw * 0.42);
 
                 addOrientedEnvelope(
                     group, sector, baseAz + BACK_LOBE_AZ_OFFSET, effTilt, sector.techIndex,
@@ -776,7 +801,14 @@
                 return;
             }
             const eff = effectiveTiltDeg(sector.tiltDeg, sector.mechanicalTilt);
-            const reach = groundDistance(sector.height || state.site.antenna_height, eff);
+            const measured = Number.isFinite(sector.measuredReachM)
+                ? sector.measuredReachM
+                : NaN;
+            const reach = resolveReachM(
+                sector.height || state.site.antenna_height,
+                eff,
+                measured,
+            );
             const tiltPart = Number.isFinite(sector.tiltDeg) ? formatDegrees(sector.tiltDeg) : '—';
             const mechPart = Number.isFinite(sector.mechanicalTilt)
                 ? formatDegrees(sector.mechanicalTilt)
@@ -793,9 +825,12 @@
                 `RET ${tiltPart} + mech ${mechPart} ×${MECH_TILT_WEIGHT} → effective ${formatDegrees(eff)}`,
                 `HPBW ${formatDegrees(sector.beamwidth || HPBW_DEG)}`
                     + (state.patternDetail
-                        ? ' · pattern: main + 2 sides (±90°) + back (180°)'
+                        ? ' · pattern: main + 2 sides (±75°) + back (180°)'
                         : ''),
-                `Ground reach ~${formatDistance(reach)}`,
+                `Ground reach ~${formatDistance(reach)} · ${reachSourceLabel(
+                    measured,
+                    sector.measuredReachSource,
+                )}`,
             ].filter(Boolean).join('<br>');
             tooltip.hidden = false;
             const rect = (wrapper || canvas).getBoundingClientRect();

@@ -4,6 +4,14 @@ Detailed dated log for this blueprint. Brief: [`performance.md`](performance.md)
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
 ---
+## 2026-10-07 (Nokia 4G empty — PG 63-byte column truncate)
+
+- Symptom: Performance Explorer Nokia 4G cell query/export empty while SFTP had files; 2G/3G/5G + Huawei 4G OK; metadata cell list OK.
+- Root cause: Nokia 4G CSV has a 94-byte KPI header; Postgres truncates idents to 63 bytes. Chunk 1 CREATE succeeded; chunk 2+ `ALTER … ADD COLUMN` saw the truncated name as already existing → whole load aborted/rolled back. Empty stub `4G_CELLS_HOURLY` left behind.
+- Fix: `postgres_ident_truncate` in `db/runtime.py`; normalize names before append/ensure in loader; stream Nokia zip extract (no full `src.read()`).
+- Recovered shared PG: hourly ~369k + daily ~474k Nokia 4G area-shard rows. Deploy loader/runtime fix to server so watcher keeps succeeding.
+- NEXT: Deploy code to 97.141; confirm next watcher Nokia cells cycle loads 4G without error; smoke Performance export on a West Amman LNCEL.
+
 ## 2026-10-04 (Soft Steel UI retoken)
 
 - Retokened Element/Ant blues + chart purples to Soft Steel Sky; shared header logout chip; removed title emoji; modal title h2 for heading order.

@@ -20,8 +20,16 @@ let etlDiagPollTimer = null;
 let etlDiagMsgTimer = null;
 let etlDiagLastFingerprint = '';
 let etlDiagInflight = false;
+let etlDiagCache = null;
+let etlSelectedStore = '';
+let etlSelectedDomain = '';
+let etlKpiExpanded = false;
+try {
+    etlKpiExpanded = sessionStorage.getItem('etlKpiExpanded') === '1';
+} catch (_) { /* ignore */ }
 const ETL_DIAG_POLL_MS = 10000;
 const ETL_PROGRESS_META_MAX = 140;
+const ETL_CM_JOB_IDS = new Set(['cm_extractor_scheduled_jobs', 'nokia_cm_inventory_discovery']);
 const API_CONNECTION_KEYS = ['nokia_cm', 'huawei_cm', 'huawei_pm'];
 const ETL_PROGRESS_ORDER = [
     'hourly_full',
@@ -52,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionFromUrl = new URLSearchParams(window.location.search).get('section');
     let defaultPage = sectionFromUrl || 'data-sync';
     if (defaultPage === 'user-admin' || defaultPage === 'feature-access') {
-        defaultPage = 'data-sync';
+        defaultPage = 'module-access-by-role';
     }
     const sectionSelect = document.getElementById('admin-section-select');
     if (sectionSelect) {
@@ -87,7 +95,7 @@ function openAdminPage(pageName) {
     } else {
         stopProgressPolling();
     }
-    if (pageName === 'etl-diagnosis') {
+    if (pageName === 'etl-diagnosis' || pageName === 'pipeline-scheduler') {
         startEtlDiagnosisPolling();
         loadEtlDiagnosis(true);
     } else {
@@ -101,6 +109,15 @@ function openAdminPage(pageName) {
     }
     if (pageName === 'power-bi') {
         loadPowerBiAdminCatalog();
+    }
+    if (pageName === 'cm-live-write') {
+        loadCmLiveWriteUsers();
+    }
+    if (pageName === 'module-access-by-role') {
+        loadModuleAccessByRole();
+    }
+    if (pageName === 'module-access-by-user') {
+        ensureModuleAccessUserPicker();
     }
     if (pageName === 'ops-alerts') {
         loadRetCredentialFallbacks();
@@ -171,8 +188,16 @@ function stopEtlDiagnosisPolling() {
 function startEtlDiagnosisPolling() {
     stopEtlDiagnosisPolling();
     etlDiagPollTimer = setInterval(() => {
-        const auto = document.getElementById('etl-diag-auto');
-        if (auto && !auto.checked) return;
+        const section = document.getElementById('admin-section-select')?.value || '';
+        if (section === 'etl-diagnosis') {
+            const auto = document.getElementById('etl-diag-auto');
+            if (auto && !auto.checked) return;
+        } else if (section === 'pipeline-scheduler') {
+            const auto = document.getElementById('etl-sched-auto');
+            if (auto && !auto.checked) return;
+        } else {
+            return;
+        }
         loadEtlDiagnosis(false);
     }, ETL_DIAG_POLL_MS);
 }
@@ -237,7 +262,49 @@ function _etlSetHtmlIfChanged(el, html) {
     el.innerHTML = html;
 }
 
-function _etlEnsureProgressCards(progress) {
+function toggleEtlKpis() {
+    etlKpiExpanded = !etlKpiExpanded;
+    try {
+        sessionStorage.setItem('etlKpiExpanded', etlKpiExpanded ? '1' : '0');
+    } catch (_) { /* ignore */ }
+    _applyEtlKpiExpanded();
+}
+
+function _applyEtlKpiExpanded() {
+    const grid = document.getElementById('etl-diag-kpis');
+    const btn = document.getElementById('etl-kpi-toggle');
+    const shell = document.getElementById('etl-kpi-shell');
+    if (grid) {
+        grid.hidden = !etlKpiExpanded;
+        grid.classList.toggle('etl-kpi-grid-collapsed', !etlKpiExpanded);
+    }
+    if (btn) {
+        btn.setAttribute('aria-expanded', etlKpiExpanded ? 'true' : 'false');
+        const chev = btn.querySelector('.etl-kpi-chevron');
+        if (chev) chev.textContent = etlKpiExpanded ? '▾' : '▸';
+    }
+    if (shell) shell.classList.toggle('expanded', etlKpiExpanded);
+}
+
+function _etlKpiItems(d) {
+    const etlOn = !!d.etl?.enabled;
+    const lockHere = !!d.scheduler?.pipeline_lock_held_here;
+    const stuck = !!d.pipeline_health?.appears_stuck;
+    const schedIn = !!d.scheduler?.in_process;
+    const domains = (d.domains?.enabled_groups || []).join(', ') || 'postgres domains unset';
+    return [
+        { label: 'ETL gate', value: etlOn ? 'ENABLED' : 'DISABLED', cls: etlOn ? 'ok' : 'bad' },
+        { label: 'Scheduler here', value: schedIn ? 'yes' : 'no (web tier)', cls: '' },
+        { label: 'Pipeline lock (this process)', value: lockHere ? 'HELD' : 'free', cls: lockHere ? 'bad' : 'ok' },
+        { label: 'Lock storm', value: stuck ? `yes (streak ${d.pipeline_health.skip_streak})` : 'no', cls: stuck ? 'bad' : 'ok' },
+        { label: 'Mode', value: d.scheduler?.mode || '—', cls: '' },
+        { label: 'PG domains', value: domains, cls: d.domains?.metadata_pm_backend_mismatch ? 'bad' : '' },
+        { label: 'RAM free', value: d.resources?.available_mb != null ? `${d.resources.available_mb} MB` : 'n/a', cls: '' },
+        { label: 'Pressure', value: d.resources?.pressure != null ? String(d.resources.pressure) : 'n/a', cls: '' },
+    ];
+}
+
+function _etlEnsureProgressCards(progress, timing) {
     const grid = document.getElementById('etl-diag-progress');
     if (!grid) return;
     const keys = new Set([...ETL_PROGRESS_ORDER, ...Object.keys(progress || {})]);
@@ -251,6 +318,10 @@ function _etlEnsureProgressCards(progress) {
                 <div class="progress-title">${_escapeHtml(ETL_PROGRESS_LABELS[key] || key)}</div>
                 <div class="progress-meta" id="etl-progress-meta-${key}">Idle</div>
                 <div class="progress-track"><div class="progress-fill" id="etl-progress-fill-${key}"></div></div>
+                <div class="progress-timing" id="etl-progress-timing-${key}">
+                    <span class="progress-last">Last: —</span>
+                    <span class="progress-next">Next: —</span>
+                </div>
             </div>
         `).join('');
         grid.dataset.ready = '1';
@@ -259,6 +330,7 @@ function _etlEnsureProgressCards(progress) {
         const card = document.getElementById(`etl-progress-card-${key}`);
         const meta = document.getElementById(`etl-progress-meta-${key}`);
         const fill = document.getElementById(`etl-progress-fill-${key}`);
+        const timingEl = document.getElementById(`etl-progress-timing-${key}`);
         if (!card || !meta || !fill) return;
         const data = (progress && progress[key]) || {};
         const running = !!data.running;
@@ -277,7 +349,6 @@ function _etlEnsureProgressCards(progress) {
         const width = `${percent}%`;
         if (fill.style.width !== width) fill.style.width = width;
         const counter = total > 0 ? `${p}/${total} (${percent}%)` : `${percent}%`;
-        // Keep updated_at out of the visible line so polls don't rewrite text every tick.
         const short = _etlShortMeta(data.message || '', '');
         const line = `${counter}${short.text ? ` - ${short.text}` : ''}`;
         if (meta.dataset.line !== line) {
@@ -285,33 +356,48 @@ function _etlEnsureProgressCards(progress) {
             meta.textContent = line;
             meta.title = `${counter}${data.message ? ` - ${data.message}` : ''}${data.updated_at ? ` [${data.updated_at}]` : ''}`;
         }
+        if (timingEl) {
+            const t = (timing && timing[key]) || {};
+            const last = t.last_ok_at || '—';
+            const next = t.next_run_time || '—';
+            const tLine = `${last}|${next}`;
+            if (timingEl.dataset.line !== tLine) {
+                timingEl.dataset.line = tLine;
+                timingEl.innerHTML = `
+                    <span class="progress-last" title="${_escapeHtml(t.last_ok_message || '')}">Last: ${_escapeHtml(last)}</span>
+                    <span class="progress-next">Next: ${_escapeHtml(next)}</span>
+                `;
+            }
+        }
     });
 }
 
 function _renderEtlKpis(d) {
     const el = document.getElementById('etl-diag-kpis');
+    const summary = document.getElementById('etl-kpi-summary');
     if (!el) return;
+    const items = _etlKpiItems(d);
     const etlOn = !!d.etl?.enabled;
-    const lockHere = !!d.scheduler?.pipeline_lock_held_here;
     const stuck = !!d.pipeline_health?.appears_stuck;
-    const schedIn = !!d.scheduler?.in_process;
-    const domains = (d.domains?.enabled_groups || []).join(', ') || 'postgres domains unset';
-    const items = [
-        { label: 'ETL gate', value: etlOn ? 'ENABLED' : 'DISABLED', cls: etlOn ? 'ok' : 'bad' },
-        { label: 'Scheduler here', value: schedIn ? 'yes' : 'no (web tier)', cls: '' },
-        { label: 'Pipeline lock (this process)', value: lockHere ? 'HELD' : 'free', cls: lockHere ? 'bad' : 'ok' },
-        { label: 'Lock storm', value: stuck ? `yes (streak ${d.pipeline_health.skip_streak})` : 'no', cls: stuck ? 'bad' : 'ok' },
-        { label: 'Mode', value: d.scheduler?.mode || '—', cls: '' },
-        { label: 'PG domains', value: domains, cls: d.domains?.metadata_pm_backend_mismatch ? 'bad' : '' },
-        { label: 'RAM free', value: d.resources?.available_mb != null ? `${d.resources.available_mb} MB` : 'n/a', cls: '' },
-        { label: 'Pressure', value: d.resources?.pressure != null ? String(d.resources.pressure) : 'n/a', cls: '' },
+    const lockHere = !!d.scheduler?.pipeline_lock_held_here;
+    const alertN = (d.alerts || []).filter((a) => a.level === 'critical' || a.level === 'warning').length;
+    const parts = [
+        etlOn ? 'ETL on' : 'ETL off',
+        stuck ? 'lock storm' : (lockHere ? 'lock held' : 'lock free'),
+        `mode ${d.scheduler?.mode || '—'}`,
+        alertN ? `${alertN} alert${alertN === 1 ? '' : 's'}` : 'no alerts',
     ];
+    if (summary) {
+        summary.textContent = parts.join(' · ');
+        summary.className = `etl-kpi-summary${(!etlOn || stuck || alertN) ? ' warn' : ''}`;
+    }
     _etlSetHtmlIfChanged(el, items.map(it => `
         <div class="etl-kpi ${it.cls || ''}">
             <div class="etl-kpi-label">${_escapeHtml(it.label)}</div>
             <div class="etl-kpi-value">${_escapeHtml(it.value)}</div>
         </div>
     `).join(''));
+    _applyEtlKpiExpanded();
 }
 
 function _renderEtlAlerts(alerts) {
@@ -328,104 +414,227 @@ function _renderEtlAlerts(alerts) {
     `).join(''));
 }
 
-function _renderEtlOps(ops) {
-    const el = document.getElementById('etl-diag-ops');
-    if (!el) return;
-    const list = ops && ops.length ? ops : [];
-    _etlSetHtmlIfChanged(el, list.map(op => `
-        <button type="button" class="btn-sync refresh" onclick="runEtlDiagOperation('${_escapeHtml(op.key)}', '${_escapeHtml(op.endpoint)}', '${_escapeHtml(op.method || 'POST')}')">
-            ${_escapeHtml(op.label || op.key)}
-        </button>
-    `).join('') + `
-        <button type="button" class="btn-sync test" onclick="testConnectivity()">Test connectivity (legacy UI)</button>
-    `);
+function _fillSelect(selectEl, options, selected, onChange) {
+    if (!selectEl) return;
+    const prev = selected || selectEl.value || '';
+    const html = options.map((o) => {
+        const val = typeof o === 'string' ? o : o.value;
+        const label = typeof o === 'string' ? o : o.label;
+        return `<option value="${_escapeHtml(val)}">${_escapeHtml(label)}</option>`;
+    }).join('');
+    if (selectEl.dataset.optsHtml !== html) {
+        selectEl.dataset.optsHtml = html;
+        selectEl.innerHTML = html || '<option value="">—</option>';
+        if (!selectEl.dataset.bound) {
+            selectEl.dataset.bound = '1';
+            selectEl.addEventListener('change', () => onChange(selectEl.value));
+        }
+    }
+    if (prev && [...selectEl.options].some((o) => o.value === prev)) {
+        selectEl.value = prev;
+    } else if (selectEl.options.length) {
+        selectEl.selectedIndex = 0;
+    }
 }
 
-function _renderEtlDomains(domains) {
+function _renderEtlDomains(domains, stores) {
     const el = document.getElementById('etl-diag-domains');
+    const sel = document.getElementById('etl-domain-select');
     if (!el) return;
     if (!domains) {
         _etlSetHtmlIfChanged(el, 'No domain info.');
         return;
     }
-    const enabled = domains.enabled_groups || [];
-    const missing = domains.missing_groups || [];
-    _etlSetHtmlIfChanged(el, `
-        <div><strong>Configured:</strong> ${domains.postgres_configured ? 'yes' : 'no'}</div>
-        <div><strong>NCM_PG_DOMAINS:</strong> <code>${_escapeHtml(domains.ncm_pg_domains_env || '(unset = all when NCM_DATABASE_URL set)')}</code></div>
-        <div class="etl-chip-row">
-            ${enabled.map(g => `<span class="etl-chip pg">${_escapeHtml(g)}</span>`).join('') || '<span class="etl-chip">none</span>'}
+    const enabled = new Set(domains.enabled_groups || []);
+    const all = domains.all_groups || [];
+    const opts = all.map((g) => ({
+        value: g,
+        label: enabled.has(g) ? `${g} (on PG)` : `${g} (off)`,
+    }));
+    _fillSelect(sel, opts, etlSelectedDomain, (v) => {
+        etlSelectedDomain = v;
+        if (etlDiagCache) _paintEtlDomainDetail(etlDiagCache.domains, etlDiagCache.stores || []);
+    });
+    if (!etlSelectedDomain || !all.includes(etlSelectedDomain)) {
+        etlSelectedDomain = (sel && sel.value) || all[0] || '';
+    }
+    _paintEtlDomainDetail(domains, stores || []);
+}
+
+function _paintEtlDomainDetail(domains, stores) {
+    const el = document.getElementById('etl-diag-domains');
+    if (!el || !domains) return;
+    const g = etlSelectedDomain || (domains.enabled_groups || [])[0] || '';
+    const enabled = new Set(domains.enabled_groups || []);
+    const schemas = (domains.schemas_by_group && domains.schemas_by_group[g])
+        || [];
+    const linked = (stores || []).filter((s) => s.group === g);
+    const html = `
+        <div class="etl-store-meta"><strong>Postgres configured:</strong> ${domains.postgres_configured ? 'yes' : 'no'}</div>
+        <div class="etl-store-meta"><strong>NCM_PG_DOMAINS:</strong> <code>${_escapeHtml(domains.ncm_pg_domains_env || '(unset = all when NCM_DATABASE_URL set)')}</code></div>
+        <div class="etl-domain-focus">
+            <div><strong>${_escapeHtml(g || '—')}</strong>
+                <span class="etl-chip ${enabled.has(g) ? 'pg' : 'empty'}">${enabled.has(g) ? 'enabled' : 'not on PG'}</span>
+            </div>
+            <div class="etl-store-meta" style="margin-top:6px;">Schemas: ${schemas.length
+                ? schemas.map((s) => `<code>${_escapeHtml(s)}</code>`).join(', ')
+                : '<em>none mapped</em>'}</div>
+            ${linked.length ? `
+                <div class="etl-store-meta" style="margin-top:8px;"><strong>Surveyed stores</strong></div>
+                <table class="etl-mini-table">
+                    <thead><tr><th>Store</th><th>Backend</th><th>Tables</th><th>Rows</th></tr></thead>
+                    <tbody>
+                        ${linked.map((s) => `
+                            <tr>
+                                <td>${_escapeHtml(s.store)}</td>
+                                <td>${_escapeHtml(s.backend)}</td>
+                                <td>${s.table_count || 0}</td>
+                                <td>${Number(s.row_total || 0).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<div class="etl-store-meta" style="margin-top:8px;">No row-count survey for this domain (not in ETL store list).</div>'}
+            ${domains.metadata_pm_backend_mismatch && (g === 'metadata' || g === 'pm')
+                ? '<div style="margin-top:8px;color:#c0392b;"><strong>Mismatch:</strong> metadata and pm backends differ.</div>'
+                : ''}
         </div>
-        ${missing.length ? `<div style="margin-top:8px;"><strong>Not on PG:</strong></div>
-        <div class="etl-chip-row">${missing.map(g => `<span class="etl-chip">${_escapeHtml(g)}</span>`).join('')}</div>` : ''}
-        ${domains.metadata_pm_backend_mismatch ? '<div style="margin-top:8px;color:#c0392b;"><strong>Mismatch:</strong> metadata and pm backends differ.</div>' : ''}
-    `);
+        <p class="etl-store-meta" style="margin-top:10px;">
+            Selection is a frontend focus only — changing domains in production still requires
+            <code>NCM_PG_DOMAINS</code> + process restart.
+        </p>
+    `;
+    _etlSetHtmlIfChanged(el, html);
 }
 
 function _renderEtlStores(stores) {
     const el = document.getElementById('etl-diag-stores');
+    const sel = document.getElementById('etl-store-select');
     if (!el) return;
     if (!stores || !stores.length) {
         _etlSetHtmlIfChanged(el, 'No stores surveyed.');
         return;
     }
-    _etlSetHtmlIfChanged(el, stores.map(s => {
-        const emptyCls = s.empty ? 'empty' : 'pg';
-        const tables = Object.entries(s.tables || {}).slice(0, 8)
-            .map(([n, c]) => `${n}:${c}`).join(', ');
-        return `
-            <div class="etl-store-row">
-                <div><strong>${_escapeHtml(s.store)}</strong>
-                    <span class="etl-chip ${emptyCls}">${_escapeHtml(s.backend)}</span>
-                    <span class="etl-chip ${s.empty ? 'empty' : ''}">${Number(s.row_total || 0).toLocaleString()} rows</span>
-                </div>
-                <div class="etl-store-meta">${s.table_count || 0} tables${tables ? ` — ${_escapeHtml(tables)}` : ''}${s.empty ? ' (EMPTY)' : ''}${s.error ? ` — ERR ${_escapeHtml(s.error)}` : ''}</div>
-            </div>
-        `;
-    }).join(''));
+    const opts = stores.map((s) => ({
+        value: s.store,
+        label: `${s.store} · ${Number(s.row_total || 0).toLocaleString()} rows`,
+    }));
+    _fillSelect(sel, opts, etlSelectedStore, (v) => {
+        etlSelectedStore = v;
+        if (etlDiagCache) _paintEtlStoreTable(etlDiagCache.stores || []);
+    });
+    if (!etlSelectedStore || !stores.some((s) => s.store === etlSelectedStore)) {
+        etlSelectedStore = (sel && sel.value) || stores[0].store;
+    }
+    _paintEtlStoreTable(stores);
 }
 
-function _renderEtlJobs(jobs, scheduler) {
-    const el = document.getElementById('etl-diag-jobs');
+function _paintEtlStoreTable(stores) {
+    const el = document.getElementById('etl-diag-stores');
     if (!el) return;
-    if (!scheduler?.in_process) {
-        const mode = scheduler?.mode || 'unknown';
-        const schedIngest = scheduler?.scheduled_ingest_enabled;
-        const watcherNote = scheduler?.watcher_primary
+    const s = (stores || []).find((x) => x.store === etlSelectedStore) || (stores || [])[0];
+    if (!s) {
+        _etlSetHtmlIfChanged(el, 'No stores surveyed.');
+        return;
+    }
+    const emptyCls = s.empty ? 'empty' : 'pg';
+    const rows = Object.entries(s.tables || {}).sort((a, b) => a[0].localeCompare(b[0]));
+    const body = rows.length
+        ? rows.map(([n, c]) => `
+            <tr>
+                <td><code>${_escapeHtml(n)}</code></td>
+                <td class="etl-num">${Number(c || 0).toLocaleString()}</td>
+            </tr>`).join('')
+        : '<tr><td colspan="2" style="text-align:center;">No tables</td></tr>';
+    const html = `
+        <div class="etl-store-head">
+            <strong>${_escapeHtml(s.store)}</strong>
+            <span class="etl-chip ${emptyCls}">${_escapeHtml(s.backend)}</span>
+            <span class="etl-chip">group: ${_escapeHtml(s.group || '')}</span>
+            <span class="etl-chip ${s.empty ? 'empty' : ''}">${Number(s.row_total || 0).toLocaleString()} rows total</span>
+            ${s.error ? `<span class="etl-chip empty">${_escapeHtml(s.error)}</span>` : ''}
+        </div>
+        <table class="etl-mini-table etl-store-table">
+            <thead><tr><th>Table</th><th>Rows</th></tr></thead>
+            <tbody>${body}</tbody>
+        </table>
+    `;
+    _etlSetHtmlIfChanged(el, html);
+}
+
+function _jobKind(jobId) {
+    if (ETL_CM_JOB_IDS.has(jobId)) return 'CM wake';
+    if (String(jobId || '').includes('adjacency') || String(jobId || '').includes('rru') || String(jobId || '').includes('inventory')) {
+        return 'Inventory';
+    }
+    if (String(jobId || '').includes('son_ml') || String(jobId || '').includes('network_health')) {
+        return 'Analytics';
+    }
+    return 'Pipeline';
+}
+
+function _renderPipelineScheduler(d) {
+    const gen = document.getElementById('etl-sched-generated');
+    const status = document.getElementById('etl-sched-status');
+    const tbody = document.getElementById('etl-sched-jobs');
+    if (gen) {
+        gen.textContent = `Snapshot ${d.generated_at || ''}`;
+    }
+    if (status) {
+        const sched = d.scheduler || {};
+        const mode = sched.mode || 'unknown';
+        const inProc = !!sched.in_process;
+        const watcherNote = sched.watcher_primary
             ? ' NCM_WATCHER_PRIMARY=1 may suppress hourly/daily cron in favor of the pull watcher.'
             : '';
-        const ingestNote = schedIngest === false
+        const ingestNote = sched.scheduled_ingest_enabled === false
             ? ' Scheduled ingest is disabled for this mode — only manual triggers and watcher-driven pulls run.'
             : '';
-        _etlSetHtmlIfChanged(el, `
-            <div class="etl-store-meta">
-                APScheduler is <strong>not</strong> running in this web process (mode: <code>${_escapeHtml(mode)}</code>).
-                Cron next-run times exist only inside the <strong>scheduler</strong> container.
-                Manual buttons on this page still work in the web process.${ingestNote}${watcherNote}
-            </div>
-            <div class="etl-store-meta" style="margin-top:8px;">
-                Check on the host: <code>docker compose ps scheduler</code> and
-                <code>docker compose logs --tail=80 scheduler</code>.
-                Web should have <code>NCM_DISABLE_SCHEDULER=1</code>; scheduler must not.
-            </div>
-        `);
-        return;
+        let html;
+        if (!inProc) {
+            html = `
+                <div class="etl-store-meta">
+                    APScheduler is <strong>not</strong> running in this web process (mode: <code>${_escapeHtml(mode)}</code>).
+                    Cron next-run times exist only inside the <strong>scheduler</strong> container.
+                    Manual buttons on <a href="/admin-panel?section=data-sync">Data Sync</a> still work in the web process.${ingestNote}${watcherNote}
+                </div>
+                <div class="etl-store-meta" style="margin-top:8px;">
+                    Check on the host: <code>docker compose ps scheduler</code> and
+                    <code>docker compose logs --tail=80 scheduler</code>.
+                    Web should have <code>NCM_DISABLE_SCHEDULER=1</code>; scheduler must not.
+                </div>
+            `;
+        } else {
+            html = `
+                <div class="etl-store-meta">
+                    APScheduler <strong>is</strong> running here (mode: <code>${_escapeHtml(mode)}</code>).
+                    Pipeline lock: <strong>${sched.pipeline_lock_held_here ? 'HELD' : 'free'}</strong>.
+                    Neighbor lock: <strong>${sched.neighbor_lock_held_here ? 'HELD' : 'free'}</strong>.${ingestNote}${watcherNote}
+                </div>
+            `;
+        }
+        _etlSetHtmlIfChanged(status, html);
     }
-    if (!jobs || !jobs.length) {
-        _etlSetHtmlIfChanged(el, 'No jobs registered.');
-        return;
+    if (!tbody) return;
+    const jobs = d.scheduler?.jobs || [];
+    let html;
+    if (!d.scheduler?.in_process) {
+        html = `<tr><td colspan="4" style="text-align:center;">No in-process job list (scheduler container only). Status above explains why.</td></tr>`;
+    } else if (!jobs.length) {
+        html = `<tr><td colspan="4" style="text-align:center;">No jobs registered.</td></tr>`;
+    } else if (jobs[0]?.error) {
+        html = `<tr><td colspan="4">${_escapeHtml(jobs[0].error)}</td></tr>`;
+    } else {
+        html = jobs.map((j) => `
+            <tr>
+                <td><code>${_escapeHtml(j.id || '')}</code></td>
+                <td>${_escapeHtml(j.name || '')}</td>
+                <td>${_escapeHtml(j.next_run_time || '—')}</td>
+                <td><span class="etl-chip">${_escapeHtml(_jobKind(j.id || ''))}</span></td>
+            </tr>
+        `).join('');
     }
-    if (jobs[0]?.error) {
-        _etlSetHtmlIfChanged(el, _escapeHtml(jobs[0].error));
-        return;
-    }
-    _etlSetHtmlIfChanged(el, jobs.map(j => `
-        <div class="etl-store-row">
-            <div><strong>${_escapeHtml(j.id || '')}</strong></div>
-            <div class="etl-store-meta">${_escapeHtml(j.name || '')}</div>
-            <div class="etl-store-meta">next: ${_escapeHtml(j.next_run_time || '—')}</div>
-        </div>
-    `).join(''));
+    _etlSetHtmlIfChanged(tbody, html);
 }
 
 function _renderEtlLastOk(lastOk) {
@@ -488,20 +697,19 @@ async function loadEtlDiagnosis(force) {
             return;
         }
         const d = data.diagnosis;
+        etlDiagCache = d;
         const fp = _etlStableFingerprint(d);
         if (gen) {
             gen.textContent = `Snapshot ${d.generated_at || ''}${force ? ' (manual)' : ''}`;
         }
-        // Progress cards update in place (cheap); skip full panel rewrites when unchanged.
-        _etlEnsureProgressCards(d.progress || {});
+        _etlEnsureProgressCards(d.progress || {}, d.progress_timing || {});
+        _renderPipelineScheduler(d);
         if (!force && fp === etlDiagLastFingerprint) return;
         etlDiagLastFingerprint = fp;
         _renderEtlAlerts(d.alerts || []);
         _renderEtlKpis(d);
-        _renderEtlOps(d.manual_operations || []);
-        _renderEtlDomains(d.domains);
+        _renderEtlDomains(d.domains, d.stores || []);
         _renderEtlStores(d.stores || []);
-        _renderEtlJobs(d.scheduler?.jobs || [], d.scheduler);
         _renderEtlLastOk(d.last_ok || {});
         _renderEtlEventRows('etl-diag-errors', d.recent_errors || [], 4);
         _renderEtlEventRows('etl-diag-events', d.recent_events || [], 5);
@@ -1719,6 +1927,88 @@ function _escPowerBi(v) {
         .replace(/"/g, '&quot;');
 }
 
+function _cmLiveWriteMsg(text, isError) {
+    const el = document.getElementById('cm-live-write-msg');
+    if (!el) return;
+    if (!text) {
+        el.style.display = 'none';
+        el.textContent = '';
+        return;
+    }
+    el.style.display = 'block';
+    el.textContent = text;
+    el.classList.toggle('error', !!isError);
+}
+
+async function loadCmLiveWriteUsers() {
+    const body = document.getElementById('cm-live-write-body');
+    if (!body) return;
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+    _cmLiveWriteMsg('');
+    try {
+        const res = await fetch('/api/admin/cm-live-write/users');
+        const data = await res.json();
+        if (!data.success) {
+            body.innerHTML = `<tr><td colspan="5" style="text-align:center;">${_escPowerBi(data.error || 'Failed')}</td></tr>`;
+            return;
+        }
+        const users = (data.users || []).filter((u) => u.is_active);
+        if (!users.length) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No active users.</td></tr>';
+            return;
+        }
+        body.innerHTML = users.map((u) => {
+            const id = Number(u.id);
+            const username = _escPowerBi(u.username);
+            const email = _escPowerBi(u.email || '—');
+            const role = _escPowerBi(u.role_label || u.role || '');
+            const checked = u.can_live_write ? 'checked' : '';
+            const disabled = u.is_owner ? 'disabled' : '';
+            const label = u.is_owner ? 'Owner (always)' : (u.can_live_write ? 'Yes' : 'No');
+            return `<tr>
+                <td><strong>${username}</strong></td>
+                <td>${email}</td>
+                <td>${role}</td>
+                <td>Active</td>
+                <td>
+                    <label class="cm-live-write-toggle" title="Authorized to push live CM changes">
+                        <input type="checkbox" ${checked} ${disabled}
+                            onchange="toggleCmLiveWrite(${id}, this.checked)">
+                        ${_escPowerBi(label)}
+                    </label>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (_) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Network error</td></tr>';
+    }
+}
+
+async function toggleCmLiveWrite(userId, enabled) {
+    _cmLiveWriteMsg('Saving...');
+    try {
+        const res = await fetch(`/api/admin/cm-live-write/users/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ can_approve: !!enabled }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            _cmLiveWriteMsg(data.error || 'Update failed', true);
+            showNotification(data.error || 'Update failed', 'error');
+            loadCmLiveWriteUsers();
+            return;
+        }
+        _cmLiveWriteMsg('');
+        showNotification(enabled ? 'CM Live Write enabled' : 'CM Live Write removed', 'success');
+        loadCmLiveWriteUsers();
+    } catch (_) {
+        _cmLiveWriteMsg('Network error', true);
+        showNotification('Network error', 'error');
+        loadCmLiveWriteUsers();
+    }
+}
+
 async function loadPowerBiAdminCatalog() {
     const body = document.getElementById('power-bi-admin-body');
     if (!body) return;
@@ -1803,5 +2093,257 @@ async function removePowerBiReport(slug) {
         loadPowerBiAdminCatalog();
     } catch (e) {
         showNotification('Network error', 'error');
+    }
+}
+
+let moduleAccessRoleLoaded = false;
+let moduleAccessEditableRoles = [];
+let moduleAccessUserPickerLoaded = false;
+let moduleAccessSelectedUserId = null;
+
+function _moduleAccessRoleStatus(msg, isError) {
+    const el = document.getElementById('module-access-role-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('is-error', !!isError);
+}
+
+function _moduleAccessUserStatus(msg, isError) {
+    const el = document.getElementById('module-access-user-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('is-error', !!isError);
+}
+
+async function loadModuleAccessByRole() {
+    const body = document.getElementById('module-access-role-body');
+    if (!body) return;
+    body.innerHTML = '<tr><td class="feature-access-loading">Loading…</td></tr>';
+    _moduleAccessRoleStatus('');
+    try {
+        const res = await fetch('/api/admin/module-access/roles');
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessRoleStatus(data.error || 'Failed to load', true);
+            return;
+        }
+        moduleAccessEditableRoles = data.editable_roles || [];
+        renderModuleAccessByRole(data.features || []);
+        moduleAccessRoleLoaded = true;
+    } catch (_) {
+        _moduleAccessRoleStatus('Network error', true);
+    }
+}
+
+function renderModuleAccessByRole(features) {
+    const head = document.getElementById('module-access-role-head');
+    const body = document.getElementById('module-access-role-body');
+    if (!head || !body) return;
+    let headHtml = '<tr><th>Feature</th><th>Section</th><th class="fa-owner-col">Owner</th>';
+    moduleAccessEditableRoles.forEach((r) => {
+        headHtml += `<th>${_escPowerBi(r.label)}</th>`;
+    });
+    headHtml += '</tr>';
+    head.innerHTML = headHtml;
+    let rows = '';
+    features.forEach((f) => {
+        const enabled = new Set(f.roles || []);
+        let cells = '';
+        moduleAccessEditableRoles.forEach((r) => {
+            const checked = enabled.has(r.key) ? 'checked' : '';
+            const dis = f.locked ? 'disabled' : '';
+            cells += `<td class="fa-check"><input type="checkbox" data-href="${_escPowerBi(f.href)}" data-role="${_escPowerBi(r.key)}" ${checked} ${dis}></td>`;
+        });
+        const lockBadge = f.locked ? ' <span class="fa-lock" title="Core feature">🔒</span>' : '';
+        rows += `<tr class="fa-row ma-role-row" data-label="${_escPowerBi((f.label + ' ' + f.href).toLowerCase())}">
+            <td class="fa-name">${_escPowerBi(f.label)}${lockBadge}<span class="fa-href">${_escPowerBi(f.href)}</span></td>
+            <td class="fa-section">${_escPowerBi(f.section)}</td>
+            <td class="fa-check fa-owner-col"><input type="checkbox" checked disabled></td>
+            ${cells}
+        </tr>`;
+    });
+    body.innerHTML = rows || '<tr><td class="feature-access-loading">No features</td></tr>';
+}
+
+function filterModuleAccessByRole() {
+    const q = (document.getElementById('module-access-role-search')?.value || '').trim().toLowerCase();
+    document.querySelectorAll('#module-access-role-body .ma-role-row').forEach((row) => {
+        row.style.display = (row.getAttribute('data-label') || '').includes(q) ? '' : 'none';
+    });
+}
+
+async function saveModuleAccessByRole() {
+    const btn = document.getElementById('module-access-role-save-btn');
+    const byHref = {};
+    document.querySelectorAll('#module-access-role-body input[type="checkbox"][data-href]').forEach((cb) => {
+        if (cb.disabled) return;
+        const href = cb.getAttribute('data-href');
+        if (!byHref[href]) byHref[href] = [];
+        if (cb.checked) byHref[href].push(cb.getAttribute('data-role'));
+    });
+    const updates = Object.keys(byHref).map((href) => ({ href, roles: byHref[href] }));
+    if (btn) btn.disabled = true;
+    _moduleAccessRoleStatus('Saving…');
+    try {
+        const res = await fetch('/api/admin/module-access/roles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ updates }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessRoleStatus(data.error || 'Save failed', true);
+        } else {
+            if (data.features) renderModuleAccessByRole(data.features);
+            _moduleAccessRoleStatus(`Saved ${data.updated} feature(s).`);
+        }
+    } catch (_) {
+        _moduleAccessRoleStatus('Network error', true);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+async function resetModuleAccessByRole() {
+    if (!confirm('Reset all role module access to defaults?')) return;
+    _moduleAccessRoleStatus('Resetting…');
+    try {
+        const res = await fetch('/api/admin/module-access/roles/reset', { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessRoleStatus(data.error || 'Reset failed', true);
+        } else {
+            if (data.features) renderModuleAccessByRole(data.features);
+            _moduleAccessRoleStatus('Restored defaults.');
+        }
+    } catch (_) {
+        _moduleAccessRoleStatus('Network error', true);
+    }
+}
+
+async function ensureModuleAccessUserPicker() {
+    const sel = document.getElementById('module-access-user-select');
+    if (!sel || moduleAccessUserPickerLoaded) return;
+    try {
+        const res = await fetch('/api/admin/module-access/users');
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessUserStatus(data.error || 'Failed to load users', true);
+            return;
+        }
+        const users = (data.users || []).filter((u) => !u.is_owner);
+        sel.innerHTML = '<option value="">Select user…</option>' + users.map((u) =>
+            `<option value="${Number(u.id)}">${_escPowerBi(u.username)} (${_escPowerBi(u.role_label || u.role)})</option>`,
+        ).join('');
+        moduleAccessUserPickerLoaded = true;
+    } catch (_) {
+        _moduleAccessUserStatus('Network error', true);
+    }
+}
+
+async function loadModuleAccessByUser() {
+    const sel = document.getElementById('module-access-user-select');
+    const body = document.getElementById('module-access-user-body');
+    if (!sel || !body) return;
+    const userId = Number(sel.value || 0);
+    moduleAccessSelectedUserId = userId || null;
+    const saveBtn = document.getElementById('module-access-user-save-btn');
+    const resetBtn = document.getElementById('module-access-user-reset-btn');
+    if (!userId) {
+        body.innerHTML = '<tr><td colspan="5" class="feature-access-loading">Select a user…</td></tr>';
+        if (saveBtn) saveBtn.disabled = true;
+        if (resetBtn) resetBtn.disabled = true;
+        return;
+    }
+    body.innerHTML = '<tr><td colspan="5" class="feature-access-loading">Loading…</td></tr>';
+    if (saveBtn) saveBtn.disabled = false;
+    if (resetBtn) resetBtn.disabled = false;
+    try {
+        const res = await fetch(`/api/admin/module-access/user/${userId}`);
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessUserStatus(data.error || 'Failed', true);
+            return;
+        }
+        renderModuleAccessByUser(data.features || []);
+        _moduleAccessUserStatus('');
+    } catch (_) {
+        _moduleAccessUserStatus('Network error', true);
+    }
+}
+
+function renderModuleAccessByUser(features) {
+    const body = document.getElementById('module-access-user-body');
+    if (!body) return;
+    body.innerHTML = features.map((f) => {
+        const ov = f.override;
+        const inheritSel = ov === null || ov === undefined ? 'selected' : '';
+        const allowSel = ov === true ? 'selected' : '';
+        const denySel = ov === false ? 'selected' : '';
+        const roleTxt = f.role_allowed ? 'Allow' : 'Deny';
+        const effTxt = f.effective ? 'Allow' : 'Deny';
+        const dis = f.locked ? 'disabled' : '';
+        return `<tr class="fa-row ma-user-row" data-label="${_escPowerBi((f.label + ' ' + f.href).toLowerCase())}">
+            <td class="fa-name">${_escPowerBi(f.label)}<span class="fa-href">${_escPowerBi(f.href)}</span></td>
+            <td class="fa-section">${_escPowerBi(f.section)}</td>
+            <td>${roleTxt}</td>
+            <td>
+                <select class="module-access-override-select" data-href="${_escPowerBi(f.href)}" ${dis}>
+                    <option value="inherit" ${inheritSel}>Inherit role</option>
+                    <option value="allow" ${allowSel}>Allow</option>
+                    <option value="deny" ${denySel}>Deny</option>
+                </select>
+            </td>
+            <td>${effTxt}</td>
+        </tr>`;
+    }).join('');
+}
+
+function filterModuleAccessByUser() {
+    const q = (document.getElementById('module-access-user-search')?.value || '').trim().toLowerCase();
+    document.querySelectorAll('#module-access-user-body .ma-user-row').forEach((row) => {
+        row.style.display = (row.getAttribute('data-label') || '').includes(q) ? '' : 'none';
+    });
+}
+
+async function saveModuleAccessByUser() {
+    if (!moduleAccessSelectedUserId) return;
+    const updates = [];
+    document.querySelectorAll('#module-access-user-body select.module-access-override-select').forEach((sel) => {
+        updates.push({ href: sel.getAttribute('data-href'), override: sel.value });
+    });
+    _moduleAccessUserStatus('Saving…');
+    try {
+        const res = await fetch(`/api/admin/module-access/user/${moduleAccessSelectedUserId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ updates }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessUserStatus(data.error || 'Save failed', true);
+            return;
+        }
+        renderModuleAccessByUser(data.features || []);
+        _moduleAccessUserStatus(`Saved ${data.updated} override(s).`);
+    } catch (_) {
+        _moduleAccessUserStatus('Network error', true);
+    }
+}
+
+async function resetModuleAccessByUser() {
+    if (!moduleAccessSelectedUserId) return;
+    if (!confirm('Clear all module overrides for this user?')) return;
+    try {
+        const res = await fetch(`/api/admin/module-access/user/${moduleAccessSelectedUserId}/reset`, { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) {
+            _moduleAccessUserStatus(data.error || 'Reset failed', true);
+            return;
+        }
+        renderModuleAccessByUser(data.features || []);
+        _moduleAccessUserStatus('Overrides cleared.');
+    } catch (_) {
+        _moduleAccessUserStatus('Network error', true);
     }
 }

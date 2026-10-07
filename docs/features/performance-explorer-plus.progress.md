@@ -3,11 +3,26 @@
 Detailed dated log for this blueprint. Brief: [`performance-explorer-plus.md`](performance-explorer-plus.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
-**Parked:** PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`).
+**Parked:** None — continuous worker is deploy/ops (checklist below), not a code gap.
 
-**NEXT:** Tune live SFTP workers against <15 min lag SLO when on production hosts.
+**NEXT:** On server, run the deploy checklist; then tune SFTP workers against <15 min lag SLO.
 
 ---
+
+## 2026-10-07 (PM Plus continuous worker — deploy checklist)
+
+Run on the **server** only (laptop keeps `NCM_ENABLE_ETL=0`):
+
+1. Server `.env`: `NCM_ENABLE_ETL=1` (or unset so `deploy/entrypoint.sh` / `deploy/run_scheduler.py` default to `1`). Do **not** flip laptop `.env`.
+2. Confirm `PM_PLUS_DATABASE_URL` (or `pm_plus` in `NCM_PG_DOMAINS`) + `NOKIA_PM_FTP_*` / `PM_PLUS_*` worker envs from `.env.example`.
+3. Start a **separate** process (not Gunicorn, not the Excel `scheduler` compose service):
+   - Smoke once: `python scripts/pm_plus/run_ingest_worker.py --once --buckets 2`
+   - Continuous: `python scripts/pm_plus/run_ingest_worker.py` (tmux/systemd/sidecar). Poll default `PM_PLUS_POLL_INTERVAL_SEC` (30s).
+4. Alt without Excel ETL on that host: `python scripts/pm_plus/run_ingest_worker.py --ignore-etl-gate`.
+5. UI: `/performance-explorer-plus` → Ingest Health — lag/backlog; aim &lt;15 min when workers are up.
+6. Optional rollup: `python scripts/pm_plus/run_rollup.py`.
+
+Compose today has no `pm-plus-ingest` service — keep it as a sidecar/systemd unit until one is added.
 
 ---
 ## 2026-09-29 (Postgres-only)

@@ -10,9 +10,11 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from functools import wraps
 
 from database_enhanced import (
+    get_all_users,
     get_user_by_session,
     log_activity,
     get_db,
+    update_user_can_approve,
 )
 from db.runtime import (
     execute_query,
@@ -33,6 +35,8 @@ from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
 from core.huawei_pm.config import build_pm_client, pm_configured
 from core.huawei_pm.client import HuaweiPmError
 from core.platform.paths import platform_admin_entry_url
+from core import feature_access
+from core.module_access import feature_catalog, feature_catalog_for_user
 from modules.admin_panel.export import build_table_workbook
 from sync_config import (
     FEMTO_PM_DB,
@@ -150,10 +154,205 @@ def admin_panel_page():
     )
 
 
+def _engineering_admin_only():
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    return None
+
+
+@admin_panel_bp.route('/api/admin/module-access/roles', methods=['GET'])
+@admin_required
+def api_module_access_roles_get():
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    return jsonify({
+        'success': True,
+        'editable_roles': [
+            {'key': r, 'label': feature_access.ROLE_LABELS.get(r, r)}
+            for r in feature_access.EDITABLE_ROLES
+        ],
+        'features': feature_catalog(),
+    })
+
+
+@admin_panel_bp.route('/api/admin/module-access/roles', methods=['POST'])
+@admin_required
+def api_module_access_roles_post():
+    user = get_current_user()
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    data = request.get_json(silent=True) or {}
+    updates = data.get('updates')
+    if not isinstance(updates, list):
+        return jsonify({'success': False, 'error': 'Expected {"updates": [...]}'}), 400
+    known = {f['href']: f for f in feature_catalog()}
+    valid_roles = set(feature_access.EDITABLE_ROLES)
+    applied = 0
+    for item in updates:
+        if not isinstance(item, dict):
+            continue
+        href = str(item.get('href') or '').strip()
+        feat = known.get(href)
+        if not feat or feat.get('locked'):
+            continue
+        roles = [str(r).strip().lower() for r in (item.get('roles') or [])]
+        roles = [r for r in roles if r in valid_roles]
+        feature_access.set_feature_roles(
+            href,
+            roles,
+            updated_by=str(user.get('username') if isinstance(user, dict) else user[1]),
+        )
+        applied += 1
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_feature_access_update',
+        f'Updated role module access for {applied} feature(s)',
+    )
+    return jsonify({'success': True, 'updated': applied, 'features': feature_catalog()})
+
+
+@admin_panel_bp.route('/api/admin/module-access/roles/reset', methods=['POST'])
+@admin_required
+def api_module_access_roles_reset():
+    user = get_current_user()
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    feature_access.reset_all()
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_feature_access_reset',
+        'Reset role module access to defaults',
+    )
+    return jsonify({'success': True, 'features': feature_catalog()})
+
+
+@admin_panel_bp.route('/api/admin/module-access/users', methods=['GET'])
+@admin_required
+def api_module_access_users_list():
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    rows = []
+    for u in get_all_users():
+        if not u.get('is_active'):
+            continue
+        role = str(u.get('role') or '').strip().lower()
+        rows.append({
+            'id': u['id'],
+            'username': u['username'],
+            'email': u.get('email') or '',
+            'role': u.get('role') or '',
+            'role_label': ROLE_LABELS.get(role, u.get('role') or ''),
+            'is_owner': role == 'admin',
+        })
+    return jsonify({'success': True, 'users': rows})
+
+
+@admin_panel_bp.route('/api/admin/module-access/user/<int:user_id>', methods=['GET'])
+@admin_required
+def api_module_access_user_get(user_id):
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    targets = [u for u in get_all_users() if int(u['id']) == int(user_id)]
+    if not targets:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    target = targets[0]
+    role = str(target.get('role') or '').strip().lower()
+    return jsonify({
+        'success': True,
+        'user': {
+            'id': target['id'],
+            'username': target['username'],
+            'role': target.get('role') or '',
+            'role_label': ROLE_LABELS.get(role, target.get('role') or ''),
+            'is_owner': role == 'admin',
+        },
+        'features': feature_catalog_for_user(int(user_id), role),
+    })
+
+
+@admin_panel_bp.route('/api/admin/module-access/user/<int:user_id>', methods=['PUT'])
+@admin_required
+def api_module_access_user_put(user_id):
+    user = get_current_user()
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    targets = [u for u in get_all_users() if int(u['id']) == int(user_id)]
+    if not targets:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    target = targets[0]
+    if str(target.get('role') or '').strip().lower() == 'admin':
+        return jsonify({'success': False, 'error': 'Owners always have full module access'}), 400
+    data = request.get_json(silent=True) or {}
+    updates = data.get('updates')
+    if not isinstance(updates, list):
+        return jsonify({'success': False, 'error': 'Expected {"updates": [...]}'}), 400
+    known = {f['href'] for f in feature_catalog()}
+    applied = 0
+    actor = (user.get('username') if isinstance(user, dict) else user[1]) or ''
+    for item in updates:
+        if not isinstance(item, dict):
+            continue
+        href = str(item.get('href') or '').strip()
+        if href not in known:
+            continue
+        raw = item.get('override')
+        if raw is None or raw == 'inherit':
+            feature_access.set_user_override(user_id, href, None, updated_by=actor)
+        elif raw is True or raw == 'allow' or raw == 1 or raw == '1':
+            feature_access.set_user_override(user_id, href, True, updated_by=actor)
+        elif raw is False or raw == 'deny' or raw == 0 or raw == '0':
+            feature_access.set_user_override(user_id, href, False, updated_by=actor)
+        else:
+            continue
+        applied += 1
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_user_module_access',
+        f'Updated per-user module access for user {user_id} ({applied} feature(s))',
+    )
+    role = str(target.get('role') or '').strip().lower()
+    return jsonify({
+        'success': True,
+        'updated': applied,
+        'features': feature_catalog_for_user(int(user_id), role),
+    })
+
+
+@admin_panel_bp.route('/api/admin/module-access/user/<int:user_id>/reset', methods=['POST'])
+@admin_required
+def api_module_access_user_reset(user_id):
+    user = get_current_user()
+    denied = _engineering_admin_only()
+    if denied:
+        return denied
+    feature_access.reset_user_overrides(user_id)
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_user_module_access_reset',
+        f'Cleared per-user module overrides for user {user_id}',
+    )
+    targets = [u for u in get_all_users() if int(u['id']) == int(user_id)]
+    role = str((targets[0] if targets else {}).get('role') or '').strip().lower()
+    return jsonify({
+        'success': True,
+        'features': feature_catalog_for_user(int(user_id), role),
+    })
+
+
 @admin_panel_bp.route('/api/admin/feature-access', methods=['GET', 'POST'])
 @admin_panel_bp.route('/api/admin/feature-access/reset', methods=['POST'])
-def feature_access_moved():
-    return _platform_admin_moved()
+def feature_access_legacy():
+    return jsonify({
+        'error': 'Module access moved to Engineering Admin sections module-access-by-role / module-access-by-user',
+        'redirect': '/admin-panel?section=module-access-by-role',
+    }), 410
 
 
 @admin_panel_bp.route('/api/admin/users', methods=['GET', 'POST'])
@@ -993,3 +1192,60 @@ def api_power_bi_reports_remove(slug):
         return jsonify({'success': True, 'slug': slug})
     except Exception as exc:
         return jsonify({'success': False, 'error': str(exc)}), 500
+
+
+@admin_panel_bp.route('/api/admin/cm-live-write/users', methods=['GET'])
+@admin_required
+def api_cm_live_write_users_list():
+    """List users and CM live-write authorization (Owner manages on Engineering Admin)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    rows = []
+    for u in get_all_users():
+        role = str(u.get('role') or '').strip().lower()
+        is_owner = role == 'admin'
+        rows.append({
+            'id': u['id'],
+            'username': u['username'],
+            'email': u.get('email') or '',
+            'role': u.get('role') or '',
+            'role_label': ROLE_LABELS.get(role, u.get('role') or ''),
+            'is_active': bool(u.get('is_active')),
+            'can_live_write': is_owner or bool(u.get('can_approve')),
+            'is_owner': is_owner,
+        })
+    return jsonify({'success': True, 'users': rows})
+
+
+@admin_panel_bp.route('/api/admin/cm-live-write/users/<int:user_id>', methods=['PUT'])
+@admin_required
+def api_cm_live_write_user_update(user_id):
+    """Toggle whether a user may push live CM changes (RET, etc.)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'success': False, 'error': 'Owner access required'}), 403
+    body = request.get_json(silent=True) or {}
+    enabled = bool(body.get('can_approve'))
+    targets = [u for u in get_all_users() if int(u['id']) == int(user_id)]
+    if not targets:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    target = targets[0]
+    if str(target.get('role') or '').strip().lower() == 'admin':
+        return jsonify({
+            'success': True,
+            'can_approve': True,
+            'message': 'Owners always have CM Live Write',
+        })
+    if not update_user_can_approve(user_id, enabled):
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    log_activity(
+        (user.get('id') if isinstance(user, dict) else user[0]),
+        'admin_cm_live_write',
+        f'Set user {user_id} can_approve={int(enabled)}',
+    )
+    return jsonify({
+        'success': True,
+        'can_approve': enabled,
+        'message': 'CM Live Write updated',
+    })

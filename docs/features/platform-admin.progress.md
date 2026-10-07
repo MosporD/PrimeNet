@@ -9,7 +9,21 @@ Root journal (topics only): [../../progress.md](../../progress.md).
 
 - Done: `users.can_approve` column; Platform Admin Users table **Approver** checkbox; `PUT /api/platform-admin/users/<id>/approve`.
 - Owners always count as approvers (checkbox disabled). Flagged emails feed Teams MessageCards via `list_approver_emails()`.
-- NEXT: Assign Approver on real accounts; set `NCM_TEAMS_WEBHOOK_URL` and smoke an ETL finish card.
+
+## 2026-10-07 (Owner persistent session)
+
+- Done: Owners (`role=admin`) skip `is_password_change_required`; login creates ~100y session + cookie `max_age`; `get_user_by_session` extends Owner expiry on use. Other roles still use `SESSION_LIFETIME_HOURS`.
+- NEXT: Re-login once as Owner after deploy so the long-lived cookie is set.
+
+## 2026-10-07 (Platform Access vs module access)
+
+- Done: Renamed tab to **Platform Access** (portals only). Removed Module Access UI/API from NexusCore (410 → Engineering Admin module-access-by-role).
+- NEXT: NOC smoke — User Administration + Platform Access tab; portal edits unchanged.
+
+## 2026-10-07 (CM Live Write moved to Engineering Admin)
+
+- Done: Removed Approver UI and approve API from Platform Admin. Assignment lives on PrimeNet Engineering Admin → **CM Live Write** (`/admin-panel?section=cm-live-write`).
+- NEXT: Set `NCM_TEAMS_WEBHOOK_URL` and smoke an ETL finish card (approver emails unchanged — same DB flag).
 
 ---
 ## 2026-09-29 (Postgres-only)

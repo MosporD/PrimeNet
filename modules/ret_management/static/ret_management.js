@@ -50,7 +50,7 @@
     let activeTechs = new Set();
     let techFilterInitialized = false;
     /** Analytical pattern detail — isolates one sector (main + 2 sides + back). */
-    let patternDetailEnabled = false;
+    let patternDetailEnabled = true;
     /** Always live network (NetAct conf_id=1). */
     const LIVE_CONF_ID = 1;
     const TECH_ORDER = [
@@ -460,6 +460,10 @@
                     : null;
                 const techLabel = tech || 'Unknown';
                 const baseAzimuth = hasMetaAz ? sector.azimuth : retAzimuth;
+                const byTech = sector.measured_reach_by_tech || {};
+                const measuredReach = Number.isFinite(byTech[tech])
+                    ? byTech[tech]
+                    : (Number.isFinite(sector.measured_reach_m) ? sector.measured_reach_m : NaN);
                 lobes.push({
                     key: bucket,
                     sectorKey: sector.key,
@@ -472,6 +476,8 @@
                     beamwidth: techBeamwidth(tech),
                     height: sector.height,
                     mechanicalTilt: sector.mechanical_tilt,
+                    measuredReachM: measuredReach,
+                    measuredReachSource: sector.measured_reach_source || null,
                     bands: sector.bands || [],
                     cellCount: (sector.cells || []).filter((c) => !tech || c.technology === tech).length
                         || (tech ? 0 : (sector.cell_count || 0)),
@@ -731,8 +737,9 @@
                 + 'Pattern detail</button>',
             '<span class="holo-legend-item"><i class="edited"></i>edited (mesh ghost = committed tilt)</span>',
             '<p class="holo-legend-note">Pointing uses RET + 3× mechanical (metadata). '
-                + 'Reach clamped 100–1000 m, then band. Pattern detail = main + 2 sides (~20% @ ±90°) '
-                + '+ back (~55% @ 180°) and turns other sectors off — click a sector chip to switch focus; '
+                + 'Reach: PM UE distance when matched, else h/tan(tilt); clamped 100–1000 m, then band. '
+                + 'Pattern detail = cos^n main + 2 sides (~28% @ ±75°) '
+                + '+ back (~42% @ 180°) and turns other sectors off — click a sector chip to switch focus; '
                 + 'tech toggles still compare techs on that sector.</p>',
         ].join('');
         holoLegend.querySelectorAll('.holo-tech-toggle').forEach((btn) => {
@@ -1229,11 +1236,10 @@
 
     function askRetConfirmation(changeCount) {
         const phrase = 'APPLY RET CHANGES';
-        const typed = window.prompt(
-            `Confirm ${changeCount} RET change(s) to the live network.\nType exactly: ${phrase}`,
-            '',
+        const ok = window.confirm(
+            `Apply ${changeCount} RET change(s) to the live network?\n\nOK = apply · Cancel = abort`,
         );
-        return (typed || '').trim() === phrase ? phrase : null;
+        return ok ? phrase : null;
     }
 
     async function previewThenApplyNokia(body) {

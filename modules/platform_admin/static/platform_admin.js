@@ -1,5 +1,5 @@
 /**
- * NexusCore Platform Admin — users + module access.
+ * NexusCore Platform Admin — users + platform (portal) access.
  */
 
 const API = "/api/platform-admin";
@@ -23,149 +23,149 @@ const ROLE_LABELS = {
 const DEFAULT_USER_PASSWORD =
     document.getElementById("default-user-password-label")?.textContent?.trim() || "Zain@1234";
 const CURRENT_USER_ID = Number(document.body?.dataset?.currentUserId || 0);
-const CAN_MANAGE_ACCESS = document.body?.dataset?.canManageAccess === "1";
-
-let featureAccessLoaded = false;
-let featureAccessRoles = [];
-
 document.addEventListener("DOMContentLoaded", () => {
     const sectionFromUrl = new URLSearchParams(window.location.search).get("section");
-    const defaultPage = sectionFromUrl || "user-admin";
+    let defaultPage = sectionFromUrl || "user-admin";
+    if (defaultPage === "feature-access") {
+        defaultPage = "platform-access";
+    }
     openAdminPage(defaultPage);
     loadAllUsers();
 });
 
 function openAdminPage(pageName) {
-    if (pageName === "feature-access" && !CAN_MANAGE_ACCESS) {
-        pageName = "user-admin";
-    }
     document.querySelectorAll(".admin-page-tab").forEach((tab) => {
         tab.classList.toggle("active", tab.getAttribute("data-page") === pageName);
     });
     document.querySelectorAll(".admin-page-panel").forEach((panel) => {
         panel.classList.toggle("active", panel.getAttribute("data-page") === pageName);
     });
-    if (pageName === "feature-access" && !featureAccessLoaded) {
-        loadFeatureAccess();
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("section", pageName);
+        window.history.replaceState({}, "", url);
+    } catch (_) { /* ignore */ }
+    if (pageName === "platform-access") {
+        renderPlatformAccessUsers();
+        if (!allUsers.length) {
+            loadAllUsers();
+        }
     }
 }
 
-function _setFeatureStatus(msg, isError) {
-    const el = document.getElementById("feature-access-status");
+function _setPlatformAccessStatus(msg, isError) {
+    const el = document.getElementById("platform-access-status");
     if (!el) return;
     el.textContent = msg || "";
     el.classList.toggle("is-error", !!isError);
 }
 
-async function loadFeatureAccess() {
-    try {
-        const res = await fetch(`${API}/feature-access`);
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            _setFeatureStatus((data && data.error) || "Failed to load.", true);
-            return;
-        }
-        featureAccessRoles = data.editable_roles || [];
-        renderFeatureAccess(data.features || []);
-        featureAccessLoaded = true;
-        _setFeatureStatus("");
-    } catch (e) {
-        _setFeatureStatus("Network error loading feature access.", true);
-    }
+function filterPlatformAccessUsers() {
+    renderPlatformAccessUsers();
 }
 
-function renderFeatureAccess(features) {
-    const head = document.getElementById("feature-access-head");
-    const body = document.getElementById("feature-access-body");
+function renderPlatformAccessUsers() {
+    const head = document.getElementById("platform-access-head");
+    const body = document.getElementById("platform-access-body");
     if (!head || !body) return;
 
-    let headHtml = '<tr><th>Feature</th><th>Section</th><th class="fa-owner-col">Owner</th>';
-    featureAccessRoles.forEach((r) => {
-        headHtml += `<th>${r.label}</th>`;
+    const portals = portalCatalog || [];
+    let headHtml = "<tr><th>Username</th><th>Role</th><th>Status</th>";
+    portals.forEach((p) => {
+        const planned = p.live ? "" : ' <span class="fa-href">(planned)</span>';
+        headHtml += `<th title="${_escapeHtml(p.key)}">${_escapeHtml(p.label)}${planned}</th>`;
     });
     headHtml += "</tr>";
     head.innerHTML = headHtml;
 
-    let rows = "";
-    features.forEach((f) => {
-        const enabled = new Set(f.roles || []);
-        let cells = "";
-        featureAccessRoles.forEach((r) => {
-            const checked = enabled.has(r.key) ? "checked" : "";
-            const dis = f.locked ? "disabled" : "";
-            cells += `<td class="fa-check"><input type="checkbox" data-href="${f.href}" data-role="${r.key}" ${checked} ${dis}></td>`;
-        });
-        const lockBadge = f.locked
-            ? ' <span class="fa-lock" title="Core feature — cannot be restricted">🔒</span>'
-            : "";
-        rows += `<tr class="fa-row" data-label="${(f.label + " " + f.href).toLowerCase()}">
-            <td class="fa-name">${f.label}${lockBadge}<span class="fa-href">${f.href}</span></td>
-            <td class="fa-section">${f.section}</td>
-            <td class="fa-check fa-owner-col"><input type="checkbox" checked disabled title="Owner always has access"></td>
-            ${cells}
-        </tr>`;
+    const q = (document.getElementById("platform-access-search")?.value || "").trim().toLowerCase();
+    const users = (allUsers || []).filter((u) => {
+        if (!q) return true;
+        return (
+            String(u.username || "").toLowerCase().includes(q) ||
+            String(u.email || "").toLowerCase().includes(q)
+        );
     });
-    body.innerHTML = rows || '<tr><td class="feature-access-loading">No features found.</td></tr>';
-}
 
-function filterFeatureAccess() {
-    const q = (document.getElementById("feature-access-search").value || "").trim().toLowerCase();
-    document.querySelectorAll("#feature-access-body .fa-row").forEach((row) => {
-        const hit = (row.getAttribute("data-label") || "").indexOf(q) !== -1;
-        row.style.display = hit ? "" : "none";
-    });
-}
-
-async function saveFeatureAccess() {
-    const btn = document.getElementById("feature-access-save-btn");
-    const byHref = {};
-    document.querySelectorAll('#feature-access-body input[type="checkbox"][data-href]').forEach((cb) => {
-        if (cb.disabled) return;
-        const href = cb.getAttribute("data-href");
-        if (!byHref[href]) byHref[href] = [];
-        if (cb.checked) byHref[href].push(cb.getAttribute("data-role"));
-    });
-    const updates = Object.keys(byHref).map((href) => ({ href, roles: byHref[href] }));
-    if (btn) btn.disabled = true;
-    _setFeatureStatus("Saving…");
-    try {
-        const res = await fetch(`${API}/feature-access`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ updates }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            _setFeatureStatus((data && data.error) || "Save failed.", true);
-        } else {
-            if (data.features) renderFeatureAccess(data.features);
-            _setFeatureStatus(`Saved ${data.updated} feature(s).`);
-        }
-    } catch (e) {
-        _setFeatureStatus("Network error while saving.", true);
-    } finally {
-        if (btn) btn.disabled = false;
+    if (!users.length) {
+        body.innerHTML = `<tr><td colspan="${3 + portals.length}" style="text-align:center;">No users found</td></tr>`;
+        return;
     }
+
+    body.innerHTML = users
+        .map((user) => {
+            const isOwner = user.role === "admin";
+            const allowed = new Set(user.allowed_portals || []);
+            const cells = portals
+                .map((p) => {
+                    const checked = isOwner || allowed.has(p.key) ? "checked" : "";
+                    const disabled = isOwner ? "disabled" : "";
+                    return `<td class="fa-check">
+                        <input type="checkbox" ${checked} ${disabled}
+                            title="${_escapeHtml(p.label)}"
+                            onchange="toggleUserPortal(${Number(user.id)}, '${_escapeHtml(p.key)}', this.checked)">
+                    </td>`;
+                })
+                .join("");
+            return `<tr>
+                <td><strong>${_escapeHtml(user.username)}</strong><div class="fa-href">${_escapeHtml(user.email || "")}</div></td>
+                <td><span class="role-badge ${_escapeHtml(user.role)}">${_escapeHtml(user.role_label || ROLE_LABELS[user.role] || user.role)}</span></td>
+                <td><span class="status-badge ${user.is_active ? "active" : "inactive"}">${user.is_active ? "Active" : "Inactive"}</span></td>
+                ${cells}
+            </tr>`;
+        })
+        .join("");
 }
 
-async function resetFeatureAccess() {
-    if (!confirm("Reset all feature visibility to defaults? This clears every override.")) return;
-    _setFeatureStatus("Resetting…");
+async function toggleUserPortal(userId, portalKey, enabled) {
+    const user = allUsers.find((u) => Number(u.id) === Number(userId));
+    if (!user || user.role === "admin") {
+        renderPlatformAccessUsers();
+        return;
+    }
+    const current = new Set(user.allowed_portals || []);
+    if (enabled) current.add(portalKey);
+    else current.delete(portalKey);
+    if (!current.size) {
+        showNotification("Keep at least one portal", "error");
+        renderPlatformAccessUsers();
+        return;
+    }
+    _setPlatformAccessStatus("Saving…");
     try {
-        const res = await fetch(`${API}/feature-access/reset`, { method: "POST" });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            _setFeatureStatus((data && data.error) || "Reset failed.", true);
-        } else {
-            if (data.features) renderFeatureAccess(data.features);
-            _setFeatureStatus("Restored defaults.");
+        const response = await fetch(`${API}/users/${userId}/portals`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ allowed_portals: Array.from(current) }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            _setPlatformAccessStatus(data.error || "Save failed", true);
+            showNotification(data.error || "Failed to update portals", "error");
+            loadAllUsers();
+            return;
         }
-    } catch (e) {
-        _setFeatureStatus("Network error while resetting.", true);
+        user.allowed_portals = Array.from(current);
+        user.portal_labels = (portalCatalog || [])
+            .filter((p) => current.has(p.key))
+            .map((p) => p.label);
+        _setPlatformAccessStatus("Saved");
+        renderPlatformAccessUsers();
+        if (document.querySelector('.admin-page-panel[data-page="user-admin"].active')) {
+            displayUsers(filteredUsers);
+        }
+    } catch (error) {
+        _setPlatformAccessStatus("Network error", true);
+        showNotification("Error updating portals", "error");
+        loadAllUsers();
     }
 }
 
 async function loadAllUsers() {
+    const platformBody = document.getElementById("platform-access-body");
+    if (platformBody && !allUsers.length) {
+        platformBody.innerHTML = '<tr><td style="text-align:center;">Loading…</td></tr>';
+    }
     try {
         const response = await fetch(`${API}/users`);
         if (!response.ok) {
@@ -181,13 +181,25 @@ async function loadAllUsers() {
         usersPage = 1;
         displayUsers(filteredUsers);
         updateStats(allUsers);
+        renderPlatformAccessUsers();
+        _setPlatformAccessStatus(`${allUsers.length} user(s)`);
     } catch (error) {
         console.error("Error loading users:", error);
-        document.getElementById("users-table-body").innerHTML = `
+        const usersBody = document.getElementById("users-table-body");
+        if (usersBody) {
+            usersBody.innerHTML = `
             <tr><td colspan="9" style="text-align: center; color: #e74c3c;">
                 Error loading users: ${_escapeHtml(error.message)}
             </td></tr>
         `;
+        }
+        if (platformBody) {
+            platformBody.innerHTML = `
+            <tr><td style="text-align:center; color:#e74c3c;">
+                Error loading users: ${_escapeHtml(error.message)}
+            </td></tr>`;
+        }
+        _setPlatformAccessStatus(error.message || "Failed to load", true);
     }
 }
 
@@ -210,14 +222,6 @@ function displayUsers(users) {
             <td><strong>${_escapeHtml(user.username)}</strong></td>
             <td>${_escapeHtml(user.email)}</td>
             <td><span class="role-badge ${_escapeHtml(user.role)}">${_escapeHtml(user.role_label || ROLE_LABELS[user.role] || user.role)}</span></td>
-            <td>
-                <label class="approver-toggle" title="CM / change approver — receives Teams alerts">
-                    <input type="checkbox" ${user.can_approve || user.role === "admin" ? "checked" : ""}
-                        ${user.role === "admin" ? "disabled" : ""}
-                        onchange="toggleApprover(${Number(user.id)}, this.checked)">
-                    ${user.role === "admin" ? "Owner" : (user.can_approve ? "Yes" : "No")}
-                </label>
-            </td>
             <td class="portal-cell">${_escapeHtml((user.portal_labels || user.allowed_portals || []).join(", ") || "—")}</td>
             <td><span class="status-badge ${user.is_active ? "active" : "inactive"}">
                 ${user.is_active ? "Active" : "Inactive"}
@@ -275,27 +279,6 @@ async function toggleRole(userId, currentRole) {
         }
     } catch (error) {
         showNotification("Error updating role", "error");
-    }
-}
-
-async function toggleApprover(userId, enabled) {
-    try {
-        const response = await fetch(`${API}/users/${userId}/approve`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ can_approve: !!enabled }),
-        });
-        const data = await response.json();
-        if (data.success) {
-            showNotification(enabled ? "Approver enabled" : "Approver removed", "success");
-            loadAllUsers();
-        } else {
-            showNotification(data.error || "Failed to update approver flag", "error");
-            loadAllUsers();
-        }
-    } catch (error) {
-        showNotification("Error updating approver flag", "error");
-        loadAllUsers();
     }
 }
 

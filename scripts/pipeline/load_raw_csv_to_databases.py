@@ -37,6 +37,7 @@ from db.runtime import (
     execute_query,
     list_tables,
     open_db,
+    postgres_ident_truncate,
     read_sql_query,
     sqlite_ident,
     table_exists,
@@ -624,7 +625,7 @@ def _pm_cell_area_index() -> dict[str, str]:
         from core.site_area import build_cell_area_index
 
         _CELL_AREA_INDEX_CACHE = build_cell_area_index()
-        print(f"[pm-area] loaded cell→area index ({len(_CELL_AREA_INDEX_CACHE)} cells)")
+        print(f"[pm-area] loaded cell->area index ({len(_CELL_AREA_INDEX_CACHE)} cells)")
     return _CELL_AREA_INDEX_CACHE
 
 
@@ -670,6 +671,16 @@ def _append_dataframe_to_table(
     if df.empty:
         return 0
     df = _enrich_pm_report_columns(df, label, scope=scope, base_table=table)
+
+    # Match Postgres NAMEDATALEN truncation so chunked reloads compare equal to PRAGMA names.
+    if _is_pg_conn(conn):
+        rename = {
+            str(c): postgres_ident_truncate(str(c))
+            for c in df.columns
+            if postgres_ident_truncate(str(c)) != str(c)
+        }
+        if rename:
+            df = df.rename(columns=rename)
     table_exists = _table_exists(conn, table)
     if not table_exists:
         _df_to_sql(df, table, conn, if_exists="append")
@@ -941,13 +952,19 @@ def _ensure_table_columns(
 ) -> list[str]:
     """Add new incoming columns without replacing retained PM history."""
     cols = list(existing_cols)
-    seen = {str(c).lower().strip() for c in cols}
+    # On Postgres, compare/add using the same 63-byte truncated form PG stores.
+    def _norm(name: str) -> str:
+        text = str(name)
+        return postgres_ident_truncate(text) if _is_pg_conn(conn) else text
+
+    seen = {_norm(c).lower().strip() for c in cols}
     for col in incoming_cols:
-        key = str(col).lower().strip()
+        real = _norm(col)
+        key = real.lower().strip()
         if not key or key in seen:
             continue
-        conn.execute(f'ALTER TABLE {_sqlite_ident(table)} ADD COLUMN {_sqlite_ident(col)} TEXT')
-        cols.append(col)
+        conn.execute(f'ALTER TABLE {_sqlite_ident(table)} ADD COLUMN {_sqlite_ident(real)} TEXT')
+        cols.append(real)
         seen.add(key)
     return cols
 

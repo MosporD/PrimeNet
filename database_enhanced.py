@@ -322,6 +322,16 @@ def init_db():
         )
     ''')
     _exec(cursor, '''
+        CREATE TABLE IF NOT EXISTS user_feature_access (
+            user_id    INTEGER NOT NULL,
+            href       TEXT NOT NULL,
+            allowed    INTEGER NOT NULL,
+            updated_by TEXT,
+            updated_at TEXT,
+            PRIMARY KEY (user_id, href)
+        )
+    ''')
+    _exec(cursor, '''
         CREATE TABLE IF NOT EXISTS sync_log (
             id            INTEGER PRIMARY KEY AUTOINCREMENT,
             sync_type     TEXT NOT NULL,
@@ -580,7 +590,7 @@ def update_user_can_approve(user_id, can_approve: bool) -> bool:
     _exec(
         cursor,
         'UPDATE users SET can_approve = ? WHERE id = ?',
-        (1 if can_approve else 0, user_id),
+        (bool(can_approve), user_id),
     )
     affected = cursor.rowcount
     conn.commit()
@@ -793,17 +803,62 @@ def count_active_admins(exclude_user_id: int | None = None) -> int:
 # SESSION FUNCTIONS
 # ============================================================================
 
+# Owners keep a persistent login (DB + cookie); other roles use SESSION_LIFETIME_HOURS.
+OWNER_SESSION_YEARS = 100
+
+
+def _is_owner_user(user) -> bool:
+    if not user:
+        return False
+    if isinstance(user, dict):
+        role = user.get('role')
+    else:
+        try:
+            role = user[6]
+        except (IndexError, TypeError, KeyError):
+            role = None
+    return str(role or '').strip().lower() == 'admin'
+
+
+def session_cookie_max_age(user) -> int | None:
+    """Browser cookie lifetime. Owners get a long-lived cookie; others use session cookie."""
+    if _is_owner_user(user):
+        return int(timedelta(days=365 * OWNER_SESSION_YEARS).total_seconds())
+    return None
+
+
+def _owner_session_expires_at() -> datetime:
+    return datetime.now() + timedelta(days=365 * OWNER_SESSION_YEARS)
+
+
+def _user_role_by_id(user_id) -> str:
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        _exec(cursor, 'SELECT role FROM users WHERE id = ?', (user_id,))
+        row = cursor.fetchone()
+    finally:
+        conn.close()
+    if not row:
+        return ''
+    return str((row['role'] if isinstance(row, dict) else row[0]) or '').strip().lower()
+
+
 def create_session(user_id):
-    """Create session token for user"""
+    """Create session token for user. Owners get a non-expiring (century-scale) session."""
     conn = get_db()
     cursor = conn.cursor()
     session_token = secrets.token_urlsafe(32)
-    try:
-        lifetime_hours = int(os.getenv('SESSION_LIFETIME_HOURS', '2'))
-    except (TypeError, ValueError):
-        lifetime_hours = 2
-    lifetime_hours = max(1, min(lifetime_hours, 24 * 30))
-    expires_at = datetime.now() + timedelta(hours=lifetime_hours)
+    role = _user_role_by_id(user_id)
+    if role == 'admin':
+        expires_at = _owner_session_expires_at()
+    else:
+        try:
+            lifetime_hours = int(os.getenv('SESSION_LIFETIME_HOURS', '2'))
+        except (TypeError, ValueError):
+            lifetime_hours = 2
+        lifetime_hours = max(1, min(lifetime_hours, 24 * 30))
+        expires_at = datetime.now() + timedelta(hours=lifetime_hours)
 
     _exec(
         cursor,
@@ -819,7 +874,7 @@ def create_session(user_id):
     return session_token
 
 def get_user_by_session(session_token):
-    """Get user data by session token"""
+    """Get user data by session token. Owner sessions are extended on use."""
     if not session_token:
         return None
     try:
@@ -849,9 +904,17 @@ def get_user_by_session(session_token):
     )
     
     user = cursor.fetchone()
+    result = dict(user) if user else None
+    if result and _is_owner_user(result):
+        # Keep Owner sessions from ever aging out while they stay active.
+        _exec(
+            cursor,
+            'UPDATE sessions SET expires_at = ? WHERE session_token = ?',
+            (_owner_session_expires_at(), session_token),
+        )
+        conn.commit()
     conn.close()
     
-    result = dict(user) if user else None
     try:
         from flask import g, has_request_context
 
@@ -1347,9 +1410,22 @@ def _parse_timestamp(value):
 def is_password_change_required(user, max_days=60):
     if not user:
         return True
-    if user.get('force_password_change'):
-        return True
-    changed_at = _parse_timestamp(user.get('password_changed_at'))
+    # Owners are exempt — no forced rotation / forced change gates.
+    if _is_owner_user(user):
+        return False
+    if isinstance(user, dict):
+        if user.get('force_password_change'):
+            return True
+        changed_at = _parse_timestamp(user.get('password_changed_at'))
+    else:
+        try:
+            force = user[8] if len(user) > 8 else 1
+            changed_raw = user[7] if len(user) > 7 else None
+        except (IndexError, TypeError):
+            force, changed_raw = 1, None
+        if force:
+            return True
+        changed_at = _parse_timestamp(changed_raw)
     if not changed_at:
         return True
     return datetime.now() - changed_at >= timedelta(days=max_days)

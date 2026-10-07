@@ -10,11 +10,77 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import zipfile
 from typing import Iterable
 
 from pipeline.paths import raw_path
 
 _TABULAR_EXTS = (".csv", ".txt", ".tsv", ".xlsx", ".xls", ".xlsm")
+
+
+def extract_zip_tabular_members(path: str, *, log_prefix: str = "zip") -> int:
+    """
+    Stream-extract tabular members from a zip to the zip's directory, then remove the archive.
+
+    Uses copyfileobj (1 MiB chunks) so large Nokia 4G CSVs (~250MB+) do not need a full
+    in-memory ``src.read()``. Returns the number of members extracted.
+    """
+    if not path or not str(path).lower().endswith(".zip") or not os.path.isfile(path):
+        return 0
+    out_dir = os.path.dirname(path)
+    extracted = 0
+    skipped = 0
+    try:
+        with zipfile.ZipFile(path, "r") as zf:
+            members = [
+                m for m in zf.namelist()
+                if not m.endswith("/") and m.lower().endswith(".csv")
+            ]
+            if not members:
+                members = [
+                    m for m in zf.namelist()
+                    if not m.endswith("/") and m.lower().endswith(_TABULAR_EXTS)
+                ]
+            if not members:
+                print(f"[{log_prefix}] no extractable tabular members in {path}")
+                return 0
+            for m in members:
+                target_name = os.path.basename(m)
+                if not target_name:
+                    continue
+                target_path = os.path.join(out_dir, target_name)
+                try:
+                    with zf.open(m) as src, open(target_path, "wb") as dst:
+                        shutil.copyfileobj(src, dst, length=1024 * 1024)
+                except (EOFError, OSError, RuntimeError, MemoryError, zipfile.BadZipFile, zipfile.LargeZipFile) as e:
+                    skipped += 1
+                    print(f"[{log_prefix}] skipped member '{m}' in {path}: {e}")
+                    try:
+                        if os.path.isfile(target_path):
+                            os.remove(target_path)
+                    except OSError:
+                        pass
+                    continue
+                extracted += 1
+        if extracted > 0:
+            try:
+                os.remove(path)
+                removed = True
+            except OSError:
+                removed = False
+            msg = f"[{log_prefix}] extracted {extracted} file(s)"
+            if skipped:
+                msg += f", skipped {skipped} member(s)"
+            if removed:
+                print(f"{msg} and removed archive: {path}")
+            else:
+                print(f"{msg}; archive kept (remove failed): {path}")
+        else:
+            print(f"[{log_prefix}] no valid members extracted from archive (skipped={skipped}): {path}")
+    except zipfile.BadZipFile:
+        print(f"[{log_prefix}] skip invalid zip archive: {path}")
+        return 0
+    return extracted
 
 
 def infer_technology_from_filename(file_name: str) -> str | None:

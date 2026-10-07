@@ -29,6 +29,17 @@ _CELL_COL_CANDIDATES = [
     "Cell CI",
     "Cell Name",
 ]
+
+# SON / topology joins: Huawei 4G must key by Cell Name (not LocalCell Id).
+# Do not reorder _CELL_COL_CANDIDATES — Health precalc still uses the default.
+HUAWEI_SON_CELL_COLS = ["Cell Name", "cell_name", "Local_cell_name"]
+
+
+def prefer_cell_cols_for_vendor(vendor: str) -> list[str] | None:
+    """Optional cell-id override for a vendor label (e.g. huawei → Cell Name)."""
+    if (vendor or "").strip().lower() == "huawei":
+        return list(HUAWEI_SON_CELL_COLS)
+    return None
 _TS_COL_CANDIDATES = [
     "PERIOD_START_TIME",
     "Date",
@@ -243,6 +254,7 @@ def latest_kpi_values(
     kpi_column: str,
     *,
     limit: int = 8000,
+    prefer_cell_cols: list[str] | None = None,
 ) -> dict[str, float]:
     if not store_available(pm_db_path):
         return {}
@@ -254,7 +266,11 @@ def latest_kpi_values(
         cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()]
         if not cols or kpi_column not in cols:
             return out
-        cell_col = _find_col(cols, _CELL_COL_CANDIDATES)
+        cell_candidates: list[str] = []
+        for name in list(prefer_cell_cols or []) + _CELL_COL_CANDIDATES + ["DN", "dn"]:
+            if name not in cell_candidates:
+                cell_candidates.append(name)
+        cell_col = _find_col(cols, cell_candidates)
         ts_col = _find_col(cols, _TS_COL_CANDIDATES)
         if not cell_col or not ts_col:
             return out
@@ -617,10 +633,21 @@ def collect_degraded_cells(
     min_history_days: int = 3,
     degradation_pct: float = 5.0,
     min_absolute_delta: float = 0.5,
+    prefer_cell_cols_by_vendor: dict[str, list[str]] | None = None,
 ) -> list[dict]:
-    """Cells worse than last week, or currently past the operator `threshold_bad` target."""
+    """Cells worse than last week, or currently past the operator `threshold_bad` target.
+
+    ``prefer_cell_cols_by_vendor`` maps vendor labels (e.g. ``huawei``) to cell-column
+    overrides. SON Cluster passes Huawei Cell Name so keys align with ML scores.
+    Network Health / radio leave this unset (default LocalCell Id order).
+    """
     from core.radio.scoring import bounded_score, breached_threshold, score_vs_preset
 
+    prefer_map = {
+        str(k).strip().lower(): list(v)
+        for k, v in (prefer_cell_cols_by_vendor or {}).items()
+        if v
+    }
     degraded: list[dict] = []
     for cat_name, preset in category_presets.items():
         direction = preset["direction"]
@@ -629,8 +656,13 @@ def collect_degraded_cells(
             col = resolve_kpi_column(db_path, table, aliases)
             if not col:
                 continue
+            prefs = prefer_map.get(str(vlabel).strip().lower())
             series_map = _cell_daily_kpi_series(
-                db_path, table, col, lookback_days=lookback_days,
+                db_path,
+                table,
+                col,
+                lookback_days=lookback_days,
+                prefer_cell_cols=prefs,
             )
             for cell, series in series_map.items():
                 bench = benchmark_cell_change(

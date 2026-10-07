@@ -16,7 +16,7 @@
                 <div class="header-left">
                     <a href="{{ url_for('nexuscore.portal_select') }}" class="back-link">Portals</a>
                     <h1>Platform Admin</h1>
-                    <p>Users, portal allow-list, and engineering module access</p>
+                    <p>Users and platform (portal) access — PrimeNet module access is on Engineering Admin</p>
                 </div>
                 <div class="header-right">
                     <span class="user-name">{{ user.username }}</span>
@@ -43,40 +43,32 @@
 
             <div class="admin-pages-nav" role="tablist" aria-label="Platform admin sections">
                 <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
-                {% if can_manage_access %}
-                <button class="admin-page-tab" data-page="feature-access" type="button" onclick="openAdminPage('feature-access')">Module Access</button>
-                {% endif %}
+                <button class="admin-page-tab" data-page="platform-access" type="button" onclick="openAdminPage('platform-access')">Platform Access</button>
             </div>
 
-            {% if can_manage_access %}
-            <div class="admin-page-panel" data-page="feature-access">
-                <div class="sync-section feature-access-section">
-                    <h2 class="section-title">Module Access</h2>
+            <div class="admin-page-panel" data-page="platform-access">
+                <div class="sync-section">
+                    <h2 class="section-title">Platform Access</h2>
                     <p class="feature-access-intro">
-                        Choose which roles can see and open each PrimeNet feature. <strong>Owner</strong> always
-                        has full access. Locked core features (Dashboard, Profile, Admin Panel) can't be
-                        restricted. Changes apply within a few seconds.
+                        Tick which <strong>portals</strong> each user may open. Owners always keep every portal.
+                        PrimeNet <em>module</em> access (RET, Performance, …) is separate —
+                        <a href="{{ engineering_module_access_url }}">Engineering Admin → Module Access</a>.
                     </p>
-                    <div class="feature-access-toolbar">
-                        <input type="search" id="feature-access-search" class="feature-access-search"
-                               placeholder="Filter features…" autocomplete="off" oninput="filterFeatureAccess()">
-                        <div class="feature-access-actions">
-                            <span class="feature-access-status" id="feature-access-status"></span>
-                            <button type="button" class="btn-user-secondary" onclick="resetFeatureAccess()">Reset to defaults</button>
-                            <button type="button" class="btn-user-primary" id="feature-access-save-btn" onclick="saveFeatureAccess()">Save changes</button>
-                        </div>
+                    <div class="search-section user-admin-controls" style="margin-bottom:14px;">
+                        <input type="text" id="platform-access-search" placeholder="Search users…" onkeyup="filterPlatformAccessUsers()">
+                        <button type="button" class="btn-user-secondary" onclick="loadAllUsers()">↻ Refresh</button>
+                        <span class="feature-access-status" id="platform-access-status"></span>
                     </div>
-                    <div class="feature-access-table-wrap">
-                        <table class="feature-access-table" id="feature-access-table">
-                            <thead id="feature-access-head"></thead>
-                            <tbody id="feature-access-body">
-                                <tr><td class="feature-access-loading">Loading…</td></tr>
+                    <div class="users-table-container" style="padding:0; box-shadow:none;">
+                        <table class="users-table" id="platform-access-table">
+                            <thead id="platform-access-head"></thead>
+                            <tbody id="platform-access-body">
+                                <tr><td style="text-align:center;">Loading…</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            {% endif %}
 
             <div class="admin-page-panel active" data-page="user-admin">
                 <h2 class="section-title user-admin-title">User Administration</h2>
@@ -154,7 +146,6 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th>Approver</th>
                                 <th>Portals</th>
                                 <th>Status</th>
                                 <th>Created</th>
@@ -173,7 +164,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
-    <script src="{{ url_for('platform_admin.static', filename='platform_admin.js') }}?v=1.1"></script>
+    <script src="{{ url_for('platform_admin.static', filename='platform_admin.js') }}?v=1.5"></script>
 <!-- impeccable-live-start -->
 <script src="http://localhost:8400/live.js?token=1fdcccc0-d74b-4537-ad5c-5b4f96468180"></script>
 <!-- impeccable-live-end -->

@@ -17,7 +17,7 @@ WoW clusters + optional ML scores (PCA/IF, neighbor-graph topology, spatial DBSC
 ## Approach
 
 - Kill switch: `SON_DISABLE_ML=1`.
-- `pm_helpers.py` is shared by Health/SON. Default cell-id order is unchanged (Huawei `LocalCell Id` before `Cell Name`). SON ML passes `prefer_cell_cols=["Cell Name"]` so Topology can join neighbor `Local_cell_name`.
+- `pm_helpers.py` is shared by Health/SON. Default cell-id order is unchanged (Huawei `LocalCell Id` before `Cell Name`). SON ML and SON Cluster WoW pass Huawei `prefer_cell_cols` (Cell Name) so keys align with neighbor `Local_cell_name`; Health / radio leave the default.
 - Neighbor graph: `ml/neighbor_agg.py` aggregates vendor 4G export tables (not the map-line 100k sampler). Nokia targets resolve ECI → metadata `cell_name`.
 - Tests: `modules/son_analytics/test_recommendations.py`, `modules/son_analytics/ml/test_neighbor_graph.py`.
 
@@ -28,8 +28,8 @@ Dated work log: [`son-analytics.progress.md`](son-analytics.progress.md). Do not
 
 ## Plans
 
-**NEXT:** browser-click `/son-analytics`. No 2G/3G/5G ML. No closed-loop.
+**NEXT:** Optional live browser thumbs/Open-Case on server after deploy. No 2G/3G/5G ML. No closed-loop.
 
 ## Watch-outs
 
-Treatment scores are heuristic when CM+PM pairs are 0. Do not swap Huawei `LocalCell Id` vs `Cell Name` in the shared helper — that collapses Health cells to ~61 ids. Nokia 4G Target LNCEL is empty in NetAct HO analysis exports; SON must use `eci_id`.
+Treatment scores are heuristic when CM+PM pairs are 0. Do not reorder shared `_CELL_COL_CANDIDATES` (Health precalc stays on LocalCell Id). SON-only overrides use `prefer_cell_cols` / `prefer_cell_cols_by_vendor`. Nokia 4G Target LNCEL is empty in NetAct HO analysis exports; SON must use `eci_id`.

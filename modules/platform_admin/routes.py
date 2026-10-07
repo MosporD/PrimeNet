@@ -33,7 +33,6 @@ from database_enhanced import (
     log_activity,
     reset_user_password,
     set_user_force_password_change,
-    update_user_can_approve as db_update_user_can_approve,
     update_user_portals as db_update_user_portals,
     update_user_role as db_update_user_role,
     update_user_status as db_update_user_status,
@@ -118,90 +117,30 @@ def platform_admin_required(f):
 def platform_admin_page():
     user = get_current_user()
     role = _user_role(user)
+    from core.platform.paths import engineering_admin_section_url
+
     return render_template(
         "platform_admin.html",
         user=_format_user_data(user),
         role_labels=ROLE_LABELS,
         can_manage_access=role == "admin",
         default_user_password=NCM_DEFAULT_USER_PASSWORD,
+        engineering_module_access_url=engineering_admin_section_url("module-access-by-role"),
     )
 
 
-@platform_admin_bp.route("/api/platform-admin/feature-access", methods=["GET"])
-def get_feature_access():
-    user = get_current_user()
-    if not _is_owner(user):
-        return jsonify({"error": "Owner access required"}), 403
-    from core import feature_access
-    from core.module_access import feature_catalog
-
-    return jsonify(
-        {
-            "success": True,
-            "editable_roles": [
-                {"key": r, "label": feature_access.ROLE_LABELS.get(r, r)}
-                for r in feature_access.EDITABLE_ROLES
-            ],
-            "features": feature_catalog(),
-        }
-    )
+def _module_access_moved():
+    from core.platform.paths import engineering_admin_section_url
+    return jsonify({
+        "error": "PrimeNet module access moved to Engineering Admin",
+        "redirect": engineering_admin_section_url("module-access-by-role"),
+    }), 410
 
 
-@platform_admin_bp.route("/api/platform-admin/feature-access", methods=["POST"])
-def update_feature_access():
-    user = get_current_user()
-    if not _is_owner(user):
-        return jsonify({"error": "Owner access required"}), 403
-    from core import feature_access
-    from core.module_access import feature_catalog
-
-    data = request.get_json(silent=True) or {}
-    updates = data.get("updates")
-    if not isinstance(updates, list):
-        return jsonify({"error": 'Expected {"updates": [...]}'}), 400
-
-    known = {f["href"]: f for f in feature_catalog()}
-    valid_roles = set(feature_access.EDITABLE_ROLES)
-    applied = 0
-    for item in updates:
-        if not isinstance(item, dict):
-            continue
-        href = str(item.get("href") or "").strip()
-        feat = known.get(href)
-        if not feat or feat.get("locked"):
-            continue
-        roles = [str(r).strip().lower() for r in (item.get("roles") or [])]
-        roles = [r for r in roles if r in valid_roles]
-        feature_access.set_feature_roles(
-            href,
-            roles,
-            updated_by=str(user.get("username") if isinstance(user, dict) else user[1]),
-        )
-        applied += 1
-
-    log_activity(
-        (user.get("id") if isinstance(user, dict) else user[0]),
-        "admin_feature_access_update",
-        f"Updated visibility for {applied} feature(s)",
-    )
-    return jsonify({"success": True, "updated": applied, "features": feature_catalog()})
-
-
+@platform_admin_bp.route("/api/platform-admin/feature-access", methods=["GET", "POST"])
 @platform_admin_bp.route("/api/platform-admin/feature-access/reset", methods=["POST"])
-def reset_feature_access():
-    user = get_current_user()
-    if not _is_owner(user):
-        return jsonify({"error": "Owner access required"}), 403
-    from core import feature_access
-    from core.module_access import feature_catalog
-
-    feature_access.reset_all()
-    log_activity(
-        (user.get("id") if isinstance(user, dict) else user[0]),
-        "admin_feature_access_reset",
-        "Reset all feature visibility to defaults",
-    )
-    return jsonify({"success": True, "features": feature_catalog()})
+def feature_access_moved():
+    return _module_access_moved()
 
 
 @platform_admin_bp.route("/api/platform-admin/users", methods=["GET"])
@@ -226,8 +165,6 @@ def get_users():
                     "role_label": ROLE_LABELS.get(
                         str(u.get("role", "")).strip().lower(), u.get("role", "")
                     ),
-                    "can_approve": bool(u.get("can_approve"))
-                    or str(u.get("role", "")).strip().lower() == "admin",
                     "last_activity": u["last_login"],
                     "allowed_portals": portals,
                     "portal_labels": [PORTAL_LABELS.get(p, p) for p in portals],
@@ -407,45 +344,6 @@ def update_user_role(user_id):
             f"Changed user {user_id} role to {new_role}",
         )
         return jsonify({"success": True, "message": f"Role updated to {new_role}"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@platform_admin_bp.route("/api/platform-admin/users/<int:user_id>/approve", methods=["PUT"])
-def update_user_approve(user_id):
-    """Toggle CM / change approver flag (Teams notify list + write gate)."""
-    user = get_current_user()
-    if not _can_access_user_admin(user):
-        return jsonify({"error": "Owner or NOC SYS access required"}), 403
-
-    try:
-        data = request.get_json() or {}
-        can_approve = bool(data.get("can_approve"))
-
-        targets = [u for u in get_all_users() if int(u["id"]) == int(user_id)]
-        if not targets:
-            return jsonify({"error": "User not found"}), 404
-        target = targets[0]
-        if str(target.get("role", "")).strip().lower() == "admin":
-            return jsonify({
-                "success": True,
-                "can_approve": True,
-                "message": "Owners are always approvers",
-            })
-
-        if not db_update_user_can_approve(user_id, can_approve):
-            return jsonify({"error": "User not found"}), 404
-
-        log_activity(
-            (user.get("id") if isinstance(user, dict) else user[0]),
-            "admin_change_approver",
-            f"Set user {user_id} can_approve={int(can_approve)}",
-        )
-        return jsonify({
-            "success": True,
-            "can_approve": can_approve,
-            "message": "Approver flag updated",
-        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

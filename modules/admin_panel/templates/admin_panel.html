@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineering Admin - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=2.3">
 </head>
 <body class="admin-panel-page" data-current-user-id="{{ user.id }}">
     <div class="container">
@@ -30,12 +30,16 @@
                     <select id="admin-section-select" class="admin-section-select" aria-label="Admin section">
                         <option value="data-sync">Data Sync</option>
                         <option value="etl-diagnosis">ETL Diagnosis</option>
+                        <option value="pipeline-scheduler">Pipeline Scheduler</option>
                         <option value="sync-status">Sync Status</option>
                         <option value="sync-history">Sync History</option>
                         <option value="api-connections">API Connections</option>
                         <option value="pm-plus-rules">PM Plus Rules</option>
                         <option value="power-bi">Power BI</option>
                         <option value="ops-alerts">Ops Alerts</option>
+                        <option value="cm-live-write">CM Live Write</option>
+                        <option value="module-access-by-role">Module Access (by role)</option>
+                        <option value="module-access-by-user">Module Access (by user)</option>
                         <option value="activity-log">Activity Log</option>
                     </select>
                 </div>
@@ -135,31 +139,48 @@
                     <p class="field-hint" id="etl-diag-generated">Loading diagnosis…</p>
                     <div id="etl-diag-alerts" class="etl-alert-list"></div>
 
-                    <div class="etl-kpi-grid" id="etl-diag-kpis"></div>
+                    <div class="etl-kpi-shell" id="etl-kpi-shell">
+                        <button type="button" class="etl-kpi-toggle" id="etl-kpi-toggle" aria-expanded="false" onclick="toggleEtlKpis()">
+                            <span class="etl-kpi-toggle-label">Pipeline status</span>
+                            <span class="etl-kpi-summary" id="etl-kpi-summary">Loading…</span>
+                            <span class="etl-kpi-chevron" aria-hidden="true">▸</span>
+                        </button>
+                        <div class="etl-kpi-grid etl-kpi-grid-collapsed" id="etl-diag-kpis" hidden></div>
+                    </div>
 
                     <h3 class="section-subtitle">Live pipeline progress</h3>
                     <p class="field-hint">
-                        Progress bars update for jobs running in this process (manual triggers from the web UI).
-                        Scheduled work on the scheduler container is visible via events and store counts below.
+                        Progress bars update for jobs running in this process (manual triggers from Data Sync).
+                        Scheduled next-run times appear when APScheduler is hosted here; otherwise check
+                        <a href="/admin-panel?section=pipeline-scheduler">Pipeline Scheduler</a>.
                     </p>
                     <div class="live-progress-grid etl-progress-grid" id="etl-diag-progress"></div>
 
-                    <h3 class="section-subtitle">Manual operations</h3>
-                    <div class="etl-ops-grid" id="etl-diag-ops"></div>
+                    <p class="field-hint etl-manual-note">
+                        Manual pull / load buttons live on
+                        <a href="/admin-panel?section=data-sync">Data Sync</a>
+                        (same endpoints). This page is diagnosis only.
+                    </p>
                     <div id="etl-diag-msg" class="sync-msg" style="display:none;"></div>
 
                     <div class="etl-two-col">
                         <div>
                             <h3 class="section-subtitle">Postgres domains</h3>
-                            <div id="etl-diag-domains" class="etl-panel-box"></div>
-                            <h3 class="section-subtitle">Store row counts</h3>
-                            <div id="etl-diag-stores" class="etl-panel-box"></div>
+                            <div class="etl-select-row">
+                                <label for="etl-domain-select">Domain</label>
+                                <select id="etl-domain-select" class="etl-select" aria-label="Postgres domain"></select>
+                            </div>
+                            <div id="etl-diag-domains" class="etl-panel-box etl-panel-box-tall"></div>
+                            <h3 class="section-subtitle">Store tables</h3>
+                            <div class="etl-select-row">
+                                <label for="etl-store-select">Store</label>
+                                <select id="etl-store-select" class="etl-select" aria-label="Data store"></select>
+                            </div>
+                            <div id="etl-diag-stores" class="etl-panel-box etl-panel-box-tall"></div>
                         </div>
                         <div>
-                            <h3 class="section-subtitle">Scheduler jobs</h3>
-                            <div id="etl-diag-jobs" class="etl-panel-box"></div>
                             <h3 class="section-subtitle">Last successful runs</h3>
-                            <div id="etl-diag-last-ok" class="etl-panel-box"></div>
+                            <div id="etl-diag-last-ok" class="etl-panel-box etl-panel-box-tall"></div>
                         </div>
                     </div>
 
@@ -198,6 +219,44 @@
                             </thead>
                             <tbody id="etl-diag-events">
                                 <tr><td colspan="5" style="text-align:center;">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="pipeline-scheduler">
+                <div class="sync-section etl-diagnosis-section">
+                    <div class="section-title-row">
+                        <h2 class="section-title">Pipeline Scheduler</h2>
+                        <div class="etl-diag-toolbar">
+                            <label class="etl-auto-refresh">
+                                <input type="checkbox" id="etl-sched-auto" checked>
+                                Auto-refresh
+                            </label>
+                            <button type="button" class="btn-history-reload" onclick="loadEtlDiagnosis(true)">↻ Refresh</button>
+                        </div>
+                    </div>
+                    <p class="field-hint">
+                        PrimeNet <strong>APScheduler</strong> (hourly/daily ingest, metadata, neighbors, inventory, etc.).
+                        This is <em>not</em> the CM Extractor job UI — that module has its own schedule list.
+                        One cron here (<code>cm_extractor_scheduled_jobs</code>) only wakes CM due-jobs when the scheduler process is running.
+                    </p>
+                    <p class="field-hint" id="etl-sched-generated">Loading…</p>
+                    <div id="etl-sched-status" class="etl-panel-box"></div>
+                    <h3 class="section-subtitle">Registered jobs</h3>
+                    <div class="etl-table-wrap">
+                        <table class="sync-table etl-jobs-table">
+                            <thead>
+                                <tr>
+                                    <th>Job id</th>
+                                    <th>Name</th>
+                                    <th>Next run</th>
+                                    <th>Kind</th>
+                                </tr>
+                            </thead>
+                            <tbody id="etl-sched-jobs">
+                                <tr><td colspan="4" style="text-align:center;">Loading…</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -382,6 +441,101 @@
                 </div>
             </div>
 
+            <div class="admin-page-panel" data-page="module-access-by-role">
+                <div class="sync-section feature-access-section">
+                    <h2 class="section-title">Module Access — by role</h2>
+                    <p class="feature-access-intro">
+                        Baseline PrimeNet feature visibility per role. <strong>Owner</strong> always has full access.
+                        Per-user overrides (next section) win over these rules when set.
+                    </p>
+                    <div class="feature-access-toolbar">
+                        <input type="search" id="module-access-role-search" class="feature-access-search"
+                               placeholder="Filter features…" autocomplete="off" oninput="filterModuleAccessByRole()">
+                        <div class="feature-access-actions">
+                            <span class="feature-access-status" id="module-access-role-status"></span>
+                            <button type="button" class="btn-history-reload" onclick="loadModuleAccessByRole()">↻ Refresh</button>
+                            <button type="button" class="btn-user-secondary" onclick="resetModuleAccessByRole()">Reset to defaults</button>
+                            <button type="button" class="btn-user-primary" id="module-access-role-save-btn" onclick="saveModuleAccessByRole()">Save changes</button>
+                        </div>
+                    </div>
+                    <div class="feature-access-table-wrap">
+                        <table class="feature-access-table" id="module-access-role-table">
+                            <thead id="module-access-role-head"></thead>
+                            <tbody id="module-access-role-body">
+                                <tr><td class="feature-access-loading">Open this tab to load…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="module-access-by-user">
+                <div class="sync-section feature-access-section">
+                    <h2 class="section-title">Module Access — by user</h2>
+                    <p class="feature-access-intro">
+                        Override role rules for one user. <strong>Inherit</strong> uses the role matrix above;
+                        <strong>Allow</strong> or <strong>Deny</strong> forces access regardless of role (except Owners).
+                    </p>
+                    <div class="feature-access-toolbar">
+                        <label class="admin-section-label" for="module-access-user-select">User</label>
+                        <select id="module-access-user-select" class="admin-section-select" onchange="loadModuleAccessByUser()">
+                            <option value="">Select user…</option>
+                        </select>
+                        <div class="feature-access-actions">
+                            <span class="feature-access-status" id="module-access-user-status"></span>
+                            <button type="button" class="btn-user-secondary" onclick="resetModuleAccessByUser()" id="module-access-user-reset-btn" disabled>Clear user overrides</button>
+                            <button type="button" class="btn-user-primary" id="module-access-user-save-btn" onclick="saveModuleAccessByUser()" disabled>Save overrides</button>
+                        </div>
+                    </div>
+                    <input type="search" id="module-access-user-search" class="feature-access-search"
+                           placeholder="Filter features…" autocomplete="off" oninput="filterModuleAccessByUser()" style="margin-bottom:12px;">
+                    <div class="feature-access-table-wrap">
+                        <table class="feature-access-table" id="module-access-user-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Section</th>
+                                    <th>Role default</th>
+                                    <th>Override</th>
+                                    <th>Effective</th>
+                                </tr>
+                            </thead>
+                            <tbody id="module-access-user-body">
+                                <tr><td colspan="5" class="feature-access-loading">Select a user…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="cm-live-write">
+                <div class="sync-section">
+                    <div class="section-title-row">
+                        <h2 class="section-title">CM Live Write</h2>
+                        <button type="button" class="btn-history-reload" onclick="loadCmLiveWriteUsers()">↻ Refresh</button>
+                    </div>
+                    <p class="api-connections-intro">
+                        Users who may <strong>apply live CM changes</strong> to the network (RET Management today; more CM modules later).
+                        This is permission to push — not a pending-approval queue. <strong>Owners</strong> always have access.
+                    </p>
+                    <table class="sync-table" style="margin-top:8px;">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>CM Live Write</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cm-live-write-body">
+                            <tr><td colspan="5" style="text-align:center;">Open this tab to load…</td></tr>
+                        </tbody>
+                    </table>
+                    <pre id="cm-live-write-msg" class="inspect-output" style="display:none; margin-top:10px;"></pre>
+                </div>
+            </div>
+
             <div class="admin-page-panel" data-page="power-bi">
                 <div class="sync-section">
                     <div class="section-title-row">
@@ -477,7 +631,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=3.2"></script>
-    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.14"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.17"></script>
 <!-- impeccable-live-start -->
 <script src="http://localhost:8400/live.js?token=1fdcccc0-d74b-4537-ad5c-5b4f96468180"></script>
 <!-- impeccable-live-end -->

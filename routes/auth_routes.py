@@ -10,7 +10,8 @@ from collections import defaultdict, deque
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, make_response, g
 from database_enhanced import (
     authenticate_user, create_session,
-    get_user_by_session, delete_session, log_activity, is_password_change_required
+    get_user_by_session, delete_session, log_activity, is_password_change_required,
+    session_cookie_max_age,
 )
 from db.runtime import connect_metadata, execute_query
 from core.module_access import allowed_hrefs_for_role, navigation_sections_for_role
@@ -454,7 +455,11 @@ def login():
                 'allowed_hrefs': allowed_hrefs_for_role(user_role),
             }))
 
-            set_session_cookie(response, session_token)
+            set_session_cookie(
+                response,
+                session_token,
+                max_age=session_cookie_max_age(user),
+            )
             return response
         else:
             _record_login_failure(client_ip, username)

@@ -286,7 +286,14 @@ def create_identity_blueprint(
                     }
                 )
             )
-            set_session_cookie(response, token)
+            cookie_max_age = None
+            try:
+                from database_enhanced import session_cookie_max_age
+
+                cookie_max_age = session_cookie_max_age(user)
+            except Exception:
+                cookie_max_age = None
+            set_session_cookie(response, token, max_age=cookie_max_age)
             return response
         except Exception:
             logger.exception("Login error (%s)", platform_id)

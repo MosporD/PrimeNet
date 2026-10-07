@@ -3,7 +3,13 @@
 Detailed dated log for this blueprint. Brief: [`sync.md`](sync.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
-**Parked:** Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop.
+**Parked:** None for ETL gate — laptop `NCM_ENABLE_ETL=0` is intentional policy (see 2026-10-07).
+
+---
+## 2026-10-07 (Laptop ETL kill switch = policy)
+
+- Confirmed: `.env.example` keeps `NCM_ENABLE_ETL=0` (laptop-safe). Server scheduler entrypoint defaults to `1` when unset (`deploy/entrypoint.sh`, `deploy/run_scheduler.py`).
+- Not debt: do not enable pull/load/PM-Plus Excel ETL on the laptop. Close parked wording.
 
 ---
 ## 2026-10-05 (Nokia/Huawei CM catalog on shared volume)

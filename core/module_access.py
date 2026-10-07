@@ -98,6 +98,13 @@ def _role_key(user_or_role) -> str:
     return str(user_or_role or "").strip().lower()
 
 
+def _user_id(user_or_role) -> int | None:
+    if isinstance(user_or_role, dict):
+        uid = user_or_role.get("id")
+        return int(uid) if uid is not None else None
+    return None
+
+
 def _default_visibility_map() -> dict[str, str]:
     """Normalized href -> hardcoded default visibility, from NAV_SECTIONS."""
     out: dict[str, str] = {}
@@ -111,13 +118,17 @@ def default_visibility_for(href: str) -> str:
     return _default_visibility_map().get(normalize_href(href), "all")
 
 
-def _link_visible(href: str, visibility: str, role: str) -> bool:
-    """Config-aware visibility check (admin always visible)."""
-    if role == "admin":
-        return True
+def _link_visible(href: str, visibility: str, user_or_role) -> bool:
+    """Config-aware visibility (role rules + per-user override)."""
+    role = _role_key(user_or_role)
     from core import feature_access
 
-    return feature_access.role_can_access(normalize_href(href), visibility, role)
+    return feature_access.user_can_access(
+        normalize_href(href),
+        visibility,
+        role,
+        user_id=_user_id(user_or_role),
+    )
 
 
 def feature_catalog(user_or_role=None) -> list[dict]:
@@ -185,7 +196,8 @@ def path_access(path: str, user_or_role) -> tuple[bool, bool]:
         return (role == "admin", False)
     if role == "admin":
         return (True, True)
-    return (_link_visible(href, default_visibility_for(href), role), True)
+    vis = default_visibility_for(href)
+    return (_link_visible(href, vis, user_or_role), True)
 
 
 def enforce_module_access(href: str, user_or_role):
@@ -222,18 +234,48 @@ def module_access_before_request(href: str):
 
 
 def navigation_sections_for_role(user_or_role) -> list[dict]:
-    """Return feature-nav sections filtered for the user's role."""
-    role = _role_key(user_or_role)
+    """Return feature-nav sections filtered for the user (role + overrides)."""
     sections: list[dict] = []
     for section in NAV_SECTIONS:
         links = [
             {"label": nav_label(link["label"], link["href"]), "href": link["href"]}
             for link in section.get("links") or []
-            if _link_visible(link.get("href") or "", str(link.get("visibility") or "all"), role)
+            if _link_visible(
+                link.get("href") or "",
+                str(link.get("visibility") or "all"),
+                user_or_role,
+            )
         ]
         if links:
             sections.append({"title": section["title"], "links": links})
     return sections
+
+
+def feature_catalog_for_user(user_id: int, role: str) -> list[dict]:
+    """Feature list with role default, override, and effective access for one user."""
+    from core import feature_access
+
+    overrides = feature_access.get_user_overrides(user_id)
+    base = feature_catalog()
+    out: list[dict] = []
+    for feat in base:
+        href = feat["href"]
+        visibility = feat["default_visibility"]
+        role_allowed = feature_access.role_can_access(href, visibility, role)
+        override = overrides.get(href)
+        if str(role or "").strip().lower() == "admin":
+            effective = True
+        elif override is not None:
+            effective = bool(override)
+        else:
+            effective = role_allowed
+        out.append({
+            **feat,
+            "role_allowed": role_allowed,
+            "override": override,
+            "effective": effective,
+        })
+    return out
 
 
 def allowed_hrefs_for_role(user_or_role) -> list[str]:

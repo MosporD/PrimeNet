@@ -4,9 +4,26 @@ Dated log of verified work. Mark items done only after end-to-end verification.
 
 **Current track:** Postgres-only runtime (1B) + blueprint sweep (2B).
 
-**Parked:** SON trust click-through. Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`. PM Plus continuous worker on server (`NCM_ENABLE_ETL=1`). Local ETL kill switch remains `NCM_ENABLE_ETL=0` on laptop. RET hologram ground reach from performance/TA (needs per-cell PM pipeline + RET↔cell map) — for now geometric h/tan(tilt) clamped 100–1000 m. Pattern detail is cosmetic side lobes/nulls — upgrade to analytic/real patterns if the look is wrong.
+**Parked:** None from the Oct-7 unpark slice. Laptop `NCM_ENABLE_ETL=0` stays intentional policy. PM Plus continuous worker is a server deploy checklist (see performance-explorer-plus progress).
 
-**NEXT:** Rebuild/restart scheduler + primenet; one Nokia CM inventory refresh; confirm new MRBTS (e.g. 54792) in RET Management; then Teams webhook + Approver smoke.
+**NEXT:** Rebuild/restart scheduler + primenet; one Nokia CM inventory refresh; confirm new MRBTS (e.g. 54792) in RET Management; then Teams webhook + Approver smoke. Run PM Plus ingest checklist on server when ready.
+
+## 2026-10-07 (ETL Diagnosis UI)
+
+- Eng Admin: selectable store tables + domain focus, collapsible KPIs, wider progress + last/next, Manual ops → Data Sync, new Pipeline Scheduler tab (APScheduler, not CM UI).
+
+## 2026-10-07 (Nokia 4G Performance empty)
+
+- Root cause: PG 63-byte column truncate broke multi-chunk Nokia 4G cell loads. Fixed + backfilled hourly/daily into shared PM. Deploy loader fix to server.
+
+## 2026-10-07 (Unpark: SON identity, RET hologram, ETL policy)
+
+- SON Cluster WoW uses Huawei Cell Name prefer (shared default unchanged); trust smoke script + units.
+- RET hologram: measured reach from PM UE distance; analytic pattern detail default on (V1.3).
+- RET live apply: OK/Cancel confirm (V1.4). CM Live Write on Engineering Admin.
+- Module access: role matrix + per-user override on Engineering Admin; NexusCore → Platform Access (portals only).
+- Owner sessions: no password-rotation gate; long-lived cookie + session (extended on use).
+- PM Plus continuous worker: deploy checklist only. Laptop ETL kill switch closed as policy.
 
 ## 2026-10-05 (Dashboard My Day)
 

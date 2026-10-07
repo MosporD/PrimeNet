@@ -7,7 +7,6 @@ Step 1 pipeline: pull latest Nokia raw files.
 
 import os
 import stat
-import zipfile
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 
@@ -27,6 +26,7 @@ from sync_config import (
 from pipeline.paths import iter_pm_raw_paths, raw_path
 from core.raw_pm_files import (
     clear_tabular_files,
+    extract_zip_tabular_members,
     prune_stale_pm_files,
     relocate_legacy_all_folder,
 )
@@ -115,32 +115,8 @@ def _download_latest_per_tech(
 
 
 def _extract_zip_csvs(path: str):
-    if not path or not path.lower().endswith(".zip") or not os.path.isfile(path):
-        return
-    out_dir = os.path.dirname(path)
-    extracted = 0
-    try:
-        with zipfile.ZipFile(path, "r") as zf:
-            members = [m for m in zf.namelist() if not m.endswith("/") and m.lower().endswith(".csv")]
-            if not members:
-                members = [
-                    m for m in zf.namelist()
-                    if not m.endswith("/") and m.lower().endswith((".csv", ".xlsx", ".xls", ".xlsm", ".txt", ".tsv"))
-                ]
-            if not members:
-                print(f"[zip] no extractable tabular members in {path}")
-                return
-            for m in members:
-                target_name = os.path.basename(m)
-                if not target_name:
-                    continue
-                with zf.open(m) as src, open(os.path.join(out_dir, target_name), "wb") as dst:
-                    dst.write(src.read())
-                extracted += 1
-        os.remove(path)
-        print(f"[zip] extracted {extracted} file(s) and removed archive: {path}")
-    except zipfile.BadZipFile:
-        print(f"[zip] skip invalid zip archive: {path}")
+    # Stream extract — Nokia 4G hourly CSVs are ~250MB+ uncompressed.
+    extract_zip_tabular_members(path, log_prefix="zip")
 
 
 def _prepare_raw_folder(folder: str, label: str) -> None:

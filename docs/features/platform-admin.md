@@ -1,6 +1,6 @@
 # Platform Admin
 
-NexusCore identity, portal allow-list, and PrimeNet module-access matrix.
+NexusCore identity and platform (portal) allow-list per user.
 
 | | |
 |---|---|
@@ -11,7 +11,7 @@ NexusCore identity, portal allow-list, and PrimeNet module-access matrix.
 
 ## Purpose
 
-Central place on the portal tower for creating users, roles, portal grants (`allowed_portals`), and the PrimeNet Feature/Module Access matrix (`feature_access`).
+Central place on the portal tower for creating users, roles, and portal grants (`allowed_portals`). PrimeNet **module** access (by role + per-user override) lives on Engineering Admin.
 
 ## Approach
 

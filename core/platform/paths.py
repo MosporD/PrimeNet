@@ -134,3 +134,11 @@ def platform_admin_entry_url() -> str:
     if portals_share_origin():
         return "/admin"
     return f"{nexuscore_public_url()}/admin"
+
+
+def engineering_admin_section_url(section: str) -> str:
+    """Deep link into PrimeNet Engineering Admin (module access, CM live write, …)."""
+    q = f"?section={section}"
+    if portals_share_origin():
+        return f"/admin-panel{q}"
+    return f"{primenet_public_url()}/admin-panel{q}"

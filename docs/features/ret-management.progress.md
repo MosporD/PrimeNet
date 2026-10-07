@@ -3,11 +3,24 @@
 Detailed dated log for this blueprint. Brief: [`ret-management.md`](ret-management.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
-**Parked:** Hologram polish browser smoke; ground reach from performance/TA (needs per-cell PM + RET↔cell map) — geometric h/tan(tilt) clamped 100–1000 m for now.
+**Parked:** None for hologram reach/pattern this slice.
 
-**NEXT:** Rebuild/restart scheduler + primenet so CM catalogs land on shared `/data`; trigger Nokia inventory once; confirm site 54792 in RET search; then hologram smoke + preview→apply.
+**NEXT:** Hard-refresh RET page; smoke OK/Cancel apply (Approver account); hologram measured reach when PM distance columns present.
 
 ---
+
+## 2026-10-07 (Confirm dialog — no typed phrase)
+
+- Done: Live apply uses `window.confirm` OK/Cancel instead of typing `APPLY RET CHANGES` (phrase still sent server-side on OK). Cache-bust `ret_management.js?v=1.29`; module V1.4.
+- CM Live Write gate unchanged: Engineering Admin → **CM Live Write** (Owners always allowed).
+- NEXT: Hard-refresh RET; smoke one Nokia + one Huawei apply with Approver account.
+
+## 2026-10-07 (Hologram measured reach + analytic pattern)
+
+- Done: `site_layout` attaches `measured_reach_m` / `measured_reach_by_tech` from daily PM — UE-distance first (Nokia Avg UE dist / Huawei UCELL), then TA fallback (`L.RA.TA.UE.Index`); median per sector; source `pm_ue_distance` / `pm_ta`; warns when falling back to geometry.
+- Done: `ret_hologram.js` prefers measured reach over `h/tan(tilt)`; tooltip shows source; clamp 100–1000 m kept. Pattern detail default on; side lobes ±75° / ~28%, back ~42%; tighter cos^n contour.
+- Done: cache-bust `ret_hologram.js?v=3.1`, `ret_management.js?v=1.28`; module version V1.3. Tests: `test_site_layout` + SON suite green.
+- NEXT: Browser smoke on Nokia 1003 / Huawei 1020 after deploy; confirm measured reach when PM distance columns present.
 
 ---
 ## 2026-10-05 (CM inventory path — RET picker)

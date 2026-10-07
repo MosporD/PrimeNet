@@ -10,21 +10,16 @@ from modules.son_analytics.area_helpers import get_cell_area_map, get_cell_locat
 from modules.son_analytics.pm_helpers import (
     PM_DATA_SCOPE,
     _cell_daily_kpi_series,
+    prefer_cell_cols_for_vendor,
     resolve_kpi_column,
     vendor_pm_sources,
 )
 
 from . import config as cfg
 
-# SON ML only: Huawei 4G PM must key by Cell Name so neighbor Local_cell_name joins.
-# Shared Health/SON helper still prefers LocalCell Id unless this override is passed.
-_HUAWEI_CELL_COLS = ["Cell Name", "cell_name", "Local_cell_name"]
-
 
 def _prefer_cell_cols(vendor: str) -> list[str] | None:
-    if (vendor or "").strip().lower() == "huawei":
-        return list(_HUAWEI_CELL_COLS)
-    return None
+    return prefer_cell_cols_for_vendor(vendor)
 
 
 def _guess_layer(cell_name: str) -> str:

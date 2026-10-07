@@ -17,7 +17,11 @@ from .area_helpers import (
     primary_area_for_cells,
     recommendation_matches_area,
 )
-from .pm_helpers import PM_DATA_SCOPE, collect_degraded_cells
+from .pm_helpers import (
+    HUAWEI_SON_CELL_COLS,
+    PM_DATA_SCOPE,
+    collect_degraded_cells,
+)
 
 _SON_CACHE: dict[str, dict] = {}
 
@@ -389,6 +393,8 @@ def build_all_recommendations(*, force_refresh: bool = False) -> dict:
         min_history_days=nh_cfg.WOW_MIN_HISTORY_DAYS,
         degradation_pct=nh_cfg.WOW_DEGRADATION_PCT,
         min_absolute_delta=nh_cfg.WOW_MIN_ABSOLUTE_DELTA,
+        # Align Cluster WoW keys with SON ML (Cell Name), not Health LocalCell Id.
+        prefer_cell_cols_by_vendor={"huawei": list(HUAWEI_SON_CELL_COLS)},
     )
     degraded = _attach_location_context(degraded)
     clusters = _build_geo_cluster_recommendations(degraded, scores)

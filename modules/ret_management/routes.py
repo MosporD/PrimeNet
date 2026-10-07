@@ -115,7 +115,7 @@ def cm_write_required(f):
 
 
 def cm_approve_required(f):
-    """Live apply (not preview) — must be flagged can_approve or Owner."""
+    """Live apply (not preview) — must have CM Live Write (can_approve) or Owner."""
     @wraps(f)
     def decorated(*args, **kwargs):
         user = get_current_user()
@@ -123,7 +123,7 @@ def cm_approve_required(f):
             return jsonify({'error': 'Unauthorized'}), 401
         if not _cm_approve_allowed(user):
             return jsonify({
-                'error': 'Approver role required. Ask an Owner to enable Approver on your account in Platform Admin.',
+                'error': 'CM Live Write required. Ask an Owner to enable you under Engineering Admin → CM Live Write.',
             }), 403
         return f(*args, **kwargs)
     return decorated
@@ -315,7 +315,7 @@ def huawei_ret_update():
         confirmation = str(data.get('confirmation') or '').strip()
         if confirmation != RET_CONFIRMATION_PHRASE:
             return jsonify({
-                'error': f'Type {RET_CONFIRMATION_PHRASE!r} to apply these changes to the network.',
+                'error': 'Confirmation required before applying RET changes to the network.',
             }), 400
         preview = require_preview_token(
             preview_id,
@@ -480,7 +480,7 @@ def nokia_retu_update():
         confirmation = str(data.get('confirmation') or '').strip()
         if confirmation != RET_CONFIRMATION_PHRASE:
             return jsonify({
-                'error': f'Type {RET_CONFIRMATION_PHRASE!r} to apply these changes to the network.',
+                'error': 'Confirmation required before applying RET changes to the network.',
             }), 400
         preview = require_preview_token(
             preview_id,

@@ -3,11 +3,18 @@
 Detailed dated log for this blueprint. Brief: [`son-analytics.md`](son-analytics.md).
 Root journal (topics only): [`../../progress.md`](../../progress.md).
 
-**Parked:** SON trust click-through; Huawei 4G identity in shared `pm_helpers` still prefers `LocalCell Id`.
+**Parked:** None for this slice.
 
-**NEXT:** Browser-click `/son-analytics`.
+**NEXT:** Optional live browser thumbs/Open-Case on server after deploy; no 2G/3G/5G ML; no closed-loop.
 
 ---
+
+## 2026-10-07 (SON trust smoke + Huawei Cluster Cell Name)
+
+- Done: `collect_degraded_cells` accepts `prefer_cell_cols_by_vendor`; SON Cluster WoW passes Huawei `HUAWEI_SON_CELL_COLS` so keys match ML (shared `_CELL_COL_CANDIDATES` / NH precalc unchanged).
+- Done: `prefer_cell_cols_for_vendor` + `HUAWEI_SON_CELL_COLS` live on `pm_helpers` (ML features reuse them).
+- Done: unit suite 10/10; `scripts/_smoke_son_trust.py` logic path OK (local PM empty → 0 recs). HTTP path against `:8001` when PrimeNet is up.
+- NEXT: Optional live browser thumbs/Open-Case on server after deploy.
 
 ---
 ## 2026-09-29 (Postgres-only)

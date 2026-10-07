@@ -7,7 +7,6 @@ Step 1 pipeline: pull latest Nokia DAILY raw files.
 
 import os
 import stat
-import zipfile
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 
@@ -18,6 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from sync_config import NOKIA_PM_DAILY_SERVER, NOKIA_GROUPS_DAILY_SERVER
 from pipeline.paths import raw_path
+from core.raw_pm_files import extract_zip_tabular_members
 
 
 ALLOWED_EXTS = (".xlsx", ".xls", ".xlsm", ".csv", ".zip")
@@ -102,32 +102,8 @@ def _download_latest_per_tech(
 
 
 def _extract_zip_csvs(path: str):
-    if not path or not path.lower().endswith(".zip") or not os.path.isfile(path):
-        return
-    out_dir = os.path.dirname(path)
-    extracted = 0
-    try:
-        with zipfile.ZipFile(path, "r") as zf:
-            members = [m for m in zf.namelist() if not m.endswith("/") and m.lower().endswith(".csv")]
-            if not members:
-                members = [
-                    m for m in zf.namelist()
-                    if not m.endswith("/") and m.lower().endswith((".csv", ".xlsx", ".xls", ".xlsm", ".txt", ".tsv"))
-                ]
-            if not members:
-                print(f"[daily/zip] no extractable tabular members in {path}")
-                return
-            for m in members:
-                target_name = os.path.basename(m)
-                if not target_name:
-                    continue
-                with zf.open(m) as src, open(os.path.join(out_dir, target_name), "wb") as dst:
-                    dst.write(src.read())
-                extracted += 1
-        os.remove(path)
-        print(f"[daily/zip] extracted {extracted} file(s) and removed archive: {path}")
-    except zipfile.BadZipFile:
-        print(f"[daily/zip] skip invalid zip archive: {path}")
+    # Stream extract — Nokia 4G daily CSVs are larger than hourly (~100MB+ zip).
+    extract_zip_tabular_members(path, log_prefix="daily/zip")
 
 
 def main() -> int:

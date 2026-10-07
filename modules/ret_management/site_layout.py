@@ -76,6 +76,26 @@ DEFAULT_ANTENNA_HEIGHT_M = 25.0
 # Half-power beamwidth used for hologram lobes (theta and phi).
 DEFAULT_BEAMWIDTH_DEG = 60.0
 
+# Measured ground-reach KPIs (metres). UE distance first; TA index as fallback
+# (Performance catalog: AZ-L.RA.TA.UE.Index → L.RA.TA.UE.Index).
+UE_DISTANCE_ALIASES = (
+    'Avg UE dist RRC con',
+    'Avg UE dist RACH stp',
+    'Average UE Distance (m)',
+    'Avg UE distance',
+    'Expect cell size',
+    'avg_ue_distance',
+    'avg_ue_dist_rrc',
+    'avg_ue_dist_rach',
+    'UCELL.UE.TP.MEAN.DISTANCE(m)',
+)
+TA_REACH_ALIASES = (
+    'L.RA.TA.UE.Index (m)',
+    'AZ-L.RA.TA.UE.Index (Avg)(m)',
+    'L.RA.TA.UE.Index',
+    'AZ-L.RA.TA.UE.Index (Avg)',
+)
+
 
 def _as_float(value: Any) -> float | None:
     text = str(value if value is not None else '').strip()
@@ -475,6 +495,108 @@ def _build_sectors(cells: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], l
     return sectors, warnings
 
 
+def _pm_metres_by_cell(
+    vendor: str,
+    aliases: tuple[str, ...],
+) -> dict[str, float]:
+    """Latest positive metre KPI values keyed by lowercased cell name."""
+    from modules.son_analytics.pm_helpers import (
+        latest_kpi_values,
+        prefer_cell_cols_for_vendor,
+        resolve_kpi_column,
+        vendor_pm_sources,
+    )
+
+    vkey = (vendor or '').strip().lower()
+    prefs = prefer_cell_cols_for_vendor(vkey)
+    merged: dict[str, float] = {}
+    # Prefer 4G; fall back to 3G when 4G has no matching column.
+    for technology in ('4G', '3G'):
+        for vlabel, db_path, table in vendor_pm_sources(vkey, technology, 'daily'):
+            col = resolve_kpi_column(db_path, table, list(aliases))
+            if not col:
+                continue
+            part = latest_kpi_values(
+                db_path,
+                table,
+                col,
+                limit=80_000,
+                prefer_cell_cols=prefs if str(vlabel).strip().lower() == 'huawei' else None,
+            )
+            for name, value in part.items():
+                key = str(name or '').strip().lower()
+                if not key or value is None:
+                    continue
+                try:
+                    dist = float(value)
+                except (TypeError, ValueError):
+                    continue
+                if dist > 0:
+                    merged.setdefault(key, dist)
+        if merged:
+            break
+    return merged
+
+
+def _ue_distance_by_cell(vendor: str) -> dict[str, float]:
+    """Latest UE distance (m); kept for tests / callers that only need the map."""
+    distances, _source = _measured_reach_by_cell(vendor)
+    return distances
+
+
+def _measured_reach_by_cell(vendor: str) -> tuple[dict[str, float], str | None]:
+    """UE-distance first, then Performance TA index (m). Returns (map, source)."""
+    distances = _pm_metres_by_cell(vendor, UE_DISTANCE_ALIASES)
+    if distances:
+        return distances, 'pm_ue_distance'
+    ta = _pm_metres_by_cell(vendor, TA_REACH_ALIASES)
+    if ta:
+        return ta, 'pm_ta'
+    return {}, None
+
+
+def _attach_measured_reach(
+    sectors: list[dict[str, Any]],
+    *,
+    vendor: str,
+) -> None:
+    """Attach sector measured_reach_m from PM UE-distance or TA KPIs when available."""
+    try:
+        distances, source = _measured_reach_by_cell(vendor)
+    except Exception:  # noqa: BLE001 — hologram must still draw without PM
+        logger.exception('RET measured reach PM lookup failed')
+        distances, source = {}, None
+    if not distances:
+        for sector in sectors:
+            sector['measured_reach_m'] = None
+            sector['measured_reach_source'] = None
+            sector['measured_reach_samples'] = 0
+        return
+
+    for sector in sectors:
+        samples: list[float] = []
+        by_tech: dict[str, list[float]] = {}
+        for cell in sector.get('cells') or []:
+            name = str(cell.get('cell_name') or '').strip().lower()
+            if not name:
+                continue
+            dist = distances.get(name)
+            if dist is None:
+                continue
+            samples.append(dist)
+            tech = str(cell.get('technology') or '').strip() or 'Unknown'
+            by_tech.setdefault(tech, []).append(dist)
+        median = _median(samples)
+        sector['measured_reach_m'] = median
+        sector['measured_reach_samples'] = len(samples)
+        sector['measured_reach_source'] = source if median is not None else None
+        sector['measured_reach_by_tech'] = {
+            tech: _median(vals)
+            for tech, vals in by_tech.items()
+            if _median(vals) is not None
+        }
+
+
 def _fill_missing_azimuths(sectors: list[dict[str, Any]]) -> None:
     """Place azimuth-less sectors on an even split so the top view stays readable."""
     missing = [sector for sector in sectors if sector['azimuth'] is None]
@@ -537,6 +659,17 @@ def fetch_site_layout(
     sectors, sector_warnings = _build_sectors(cells)
     warnings.extend(sector_warnings)
     _fill_missing_azimuths(sectors)
+    _attach_measured_reach(sectors, vendor=vendor)
+    measured_n = sum(1 for s in sectors if s.get('measured_reach_m') is not None)
+    if cells and measured_n == 0:
+        warnings.append(
+            'No PM UE-distance samples matched this site — hologram reach uses '
+            'geometric h/tan(tilt) (clamped 100–1000 m).'
+        )
+    elif measured_n:
+        warnings.append(
+            f'Measured ground reach from PM UE distance on {measured_n}/{len(sectors)} sector(s).'
+        )
 
     if not cells:
         warnings.append(

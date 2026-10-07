@@ -6,6 +6,7 @@ import pytest
 
 from modules.ret_management import site_layout
 from modules.ret_management.site_layout import (
+    _attach_measured_reach,
     _build_sectors,
     _fill_missing_azimuths,
     default_beamwidth,
@@ -178,14 +179,56 @@ def metadata_db(tmp_path, monkeypatch):
     conn.close()
 
 
-def test_fetch_site_layout_reads_three_sectors(metadata_db):
+def test_fetch_site_layout_reads_three_sectors(metadata_db, monkeypatch):
+    monkeypatch.setattr(
+        site_layout, '_measured_reach_by_cell', lambda _vendor: ({}, None),
+    )
     layout = fetch_site_layout('nokia', site_id='51021', metadata_site_id='1021')
     assert layout['site']['site_name'] == 'AMMAN_TEST'
     assert layout['site']['antenna_height'] == 25.0
     assert layout['sector_count'] == 3
     assert [s['azimuth'] for s in layout['sectors']] == [30.0, 150.0, 270.0]
     assert [s['label'] for s in layout['sectors']] == ['1 (A)', '2 (B)', '3 (C)']
-    assert layout['warnings'] == []
+    assert any('geometric h/tan(tilt)' in w for w in layout['warnings'])
+    assert all(s.get('measured_reach_m') is None for s in layout['sectors'])
+
+
+def test_attach_measured_reach_medians_per_sector(monkeypatch):
+    sectors, _ = _build_sectors([
+        _cell('1', 30.0, name='AMMAN_TEST_A1'),
+        _cell('1', 32.0, tech='2G', band='GSM 900', name='AMMAN_TEST_G1'),
+        _cell('2', 150.0, name='AMMAN_TEST_B1'),
+    ])
+    monkeypatch.setattr(
+        site_layout,
+        '_measured_reach_by_cell',
+        lambda _vendor: (
+            {
+                'amman_test_a1': 400.0,
+                'amman_test_g1': 600.0,
+                'amman_test_b1': 250.0,
+            },
+            'pm_ue_distance',
+        ),
+    )
+    _attach_measured_reach(sectors, vendor='nokia')
+    by_key = {s['key']: s for s in sectors}
+    assert by_key['1']['measured_reach_m'] == 500.0
+    assert by_key['1']['measured_reach_source'] == 'pm_ue_distance'
+    assert by_key['1']['measured_reach_samples'] == 2
+    assert by_key['2']['measured_reach_m'] == 250.0
+
+
+def test_attach_measured_reach_accepts_ta_source(monkeypatch):
+    sectors, _ = _build_sectors([_cell('1', 30.0, name='AMMAN_TEST_A1')])
+    monkeypatch.setattr(
+        site_layout,
+        '_measured_reach_by_cell',
+        lambda _vendor: ({'amman_test_a1': 720.0}, 'pm_ta'),
+    )
+    _attach_measured_reach(sectors, vendor='nokia')
+    assert sectors[0]['measured_reach_m'] == 720.0
+    assert sectors[0]['measured_reach_source'] == 'pm_ta'
 
 
 def test_fetch_site_layout_warns_for_unknown_site(metadata_db):

@@ -224,6 +224,46 @@ def _scheduler_jobs_snapshot() -> list[dict]:
     return out
 
 
+# Progress card key → last_ok sync_type + APScheduler job id(s) for next-run.
+_PROGRESS_TIMING = {
+    'hourly_full': ('db_loader', ('hourly_ingest_sync',)),
+    'daily_full': ('daily_full_sync', ('daily_ingest_sync',)),
+    'neighbor_sync': ('neighbor_sync', ('neighbor_ingest_sync',)),
+    'metadata': ('metadata', ('metadata_pull_daily',)),
+    'nokia_pm': ('db_loader', ('hourly_ingest_sync',)),
+    'huawei_pm': ('db_loader', ('hourly_ingest_sync',)),
+    'cells_hourly': ('db_loader', ('hourly_ingest_sync',)),
+    'cells_daily': ('daily_full_sync', ('daily_ingest_sync',)),
+    'groups_hourly': ('db_loader', ('hourly_ingest_sync',)),
+    'groups_daily': ('daily_full_sync', ('daily_ingest_sync',)),
+}
+
+
+def _progress_timing(last_ok: dict, jobs: list[dict]) -> dict[str, dict]:
+    by_id = {
+        str(j.get('id') or ''): j
+        for j in (jobs or [])
+        if isinstance(j, dict) and j.get('id') and not j.get('error')
+    }
+    out: dict[str, dict] = {}
+    for key, (ok_key, job_ids) in _PROGRESS_TIMING.items():
+        row = last_ok.get(ok_key) if isinstance(last_ok, dict) else None
+        next_run = None
+        for jid in job_ids:
+            job = by_id.get(jid)
+            if job and job.get('next_run_time'):
+                next_run = job['next_run_time']
+                break
+        out[key] = {
+            'last_ok_key': ok_key,
+            'last_ok_at': (row or {}).get('started_at') if row else None,
+            'last_ok_message': (row or {}).get('message') if row else None,
+            'next_run_time': next_run,
+            'job_ids': list(job_ids),
+        }
+    return out
+
+
 def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
     from core.etl_gate import etl_disabled_reason, etl_enabled
     from core.load_monitor import resource_snapshot
@@ -246,7 +286,7 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
         'missing_groups': [g for g in ALL_GROUPS if g not in groups] if url else list(ALL_GROUPS),
         'schemas_by_group': {
             g: list(DOMAIN_GROUPS.get(g, ()))
-            for g in groups
+            for g in ALL_GROUPS
         },
         'metadata_pm_backend_mismatch': (
             ('metadata' in groups) != ('pm' in groups)
@@ -364,6 +404,7 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
             ),
         })
 
+    jobs_snap = _scheduler_jobs_snapshot()
     return {
         'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'etl': {
@@ -378,9 +419,10 @@ def build_etl_diagnosis(*, history_limit: int = 80) -> dict:
             'in_process': sched is not None,
             'pipeline_lock_held_here': bool(pipeline_cycle_lock_held()),
             'neighbor_lock_held_here': bool(neighbor_cycle_lock_held()),
-            'jobs': _scheduler_jobs_snapshot(),
+            'jobs': jobs_snap,
         },
         'progress': progress,
+        'progress_timing': _progress_timing(last_ok, jobs_snap),
         'domains': domains,
         'stores': stores,
         'pipeline_health': stuck,

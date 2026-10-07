@@ -182,14 +182,25 @@ def authenticate(db_path: str, username: str, password: str) -> dict | None:
 def create_session(db_path: str, user_id: int) -> str:
     ensure_schema(db_path)
     token = secrets.token_urlsafe(32)
-    try:
-        lifetime_hours = int(os.getenv("SESSION_LIFETIME_HOURS", "2"))
-    except (TypeError, ValueError):
-        lifetime_hours = 2
-    lifetime_hours = max(1, min(lifetime_hours, 24 * 30))
-    expires_at = datetime.now() + timedelta(hours=lifetime_hours)
     conn = _connect(db_path)
     try:
+        role_row = conn.execute(
+            "SELECT role FROM users WHERE id = ?", (user_id,)
+        ).fetchone()
+        role = str(
+            (role_row["role"] if role_row and isinstance(role_row, dict) else (role_row[0] if role_row else ""))
+            or ""
+        ).strip().lower()
+        if role == "admin":
+            # Owners: persistent session (matches database_enhanced.create_session).
+            expires_at = datetime.now() + timedelta(days=365 * 100)
+        else:
+            try:
+                lifetime_hours = int(os.getenv("SESSION_LIFETIME_HOURS", "2"))
+            except (TypeError, ValueError):
+                lifetime_hours = 2
+            lifetime_hours = max(1, min(lifetime_hours, 24 * 30))
+            expires_at = datetime.now() + timedelta(hours=lifetime_hours)
         conn.execute(
             "INSERT INTO sessions (user_id, session_token, expires_at) VALUES (?, ?, ?)",
             (user_id, token, expires_at.isoformat(timespec="seconds")),
@@ -214,7 +225,19 @@ def get_user_by_session(db_path: str, session_token: str | None) -> dict | None:
             """,
             (session_token, datetime.now().isoformat(timespec="seconds")),
         ).fetchone()
-        return dict(row) if row else None
+        if not row:
+            return None
+        user = dict(row)
+        if str(user.get("role") or "").strip().lower() == "admin":
+            conn.execute(
+                "UPDATE sessions SET expires_at = ? WHERE session_token = ?",
+                (
+                    (datetime.now() + timedelta(days=365 * 100)).isoformat(timespec="seconds"),
+                    session_token,
+                ),
+            )
+            conn.commit()
+        return user
     finally:
         conn.close()
 

@@ -28,7 +28,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "xml-parser": "V1.1",
     "excel-generator": "V1.2",
     "ne-comparison": "V1.0",
-    "ret-management": "V1.2",
+    "ret-management": "V1.4",
     "configuration-dashboard": "V1.1",
     "rru-inventory": "V1.2",
     "config-task-scheduler": "V1.0",
@@ -51,7 +51,7 @@ MODULE_VERSIONS: dict[str, str] = {
     "alarm-impact": "V1.0",
     "group-health": "V1.0",
     "irat-border": "V1.0",
-    "admin-panel": "V1.2",
+    "admin-panel": "V1.5",
     "profile": "V1.0",
     "documentation": "V1.0",
 }

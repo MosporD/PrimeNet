@@ -116,7 +116,7 @@ def _teams_card(kind: str, body: dict[str, Any], approvers: list[dict[str, Any]]
     if approver_lines:
         text_bits.append("**Approvers:** " + "; ".join(approver_lines))
     else:
-        text_bits.append("_No users flagged can_approve yet — assign Approver in Platform Admin._")
+        text_bits.append("_No users flagged for CM Live Write yet — assign in Engineering Admin → CM Live Write._")
 
     return {
         "@type": "MessageCard",

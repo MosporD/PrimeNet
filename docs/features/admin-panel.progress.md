@@ -3,7 +3,28 @@
 Detailed dated log for this blueprint. Brief: [admin-panel.md](admin-panel.md).
 Root journal (topics only): [../../progress.md](../../progress.md).
 
+**NEXT:** Hard-refresh Eng Admin; smoke ETL Diagnosis (KPI collapse, store/domain selects, progress last/next) + Pipeline Scheduler tab.
+
 ---
+
+## 2026-10-07 (ETL Diagnosis UI redesign)
+
+- Done: Store row counts → selectable store + full table list; domains → FE select to focus integration (schemas/stores); Manual ops removed (use Data Sync); KPIs collapsible with one-line summary; progress cards wider + last/next under bar.
+- Done: New **Pipeline Scheduler** section — PrimeNet APScheduler diagnostics (not CM Extractor UI; notes `cm_extractor_scheduled_jobs` wake). API adds `progress_timing`.
+- NEXT: Hard-refresh `/admin-panel?section=etl-diagnosis` and `?section=pipeline-scheduler`.
+
+## 2026-10-07 (Module access — Engineering Admin)
+
+- Done: Moved PrimeNet module matrix off NexusCore Platform Admin → Engineering Admin **Module Access (by role)** + **(by user)**. Role rules in `feature_access`; per-user overrides in `user_feature_access` (override wins).
+- Done: NexusCore **Platform Access** tab (portal catalog + per-user Portals in User Administration). Old `/api/platform-admin/feature-access` → 410 with redirect.
+- NEXT: Hard-refresh both admins; verify a deny override hides a module for one user while role still allows others.
+
+## 2026-10-07 (CM Live Write section)
+
+- Done: `?section=cm-live-write` — Owner toggles `users.can_approve` via `GET/PUT /api/admin/cm-live-write/users`. Removed Approver column from NexusCore Platform Admin.
+- Done: `update_user_can_approve` writes Python bool (fixes PG `boolean` vs smallint error).
+- NEXT: Smoke toggle + RET apply for a non-Owner user.
+
 ## 2026-10-04 (Section selector)
 
 - Done: Eng Admin section chrome — labeled **Section** `<select>` plus Soft Steel segmented tabs; URL `?section=` kept in sync.

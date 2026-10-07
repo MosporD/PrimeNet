@@ -29,7 +29,7 @@ Dated work log: [`performance-explorer-plus.progress.md`](performance-explorer-p
 
 ## Plans
 
-Tune live SFTP workers against &lt;15 min lag SLO on production hosts. Enable Huawei adapter when SFTP paths exist.
+Deploy continuous ingest via checklist in [`performance-explorer-plus.progress.md`](performance-explorer-plus.progress.md) (separate CLI process). Then tune SFTP workers against &lt;15 min lag SLO. Enable Huawei adapter when SFTP paths exist.
 
 ## Watch-outs
 
