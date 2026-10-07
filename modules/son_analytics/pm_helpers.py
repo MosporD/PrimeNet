@@ -7,7 +7,7 @@ import re
 import sqlite3
 import time
 
-from db.runtime import list_tables, open_db, store_available
+from db.runtime import _is_pg_conn, list_tables, open_db, store_available
 from sync_config import (
     HUAWEI_PM_DAILY_DB,
     HUAWEI_PM_DB,
@@ -40,14 +40,19 @@ def prefer_cell_cols_for_vendor(vendor: str) -> list[str] | None:
     if (vendor or "").strip().lower() == "huawei":
         return list(HUAWEI_SON_CELL_COLS)
     return None
+# Loader-normalized ISO columns first: raw vendor dates (Huawei DD/MM/YYYY,
+# Nokia MM.DD.YYYY) do not sort chronologically as text.
 _TS_COL_CANDIDATES = [
+    "timestamp",
+    "report_date",
     "PERIOD_START_TIME",
     "Date",
     "date",
-    "timestamp",
-    "Timestamp",
     "period_start_time",
 ]
+
+# Columns written by the PM loader as ISO text (YYYY-MM-DD[ HH:MM:SS]).
+_ISO_TS_COLS = {"timestamp", "report_date"}
 
 _SERIES_CACHE: dict[str, tuple[float, float, dict]] = {}
 _BENCHMARK_CACHE: dict[str, tuple[float, float, list]] = {}
@@ -83,6 +88,9 @@ def _cache_set(store: dict, key: str, db_path: str, payload) -> None:
 
 def _rowid_scan_cutoff(conn: sqlite3.Connection, table_name: str, lookback_days: int) -> int | None:
     """Limit PM scans to recent rows (append-only DBs). Returns None to scan all rows."""
+    if _is_pg_conn(conn):
+        # Postgres has no rowid; a failed probe would also abort the transaction.
+        return None
     try:
         row = conn.execute(f'SELECT MAX(rowid) FROM "{table_name}"').fetchone()
     except sqlite3.Error:
@@ -95,6 +103,24 @@ def _rowid_scan_cutoff(conn: sqlite3.Connection, table_name: str, lookback_days:
     floor = 1_500_000 if hourly else 250_000
     window = min(int(max_rowid), max(floor, (lookback_days + 5) * per_day))
     return max(1, int(max_rowid) - window)
+
+
+def _recent_day_cutoff(conn, table_name: str, ts_col: str, lookback_days: int) -> str | None:
+    """Earliest ISO day to read so a scan covers the latest day plus ``lookback_days``."""
+    if str(ts_col).strip().lower() not in _ISO_TS_COLS:
+        return None
+    from datetime import date, timedelta
+
+    try:
+        row = conn.execute(f'SELECT MAX("{ts_col}") FROM "{table_name}"').fetchone()
+    except sqlite3.Error:
+        return None
+    latest = row[0] if row else None
+    try:
+        latest_day = date.fromisoformat(str(latest or "")[:10])
+    except ValueError:
+        return None
+    return (latest_day - timedelta(days=max(0, int(lookback_days)))).isoformat()
 
 
 def _resolve_pm_table_axes(
@@ -391,7 +417,7 @@ def parse_pm_timestamp(raw) -> str | None:
     if text.lower().startswith("total"):
         return None
     # Huawei PM uses DD/MM/YYYY; try day-first before US month-first.
-    for fmt in ("%d/%m/%Y", "%d.%m.%Y", "%Y-%m-%d", "%m/%d/%Y", "%m.%d.%Y"):
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d.%m.%Y", "%m/%d/%Y", "%m.%d.%Y"):
         try:
             return datetime.strptime(text[:10], fmt).strftime("%Y-%m-%d")
         except ValueError:
@@ -434,6 +460,10 @@ def _cell_daily_kpi_series(
         if rowid_cutoff is not None:
             where_parts.append("rowid >= ?")
             params.append(rowid_cutoff)
+        day_cutoff = _recent_day_cutoff(conn, table_name, ts_col, lookback_days)
+        if day_cutoff is not None:
+            where_parts.append(f'"{ts_col}" >= ?')
+            params.append(day_cutoff)
         sql = f"""
             SELECT "{cell_col}" AS cell_name, "{ts_col}" AS ts_raw, "{kpi_col}" AS kpi_value
             FROM "{table_name}"
@@ -797,6 +827,10 @@ def _scan_all_kpi_daily_series(
         if rowid_cutoff is not None:
             where_parts.append("rowid >= ?")
             params.append(rowid_cutoff)
+        day_cutoff = _recent_day_cutoff(conn, table_name, ts_col, lookback_days)
+        if day_cutoff is not None:
+            where_parts.append(f'"{ts_col}" >= ?')
+            params.append(day_cutoff)
         where_sql = f" WHERE {' AND '.join(where_parts)}" if where_parts else ""
         sql = f"""
             SELECT "{cell_col}" AS cell_name, "{ts_col}" AS ts_raw, {col_sql}
@@ -820,11 +854,11 @@ def _scan_all_kpi_daily_series(
                 cell_seen = seen[kpi_col].setdefault(cell, set())
                 if day in cell_seen:
                     continue
-                cell_seen.add(day)
                 bucket = series[kpi_col].setdefault(cell, [])
-                bucket.append((day, val))
                 if len(bucket) >= max_points:
                     continue
+                cell_seen.add(day)
+                bucket.append((day, val))
         return series
     except sqlite3.Error:
         return empty

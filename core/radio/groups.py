@@ -121,10 +121,14 @@ def _scan_table(conn: sqlite3.Connection, table: str, vendor: str, technology: s
     ident_name = '"' + name_col.replace('"', '""') + '"'
     ident_kpi = '"' + kpi_col.replace('"', '""') + '"'
     ident_table = '"' + table.replace('"', '""') + '"'
+    from db.runtime import _is_pg_conn
+
+    # Newest physical rows first: rowid on SQLite, ctid on Postgres (no rowid there).
+    newest = "ctid" if _is_pg_conn(conn) else "rowid"
     sql = (
         f"SELECT {ident_name} AS grp, {ident_kpi} AS kpi_val "
         f"FROM {ident_table} WHERE {ident_kpi} IS NOT NULL "
-        f"ORDER BY rowid DESC LIMIT {max(200, limit * 20)}"
+        f"ORDER BY {newest} DESC LIMIT {max(200, limit * 20)}"
     )
     try:
         raw = conn.execute(sql).fetchall()

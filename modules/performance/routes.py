@@ -1745,6 +1745,11 @@ def _pragma_table_kpi_columns(conn: sqlite3.Connection, table: str) -> list[str]
         return []
 
 
+def _row_values(row) -> list:
+    """Row values in column order (Postgres ``PgRow`` is a dict; iterating it yields names)."""
+    return list(row.values()) if isinstance(row, dict) else list(row)
+
+
 def _nonnull_columns_via_aggregate(conn: sqlite3.Connection, table: str, cols: list[str]) -> set[str] | None:
     """
     Columns with at least one non-NULL (single full-table scan).
@@ -1753,9 +1758,11 @@ def _nonnull_columns_via_aggregate(conn: sqlite3.Connection, table: str, cols: l
     if not cols:
         return set()
     t = _sqlite_ident(table)
+    # Alias each count: Postgres rows are dicts keyed by column name, so unnamed
+    # SUM(...) columns would collapse into a single "sum" key.
     counts_sql = ', '.join(
-        f'SUM(CASE WHEN {_sqlite_ident(c)} IS NOT NULL THEN 1 ELSE 0 END)'
-        for c in cols
+        f'SUM(CASE WHEN {_sqlite_ident(c)} IS NOT NULL THEN 1 ELSE 0 END) AS "n{i}"'
+        for i, c in enumerate(cols)
     )
     try:
         row = conn.execute(f'SELECT {counts_sql} FROM {t}').fetchone()
@@ -1763,7 +1770,7 @@ def _nonnull_columns_via_aggregate(conn: sqlite3.Connection, table: str, cols: l
         return None
     if not row:
         return set()
-    return {c for c, cnt in zip(cols, row) if cnt and cnt > 0}
+    return {c for c, cnt in zip(cols, _row_values(row)) if cnt and cnt > 0}
 
 
 def _nonnull_columns_via_sample(
@@ -1791,7 +1798,7 @@ def _nonnull_columns_via_sample(
         except sqlite3.OperationalError:
             continue
         for row in cur:
-            for c, v in zip(part, row):
+            for c, v in zip(part, _row_values(row)):
                 if v is not None and str(v).strip() != '':
                     good.add(c)
     return good
